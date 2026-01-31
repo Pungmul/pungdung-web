@@ -46,3 +46,5 @@ export interface Address {
   detail: string;
   buildingName: string;
 }
+
+export type ViewType = "webview" | "mobile" | "desktop";
