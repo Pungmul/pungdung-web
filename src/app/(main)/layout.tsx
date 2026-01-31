@@ -10,6 +10,7 @@ import { Suspense } from "react";
 import ReactQueryProviders from "@/shared/lib/useReactQuery";
 import { SocketProvider } from "@/core";
 import { ChatNotificationSocket } from "@/features/chat";
+import { getInitialViewFromCookie } from "@pThunder/shared/lib/getInitialViewFromCookie";
 
 // export const dynamic = "force-static";
 
@@ -18,6 +19,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialView = await getInitialViewFromCookie();
+
   return (
     <ReactQueryProviders>
       <SocketProvider>
@@ -31,7 +34,7 @@ export default async function RootLayout({
             <HeaderProgressBar />
           </Suspense>
           <div className="flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-app">
-            <BottomTabs />
+            <BottomTabs initialView={initialView} />
             {children}
           </div>
         </div>

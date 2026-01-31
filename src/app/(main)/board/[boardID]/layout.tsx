@@ -1,9 +1,12 @@
 import { getQueryClient } from "@pThunder/core";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { getInitialViewFromCookie } from "@pThunder/shared/lib/getInitialViewFromCookie";
 
 import { loadBoardDetails, loadBoardInfoList } from "@/features/board/api";
 import { BoardListNav, BoardHeader } from "@/features/board";
 import PostingButton from "@pThunder/features/board/components/element/PostingButton";
+
+export const revalidate = 1800; // 30분(초 단위)
 
 export async function generateMetadata({
   params,
@@ -20,8 +23,6 @@ export async function generateMetadata({
   };
 }
 
-export const dynamic = "force-static";
-
 export default async function BoardPageLayout({
   children,
   params,
@@ -32,12 +33,14 @@ export default async function BoardPageLayout({
   }>;
 }) {
   const { boardID } = await params;
+  const initialView = await getInitialViewFromCookie();
   const queryClient = getQueryClient();
+  const boardList = await loadBoardInfoList();
+  const initialBoardInfo =
+    boardList.find((board) => board.id === Number(boardID) || board.id === boardID) ??
+    null;
 
-  queryClient.prefetchQuery({
-    queryKey: ["boardList"],
-    queryFn: () => loadBoardInfoList(),
-  });
+  queryClient.setQueryData(["boardList"], boardList);
   queryClient.prefetchQuery({
     queryKey: ["board", boardID],
     queryFn: () => loadBoardDetails(Number(boardID)),
@@ -48,7 +51,18 @@ export default async function BoardPageLayout({
   return (
     <HydrationBoundary state={dehydratedState}>
       <div className="relative flex flex-col flex-grow">
-        <BoardHeader boardID={boardID} />
+        <BoardHeader
+          boardID={boardID}
+          initialView={initialView === "desktop" ? "desktop" : "mobile"}
+          {...(initialBoardInfo
+            ? {
+                initialBoardInfo: {
+                  name: initialBoardInfo.name,
+                  description: initialBoardInfo.description,
+                },
+              }
+            : {})}
+        />
         <PostingButton boardID={Number(boardID)} />
         <div className="flex flex-col w-full flex-grow relative">
           <div className="flex flex-row justify-center w-full h-full">

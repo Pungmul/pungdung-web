@@ -12,9 +12,18 @@ import { useBoardList } from "../../queries";
 
 interface BoardHeaderProps {
   boardID: string;
+  initialView?: "mobile" | "desktop";
+  initialBoardInfo?: {
+    name: string;
+    description: string;
+  };
 }
 
-export default function BoardHeader({ boardID }: BoardHeaderProps) {
+export default function BoardHeader({
+  boardID,
+  initialView,
+  initialBoardInfo,
+}: BoardHeaderProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -44,13 +53,18 @@ export default function BoardHeader({ boardID }: BoardHeaderProps) {
         description: "인기 게시글 목록 입니다.",
       };
 
+    if (initialBoardInfo) {
+      return initialBoardInfo;
+    }
+
     return boardList?.find(
       (board) => board.id === Number(boardID) || boardID === board.id
     );
-  }, [boardList, boardID]);
+  }, [boardList, boardID, initialBoardInfo]);
 
   return (
     <Responsive
+      {...(initialView ? { initialView } : {})}
       mobile={
         <nav className="flex flex-col sticky top-0 z-20 bg-background">
           <Header
@@ -96,6 +110,9 @@ export default function BoardHeader({ boardID }: BoardHeaderProps) {
                     />
                     <ArrowRightIcon
                       className="w-[24px] h-[24px] cursor-pointer text-grey-400"
+                      onClick={() => {
+                        router.push(`/board/${Number(boardID)}/search?keyword=${searchValue}`);
+                      }}
                       width={24}
                       height={24}
                     />
@@ -140,6 +157,9 @@ export default function BoardHeader({ boardID }: BoardHeaderProps) {
                 />
                 <ArrowRightIcon
                   className="w-[24px] h-[24px] cursor-pointer text-grey-400"
+                  onClick={() => {
+                    router.push(`/board/${Number(boardID)}/search?keyword=${searchValue}`);
+                  }}
                   width={24}
                   height={24}
                 />

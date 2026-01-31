@@ -15,7 +15,7 @@ import {
   NotificationIcon,
 } from "@/shared/components/Icons";
 import { AnimatePresence, motion } from "framer-motion";
-import { Spinner } from "@pThunder/shared";
+import { Spinner, ViewType } from "@pThunder/shared";
 import { Header } from "@/shared/components/layout/Header";
 import { NotificationList } from "@pThunder/features/notification";
 import ProfileCircle from "@pThunder/features/my-page/components/widget/ProfileCircle";
@@ -24,8 +24,13 @@ import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { useGetMyPageInfo } from "@pThunder/features/my-page";
 import ChatMenuButton from "./ChatMenuButton/ChatMenuButton";
 
-export default function BottomTabs() {
+interface BottomTabsProps {
+  initialView?: ViewType;
+}
+
+export default function BottomTabs({ initialView }: BottomTabsProps) {
   const view = useView();
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const tabsRef = useRef<HTMLDivElement>(null);
   const notificationOverlayRef = useRef<HTMLDivElement>(null);
@@ -35,6 +40,10 @@ export default function BottomTabs() {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const { data: myPageInfo, isLoading } = useGetMyPageInfo();
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
     if (notificationListRef.current && isNotificationOpen) {
@@ -132,13 +141,14 @@ export default function BottomTabs() {
   }, []);
 
   const pathname = usePathname(); // 현재 경로 가져오기
+  const effectiveView = isHydrated ? view : initialView ?? view;
 
-  if (view === "webview") {
+  if (effectiveView === "webview") {
     return null;
   }
 
   if (
-    view === "mobile" &&
+    effectiveView === "mobile" &&
     pathname !== "/home" &&
     pathname !== "/board/main" &&
     pathname !== "/chats/r/inbox" &&
@@ -150,9 +160,8 @@ export default function BottomTabs() {
   return (
     <>
       <nav
-        className={`w-full py-[8px] bg-background flex-shrink-0 border-t sticky z-30 md:border-r md:border-t-0 md:w-auto md:h-app px-[32px] ${
-          view === "desktop" ? " top-0" : " bottom-0"
-        }`}
+        className={`w-full py-[8px] bg-background flex-shrink-0 border-t sticky z-30 md:border-r md:border-t-0 md:w-auto md:h-app px-[32px] ${effectiveView === "desktop" ? " top-0" : " bottom-0"
+          }`}
         ref={tabsRef}
       >
         <div>
