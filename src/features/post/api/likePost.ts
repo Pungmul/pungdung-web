@@ -1,7 +1,7 @@
-import { PostLikeResponse } from '../types';
+import { PostLikeResponse } from "../types";
 
 export const likePost = async (postId: number): Promise<PostLikeResponse> => {
-  const response = await fetch(`post/${postId}/like`, {
+  const response = await fetch(`/api/posts/${postId}/like`, {
     method: "POST",
     credentials: "include",
   });
@@ -18,4 +18,3 @@ export const likePost = async (postId: number): Promise<PostLikeResponse> => {
 
   return data;
 };
-
