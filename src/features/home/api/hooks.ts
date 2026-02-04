@@ -8,6 +8,7 @@ export function useNearLightningQuery() {
     queryKey: ["nearLightning"],
     queryFn: loadNearLightning,
     retry: false,
+    refetchOnMount: "always",
   });
 }
 
@@ -15,6 +16,7 @@ export function useNotReadMessageCount() {
   return useQuery({
     queryKey: ["notificationCount"],
     queryFn: loadNotReadMessageCnt,
+    refetchOnMount: "always",
   });
 }
 
@@ -22,6 +24,7 @@ export function useNotReadMessageList() {
   return useSuspenseQuery({
     queryKey: ["notificationList"],
     queryFn: loadNotReadMessage,
+    refetchOnMount: "always",
   });
 }
 
@@ -33,4 +36,4 @@ export function prefetchNotReadMessageList() {
   });
 
   return queryClient;
-} 
+}

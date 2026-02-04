@@ -79,15 +79,15 @@ export default function NearLightning() {
         <>
           {nearLightning && nearLightning.length > 0
             ? nearLightning.map((nearLightning) => (
-                <SwiperSlide
-                  key={
-                    "near-lightning-card-" + nearLightning.lightningMeeting.id
-                  }
-                  className="!w-[280px] !aspect-[16/9]"
-                >
-                  <NearLightningCard {...nearLightning} />
-                </SwiperSlide>
-              ))
+              <SwiperSlide
+                key={
+                  "near-lightning-card-" + nearLightning.lightningMeeting.id
+                }
+                className="!w-[280px] !aspect-[16/9]"
+              >
+                <NearLightningCard {...nearLightning} />
+              </SwiperSlide>
+            ))
             : null}
           <SwiperSlide
             key={"add-card-slide"}
@@ -95,9 +95,9 @@ export default function NearLightning() {
             onClick={() => {
               router.push(
                 "/lightning" +
-                  (nearLightning && nearLightning.length > 0
-                    ? ""
-                    : "?create=true")
+                (nearLightning && nearLightning.length > 0
+                  ? ""
+                  : "/build")
               );
             }}
           >
