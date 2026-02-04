@@ -27,23 +27,15 @@ const ChatRoomBox = ({ room }: { room: ChatRoomDto }) => {
       href={`/chats/r/${room.chatRoomUUID}`}
     >
       <div
-        className="flex-shrink-0 w-[64px] 
-        aspect-square 
-        lg:w-[48px] 
-        lg:h-[48px] 
-        lg:min-w-[48px]
-        rounded-[4px]
-        bg-grey-200"
-        // md:min-w-[96px]
-        // md:w-full
+        className="relative flex-shrink-0 w-[64px] aspect-square lg:w-[48px] lg:h-[48px] lg:min-w-[48px] rounded-[4px] bg-grey-200 overflow-hidden"
       >
         {/* 여기 이미지 삽입 */}
         {room.profileImageUrl && (
           <Image
             src={room.profileImageUrl}
-            alt=""
+            alt={`${room.roomName}의 프로필 이미지`}
             fill
-            className="object-cover rounded-[4px]"
+            objectFit="cover"
           />
         )}
       </div>
