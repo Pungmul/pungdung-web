@@ -7,24 +7,10 @@ import {
 import { notificationPermissionStore } from "../store";
 import { supportsPushNotification } from "../lib/guards";
 
-export async function requestFCMToken(): Promise<string | null> {
-  if (!supportsPushNotification()) return null;
-
-  // 알림 권한 요청
-  const permission = await Notification.requestPermission();
-
-  // 알림 권한 상태 저장
-  notificationPermissionStore.getState().setPermission(permission);
-
-  if (permission !== "granted") {
-    console.log("알림 권한 거부");
-    return null;
-  }
-
+async function fetchFCMTokenWithRegistration(): Promise<string | null> {
   const messaging = getFirebaseMessaging();
   if (!messaging) return null;
 
-  // FCM용 SW 등록만 사용 (다른 SW와 구분). 없으면 등록
   await navigator.serviceWorker.ready;
   let registration = await getFCMServiceWorkerRegistration();
   if (!registration) {
@@ -38,6 +24,30 @@ export async function requestFCMToken(): Promise<string | null> {
     serviceWorkerRegistration: registration,
   });
 
-  // FCM 토큰 반환
   return token ?? null;
+}
+
+/** 이미 알림 권한이 granted일 때만 토큰을 가져옵니다 (앱 시작 시 등록용). */
+export async function getFCMTokenWhenGranted(): Promise<string | null> {
+  if (!supportsPushNotification()) return null;
+  if (Notification.permission !== "granted") return null;
+
+  notificationPermissionStore.getState().setPermission("granted");
+
+  return fetchFCMTokenWithRegistration();
+}
+
+export async function requestFCMToken(): Promise<string | null> {
+  if (!supportsPushNotification()) return null;
+
+  const permission = await Notification.requestPermission();
+
+  notificationPermissionStore.getState().setPermission(permission);
+
+  if (permission !== "granted") {
+    console.log("알림 권한 거부");
+    return null;
+  }
+
+  return fetchFCMTokenWithRegistration();
 }
