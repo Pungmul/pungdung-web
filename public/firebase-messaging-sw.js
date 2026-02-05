@@ -1,12 +1,12 @@
 importScripts(
-  "https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js",
+  "https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"
 );
 importScripts(
-  "https://www.gstatic.com/firebasejs/9.0.2/firebase-messaging-compat.js",
+  "https://www.gstatic.com/firebasejs/9.0.2/firebase-messaging-compat.js"
 );
 
 const CACHE_NAME = "pungdung-v1";
-const urlsToCache = ["/", "/manifest.json"];
+const urlsToCache = ["/", "/manifest.webmanifest"];
 
 const firebaseConfig = {
   apiKey: "AIzaSyCWrmunf0CUwdDUaZo0jANyONfB0LpwYd8",
@@ -24,7 +24,17 @@ const messaging = firebase.messaging();
 // Install event - 캐싱
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache)),
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      const cacheRequests = urlsToCache.map(async (url) => {
+        try {
+          await cache.add(url);
+        } catch (error) {
+          console.warn("[SW] 프리캐시 실패:", url, error);
+        }
+      });
+      await Promise.all(cacheRequests);
+    })()
   );
   self.skipWaiting();
 });
@@ -38,15 +48,24 @@ self.addEventListener("activate", (event) => {
           if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
-        }),
+        })
       );
-    }),
+    })
   );
   self.clients.claim();
 });
 
 // Fetch event - Network First 전략
 self.addEventListener("fetch", (event) => {
+  const requestUrl = new URL(event.request.url);
+  const isHttpRequest =
+    requestUrl.protocol === "http:" || requestUrl.protocol === "https:";
+
+  if (event.request.method !== "GET" || !isHttpRequest) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
@@ -62,7 +81,7 @@ self.addEventListener("fetch", (event) => {
       .catch(() => {
         // 네트워크 실패 시 캐시에서 반환
         return caches.match(event.request);
-      }),
+      })
   );
 });
 
@@ -70,7 +89,13 @@ self.addEventListener("fetch", (event) => {
 messaging.onBackgroundMessage((payload) => {
   console.log("백그라운드 메시지 수신: ", payload);
 
-  const { title, body } = payload.notification || {};
+  // `notification` 필드가 있으면 브라우저/FCM이 이미 시스템 알림을 띄우므로 중복 방지
+  if (payload.notification?.title && payload.notification?.body) {
+    return;
+  }
+
+  const title = payload.data?.title;
+  const body = payload.data?.body;
   if (!title || !body) return;
 
   self.registration.showNotification(title, {
