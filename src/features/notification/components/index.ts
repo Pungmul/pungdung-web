@@ -8,7 +8,7 @@ export { default as NotificationContainer } from "./element/NotificationContaine
 // Notification Widget Components
 export { default as NotificationList } from "./widget/NotificationList";
 export { default as NotificationToast } from "./widget/NotificationToast";
-export { default as NotificationPermissionRequestCTA } from "./widget/NotificationPermissionRequestCTA";
+export { default as NotificationPermissionRequestCTA } from "./widget/NotificationPermissionRequestCTA.client";
 
 // Notification Module Components
 export { default as FCMClient } from "./module/FCMClient";
