@@ -1,5 +1,4 @@
 import type { ClubName } from "@/features/club";
-import type { InstrumentStatus } from "@/features/instrument-status";
 
 export interface ProfileImage {
   id: number;
@@ -23,7 +22,6 @@ export interface Member {
   area?: string;
   username: string;
   profile: ProfileImage;
-  instrumentStatusDTOList: InstrumentStatus[];
 }
 
 export interface User {
@@ -32,5 +30,3 @@ export interface User {
   name: string;
   profileImage: ProfileImage;
 }
-
-

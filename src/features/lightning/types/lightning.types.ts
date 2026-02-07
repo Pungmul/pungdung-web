@@ -1,5 +1,3 @@
-import type { Instrument } from "@/features/instrument-status";
-
 export interface LightningMeetingMessage {
   messageLogId: number;
   domainType: "LIGHTNING_MEETING";
@@ -38,21 +36,6 @@ export interface Tag {
   name: string;
   createdAt: string;
 }
-
-export type InstrumentAssignRequestDTO<T extends Instrument> = {
-  instrument: T;
-  minPersonNum: number;
-  maxPersonNum: number;
-};
-
-export type InstrumentAssignRequestDTOList = [
-  InstrumentAssignRequestDTO<"KKWAENGGWARI">,
-  InstrumentAssignRequestDTO<"JING">,
-  InstrumentAssignRequestDTO<"JANGGU">,
-  InstrumentAssignRequestDTO<"BUK">,
-  InstrumentAssignRequestDTO<"SOGO">,
-  InstrumentAssignRequestDTO<"TAEPYUNGSO">
-];
 
 export type CreateLightningMeetingRequest =
   | {
@@ -110,5 +93,3 @@ export interface UserParticipationData {
   lightningMeeting: LightningMeeting | null;
   chatRoomUUID: string | null;
 }
-
-

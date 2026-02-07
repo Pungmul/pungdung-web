@@ -1,7 +1,3 @@
-// Lightning Core Components
-export { default as InstrumentAssignForm } from './deprecated/InstrumentAssignForm'
-export { InstrumentStatusBlock } from './deprecated/InstrumentStatus'
-
 // element
 export { default as AddLightningCard } from './element/AddLightningCard'
 export { default as LightningCard } from './element/LightningCard'
