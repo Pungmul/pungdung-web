@@ -1,3 +1,7 @@
+import {
+  proxyFailureError,
+  validateUpstreamJsonResponse,
+} from "@/core/api/server";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
@@ -5,26 +9,28 @@ export async function POST(req: Request) {
     const { email } = await req.json();
 
     if (!email) {
-      return new Response("이메일이 필요합니다", { status: 400 });
+      return Response.json(
+        {
+          code: "INVALID_REQUEST",
+          message: "이메일이 필요합니다.",
+          response: null,
+          isSuccess: false,
+        },
+        { status: 400 }
+      );
     }
 
     const proxyUrl = new URL(`${process.env.BASE_URL}/api/member/signup/check`);
     proxyUrl.searchParams.set("username", email);
 
     const response = await fetch(proxyUrl);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("이메일 중복 체크 에러:", errorText);
-      throw new Error("서버 오류");
+    const parsed = await validateUpstreamJsonResponse(response);
+    if (!parsed.ok) {
+      return Response.json(parsed.error.body, { status: parsed.error.status });
     }
-    
-    const { response: { isRegistered } } = await response.json();
-    
-    // 중복되지 않으면 true, 중복되면 false 반환
-    return Response.json({ isRegistered });
+    return Response.json(parsed.data, { status: response.status });
   } catch (error) {
     console.error("이메일 중복 체크 처리 중 에러:", error);
-    return new Response("이메일 중복 체크 실패", { status: 500 });
+    return proxyFailureError(error);
   }
 }

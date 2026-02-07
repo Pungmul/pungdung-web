@@ -1,4 +1,4 @@
-import { fetchWithRefresh } from "@/core";
+import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
 export const dynamic = "force-dynamic";
 export async function GET(
   _req: Request,
@@ -12,7 +12,6 @@ export async function GET(
     }
     const proxyUrl = `${process.env.BASE_URL}/api/boards/${boardId}`;
 
-
     const proxyResponse = await fetchWithRefresh(proxyUrl);
 
     if (!proxyResponse.ok) throw Error("서버 불안정" + proxyResponse.status);
@@ -24,14 +23,6 @@ export async function GET(
     });
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
-    if (error instanceof Error) {
-      return Response.json(error.message, {
-        status: 500,
-      });
-    } else {
-      return Response.json("알 수 없는 에러발생", {
-        status: 500,
-      });
-    }
+    return proxyFailureError(error);
   }
 }

@@ -1,12 +1,15 @@
-import { fetchWithRefresh } from "@/core";
+import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
   try {
-    const proxyResponse = await fetchWithRefresh(`${process.env.BASE_URL}/api/performances`, {
-      method: "POST",
-    });
+    const proxyResponse = await fetchWithRefresh(
+      `${process.env.BASE_URL}/api/performances`,
+      {
+        method: "POST",
+      }
+    );
     if (!proxyResponse.ok) {
       const errorText = await proxyResponse.text();
       console.log("서버 오류:", errorText);
@@ -17,6 +20,6 @@ export async function POST() {
     return Response.json({ formId: response });
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
-    return new Response("프록시 처리 실패", { status: 500 });
+    return proxyFailureError(error);
   }
 }

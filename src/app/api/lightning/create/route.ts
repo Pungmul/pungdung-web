@@ -1,4 +1,4 @@
-import { fetchWithRefresh } from "@/core";
+import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
@@ -26,6 +26,6 @@ export async function POST(req: Request) {
     return Response.json(data);
   } catch (error) {
     console.error(error);
-    throw new Error("Failed to create lightning");
+    return proxyFailureError(error, "번개 모임 생성에 실패했습니다.");
   }
 }

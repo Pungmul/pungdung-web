@@ -1,3 +1,7 @@
+import {
+  proxyFailureError,
+  validateUpstreamJsonResponse,
+} from "@/core/api/server";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
@@ -5,11 +9,14 @@ export async function POST(req: Request) {
     await req.json();
 
   if (!loginId || !password)
-    return new Response(
-      `Error: wrongData:${!loginId && "longId"} ${!password && "password"} ${
-        !loginId && !password ? "are" : "is"
-      } not exist `,
-      { status: 500 }
+    return Response.json(
+      {
+        code: "INVALID_REQUEST",
+        message: "아이디와 비밀번호를 확인해주세요.",
+        response: null,
+        isSuccess: false,
+      },
+      { status: 400 }
     );
 
   try {
@@ -22,20 +29,41 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({ loginId, password }),
     });
-
-    if (!response.ok) {
-      const text = await response.text();
-      console.log("에러 메시지:" + text);
-      throw Error("서버 불안정" + response.status);
+    const parsed = await validateUpstreamJsonResponse(response);
+    if (!parsed.ok) {
+      return Response.json(parsed.error.body, { status: parsed.error.status });
     }
 
-    // 프록시 응답 받기
-    const proxyResponse = await response.json();
+    const proxyResponse = parsed.data;
+    if (!response.ok || !proxyResponse.isSuccess) {
+      return Response.json(proxyResponse, { status: response.status });
+    }
+
+    const tokenPayload =
+      typeof proxyResponse.response === "object" &&
+      proxyResponse.response !== null
+        ? (proxyResponse.response as {
+            accessToken?: string;
+            expiresIn?: number;
+            refreshToken?: string;
+            refreshTokenExpiresIn?: number;
+          })
+        : undefined;
+
+    if (!tokenPayload?.accessToken || !tokenPayload?.refreshToken) {
+      return Response.json(
+        {
+          code: proxyResponse.code,
+          message: proxyResponse.message || "Token is not valid!",
+          response: proxyResponse.response,
+          isSuccess: false,
+        },
+        { status: 400 }
+      );
+    }
 
     const { accessToken, expiresIn, refreshToken, refreshTokenExpiresIn } =
-      proxyResponse.response;
-
-    if (!accessToken || !refreshToken) throw Error("Token is not valid!");
+      tokenPayload;
 
     const headers = new Headers();
 
@@ -47,18 +75,12 @@ export async function POST(req: Request) {
       "Set-Cookie",
       `refreshToken=${refreshToken}; Path=/; SameSite=Strict; HttpOnly; Max-Age=${refreshTokenExpiresIn}`
     );
-    // 클라이언트에 프록시 응답 반환
     return Response.json(
-      { message: "success to Login!", token: accessToken },
-      { headers }
+      { ...proxyResponse, response: "로그인이 정상적으로 완료됐습니다." },
+      { status: response.status, headers }
     );
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
-    return Response.json(
-      {
-        error,
-      },
-      { status: 500 }
-    );
+    return proxyFailureError(error);
   }
 }

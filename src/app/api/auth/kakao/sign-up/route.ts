@@ -1,4 +1,8 @@
 import { cookies } from "next/headers";
+import {
+  proxyFailureError,
+  validateUpstreamJsonResponse,
+} from "@/core/api/server";
 
 export const dynamic = "force-dynamic";
 
@@ -20,22 +24,43 @@ export async function POST(req: Request) {
 
     const response = await fetch(proxyUrl, {
       method: "POST",
-      body: formData, // 원본 body를 그대로 전달
+      body: formData,
     });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("에러:", errorText);
-      throw Error("서버 불안정" + response.status);
+    const parsed = await validateUpstreamJsonResponse(response);
+    if (!parsed.ok) {
+      return Response.json(parsed.error.body, { status: parsed.error.status });
     }
 
-    // 프록시 응답 받기
-    const proxyResponse = await response.json();
+    const proxyResponse = parsed.data;
+    if (!response.ok || !proxyResponse.isSuccess) {
+      return Response.json(proxyResponse, { status: response.status });
+    }
+
+    const tokenPayload =
+      typeof proxyResponse.response === "object" &&
+      proxyResponse.response !== null
+        ? (proxyResponse.response as {
+            accessToken?: string;
+            expiresIn?: number;
+            refreshToken?: string;
+            refreshTokenExpiresIn?: number;
+          })
+        : undefined;
 
     const { accessToken, expiresIn, refreshToken, refreshTokenExpiresIn } =
-      proxyResponse.response;
+      tokenPayload ?? {};
 
-    if (!accessToken || !refreshToken) throw Error("Token is not valid!");
+    if (!accessToken || !refreshToken || !expiresIn || !refreshTokenExpiresIn) {
+      return Response.json(
+        {
+          code: proxyResponse.code,
+          message: proxyResponse.message || "Token is not valid!",
+          response: proxyResponse.response,
+          isSuccess: false,
+        },
+        { status: 400 }
+      );
+    }
 
     cookieStore.set("accessToken", accessToken, {
       httpOnly: true,
@@ -49,13 +74,15 @@ export async function POST(req: Request) {
     });
     cookieStore.delete("signUpToken");
 
-    // 클라이언트에 프록시 응답 반환
-    return Response.json({
-      message: "success to Sign Up! & Login!",
-      token: accessToken,
-    });
+    return Response.json(
+      {
+        ...proxyResponse,
+        response: "회원가입 및 로그인이 정상적으로 완료됐습니다.",
+      },
+      { status: response.status }
+    );
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
-    return new Response("프록시 처리 실패", { status: 500 });
+    return proxyFailureError(error);
   }
 }

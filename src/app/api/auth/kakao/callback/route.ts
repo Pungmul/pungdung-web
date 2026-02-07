@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { proxyFailureError } from "@/core/api/server";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export async function GET(req: Request) {
       cookieStore.set("signUpToken", signUpToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 300
+        maxAge: 300,
       });
 
       return Response.redirect(new URL("/kakao/sign-up", reqUrl).href, 302);
@@ -54,6 +55,6 @@ export async function GET(req: Request) {
     return Response.redirect(new URL("/login", reqUrl).href, 302);
   } catch (error) {
     console.error("카카오 로그인 처리 중 에러:", error);
-    return new Response(`카카오 로그인 실패: ${error}`, { status: 500 });
+    return proxyFailureError(error, "카카오 로그인 처리에 실패했습니다.");
   }
 }

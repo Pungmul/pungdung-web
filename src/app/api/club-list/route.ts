@@ -1,3 +1,4 @@
+import { proxyFailureError } from "@/core/api/server";
 export async function GET() {
   try {
     const response = await fetch(`${process.env.BASE_URL}/api/member/clubs`, {
@@ -13,7 +14,7 @@ export async function GET() {
     return Response.json({ response: data });
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
-    return new Response("프록시 처리 실패", { status: 500 });
+    return proxyFailureError(error);
   }
 }
 

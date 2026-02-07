@@ -1,4 +1,4 @@
-import { fetchWithRefresh } from "@pThunder/core";
+import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
 export const dynamic = "force-dynamic";
 
 // export async function GET(req: Request) {
@@ -29,7 +29,7 @@ export const dynamic = "force-dynamic";
 //     return Response.json(proxyResponse, { status: 200 });
 //   } catch (error) {
 //     console.error("프록시 처리 중 에러:", error);
-//     return new Response("프록시 처리 실패", { status: 500 });
+//     return proxyFailureError(error);
 //   }
 // }
 
@@ -62,6 +62,6 @@ export async function POST(req: Request) {
     return Response.json(proxyResponse, { status: 200 });
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
-    return new Response("프록시 처리 실패", { status: 500 });
+    return proxyFailureError(error);
   }
 }

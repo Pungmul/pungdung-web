@@ -1,4 +1,8 @@
-import { fetchWithRefresh } from "@pThunder/core";
+import {
+  fetchWithRefresh,
+  proxyFailureError,
+  validateUpstreamJsonResponse,
+} from "@/core/api/server";
 
 export async function PATCH(req: Request) {
   try {
@@ -9,18 +13,14 @@ export async function PATCH(req: Request) {
       method: "PATCH",
       body: formData,
     });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("에러:", errorText);
-      throw Error("서버 불안정" + response.status);
+    const parsed = await validateUpstreamJsonResponse(response);
+    if (!parsed.ok) {
+      return Response.json(parsed.error.body, { status: parsed.error.status });
     }
 
-    const proxyResponse = await response.json();
-    
-    return Response.json({ ...proxyResponse.response }, { status: 200 });
+    return Response.json(parsed.data, { status: response.status });
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
-    return new Response("프록시 처리 실패", { status: 500 });
+    return proxyFailureError(error);
   }
 }

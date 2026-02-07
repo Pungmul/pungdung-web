@@ -1,4 +1,4 @@
-import { fetchWithRefresh } from "@/core";
+import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
@@ -20,16 +20,12 @@ export async function GET() {
       { status: 200 }
     );
   } catch (error) {
-    if (error instanceof Error) {
-      return Response.json({ error: error.message }, { status: 500 });
-    }
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return proxyFailureError(error);
   }
 }
 
 export async function POST(req: Request) {
   try {
-    
     const { latitude, longitude } = await req.json();
 
     const response = await fetchWithRefresh(
@@ -51,9 +47,6 @@ export async function POST(req: Request) {
 
     return Response.json({ message: "위치 업데이트 성공" }, { status: 200 });
   } catch (error) {
-    if (error instanceof Error) {
-      return Response.json({ error: error.message }, { status: 500 });
-    }
-    return Response.json({ error: "Internal Server Error" }, { status: 500 });
+    return proxyFailureError(error);
   }
 }

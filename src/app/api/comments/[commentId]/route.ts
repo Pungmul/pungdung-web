@@ -1,4 +1,4 @@
-import { fetchWithRefresh } from "@/core";
+import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
 export const dynamic = "force-dynamic";
 export async function DELETE(
   _req: Request,
@@ -22,6 +22,6 @@ export async function DELETE(
     return Response.json({ message: "success" }, { status: 200 });
   } catch (error) {
     console.error(error);
-    return new Response("서버 불안정", { status: 500 });
+    return proxyFailureError(error);
   }
 }
