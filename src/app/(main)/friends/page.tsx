@@ -1,4 +1,5 @@
-import { fetchWithRefresh } from "@/core";
+import { fetchWithRefresh } from "@/core/api/server";
+
 import { FriendsClientComponent } from "@/features/friends";
 
 // 서버 사이드 렌더링 완전 비활성화
