@@ -1,14 +1,14 @@
 import { Viewport } from "next";
 import localFont from "next/font/local";
 
+import { FCMServiceWorkerRegistration } from "@/features/notification";
+
 import {
   PinchZoomPreventionScript,
   ViewDetector,
   AlertModal,
   PWAInstallPrompt,
 } from "@/shared/components";
-import { FCMServiceWorkerRegistration } from "@/features/notification";
-import { getInitialViewFromCookie } from "@pThunder/shared/lib/getInitialViewFromCookie";
 
 import "@/app/globals.css";
 
@@ -38,15 +38,13 @@ export default async function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const initialView = await getInitialViewFromCookie();
-
   return (
     <html lang="ko" className={nanumSquareNeo.variable}>
       <body>
         <PinchZoomPreventionScript />
         <FCMServiceWorkerRegistration />
         <PWAInstallPrompt />
-        <ViewDetector initialView={initialView} />
+        <ViewDetector />
         <AlertModal />
         {/* children은 페이지 컴포넌트 */}
         {/* 페이지 컴포넌트가 서버 컴포넌트라도 오류 없이 렌더링 됨 */}
