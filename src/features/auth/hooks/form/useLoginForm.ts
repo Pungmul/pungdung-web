@@ -1,11 +1,14 @@
 "use client";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+
 import { useRouter } from "next/navigation";
 
-import { useLoginRequest } from "../queries";
-import { LoginFormType, loginSchema } from "../types/login.schema";
-import { useLoginStore } from "../store";
+import { useMutation } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+import { authMutationOptions } from "../../queries";
+import { useLoginStore } from "../../store";
+import { LoginFormType, loginSchema } from "../../types/schemas";
 
 export const useLoginForm = () => {
   const router = useRouter();
@@ -14,7 +17,7 @@ export const useLoginForm = () => {
     mutate: loginRequest,
     error: requestError,
     isPending,
-  } = useLoginRequest();
+  } = useMutation(authMutationOptions.login());
 
   const {
     register,
