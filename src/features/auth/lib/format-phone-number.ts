@@ -19,5 +19,5 @@ export const formatPhoneNumber = (value: string): string => {
       3,
       7
     )}-${numericValue.slice(7)}`;
-  return `${numericValue.slice(0, 11)}`;
+  return formatPhoneNumber(numericValue.slice(0, 11));
 };

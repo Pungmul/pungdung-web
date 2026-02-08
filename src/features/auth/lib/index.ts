@@ -1,1 +1,2 @@
-export { formatPhoneNumber } from './formatPhoneNumber';
+export { formatPhoneNumber } from "./format-phone-number";
+export { getSignUpStepCircleBgClass } from "./sign-up-step-indicator";
