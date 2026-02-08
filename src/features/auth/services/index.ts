@@ -1,4 +1,3 @@
-// Auth 관련 타입 정의
-// 필요시 여기에 타입을 추가하세요 
-export * as signUpValidation from './signUpValidation'; 
-export * as kakaoSignUpValidation from './kakaoSignUpValidation'; 
+export { transformKakaoSignUpData } from "./kakao-sign-up.transform";
+export { transformSignUpData } from "./sign-up.transform";
+export { getNextStepInOrder, getPreviousStepInOrder } from "./sign-up-flow";
