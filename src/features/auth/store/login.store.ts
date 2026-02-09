@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { LoginMethod } from "../types";
+
+import type { LoginMethod } from "../types";
 
 type LoginStore = (
   | {
