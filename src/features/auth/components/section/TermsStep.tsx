@@ -1,39 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { Controller, UseFormReturn } from "react-hook-form";
+
+import { Controller } from "react-hook-form";
+
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 
-import { Space, Checkbox, BottomFixedButton } from "@pThunder/shared";
+import { BottomFixedButton, Checkbox, Space } from "@/shared";
 
-import { TermsStepFormData } from "../../types/kakao-sign-up.schemas";
+import { AUTH_UI_MESSAGE, SIGN_UP_FORM_FIELD } from "../../constants";
+import { useTermStepForm } from "../../hooks/form";
+import type { TermsStepFormData } from "../../types/schemas";
 
-interface TermsStepProps
-  extends Pick<UseFormReturn<TermsStepFormData>, "control" | "handleSubmit"> {
+const TERMS_FIELDS = SIGN_UP_FORM_FIELD.TERMS;
+const TERMS_FIELDS_LABEL = AUTH_UI_MESSAGE.TERMS_STEP;
+
+interface TermsStepProps {
   onSubmit: (data: TermsStepFormData) => void;
-  isAllchecked: boolean;
-  handleAllCheck: (checked: boolean) => void;
 }
 
-export const TermsStep: React.FC<TermsStepProps> = ({
-  onSubmit,
-  control,
-  handleSubmit,
-  isAllchecked,
-  handleAllCheck,
-}) => {
+export const TermsStep: React.FC<TermsStepProps> = ({ onSubmit }) => {
+  const { control, isAllChecked, handleAllCheck, submitTermsStep } =
+    useTermStepForm();
+
   return (
     <form
       className="flex flex-col flex-grow"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={(event) => {
+        event.preventDefault();
+        void submitTermsStep(onSubmit);
+      }}
     >
-      <Space h={24}/>
+      <Space h={24} />
       <div className="flex-grow px-6">
         <Checkbox
-          name="all_check"
-          label="모든 약관에 동의합니다"
+          name={TERMS_FIELDS.USING_TERM}
+          label={TERMS_FIELDS_LABEL.AGREE_ALL}
           required
-          checked={isAllchecked}
+          checked={isAllChecked}
           onChange={handleAllCheck}
           className="bg-grey-100 rounded-[6px]"
         />
@@ -43,11 +47,11 @@ export const TermsStep: React.FC<TermsStepProps> = ({
         <div className="flex flex-row justify-between items-center">
           <Controller
             control={control}
-            name="usingTermAgree"
+            name={TERMS_FIELDS.USING_TERM}
             render={({ field }) => (
               <Checkbox
                 {...field}
-                label="이용 약관에 동의합니다"
+                label={TERMS_FIELDS_LABEL.AGREE_SERVICE}
                 required
                 checked={field.value}
                 onChange={field.onChange}
@@ -64,10 +68,10 @@ export const TermsStep: React.FC<TermsStepProps> = ({
         <div className="flex flex-row justify-between items-center">
           <Controller
             control={control}
-            name="personalInfoAgree"
+            name={TERMS_FIELDS.PERSONAL_INFO}
             render={({ field }) => (
               <Checkbox
-                label="개인정보 이용에 동의합니다"
+                label={TERMS_FIELDS_LABEL.AGREE_PRIVACY}
                 required
                 checked={field.value}
                 onChange={field.onChange}
@@ -80,11 +84,11 @@ export const TermsStep: React.FC<TermsStepProps> = ({
         </div>
       </div>
       <BottomFixedButton
-        disabled={!isAllchecked}
+        disabled={!isAllChecked}
         type="submit"
         className={"bg-primary disabled:bg-primary-light text-background"}
       >
-        {isAllchecked ? "다음" : "약관에 동의해주세요"}
+        {isAllChecked ? AUTH_UI_MESSAGE.FLOW.NEXT : AUTH_UI_MESSAGE.FLOW.AGREE_TERMS_TO_CONTINUE}
       </BottomFixedButton>
     </form>
   );

@@ -1,11 +1,12 @@
 "use client";
 
-import { HookFormReturn } from "@pThunder/shared";
-import { Input, Spinner, BottomFixedButton } from "@pThunder/shared/components";
-import { ChangePasswordFormData } from "@pThunder/features/auth/types/change-password.schemas";
+import { HookFormReturn } from "@/shared";
+import { BottomFixedButton,Input, Spinner } from "@/shared/components";
 
-interface ChangePasswordFormProps
-  extends HookFormReturn<ChangePasswordFormData> {
+import { AUTH_DOMAIN_MESSAGE, AUTH_UI_MESSAGE } from "../../constants";
+import type { ChangePasswordFormData } from "../../types/schemas";
+
+interface ChangePasswordFormProps extends HookFormReturn<ChangePasswordFormData> {
   onSubmit: ({
     currentPassword,
     newPassword,
@@ -19,7 +20,7 @@ interface ChangePasswordFormProps
   requestError: Error | null;
 }
 
-export default function ChangePasswordForm({
+export function ChangePasswordForm({
   onSubmit,
   isPending,
   requestError,
@@ -32,30 +33,31 @@ export default function ChangePasswordForm({
     >
       <div className="flex flex-col gap-4 flex-grow px-[12px]">
         <Input
-          label="현재 비밀번호"
+          label={AUTH_UI_MESSAGE.CHANGE_PASSWORD.FORM.CURRENT_LABEL}
           type="password"
           {...form.register("currentPassword")}
           errorMessage={form.inputErrors.currentPassword?.message || ""}
         />
         <Input
-          label="신규 비밀번호"
+          label={AUTH_UI_MESSAGE.CHANGE_PASSWORD.FORM.NEW_LABEL}
           type="password"
           {...form.register("newPassword")}
-          placeholder="새로운 비밀번호를 입력해주세요."
+          placeholder={AUTH_UI_MESSAGE.CHANGE_PASSWORD.FORM.NEW_PLACEHOLDER}
           errorMessage={form.inputErrors.newPassword?.message || ""}
         />
         <Input
-          label="비밀번호 확인"
+          label={AUTH_UI_MESSAGE.CHANGE_PASSWORD.FORM.CONFIRM_LABEL}
           type="password"
           {...form.register("confirmPassword")}
-          placeholder="새로운 비밀번호를 다시 입력해주세요."
+          placeholder={AUTH_UI_MESSAGE.CHANGE_PASSWORD.FORM.CONFIRM_PLACEHOLDER}
           errorMessage={form.inputErrors.confirmPassword?.message || ""}
         />
       </div>
 
       {requestError && (
         <p className="w-full text-red-400 px-[12px]">
-          비밀번호 변경 실패: {requestError.message}
+          {AUTH_DOMAIN_MESSAGE.CHANGE_PASSWORD.FAILURE_PREFIX}
+          {requestError.message}
         </p>
       )}
 
@@ -64,7 +66,7 @@ export default function ChangePasswordForm({
         type="submit"
         disabled={isPending || !form.isValid}
       >
-        {isPending ? <Spinner /> : "비밀번호 변경"}
+        {isPending ? <Spinner /> : AUTH_UI_MESSAGE.CHANGE_PASSWORD.FORM.SUBMIT}
       </BottomFixedButton>
     </form>
   );

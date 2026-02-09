@@ -1,46 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Spinner } from "@pThunder/shared";
+import { Spinner } from "@/shared";
 
-interface CompleteStepProps {
-  submitFinalSignUp: () => void;
+import { AUTH_DOMAIN_MESSAGE } from "../../constants";
+
+export interface CompleteStepProps {
   isPending: boolean;
   error: Error | null;
+  onRetry: () => void;
+  onBackToInput?: () => void;
+  onNavigateToLogin: () => void;
 }
 
 export const CompleteStep = ({
-  submitFinalSignUp,
   isPending,
   error,
+  onRetry,
+  onBackToInput,
+  onNavigateToLogin,
 }: CompleteStepProps) => {
-  const router = useRouter();
-  const [isRequested, setIsRequested] = useState(false);
-
-  useEffect(() => {
-    // 컴포넌트 마운트 시 회원가입 API 호출
-    if (!isRequested) {
-      submitFinalSignUp();
-      setIsRequested(true);
-    }
-  }, [isRequested, submitFinalSignUp]);
-
-  // 로딩 상태
   if (isPending) {
     return (
-      <div className="flex flex-col items-center justify-center h-full space-y-6 flex-grow">
-        <div className="text-center flex flex-col items-center justify-center">
-          <Spinner size={64}/>
+      <div className="flex flex-col items-center justify-center h-full flex-grow">
+        <div className="text-center flex flex-col items-center justify-center space-y-8">
+          <Spinner size={64} />
           <h2 className="text-2xl font-bold text-grey-800">
-            회원가입 신청서 보내는 중...
+            {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.PENDING_TITLE}
           </h2>
         </div>
       </div>
     );
   }
 
-  // 에러 상태
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-6 flex-grow">
@@ -61,24 +52,35 @@ export const CompleteStep = ({
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-grey-800 mb-2">
-            회원가입 실패
+            {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.FAILURE_TITLE}
           </h2>
           <p className="text-grey-600 mb-4">
-            {error.message || "회원가입 중 오류가 발생했습니다."}
+            {error.message || AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.GENERIC_ERROR}
           </p>
         </div>
 
-        <button
-          onClick={submitFinalSignUp}
-          className="px-6 py-2 bg-grey-800 text-background rounded-lg hover:bg-grey-700 transition-colors"
-        >
-          다시 시도
-        </button>
+        <div className="flex items-center gap-2">
+          {onBackToInput && (
+            <button
+              type="button"
+              onClick={onBackToInput}
+              className="px-6 py-2 border border-grey-300 text-grey-700 rounded-lg hover:bg-grey-100 transition-colors"
+            >
+              {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.BACK_TO_EDIT}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onRetry}
+            className="px-6 py-2 bg-grey-800 text-background rounded-lg hover:bg-grey-700 transition-colors"
+          >
+            {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.RETRY}
+          </button>
+        </div>
       </div>
     );
   }
 
-  // 성공 상태
   return (
     <div className="flex flex-col items-center justify-center h-full space-y-6 flex-grow">
       <div className="text-center">
@@ -98,16 +100,19 @@ export const CompleteStep = ({
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-grey-800 mb-2">
-          회원가입이 완료되었어요!
+          {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.SUCCESS_TITLE}
         </h2>
-        <p className="text-grey-600 mb-4">즐거운 풍물 생활을 시작해봐요</p>
+        <p className="text-grey-600 mb-4">
+          {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.SUCCESS_SUBTITLE}
+        </p>
       </div>
 
       <button
-        onClick={() => router.push("/login")}
+        type="button"
+        onClick={onNavigateToLogin}
         className="px-6 py-2 bg-primary text-background rounded-lg hover:bg-primary-light transition-colors"
       >
-        로그인 하러가기
+        {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.GO_TO_LOGIN}
       </button>
     </div>
   );

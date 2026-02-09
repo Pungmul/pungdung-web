@@ -1,9 +1,10 @@
 "use client";
 
-import { Input, Spinner, Button } from "@/shared/components";
-import { HookFormReturn } from "@pThunder/shared";
+import { Button, HookFormReturn, Input, Spinner } from "@/shared";
 
-interface LoginFormProps
+import { AUTH_DOMAIN_MESSAGE, AUTH_UI_MESSAGE } from "../../constants";
+
+export interface LoginFormProps
   extends HookFormReturn<{
     loginId: string;
     password: string;
@@ -19,7 +20,7 @@ interface LoginFormProps
   requestError: Error | null;
 }
 
-function LoginForm({
+export function LoginForm({
   register,
   inputErrors,
   handleSubmit,
@@ -38,7 +39,7 @@ function LoginForm({
         {...register("loginId")}
       />
       <Input
-        label="비밀번호"
+        label={AUTH_UI_MESSAGE.LOGIN.PASSWORD_LABEL}
         errorMessage={inputErrors.password?.message || ""}
         isEncrypted={true}
         {...register("password")}
@@ -46,7 +47,7 @@ function LoginForm({
 
       {requestError && (
         <p className="w-full text-red-400 px-[12px]">
-          로그인 실패: {requestError.message}
+          {requestError.message || AUTH_DOMAIN_MESSAGE.LOGIN.GENERIC_FAILURE}
         </p>
       )}
 
@@ -55,10 +56,8 @@ function LoginForm({
         type="submit"
         disabled={isPending}
       >
-        {isPending ? <Spinner /> : "로그인"}
+        {isPending ? <Spinner /> : AUTH_UI_MESSAGE.LOGIN.SUBMIT}
       </Button>
     </form>
   );
 }
-
-export default LoginForm;
