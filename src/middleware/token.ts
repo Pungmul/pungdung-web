@@ -1,6 +1,7 @@
-import type { MiddlewareContext } from "./types";
-import { reissueToken } from "@/features/auth/api";
 import { enqueueCookieMutation } from "./cookie";
+import type { MiddlewareContext } from "./types";
+
+import { refreshAuthToken } from "@/features/auth/api/server";
 
 const secureCookie = process.env.NODE_ENV === "production";
 
@@ -45,7 +46,7 @@ export const tryReissueToken = async (
   ctx: MiddlewareContext
 ): Promise<boolean> => {
   try {
-    const reissued = await reissueToken();
+    const reissued = await refreshAuthToken();
     applyAuthCookies(
       ctx,
       reissued.accessToken,

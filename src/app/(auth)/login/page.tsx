@@ -1,11 +1,13 @@
 "use client";
 
-import LoginForm from "@/features/auth/components/widget/LoginForm";
 import Image from "next/image";
-import { KakaoLogo } from "@pThunder/shared/components/Icons";
-import { Space, Button, LinkButton } from "@pThunder/shared";
 import Link from "next/link";
-import { useLoginForm } from "@/features/auth/hooks/useLoginForm";
+
+import { Button, LinkButton,Space } from "@/shared";
+import { KakaoLogo } from "@/shared/components/Icons";
+
+import { LoginForm } from "@/features/auth/components";
+import { useLoginForm } from "@/features/auth/hooks/form";
 
 export default function LoginPage() {
   const loginForm = useLoginForm();

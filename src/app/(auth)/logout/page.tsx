@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useLogout } from '@/features/auth/hooks/useLogout';
+
 import { Spinner } from '@/shared/components';
 
+import { useLogoutActions } from '@/features/auth/hooks/actions';
+
 export default function Logout() {
-  const { logout } = useLogout();
- 
+  const { logout } = useLogoutActions();
+
   useEffect(() => {
-    logout();
-  }, []);
+    void logout();
+  }, [logout]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">

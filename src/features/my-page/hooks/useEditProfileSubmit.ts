@@ -8,7 +8,8 @@ import {
 } from "@/features/my-page";
 import { transformEditProfileData } from "@/features/my-page/lib";
 import { myPageQueryKeys } from "@/features/my-page/constant";
-import { useUpadateProfile } from "@/features/auth";
+import { useMutation } from "@tanstack/react-query";
+import { authMutationOptions } from "@/features/auth/queries";
 import { ClubInfo } from "@/features/club";
 import { useRouter } from "next/navigation";
 import { Toast } from "@/shared";
@@ -29,7 +30,9 @@ export const useEditProfileSubmit = ({
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { mutate: updateProfile, isPending } = useUpadateProfile();
+  const { mutate: updateProfile, isPending } = useMutation(
+    authMutationOptions.updateProfile()
+  );
 
   const handleSubmitEditProfile = form.handleSubmit((data) => {
     const formData = new FormData();
@@ -57,7 +60,7 @@ export const useEditProfileSubmit = ({
     formData.append("profile", profileImage);
 
     console.log(profileImage);
-    
+
     updateProfile(formData, {
       onSuccess: async () => {
         await queryClient.invalidateQueries({

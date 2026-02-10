@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -9,8 +9,9 @@ import {
   useSocketSubscription,
 } from "@/core/socket";
 
+import { useQuery } from "@tanstack/react-query";
 import { ChatRoomDto, ChatRoomListItemDto } from "../types";
-import { useGetToken } from "@pThunder/features/auth";
+import { authQueries } from "@/features/auth/queries";
 
 /**
  * 서버에서 받는 읽음 처리 소켓 메시지 타입
@@ -45,13 +46,36 @@ interface ReadSocketMessage {
 export function useRoomReadSocket(roomId: string) {
   const queryClient = useQueryClient();
   const isConnected = useSocketConnection();
-  const { data: token } = useGetToken();
-
-  // 페이지 가시성 상태 추적
-  const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
+  const { data: token } = useQuery(authQueries.token());
 
   // 읽음 처리 대기 플래그
   const pendingReadSignRef = useRef(false);
+  const isPageVisibleRef = useRef(!document.hidden);
+
+  const canSendNow = useCallback(
+    () => isConnected && isPageVisibleRef.current,
+    [isConnected]
+  );
+
+  const sendReadSign = useCallback(() => {
+    const message = {
+      chatRoomUUID: roomId,
+    };
+
+    try {
+      SocketService.sendMessage(`/pub/chat/read/${roomId}`, message);
+      pendingReadSignRef.current = false;
+      return true;
+    } catch (error) {
+      // 소켓 publish 타이밍 이슈로 실패할 수 있어 다음 기회에 재전송한다.
+      pendingReadSignRef.current = true;
+      console.warn(
+        "Failed to send read sign, will retry on next trigger",
+        error
+      );
+      return false;
+    }
+  }, [roomId]);
 
   /**
    * 다른 사용자의 읽음 상태 업데이트 처리
@@ -122,31 +146,26 @@ export function useRoomReadSocket(roomId: string) {
    */
   const readSign = useCallback(() => {
     // 토큰이 없으면 (로그아웃 상태) 읽음 신호 전송하지 않음
-    if (!token) {
+    if (!token?.accessToken) {
       console.warn("Cannot send read sign: No token (logged out)");
       return;
     }
 
-    if (!isConnected) {
-      console.warn("Cannot send read sign: WebSocket not connected");
-      return;
-    }
-
-    // 페이지가 보이지 않으면 읽음 처리 보류
-    if (!isPageVisible) {
-      console.log("Page not visible, pending read sign");
+    if (!canSendNow()) {
+      if (!isConnected) {
+        console.warn("Cannot send read sign: WebSocket not connected");
+      } else {
+        console.log("Page not visible, pending read sign");
+      }
       pendingReadSignRef.current = true;
       return;
     }
 
-    const message = {
-      chatRoomUUID: roomId,
-    };
+    const didSend = sendReadSign();
+    if (!didSend) {
+      return;
+    }
 
-    // 서버에 읽음 신호 전송
-    SocketService.sendMessage(`/pub/chat/read/${roomId}`, message);
-    // 대기 플래그 초기화
-    pendingReadSignRef.current = false;
     // ChatRoomList의 unreadCount 즉시 업데이트 (낙관적 업데이트)
     queryClient.setQueryData<ChatRoomListItemDto[]>(
       ["chatRoomList"],
@@ -157,7 +176,7 @@ export function useRoomReadSocket(roomId: string) {
         );
       }
     );
-  }, [token, isConnected, isPageVisible, queryClient, roomId]);
+  }, [token, canSendNow, isConnected, queryClient, roomId, sendReadSign]);
 
   /**
    * 페이지 가시성 변경 감지
@@ -166,11 +185,11 @@ export function useRoomReadSocket(roomId: string) {
    */
   useEffect(() => {
     const handleVisibilityChange = () => {
-      const visible = !document.hasFocus();
-      setIsPageVisible(visible);
+      const visible = !document.hidden;
+      isPageVisibleRef.current = visible;
 
       // 페이지가 다시 보이게 되고, 대기 중인 읽음 처리가 있고, 토큰이 있으면 실행
-      if (visible && pendingReadSignRef.current && token) {
+      if (visible && pendingReadSignRef.current && token?.accessToken) {
         console.log("Page became visible, executing pending read sign");
         readSign();
       }
@@ -181,7 +200,23 @@ export function useRoomReadSocket(roomId: string) {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [readSign, token]);
+  }, [readSign, token?.accessToken]);
+
+  /**
+   * 연결/가시성 복구 시 보류된 읽음 신호 재전송
+   * - visibilitychange가 누락되거나 연결 타이밍이 어긋난 경우를 보완
+   */
+  useEffect(() => {
+    if (
+      !token?.accessToken ||
+      !isConnected ||
+      !isPageVisibleRef.current ||
+      !pendingReadSignRef.current
+    ) {
+      return;
+    }
+    readSign();
+  }, [token?.accessToken, isConnected, readSign]);
 
   /**
    * 연결 시 자동으로 읽음 처리
@@ -189,11 +224,11 @@ export function useRoomReadSocket(roomId: string) {
    */
   useEffect(() => {
     // 토큰이 없으면 (로그아웃 상태) 읽음 신호 전송하지 않음
-    if (!token || !isConnected) {
+    if (!token?.accessToken || !isConnected) {
       return;
     }
     readSign();
-  }, [token, isConnected, readSign]);
+  }, [token?.accessToken, isConnected, readSign]);
 
   /**
    * 읽음 상태 소켓 구독

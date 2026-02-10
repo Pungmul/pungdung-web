@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { personalSchema } from "@pThunder/features/auth";
+import { personalSchema } from "@/features/auth/types/schemas";
 
 const baseSchema = personalSchema
   .omit({ club: true })
@@ -64,6 +64,5 @@ export const createEditProfileSchema = (clubNames?: string[]) => {
       path: ["club"],
     });
 };
-
 
 export type EditProfileSchema = ReturnType<typeof createEditProfileSchema>;

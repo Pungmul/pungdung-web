@@ -1,8 +1,11 @@
 import { cookies } from "next/headers";
-import { TokenProvider } from "@/features/auth";
-import Suspense from "@pThunder/shared/components/SuspenseComponent";
+
 import { ErrorBoundary } from "react-error-boundary";
-import { ChatLoadFailFallback } from "@pThunder/features/chat/components/widget/ChatLoadFailFallback";
+
+import Suspense from "@/shared/components/SuspenseComponent";
+
+import { TokenProvider } from "@/features/auth/providers";
+import { ChatLoadFailFallback } from "@/features/chat/components/widget/ChatLoadFailFallback";
 
 export default async function ChatsLayout({
   children,
