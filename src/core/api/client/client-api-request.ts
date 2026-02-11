@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { CLIENT_API_ERROR_CODE } from "./constant";
 import { ClientApiError } from "./client-api-error";
+import { CLIENT_API_ERROR_CODE } from "./constant";
 import { clientApiEnvelopeSchema } from "./type";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
