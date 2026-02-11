@@ -72,10 +72,7 @@ export default function SignUpPage() {
           {match(currentStep)
             .with("약관동의", () => (
               <TermsStep
-                onSubmit={(stepData) => {
-                  onSubmit(stepData as Partial<IEmailSignUpFormData>);
-                  onNextStep();
-                }}
+                onSubmit={onNextStep}
               />
             ))
             .with("계정정보입력", () => (

@@ -74,11 +74,7 @@ export default function KakaoSignUpPage() {
           {match(currentStep)
             .with("약관동의", () => (
               <TermsStep
-                onSubmit={(stepData) => {
-                  // onSubmit(stepData as Partial<KakaoSignUpFormData>);
-                  console.log(stepData);
-                  onNextStep();
-                }}
+                onSubmit={onNextStep}
               />
             ))
             .with("개인정보입력", () => (
@@ -86,7 +82,6 @@ export default function KakaoSignUpPage() {
                 onPrevStep={onPrevStep}
                 onSubmit={(stepData) => {
                   onSubmit(stepData);
-                  console.log(stepData);
                   onNextStep();
                 }}
               />
