@@ -5,6 +5,7 @@ import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-ho
 import { BottomFixedButton, Button, Input, Spinner } from "@/shared";
 
 import { AUTH_DOMAIN_MESSAGE, AUTH_UI_MESSAGE } from "../../constants";
+import { usePasswordVisibility } from "../../hooks/form";
 import type { ResetPasswordFormData } from "../../types/schemas";
 
 export interface ResetPasswordFormProps {
@@ -26,6 +27,9 @@ export function ResetPasswordForm({
   onSubmit,
   onNavigateToLogin,
 }: ResetPasswordFormProps) {
+  const newPassword = usePasswordVisibility();
+  const confirmPassword = usePasswordVisibility();
+
   if (invalidToken) {
     return (
       <div className="flex-1 flex flex-col justify-center items-center h-app gap-[24px]">
@@ -58,8 +62,8 @@ export function ResetPasswordForm({
             label={AUTH_UI_MESSAGE.RESET_PASSWORD.FORM.NEW_PASSWORD_LABEL}
             placeholder={AUTH_UI_MESSAGE.RESET_PASSWORD.FORM.NEW_PASSWORD_PLACEHOLDER}
             className="w-full"
-            type="password"
-            isEncrypted
+            type={newPassword.type}
+            trailingComponent={newPassword.trailingComponent}
             errorMessage={inputErrors.password?.message || ""}
             {...register("password")}
           />
@@ -67,8 +71,8 @@ export function ResetPasswordForm({
             label={AUTH_UI_MESSAGE.RESET_PASSWORD.FORM.CONFIRM_LABEL}
             placeholder={AUTH_UI_MESSAGE.RESET_PASSWORD.FORM.CONFIRM_PLACEHOLDER}
             className="w-full"
-            type="password"
-            isEncrypted
+            type={confirmPassword.type}
+            trailingComponent={confirmPassword.trailingComponent}
             errorMessage={inputErrors.confirmPassword?.message || ""}
             {...register("confirmPassword")}
           />

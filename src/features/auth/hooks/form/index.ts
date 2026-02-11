@@ -4,6 +4,7 @@ export { useEmailCheckForm } from "./useEmailCheckForm";
 export { useEmailSignUpStepForm } from "./useEmailSignUpStepForm";
 export { useKakaoSignUpStepForm } from "./useKakaoSignUpStepForm";
 export { useLoginForm } from "./useLoginForm";
+export { usePasswordVisibility } from "./usePasswordVisibility";
 export { usePersonalStepForm } from "./usePersonalStepForm";
 export { useResetPasswordForm } from "./useResetPasswordForm";
 export { useTermStepForm } from "./useTermStepForm";

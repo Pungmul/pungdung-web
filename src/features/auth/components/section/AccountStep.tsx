@@ -2,7 +2,7 @@
 import { Button, Input, Space } from "@/shared/components";
 
 import { AUTH_UI_MESSAGE, SIGN_UP_FORM_FIELD } from "../../constants";
-import { useAccountStepForm } from "../../hooks/form";
+import { useAccountStepForm, usePasswordVisibility } from "../../hooks/form";
 import type { AccountFormData } from "../../types/schemas/email-sign-up.schema";
 
 const ACCOUNT_FIELDS = SIGN_UP_FORM_FIELD.ACCOUNT;
@@ -26,6 +26,9 @@ export const AccountStep: React.FC<AccountStepProps> = ({
     passwordRegisterOptions,
   } = useAccountStepForm();
 
+  const password = usePasswordVisibility();
+  const confirmPassword = usePasswordVisibility();
+
   return (
     <form
       className="flex flex-col flex-grow"
@@ -47,7 +50,8 @@ export const AccountStep: React.FC<AccountStepProps> = ({
         <Input
           label={ACCOUNT_FIELDS_LABEL.PASSWORD_LABEL}
           placeholder={ACCOUNT_FIELDS_LABEL.PASSWORD_PLACEHOLDER}
-          isEncrypted={true}
+          type={password.type}
+          trailingComponent={password.trailingComponent}
           {...register(ACCOUNT_FIELDS.PASSWORD, passwordRegisterOptions)}
           errorMessage={inputErrors.password?.message || ""}
         />
@@ -56,7 +60,8 @@ export const AccountStep: React.FC<AccountStepProps> = ({
         <Input
           label={ACCOUNT_FIELDS_LABEL.CONFIRM_PASSWORD_LABEL}
           placeholder={ACCOUNT_FIELDS_LABEL.CONFIRM_PASSWORD_PLACEHOLDER}
-          isEncrypted={true}
+          type={confirmPassword.type}
+          trailingComponent={confirmPassword.trailingComponent}
           {...register(ACCOUNT_FIELDS.CONFIRM_PASSWORD)}
           errorMessage={inputErrors.confirmPassword?.message || ""}
         />

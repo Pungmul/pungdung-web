@@ -3,6 +3,7 @@
 import { Button, HookFormReturn, Input, Spinner } from "@/shared";
 
 import { AUTH_DOMAIN_MESSAGE, AUTH_UI_MESSAGE } from "../../constants";
+import { usePasswordVisibility } from "../../hooks/form";
 
 export interface LoginFormProps
   extends HookFormReturn<{
@@ -28,6 +29,8 @@ export function LoginForm({
   isPending,
   requestError,
 }: LoginFormProps) {
+  const password = usePasswordVisibility();
+
   return (
     <form
       className="flex w-full flex-col gap-4"
@@ -41,7 +44,8 @@ export function LoginForm({
       <Input
         label={AUTH_UI_MESSAGE.LOGIN.PASSWORD_LABEL}
         errorMessage={inputErrors.password?.message || ""}
-        isEncrypted={true}
+        type={password.type}
+        trailingComponent={password.trailingComponent}
         {...register("password")}
       />
 
