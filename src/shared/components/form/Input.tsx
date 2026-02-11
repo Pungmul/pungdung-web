@@ -1,18 +1,21 @@
 "use client";
 
-import { HTMLInputTypeAttribute, InputHTMLAttributes, useState } from "react";
-import { josa } from "es-hangul";
-import { WarningCircleIcon } from "@/shared/components/Icons";
-import { EyeIcon, EyeSlashIcon } from "../Icons";
-import "@pThunder/app/globals.css";
 import React from "react";
+import { HTMLInputTypeAttribute, InputHTMLAttributes } from "react";
+
+import { josa } from "es-hangul";
+
+import { WarningCircleIcon } from "../Icons";
+
+import "@/app/globals.css";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   type?: HTMLInputTypeAttribute;
   placeholder?: string;
   label?: string;
   errorMessage?: string | undefined;
-  isEncrypted?: boolean;
+  leadingComponent?: React.ReactNode;
+  trailingComponent?: React.ReactNode;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   ref?: React.RefCallback<HTMLInputElement | null>;
 }
@@ -21,18 +24,13 @@ function Input(props: InputProps) {
     type = "text",
     label = "",
     errorMessage,
-    isEncrypted = false,
+    leadingComponent,
+    trailingComponent,
     placeholder = `${josa(label, "을/를")} 입력해주세요.`,
     onChange,
     ref,
     ...rest
   } = props;
-
-  const [visible, setVisible] = useState(isEncrypted ? false : true);
-
-  const toggleVisible = () => {
-    setVisible((prev) => !prev);
-  };
 
   return (
     <label className="w-full" htmlFor={label}>
@@ -41,34 +39,29 @@ function Input(props: InputProps) {
           <span className="text-grey-500 px-[4px] text-[14px]">{label}{rest.required && <span className="text-red-500 ml-[4px]">*</span>}</span>
         )}
         <div
-          className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] ${
-            !!errorMessage
-              ? "border-red-400"
-              : "border-grey-300 focus-within:border-grey-500"
-          } ${
-            rest.disabled ? "bg-grey-100 text-grey-600 cursor-not-allowed border-grey-300" : ""
-          }`}
+          className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] ${!!errorMessage
+            ? "border-red-400"
+            : "border-grey-300 focus-within:border-grey-500"
+            } ${rest.disabled ? "bg-grey-100 text-grey-600 cursor-not-allowed border-grey-300" : ""
+            }`}
         >
+          {leadingComponent && (
+            <span className="shrink-0 flex items-center">{leadingComponent}</span>
+          )}
           <input
             ref={ref}
             placeholder={placeholder}
             onChange={onChange}
-            type={isEncrypted ? (visible ? "text" : "password") : type}
+            type={type}
             id={label.trim().length > 0 ? label : undefined}
             {...rest}
-            className={`flex-grow w-full outline-none placeholder-grey-300 text-grey-500 bg-transparent border-none h-full ${
-              rest.disabled
-                ? "placeholder:bg-grey-100 placeholder-grey-500"
-                : ""
-            } ${rest.className} `}
+            className={`flex-grow w-full outline-none placeholder-grey-300 text-grey-500 bg-transparent border-none h-full ${rest.disabled
+              ? "placeholder:bg-grey-100 placeholder-grey-500"
+              : ""
+              } ${rest.className} `}
           />
-          {isEncrypted && (
-            <span
-              className="size-[32px] p-[4px] cursor-pointer flex items-center justify-center text-grey-300 hover:text-grey-500"
-              onClick={toggleVisible}
-            >
-              {visible ? <EyeIcon /> : <EyeSlashIcon />}
-            </span>
+          {trailingComponent && (
+            <span className="shrink-0 flex items-center">{trailingComponent}</span>
           )}
         </div>
         {!!errorMessage && (
