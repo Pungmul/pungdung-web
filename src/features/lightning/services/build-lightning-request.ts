@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 
-import type { CreateLightningMeetingRequest, LightningCreateFormData } from "../types";
-
+import type { CreateLightningRequest } from "../api/client/dto.schema";
+import type { LightningCreateFormData } from "../types/schemas";
 /**
  * LightningCreateFormData를 API 요청 형식으로 변환
  * @param formData - 번개 생성 폼 데이터
@@ -10,9 +10,9 @@ import type { CreateLightningMeetingRequest, LightningCreateFormData } from "../
  */
 export const buildLightningRequest = (
   formData: LightningCreateFormData
-): CreateLightningMeetingRequest => {
+): CreateLightningRequest => {
   const { locationPoint } = formData;
-  
+
   if (!locationPoint) {
     throw new Error("위치 정보가 필요합니다");
   }
