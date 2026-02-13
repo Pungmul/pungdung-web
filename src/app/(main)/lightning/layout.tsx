@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "풍덩 | 번개",
@@ -7,8 +8,15 @@ export const metadata: Metadata = {
 
 export default function LightningLayout({
   children,
+  modal,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
+  modal: ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      {children}
+      {modal}
+    </>
+  );
 }

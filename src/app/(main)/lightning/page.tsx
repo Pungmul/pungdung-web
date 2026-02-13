@@ -1,157 +1,69 @@
 "use client";
-import { useState } from "react";
+
+import { useRef } from "react";
+
+import { useQuery } from "@tanstack/react-query";
+
 import { AnimatePresence } from "framer-motion";
 
-// Shared Components
-import { Responsive, MapContainer, Spinner } from "@/shared";
-import { GPSOutline } from "@/shared/components/Icons";
-
-// Hooks
-import {
-  useLightningSocket,
-  useUserLocation,
-  useUpdateUserLocation,
-  useLightningMapControls,
-  useLightningMarkers,
-} from "@/features/lightning";
-import { useLightningMap } from "@/features/lightning/hooks/useLightningMap";
-import { useLightningList } from "@/features/lightning/hooks/useLightningList";
-import { useLightningBottomSheet } from "@/features/lightning/hooks/useLightningBottomSheet";
-
-// Functions & Components from lightning feature
 import {
   LightningInformation,
-  LightningBottomSheet,
-  LightningSidebar,
+  LightningListOverlay,
+  LightningMapSection,
+  lightningQueries,
+  useLightningBottomSheetState,
+  useLightningLists,
+  useLightningListViewModel,
+  useSchoolLightningSocket,
+  useSyncUserLocation,
+  useWholeLightningSocket,
 } from "@/features/lightning";
-// Stores
-import { locationStore } from "@/features/location/store";
 
-// Styles
-import "@/app/globals.css";
 import "swiper/css";
 import "swiper/css/pagination";
-import { LightningCreateFormContainer } from "@/features/lightning/components/widget/LightningCreateFormContainer";
 
 export default function LightningPage() {
-  const currentLocation = locationStore((state) => state.currentLocation);
-  const {
-    myInfo,
-    userParticipationData,
-    wholeLightningList,
-    schoolLightningList,
-  } = useLightningSocket();
-  // TanStack Query 훅들 사용
-  const { data: serverUserLocation } = useUserLocation();
-  const { mutate: updateLocation } = useUpdateUserLocation();
+  const { data: userParticipationData } = useQuery(
+    lightningQueries.participationStatus()
+  );
 
-  // UI 상태
-  const [waitingView, setWaitingView] = useState(true);
-  const [isMapReady, setIsMapReady] = useState(false);
-  // 분리된 상태 관리 hooks
-  const mapState = useLightningMap({
-    currentLocation,
-    serverUserLocation,
-    updateLocation,
-  });
+  useSyncUserLocation();
 
-  const listState = useLightningList({
+  useWholeLightningSocket({ userParticipationData });
+  useSchoolLightningSocket({ userParticipationData });
+
+  const { wholeLightningList, schoolLightningList } = useLightningLists();
+  const { target, setTarget, lightningList } = useLightningListViewModel({
     wholeLightningList,
     schoolLightningList,
   });
 
-  const bottomSheetState = useLightningBottomSheet({
-    mapRef: mapState.mapRef,
-  });
+  const { bottomSheetRef, swiperRef } = useLightningBottomSheetState();
 
-  // 맵 컨트롤
-  const mapControls = useLightningMapControls({
-    mapRef: mapState.mapRef,
-    GPSmarkerRef: mapState.GPSmarkerRef,
-    bottomSheetRef: bottomSheetState.bottomSheetRef,
-    currentLocation,
-    isMapReady: isMapReady,
-    setIsLocationLoaded: mapState.setIsLocationLoaded,
-  });
-
-  // 마커 관리
-  useLightningMarkers({
-    mapRef: mapState.mapRef,
-    markersRef: mapState.markersRef,
-    lightningList: listState.lightningList,
-    panToCenter: mapControls.panToCenter,
-    swiperRef: bottomSheetState.swiperRef,
-    target: listState.target,
-  });
-
-  // if (!myInfo) {
-  //   return null;
-  // }
+  const mapPanToCurrentRef = useRef<(() => void) | null>(null);
 
   return (
-    <AnimatePresence mode="sync" key={"main-animate-presence"}>
+    <AnimatePresence mode="sync" key="main-animate-presence">
       <main
         key="main-div"
         className="relative w-full h-full flex-grow flex flex-col justify-end md:flex-row-reverse overflow-hidden"
       >
-        <LightningInformation
-          userPartinLightning={userParticipationData}
-          waitingView={waitingView}
-          isFirst={mapState.isFirst}
-          setWaitingView={setWaitingView}
+        <LightningInformation userPartinLightning={userParticipationData} />
+        <LightningMapSection
+          lightningList={lightningList}
+          bottomSheetRef={bottomSheetRef}
+          swiperRef={swiperRef}
+          mapPanToCurrentRef={mapPanToCurrentRef}
         />
-        <section className="flex-grow w-full h-full relative md:-left-[8px]">
-          <MapContainer
-            mapRef={mapState.mapRef}
-            className="w-[calc(100%+8px)] h-full"
-            initialLocation={currentLocation}
-            setIsMapReady={setIsMapReady}
-          >
-            {!(mapState.isLocationLoaded && isMapReady) && (
-              <div className="absolute w-full h-full flex items-center justify-center bg-black bg-opacity-40 z-10">
-                <Spinner
-                  size={32}
-                  baseColor="transparent"
-                  highlightColor="#FFFFFF"
-                />
-              </div>
-            )}
-            {currentLocation && (
-              <div
-                className="hidden md:flex absolute w-[48px] h-[48px] items-center justify-center cursor-pointer shadow-lg z-10 rounded-full bottom-[16px] bg-background right-[16px]"
-                onClick={mapControls.panToCurrentLocation}
-              >
-                <GPSOutline className="size-[24px] text-grey-700" />
-              </div>
-            )}
-          </MapContainer>
-        </section>
-        <Responsive
-          mobile={
-            <LightningBottomSheet
-              ref={bottomSheetState.bottomSheetRef}
-              myInfo={myInfo!}
-              target={listState.target}
-              setTarget={listState.setTarget}
-              swiperRef={bottomSheetState.swiperRef}
-              lightningList={listState.lightningList}
-              userPartinLightning={userParticipationData}
-              panToMyLocation={mapControls.panToCurrentLocation}
-            />
-          }
-          desktop={
-            <LightningSidebar
-              myInfo={myInfo!}
-              target={listState.target}
-              setTarget={listState.setTarget}
-              swiperRef={bottomSheetState.swiperRef}
-              lightningList={listState.lightningList}
-              userPartinLightning={userParticipationData}
-            />
-          }
+        <LightningListOverlay
+          lightningList={lightningList}
+          target={target}
+          setTarget={setTarget}
+          bottomSheetRef={bottomSheetRef}
+          swiperRef={swiperRef}
+          mapPanToCurrentRef={mapPanToCurrentRef}
         />
       </main>
-      <LightningCreateFormContainer />
     </AnimatePresence>
   );
 }
