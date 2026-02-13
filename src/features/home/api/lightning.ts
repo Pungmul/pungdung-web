@@ -1,21 +1,33 @@
-import type { NearLightningType } from "@/features/lightning";
+import {
+  fetchNearLightning,
+  type NearLightningType,
+} from "@/features/lightning";
+import {
+  fetchUserLocation,
+  locationStore,
+  updateUserLocation,
+} from "@/features/location";
 
 export async function loadNearLightning(): Promise<NearLightningType[]> {
   try {
-    const proxyUrl = `${process.env.NEXT_PUBLIC_LOCAL_URL}/api/lightning/nearby`;
+    const userLocation = await fetchUserLocation();
 
-    const proxyResponse = await fetch(proxyUrl, {
-      credentials: "include",
-    });
+    if (!userLocation) {
+      const newLocation = await locationStore.getState().getCurrentPosition();
+      if (!newLocation) {
+        throw new Error("위치 정보를 가져올 수 없습니다.");
+      }
+      await updateUserLocation({
+        latitude: newLocation.latitude,
+        longitude: newLocation.longitude,
+      });
+    }
 
-    if (!proxyResponse.ok) throw Error("서버 불안정" + proxyResponse.status);
-
-    const data = await proxyResponse.json();
-    const { lightningMeetingList } = data;
+    const { lightningMeetingList } = await fetchNearLightning();
     return lightningMeetingList;
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
     if (error instanceof Error) throw Error(error.message);
     else throw Error("알수 없는 에러");
   }
-} 
+}

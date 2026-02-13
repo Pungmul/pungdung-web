@@ -1,9 +1,10 @@
 import dayjs from "dayjs";
 
-import { HomeHeader, FrequentBoards, HomeHotPostList } from "@/features/board";
+import { FrequentBoards, HomeHeader, HomeHotPostList } from "@/features/board";
+import { NearLightningContent } from "@/features/lightning";
+import { NotificationPermissionRequestCTA } from "@/features/notification";
+
 import { SkeletonView, SuspenseComponent as Suspense } from "@/shared";
-import { NearLightningContent } from "@/features/lightning/components/widget/NearLightningContent";
-import { NotificationPermissionRequestCTA } from "@pThunder/features/notification";
 
 export default function Home() {
   const timeString = dayjs().format("YYYY.MM.DD HH:mm");

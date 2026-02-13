@@ -1,10 +1,14 @@
-import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
+import {
+  createValidatedUpstreamResponse,
+  fetchWithRefresh,
+  proxyFailureError,
+} from "@/core/api/server";
 export const dynamic = "force-dynamic";
 
+//응답 {"code":"2000","message":"성공","response":{"message":"모임이 취소되었습니다."},"isSuccess":true}%
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
     const response = await fetchWithRefresh(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/lightning/cancel`,
       {
@@ -15,14 +19,7 @@ export async function POST(req: Request) {
         body: JSON.stringify(body),
       }
     );
-
-    if (!response.ok) {
-      const errorText = await response.text(); // 또는 await res.json()
-      console.error("🔥 백엔드 에러 메시지:", errorText);
-      throw Error("서버 불안정" + response.status);
-    }
-
-    return Response.json(response);
+    return await createValidatedUpstreamResponse(response);
   } catch (error) {
     console.error(error);
     return proxyFailureError(error, "번개 모임 취소에 실패했습니다.");
