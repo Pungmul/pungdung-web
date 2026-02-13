@@ -5,7 +5,6 @@ import {
 } from "@/core/api/server";
 export const dynamic = "force-dynamic";
 
-//응답 {"code":"2001","message":"리소스가 성공적으로 생성되었습니다.","response":{"lightningMeetingId":708,"lightningMeetingName":"0521 그냥모임","organizerName":"강윤호"},"isSuccess":true}%
 export async function POST(req: Request) {
   try {
     const body = await req.json();

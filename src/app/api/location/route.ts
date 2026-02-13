@@ -1,4 +1,8 @@
-import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
+import {
+  createValidatedUpstreamResponse,
+  fetchWithRefresh,
+  proxyFailureError,
+} from "@/core/api/server";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
@@ -6,19 +10,7 @@ export async function GET() {
     const response = await fetchWithRefresh(
       `${process.env.BASE_URL}/api/location/my-location`
     );
-
-    if (!response.ok) {
-      throw new Error("Internal Server Error" + response.status);
-    }
-    const { response: data } = await response.json();
-
-    return Response.json(
-      {
-        latitude: data?.latitude,
-        longitude: data?.longitude,
-      },
-      { status: 200 }
-    );
+    return await createValidatedUpstreamResponse(response);
   } catch (error) {
     return proxyFailureError(error);
   }
@@ -27,7 +19,6 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const { latitude, longitude } = await req.json();
-
     const response = await fetchWithRefresh(
       `${process.env.BASE_URL}/api/location/update`,
       {
@@ -38,14 +29,7 @@ export async function POST(req: Request) {
         },
       }
     );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log("위치 업데이트 실패", errorText);
-      throw new Error("Internal Server Error" + response.status);
-    }
-
-    return Response.json({ message: "위치 업데이트 성공" }, { status: 200 });
+    return await createValidatedUpstreamResponse(response);
   } catch (error) {
     return proxyFailureError(error);
   }

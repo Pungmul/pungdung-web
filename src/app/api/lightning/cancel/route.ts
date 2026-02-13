@@ -5,7 +5,6 @@ import {
 } from "@/core/api/server";
 export const dynamic = "force-dynamic";
 
-//응답 {"code":"2000","message":"성공","response":{"message":"모임이 취소되었습니다."},"isSuccess":true}%
 export async function POST(req: Request) {
   try {
     const body = await req.json();
