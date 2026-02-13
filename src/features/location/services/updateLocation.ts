@@ -1,6 +1,7 @@
 import { locationStore } from "../store";
-import { updateUserLocation } from "../api";
-import { LocationType } from '../types';
+import { LocationType } from "../types";
+
+import { updateUserLocation } from "../api/client";
 
 export const updateLocation = async (): Promise<LocationType> => {
   return new Promise(async (resolve, reject) => {
@@ -23,15 +24,14 @@ export const updateLocation = async (): Promise<LocationType> => {
         return;
       }
 
-      const result = await updateUserLocation({
+      await updateUserLocation({
         latitude: patchPosition.latitude,
         longitude: patchPosition.longitude,
       });
 
-      resolve(result);
+      resolve(patchPosition);
     } catch (error) {
       reject(error);
     }
   });
 };
-

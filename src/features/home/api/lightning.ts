@@ -2,11 +2,12 @@ import {
   fetchNearLightning,
   type NearLightningType,
 } from "@/features/lightning";
+
 import {
   fetchUserLocation,
-  locationStore,
   updateUserLocation,
-} from "@/features/location";
+} from "@/features/location/api/client";
+import { locationStore } from "@/features/location/store";
 
 export async function loadNearLightning(): Promise<NearLightningType[]> {
   try {

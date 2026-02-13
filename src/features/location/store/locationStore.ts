@@ -1,6 +1,8 @@
 import { create } from "zustand";
+
 import { throttle } from "lodash";
-import { LocationType } from "@pThunder/features/location";
+
+import { LocationType } from "../types";
 
 // 클라이언트 상태만 관리하는 인터페이스
 interface LocationState {
@@ -9,7 +11,7 @@ interface LocationState {
   isWatching: boolean;
   watchId: number | null;
   error: GeolocationPositionError | null;
-  
+
   // Actions (클라이언트 상태만 변경)
   setCurrentLocation: (location: LocationType) => void;
   setError: (error: GeolocationPositionError | null) => void;
@@ -35,17 +37,19 @@ export const locationStore = create<LocationState>((set, get) => ({
 
   getCurrentPosition: async () => {
     const { currentLocation } = get();
-    
+
     // 이미 위치 정보가 있으면 즉시 반환
     if (currentLocation?.latitude && currentLocation?.longitude) {
       return currentLocation;
     }
-    
+
     return new Promise((resolve, reject) => {
       const { geolocation } = navigator;
 
       if (!geolocation) {
-        const error = new Error("Geolocation is not supported by this browser.");
+        const error = new Error(
+          "Geolocation is not supported by this browser."
+        );
         console.warn(error.message);
         reject(error);
         return;
@@ -72,7 +76,7 @@ export const locationStore = create<LocationState>((set, get) => ({
 
   startWatching: () => {
     const { geolocation } = navigator;
-    
+
     if (!geolocation) {
       console.error("Geolocation is not supported by this browser.");
       return;
@@ -110,11 +114,10 @@ export const locationStore = create<LocationState>((set, get) => ({
 
   stopWatching: () => {
     const { watchId } = get();
-    
+
     if (watchId !== null) {
       navigator.geolocation.clearWatch(watchId);
       set({ isWatching: false, watchId: null });
     }
   },
 }));
-
