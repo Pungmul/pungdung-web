@@ -58,13 +58,12 @@ export function NearLightningContent() {
 export function NearLightningSwiperList() {
   useUserLocation();
 
-  const { data: nearLightning, isError } = useNearLightningQuery();
+  const { data: nearLightning, error, isError } = useNearLightningQuery();
 
   const router = useRouter();
 
-  // 에러 발생 시 에러 메시지 표시
-  if (isError) {
-    throw new Error("Near Lightning 데이터를 불러오는데 실패했습니다.");
+  if (isError && error !== null) {
+    throw error instanceof Error ? error : new Error(String(error));
   }
 
   return (
@@ -128,6 +127,7 @@ export function NearLightningSwiperList() {
 }
 
 export function NearLightningContentError({
+  error,
   resetErrorBoundary,
 }: FallbackProps) {
   const handleRetry = () => {
@@ -135,10 +135,15 @@ export function NearLightningContentError({
     resetErrorBoundary();
   };
 
+  const message =
+    error instanceof Error && error.message.trim() !== ""
+      ? error.message
+      : "근처 번개를 불러오는데 실패했어요.";
+
   return (
     <div className="w-full relative">
-      <div className="mx-auto text-center w-[280px] aspect-[16/9] flex flex-col items-center justify-center">
-        <p className="text-grey-400 mb-2">근처 번개를 불러오는데 실패했어요.</p>
+      <div className="mx-auto text-center w-[280px] aspect-[16/9] flex flex-col items-center justify-center px-3">
+        <p className="text-grey-400 mb-2 text-sm leading-relaxed whitespace-pre-wrap">{message}</p>
         <button
           onClick={handleRetry}
           className="text-blue-500 hover:text-blue-700 underline"
