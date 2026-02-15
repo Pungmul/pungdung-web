@@ -5,10 +5,16 @@ import { useRouter } from "next/navigation";
 
 import { useFormContext } from "react-hook-form";
 
-import { Spinner } from "@/shared";
+import { BottomFixedButton, Spinner } from "@/shared";
+import { useView } from "@/shared/lib/useView";
 
+import { LightningCard } from "../../ui";
 import { LIGHTNING_BUILD_MESSAGE } from "../../../constants";
 import { useCreateLightning } from "../../../hooks/actions";
+import {
+  buildCreatedLightningMeetingPreview,
+  getLightningCreateErrorMessage,
+} from "../../../services";
 import { useLightningBuildContext } from "../../../providers";
 import type { LightningCreateFormData } from "../../../types/schemas";
 
@@ -20,10 +26,12 @@ const MESSAGE = LIGHTNING_BUILD_MESSAGE.COMPLETE;
  */
 export function LightningBuildCompleteStep() {
   const router = useRouter();
+  const view = useView();
   const hasSubmittedRef = useRef(false);
   const form = useFormContext<LightningCreateFormData>();
   const { setBuildStep } = useLightningBuildContext();
   const {
+    data: createResult,
     mutateAsync: createLightning,
     isSuccess,
     isError,
@@ -55,15 +63,28 @@ export function LightningBuildCompleteStep() {
     void submitLightningBuild();
   }, [resetCreateMutation, submitLightningBuild]);
 
-  const error = useMemo(
-    () =>
-      mutationError instanceof Error
-        ? mutationError
-        : mutationError
-          ? new Error(String(mutationError))
-          : null,
+  /** 인터셉트 모달은 `push`로 부모 경로만 바꿔도 슬롯이 안 비는 경우가 있어, 헤더 닫기와 동일하게 `back` 처리 */
+  const exitAfterSuccess = useCallback(() => {
+    if (view === "webview") {
+      window.ReactNativeWebView?.postMessage(
+        JSON.stringify({ action: "pop" })
+      );
+      return;
+    }
+    router.back();
+  }, [router, view]);
+
+  const errorMessage = useMemo(
+    () => (mutationError ? getLightningCreateErrorMessage(mutationError) : null),
     [mutationError]
   );
+
+  const createdPreview = useMemo(() => {
+    if (!createResult) {
+      return null;
+    }
+    return buildCreatedLightningMeetingPreview(form.getValues(), createResult);
+  }, [createResult, form]);
 
   useEffect(() => {
     if (hasSubmittedRef.current) {
@@ -97,8 +118,8 @@ export function LightningBuildCompleteStep() {
             <h2 className="mb-2 text-2xl font-bold text-grey-800">
               {MESSAGE.FAILURE_TITLE}
             </h2>
-            <p className="mb-4 text-grey-600">
-              {error?.message ?? MESSAGE.GENERIC_ERROR}
+            <p className="mb-4 text-grey-600 whitespace-pre-wrap">
+              {errorMessage ?? MESSAGE.GENERIC_ERROR}
             </p>
           </div>
 
@@ -123,43 +144,27 @@ export function LightningBuildCompleteStep() {
     );
   }
 
-  if (isSuccess) {
+  if (isSuccess && createdPreview) {
     return (
-      <div className="flex flex-1 flex-col px-6 py-4 overflow-y-auto">
-        <div className="flex h-full grow flex-col items-center justify-center space-y-6">
-          <div className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary">
-              <svg
-                className="h-8 w-8 text-background"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            <h2 className="mb-2 text-2xl font-bold text-grey-800">
-              {MESSAGE.SUCCESS_TITLE}
+      <>
+        <div className="flex flex-1 flex-col px-6 py-4 overflow-y-auto">
+          <div className="flex flex-1 flex-col items-stretch gap-6 justify-center">
+            <h2 className="text-center text-2xl font-bold text-grey-800">
+              {MESSAGE.SUCCESS_PAGE_TITLE}
             </h2>
-            <p className="mb-4 text-grey-600">{MESSAGE.SUCCESS_SUBTITLE}</p>
+            <div className="mx-auto w-full max-w-md">
+              <LightningCard {...createdPreview} hideJoinButton />
+            </div>
           </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              router.push("/lightning");
-            }}
-            className="rounded-lg bg-primary px-6 py-2 text-background transition-colors hover:bg-primary-light"
-          >
-            {MESSAGE.GO_TO_LIGHTNING}
-          </button>
         </div>
-      </div>
+        <BottomFixedButton
+          onClick={() => {
+            exitAfterSuccess();
+          }}
+        >
+          {MESSAGE.SUCCESS_CONFIRM}
+        </BottomFixedButton>
+      </>
     );
   }
 

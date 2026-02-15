@@ -2,16 +2,27 @@
 
 import { BottomFixedButton } from "@/shared";
 import { ChipButton } from "@/shared/components";
+import { WarningCircleIcon } from "@/shared/components/Icons";
 
+import { LIGHTNING_CREATE_FORM_FIELD } from "../../../constants";
 import { useSelectTypeStepForm } from "../../../hooks/form";
 
+const F = LIGHTNING_CREATE_FORM_FIELD;
+
 export function SelectTypeStep() {
-  const { lightningType, selectLightningType, submitSelectTypeStep } =
-    useSelectTypeStepForm();
+  const {
+    fieldErrors,
+    isNextDisabled,
+    lightningType,
+    selectLightningType,
+    submitSelectTypeStep,
+  } = useSelectTypeStepForm();
+
+  const typeErrorMessage = fieldErrors[F.LIGHTNING_TYPE];
 
   return (
     <>
-      <div className="flex flex-1 flex-col px-6 py-4 overflow-y-auto">
+      <div className="flex flex-1 flex-col px-6 py-4 overflow-y-auto gap-3">
         <div className="flex flex-row gap-4">
           <ChipButton
             type="button"
@@ -30,9 +41,16 @@ export function SelectTypeStep() {
             풍물 모임
           </ChipButton>
         </div>
+        {typeErrorMessage ? (
+          <div className="flex flex-row items-center gap-[4px] px-1">
+            <WarningCircleIcon className="shrink-0 text-red-400" />
+            <p className="text-[12px] text-red-500">{typeErrorMessage}</p>
+          </div>
+        ) : null}
       </div>
 
       <BottomFixedButton
+        disabled={isNextDisabled}
         onClick={() => {
           void submitSelectTypeStep();
         }}

@@ -4,6 +4,7 @@ import { memo } from "react";
 
 import { cn } from "@/shared";
 
+import { LIGHTNING_MEETING_TYPE } from "../../../constants";
 import { LightningCardButton } from "./LightningCardButton";
 import { LightningCardInfo } from "./LightningCardInfo";
 import { LightningRemainingTime } from "./LightningRemainingTime";
@@ -13,11 +14,14 @@ import type { LightningCardRefType, LightningMeeting } from "../../../types";
 interface LightningCardProps extends LightningMeeting {
   isParticipated?: boolean;
   organizerName?: string;
+  /** 생성 완료 등 목록 밖 미리보기에서 참여 버튼을 숨길 때 */
+  hideJoinButton?: boolean;
   onJoinLightning?: ({ meetingId }: { meetingId: number }) => void;
   onRefSet?: (ref: LightningCardRefType | null) => void;
 }
 
 export const LightningCard = memo(function LightningCard({
+  hideJoinButton = false,
   isParticipated = false,
   onJoinLightning,
   onRefSet,
@@ -33,7 +37,9 @@ export const LightningCard = memo(function LightningCard({
       <div className="flex flex-col flex-grow gap-[12px]">
         <div className="flex flex-row items-center justify-between px-[12px]">
           <div className="text-grey-500 text-[12px] font-normal p-[4px] bg-grey-200 rounded-[4px]">
-            {lightningMeeting.meetingType ? "일반 모임" : "풍물 모임"}
+            {lightningMeeting.meetingType === LIGHTNING_MEETING_TYPE.FREE
+              ? "일반 모임"
+              : "풍물 모임"}
           </div>
           <LightningRemainingTime
             recruitmentEndTime={lightningMeeting.recruitmentEndTime}
@@ -54,11 +60,13 @@ export const LightningCard = memo(function LightningCard({
           </span>
         </div>
       </div>
-      <LightningCardButton
-        isParticipated={isParticipated}
-        meetingId={lightningMeeting.id}
-        {...(onJoinLightning && { onJoinLightning })}
-      />
+      {!hideJoinButton && (
+        <LightningCardButton
+          isParticipated={isParticipated}
+          meetingId={lightningMeeting.id}
+          {...(onJoinLightning && { onJoinLightning })}
+        />
+      )}
     </div>
   );
 });

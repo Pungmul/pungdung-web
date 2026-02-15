@@ -4,11 +4,20 @@ import { XCircleIcon } from "@heroicons/react/24/solid";
 
 import { BottomFixedButton, Input } from "@/shared";
 
+import { LIGHTNING_CREATE_FORM_FIELD } from "../../../constants";
 import { useTitleStepForm } from "../../../hooks/form";
 
+const F = LIGHTNING_CREATE_FORM_FIELD;
+
 export function TitleStep() {
-  const { defaultTitle, submitTitleStep, title, updateTitle } =
-    useTitleStepForm();
+  const {
+    defaultTitle,
+    fieldErrors,
+    isNextDisabled,
+    submitTitleStep,
+    title,
+    updateTitle,
+  } = useTitleStepForm();
   const hasTitle = Boolean(title && title.trim().length > 0);
 
   return (
@@ -19,6 +28,7 @@ export function TitleStep() {
           <Input
             value={title || ""}
             placeholder={defaultTitle}
+            errorMessage={fieldErrors[F.TITLE]}
             onChange={(e) => updateTitle(e.target.value)}
             trailingComponent={
               hasTitle ? (
@@ -36,6 +46,7 @@ export function TitleStep() {
         </div>
       </div>
       <BottomFixedButton
+        disabled={isNextDisabled}
         onClick={() => {
           void submitTitleStep();
         }}

@@ -2,16 +2,27 @@
 
 import { BottomFixedButton } from "@/shared";
 import { ChipButton } from "@/shared/components";
+import { WarningCircleIcon } from "@/shared/components/Icons";
 
+import { LIGHTNING_CREATE_FORM_FIELD } from "../../../constants";
 import { useSelectTargetStepForm } from "../../../hooks/form";
 
+const F = LIGHTNING_CREATE_FORM_FIELD;
+
 export function SelectTargetStep() {
-  const { selectTarget, submitSelectTargetStep, target } =
-    useSelectTargetStepForm();
+  const {
+    fieldErrors,
+    isNextDisabled,
+    selectTarget,
+    submitSelectTargetStep,
+    target,
+  } = useSelectTargetStepForm();
+
+  const scopeErrorMessage = fieldErrors[F.TARGET];
 
   return (
     <>
-      <div className="flex flex-1 flex-col px-6 py-4 overflow-y-auto">
+      <div className="flex flex-1 flex-col px-6 py-4 overflow-y-auto gap-3">
         <div className="flex flex-row gap-4">
           <ChipButton
             type="button"
@@ -30,9 +41,16 @@ export function SelectTargetStep() {
             우리 학교만
           </ChipButton>
         </div>
+        {scopeErrorMessage ? (
+          <div className="flex flex-row items-center gap-[4px] px-1">
+            <WarningCircleIcon className="shrink-0 text-red-400" />
+            <p className="text-[12px] text-red-500">{scopeErrorMessage}</p>
+          </div>
+        ) : null}
       </div>
 
       <BottomFixedButton
+        disabled={isNextDisabled}
         onClick={() => {
           void submitSelectTargetStep();
         }}

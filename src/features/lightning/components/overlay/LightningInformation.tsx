@@ -130,14 +130,14 @@ export function LightningInformation({ userPartinLightning }: LightningInformati
                   {userPartinLightning.isOrganizer === true ? (
                     <div
                       className="w-[320px] h-[48px] bg-primary rounded-lg text-background text-center flex items-center justify-center cursor-pointer"
-                      onClick={() => void handleDeleteLightningMeeting()}
+                      onClick={handleDeleteLightningMeeting}
                     >
                       번개 삭제
                     </div>
                   ) : (
                     <div
                       className="w-[320px] h-[48px] bg-primary rounded-lg text-background text-center flex items-center justify-center cursor-pointer"
-                      onClick={() => void handleLeaveLightningMeeting()}
+                      onClick={handleLeaveLightningMeeting}
                     >
                       참여 취소
                     </div>

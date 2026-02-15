@@ -4,28 +4,39 @@ import { useCallback } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 
-import { Toast } from "@/shared";
+import { Alert, Toast } from "@/shared";
 
-import { useDeleteLightningMeeting } from "./useDeleteLightningMeeting";
+import { deleteLightningMeeting } from "../../api/client";
 import { lightningQueries } from "../../queries";
 
 /**
- * `LightningInformation` 패널: 삭제 후 목록·참여 상태 쿼리를 갱신하고 토스트로 결과를 알린다.
+ * `LightningInformation` 패널: 확인 후 삭제·쿼리 갱신·토스트.
  */
 export function useLightningDeleteAction(meetingId: number | undefined) {
   const queryClient = useQueryClient();
-  const { mutateAsync: deleteMeeting } = useDeleteLightningMeeting();
 
-  const handleDeleteLightningMeeting = useCallback(async () => {
+  const handleDeleteLightningMeeting = useCallback(() => {
     if (!meetingId) return;
-    try {
-      await deleteMeeting({ lightningMeetingId: meetingId });
-      await queryClient.invalidateQueries(lightningQueries.all());
-      Toast.show({ message: "번개 삭제에 성공했습니다.", type: "success" });
-    } catch {
-      Toast.show({ message: "번개 삭제에 실패했습니다.", type: "error" });
-    }
-  }, [meetingId, deleteMeeting, queryClient]);
+
+    Alert.confirm({
+      title: "번개 삭제",
+      message: "정말 이 번개를 삭제하시겠습니까?",
+      onConfirm: () => {
+        void (async () => {
+          try {
+            await deleteLightningMeeting({ lightningMeetingId: meetingId });
+            await queryClient.invalidateQueries(lightningQueries.all());
+            Toast.show({
+              message: "번개 삭제에 성공했습니다.",
+              type: "success",
+            });
+          } catch {
+            Toast.show({ message: "번개 삭제에 실패했습니다.", type: "error" });
+          }
+        })();
+      },
+    });
+  }, [meetingId, queryClient]);
 
   return { handleDeleteLightningMeeting };
 }

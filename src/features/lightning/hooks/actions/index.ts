@@ -1,7 +1,5 @@
 export { useCreateLightning } from "./useCreateLightning";
-export { useDeleteLightningMeeting } from "./useDeleteLightningMeeting";
-export { useExitLightningMeeting } from "./useExitLightningMeeting";
-export { useJoinLightningMeeting } from "./useJoinLightningMeeting";
+export { useLightningJoinAction } from "./useLightningJoinAction";
 export { useLightningDeleteAction } from "./useLightningDeleteAction";
 export { useLightningExitAction } from "./useLightningExitAction";
 export { useSyncUserLocation } from "./useSyncUserLocation";

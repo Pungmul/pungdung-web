@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { Swiper, SwiperRef, SwiperSlide } from "swiper/react";
 
-import { useJoinLightningMeeting } from "../../../hooks/actions";
+import { useLightningJoinAction } from "../../../hooks/actions";
 import {
   LightningCardRefType,
   LightningMeeting,
@@ -25,7 +25,7 @@ export function LightningCardList({
   ref,
   callSheetUp,
 }: LightningCardListProps) {
-  const { mutateAsync: joinLightning } = useJoinLightningMeeting();
+  const { handleJoinLightningMeeting } = useLightningJoinAction();
 
   const cardRefs = useRef<Map<string, LightningCardRefType>>(new Map());
   const currentFocusedRef = useRef<LightningCardRefType | null>(null);
@@ -123,15 +123,7 @@ export function LightningCardList({
                   lightningMeeting.id ===
                   userPartinLightning?.lightningMeeting?.id
                 }
-                onJoinLightning={({ meetingId }) => {
-                  if (
-                    confirm(
-                      "번개에 참여하시겠습니까? 번개 참여 후 참여 취소는 불가능합니다.",
-                    )
-                  ) {
-                    void joinLightning({ meetingId });
-                  }
-                }}
+                onJoinLightning={handleJoinLightningMeeting}
                 onRefSet={(cardRef) => setCardRef(meetingId, cardRef)}
               />
             </SwiperSlide>

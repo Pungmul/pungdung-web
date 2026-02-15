@@ -1,27 +1,44 @@
 "use client";
 
 import { BottomFixedButton, Input } from "@/shared";
+import { WarningCircleIcon } from "@/shared/components/Icons";
 import { LocationMapPicker } from "@/shared/components/ui";
 
+import { LIGHTNING_CREATE_FORM_FIELD } from "../../../constants";
 import { useSelectLocationStepForm } from "../../../hooks/form";
+
+const F = LIGHTNING_CREATE_FORM_FIELD;
 
 export function SelectLocationStep() {
   const {
     detailAddress,
+    fieldErrors,
     handleLocationChange,
     initialLocation,
+    isNextDisabled,
     submitSelectLocationStep,
     updateDetailAddress,
   } = useSelectLocationStepForm();
 
+  const locationBlockError =
+    fieldErrors[F.ADDRESS] ?? fieldErrors[F.LOCATION_POINT];
+
   return (
     <>
       <div className="flex flex-1 flex-col px-6 py-4 overflow-y-auto space-y-4">
-        <LocationMapPicker
-          initialLocation={initialLocation}
-          onLocationChange={handleLocationChange}
-          showSearchBar={true}
-        />
+        <div className="flex flex-col gap-1">
+          <LocationMapPicker
+            initialLocation={initialLocation}
+            onLocationChange={handleLocationChange}
+            showSearchBar={true}
+          />
+          {locationBlockError ? (
+            <div className="flex flex-row items-center gap-[4px] px-1">
+              <WarningCircleIcon className="shrink-0 text-red-400" />
+              <p className="text-[12px] text-red-500">{locationBlockError}</p>
+            </div>
+          ) : null}
+        </div>
 
         {/* 상세 주소 입력 */}
         <div className="flex flex-col gap-2">
@@ -35,6 +52,7 @@ export function SelectLocationStep() {
       </div>
 
       <BottomFixedButton
+        disabled={isNextDisabled}
         onClick={() => {
           void submitSelectLocationStep();
         }}
