@@ -1,25 +1,28 @@
 "use client";
 
 import {
+  Children,
+  createContext,
+  isValidElement,
+  ReactNode,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
-  createContext,
-  useContext,
-  ReactNode,
-  isValidElement,
-  Children,
 } from "react";
 import { InputHTMLAttributes } from "react";
+
+import { FieldValues, Path } from "react-hook-form";
 
 import {
   ChevronDownIcon,
   ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
-
 import { josa } from "es-hangul";
-import { FieldValues, Path } from "react-hook-form";
+
+import { useClickOutside } from "@/shared/hooks";
+
 import SearchInput from "./SearchInput";
 
 export interface SelectorItem<T> {
@@ -200,15 +203,13 @@ export function Select<T extends FieldValues, V extends T[keyof T]>({
           aria-haspopup="listbox"
           aria-labelledby={label}
           disabled={rest.disabled}
-          className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] w-full text-left ${
-            errorMessage
-              ? "border-red-400"
-              : "border-grey-300 focus:border-grey-500"
-          } ${
-            rest.disabled
+          className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] w-full text-left ${errorMessage
+            ? "border-red-400"
+            : "border-grey-300 focus:border-grey-500"
+            } ${rest.disabled
               ? "bg-grey-100 text-grey-400 cursor-not-allowed"
               : "cursor-pointer hover:border-grey-400"
-          }`}
+            }`}
           onClick={() => {
             if (!rest.disabled) {
               setIsListOpen(!isListOpen);
@@ -217,18 +218,16 @@ export function Select<T extends FieldValues, V extends T[keyof T]>({
           onKeyDown={handleKeyDown}
         >
           <span
-            className={`flex-grow w-full ${
-              !displayValue ? "text-grey-300" : "text-grey-500"
-            }`}
+            className={`flex-grow w-full ${!displayValue ? "text-grey-300" : "text-grey-500"
+              }`}
           >
-            {displayValue !== undefined
+            {displayValue !== undefined && displayValue.trim().length > 0
               ? displayValue
-              : `${josa(label ?? "", "을/를")} 선택해주세요`}
+              : placeholder ?? `${josa(label ?? "", "을/를")} 선택해주세요`}
           </span>
           <ChevronDownIcon
-            className={`size-5 stroke-[1.5px] text-grey-400 transition-transform duration-200 ${
-              isListOpen ? "rotate-180" : ""
-            }`}
+            className={`size-5 stroke-[1.5px] text-grey-400 transition-transform duration-200 ${isListOpen ? "rotate-180" : ""
+              }`}
           />
         </button>
 
@@ -275,9 +274,8 @@ function SelectItem<T extends FieldValues, V extends T[keyof T]>({
     <li
       role="option"
       aria-selected={isSelected}
-      className={`w-full p-[12px] cursor-pointer hover:bg-grey-100 text-[14px] ${
-        isSelected ? "text-grey-800 font-semibold bg-grey-100" : "text-grey-500"
-      }`}
+      className={`w-full p-[12px] cursor-pointer hover:bg-grey-100 text-[14px] ${isSelected ? "text-grey-800 font-semibold bg-grey-100" : "text-grey-500"
+        }`}
       onClick={() => onSelect(item)}
     >
       {item.label}
@@ -311,36 +309,29 @@ function SelectList<T extends FieldValues, V extends T[keyof T]>({
   const filteredItems =
     searchText.trim() !== ""
       ? items.filter((item) =>
-          item.label.toLowerCase().includes(searchText.toLowerCase())
-        )
+        item.label.toLowerCase().includes(searchText.toLowerCase())
+      )
       : items;
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        listRef.current &&
-        !listRef.current.contains(event.target as Node) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node)
-      ) {
-        onClose();
-      }
-    };
+  useClickOutside({
+    refs: [listRef, buttonRef],
+    onOutsideClick: onClose,
+    eventType: "click",
+  });
 
+  useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
       }
     };
 
-    document.addEventListener("click", handleClickOutside);
     document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener("click", handleClickOutside);
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [onClose, listRef, buttonRef]);
+  }, [onClose]);
 
   return (
     <div
@@ -365,18 +356,18 @@ function SelectList<T extends FieldValues, V extends T[keyof T]>({
       <ul className="flex flex-col list-none">
         {filteredItems.length > 0
           ? filteredItems.map((item, idx) => (
-              <SelectItem
-                key={`select-item-${idx}-${item.label}`}
-                item={item}
-                selectedValue={selectedValue}
-                onSelect={onSelect}
-              />
-            ))
+            <SelectItem
+              key={`select-item-${idx}-${item.label}`}
+              item={item}
+              selectedValue={selectedValue}
+              onSelect={onSelect}
+            />
+          ))
           : searchText && (
-              <div className="w-full text-grey-500 text-center p-[16px] text-[14px]">
-                검색 결과가 없습니다
-              </div>
-            )}
+            <div className="w-full text-grey-500 text-center p-[16px] text-[14px]">
+              검색 결과가 없습니다
+            </div>
+          )}
       </ul>
     </div>
   );

@@ -18,6 +18,7 @@ import { useTimeInput } from "./TimeInput/useTimeInput";
 import { useTimeFieldNavigation } from "./TimeInput/useTimeFieldNavigation";
 import { TimeFields } from "./TimeInput/TimeFields";
 import { formatIntervalValue } from "./TimeInput/formatIntervalValue";
+import { useClickOutside } from "@/shared/hooks";
 
 interface TimeInputProps
   extends Omit<
@@ -104,24 +105,11 @@ export const TimeInput = memo(function TimeInput(props: TimeInputProps) {
     setIsOpen(false);
   }, [value]);
 
-  // 외부 클릭시 닫기
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (
-        isOpen &&
-        targetRef.current &&
-        !targetRef.current.contains(e.target as Node)
-      ) {
-        closePicker();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClick);
-    }
-
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [isOpen, closePicker]);
+  useClickOutside({
+    ref: targetRef,
+    enabled: isOpen,
+    onOutsideClick: closePicker,
+  });
 
   // 스크롤시 위치 체크 - 최적화된 버전
   const checkPosition = useCallback(
