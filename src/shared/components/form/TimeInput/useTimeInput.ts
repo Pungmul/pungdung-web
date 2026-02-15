@@ -28,31 +28,60 @@ const isValidTimeValue = (
   }
 };
 
+const emptyTimeDisplay = (
+  showSeconds: boolean,
+  showAmPm: boolean
+): {
+  hour: string;
+  minute: string;
+  second?: string | undefined;
+  ampm?: string | undefined;
+} => {
+  const t: {
+    hour: string;
+    minute: string;
+    second?: string | undefined;
+    ampm?: string | undefined;
+  } = { hour: "HH", minute: "MM" };
+  if (showSeconds) t.second = "SS";
+  if (showAmPm) t.ampm = "";
+  return t;
+};
+
+const hasPlaceholderToken = (
+  t: {
+    hour: string;
+    minute: string;
+    second?: string | undefined;
+    ampm?: string | undefined;
+  },
+  showSeconds: boolean
+) => t.hour === "HH" || t.minute === "MM" || (showSeconds && t.second === "SS");
+
+const isAllPlaceholderTokens = (
+  t: {
+    hour: string;
+    minute: string;
+    second?: string | undefined;
+  },
+  showSeconds: boolean
+) =>
+  t.hour === "HH" && t.minute === "MM" && (!showSeconds || t.second === "SS");
+
 // 시간 문자열을 파싱하는 함수 - AM/PM 지원 버전
 const parseTimeString = (
   timeStr: string,
   showSeconds: boolean,
   showAmPm: boolean
 ) => {
-  if (!timeStr) {
-    return {
-      hour: "00",
-      minute: "00",
-      second: showSeconds ? "00" : undefined,
-      ampm: showAmPm ? "오전" : undefined,
-    };
+  if (!timeStr?.trim()) {
+    return emptyTimeDisplay(showSeconds, showAmPm);
   }
 
-  // 오전/오후가 포함된 경우 파싱
   const [hours, minutes, seconds] = timeStr.split(":");
 
   if (!hours || !minutes) {
-    return {
-      hour: "00",
-      minute: "00",
-      second: showSeconds ? "00" : undefined,
-      ampm: showAmPm ? "오전" : undefined,
-    };
+    return emptyTimeDisplay(showSeconds, showAmPm);
   }
 
   if (showAmPm) {
@@ -123,18 +152,14 @@ export function useTimeInput({
   minTime = "",
   maxTime = "",
 }: UseTimeInputProps) {
-  // 현재 타이핑 중인 시간 (valid하지 않아도 저장)
-  const [typeTime, setTypeTime] = useState(
-    parseTimeString(value || "", showSeconds, showAmPm) || ""
+  const [typeTime, setTypeTime] = useState(() =>
+    parseTimeString(value ?? "", showSeconds, showAmPm)
   );
 
-  // 현재 표시할 시간 값들 (타이핑 중이면 typeTime, 아니면 value)
-  const displayTime = useMemo(() => {
-    return typeTime || parseTimeString(value || "", showSeconds, showAmPm);
-  }, [typeTime, value]);
-  // 현재 시간이 유효한지 확인 - currentTime을 재사용하여 최적화
+  const displayTime = typeTime;
+
   const isValidTime = useMemo(() => {
-    if (!displayTime) return true;
+    if (hasPlaceholderToken(displayTime, showSeconds)) return true;
 
     // AM/PM 모드에서는 시간 범위가 1-12
     const hourRange = showAmPm ? { min: 1, max: 12 } : { min: 0, max: 23 };
@@ -151,20 +176,24 @@ export function useTimeInput({
     );
   }, [displayTime, showSeconds, showAmPm]);
 
-  // value 변경시 타이핑 상태 초기화
   useEffect(() => {
-    setTypeTime(parseTimeString(value || "", showSeconds, showAmPm) || "");
-  }, [value]);
+    setTypeTime(parseTimeString(value ?? "", showSeconds, showAmPm));
+  }, [value, showSeconds, showAmPm]);
 
-  // 각 필드의 값 업데이트 - AM/PM 지원 버전
   const updateFieldValue = useCallback(
     (field: "hour" | "minute" | "second" | "ampm", newValue: string) => {
       const updatedTime = { ...displayTime, [field]: newValue };
 
-      // 오전/오후 변경 시 시간도 조정
-
       if (field !== "ampm") {
         updatedTime[field] = newValue.padStart(2, "0");
+      }
+
+      if (hasPlaceholderToken(updatedTime, showSeconds)) {
+        setTypeTime(updatedTime);
+        if (isAllPlaceholderTokens(updatedTime, showSeconds)) {
+          onChange?.("");
+        }
+        return;
       }
 
       const newTimeString = formatTimeString(
@@ -183,10 +212,8 @@ export function useTimeInput({
         newTime = parseTimeString(newTimeString, showSeconds, showAmPm);
       }
 
-      // 타이핑 중인 시간 업데이트 (valid하지 않아도 저장)
       setTypeTime(newTime);
 
-      // 유효한 시간일 때만 onChange 호출
       const hourRange = showAmPm ? { min: 1, max: 12 } : { min: 0, max: 23 };
       const hourNum = parseInt(updatedTime.hour, 10);
       const isValidHour =
@@ -203,7 +230,7 @@ export function useTimeInput({
         onChange?.(newTimeString);
       }
     },
-    [displayTime, onChange, showSeconds, showAmPm]
+    [displayTime, onChange, showSeconds, showAmPm, minTime, maxTime]
   );
 
   const handleFieldInput = useCallback(
@@ -211,7 +238,6 @@ export function useTimeInput({
       type: "hour" | "minute" | "second" | "ampm",
       inputText: string
     ): string => {
-      // 오전/오후 필드 처리 - 토글 방식
       if (type === "ampm") {
         const upperInput = inputText.toUpperCase();
         if (upperInput === "A" || upperInput === "오전") {
@@ -221,38 +247,38 @@ export function useTimeInput({
           updateFieldValue("ampm", "오후");
           return "오후";
         }
-        // 기본적으로 현재 값과 반대로 토글
         const currentAmPm = displayTime.ampm || "오전";
         const newAmPm = currentAmPm === "오전" ? "오후" : "오전";
         updateFieldValue("ampm", newAmPm);
         return newAmPm;
       }
 
-      // If input is empty, clear the field
       if (!inputText) {
-        updateFieldValue(type, "00");
-        return "00";
+        const token = type === "hour" ? "HH" : type === "minute" ? "MM" : "SS";
+        const updated = { ...displayTime, [type]: token };
+        setTypeTime(updated);
+        if (isAllPlaceholderTokens(updated, showSeconds)) {
+          onChange?.("");
+        }
+        return token;
       }
 
-      // If input is a single digit, pad with zero
       if (inputText.length === 1) {
         const paddedValue = inputText.padStart(2, "0");
         updateFieldValue(type, paddedValue);
         return paddedValue;
       }
 
-      // If input is two digits, use as is
       if (inputText.length === 2) {
         updateFieldValue(type, inputText);
         return inputText;
       }
 
-      // If input is longer than 2 digits, take the last 2
       const lastTwo = inputText.slice(-2);
       updateFieldValue(type, lastTwo);
       return lastTwo;
     },
-    [updateFieldValue, displayTime.ampm]
+    [displayTime, onChange, showSeconds, updateFieldValue]
   );
 
   return {

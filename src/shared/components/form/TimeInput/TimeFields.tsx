@@ -1,6 +1,6 @@
 import { NumericField } from "../DateInput/DateField";
 import { AMPMField } from "./AMPMField";
-import { FieldType } from "@pThunder/shared/types";
+import { FieldType } from "@/shared/types";
 
 type TimeFieldType = Extract<FieldType, "hour" | "minute" | "second">;
 
@@ -60,15 +60,14 @@ export const TimeFields: React.FC<TimeFieldsProps> = ({
         <AMPMField
           ref={ampmRef!}
           type="ampm"
-          value={currentTime.ampm || "오전"}
+          value={currentTime.ampm ?? ""}
           tabIndex={disabled ? -1 : showSeconds ? 4 : 3}
           onInput={onInput}
           onFocus={onFocus}
           onBeforeInput={onBeforeInput}
           placeholder="오전"
-          className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${
-            disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
-          }`}
+          className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
+            }`}
         />
       )}
       <NumericField
@@ -80,9 +79,8 @@ export const TimeFields: React.FC<TimeFieldsProps> = ({
         onFocus={onFocus}
         onBeforeInput={onBeforeInput}
         placeholder="HH"
-        className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${
-          disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
-        }`}
+        className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
+          }`}
       />
       <span className="text-grey-400 mx-1">:</span>
       <NumericField
@@ -94,9 +92,8 @@ export const TimeFields: React.FC<TimeFieldsProps> = ({
         onFocus={onFocus}
         onBeforeInput={onBeforeInput}
         placeholder="MM"
-        className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${
-          disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
-        }`}
+        className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
+          }`}
       />
       {showSeconds && (
         <>
@@ -110,9 +107,8 @@ export const TimeFields: React.FC<TimeFieldsProps> = ({
             onFocus={onFocus}
             onBeforeInput={onBeforeInput}
             placeholder="SS"
-            className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${
-              disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
-            }`}
+            className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
+              }`}
           />
         </>
       )}

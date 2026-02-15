@@ -9,7 +9,7 @@ import {
   memo,
 } from "react";
 import { WarningCircleIcon } from "@/shared/components/Icons";
-import "@pThunder/app/globals.css";
+import "@/app/globals.css";
 import { ClockIcon } from "@heroicons/react/24/outline";
 import { throttle } from "lodash";
 import { TimePicker } from "./TimePicker";
@@ -17,7 +17,6 @@ import { josa } from "es-hangul";
 import { useTimeInput } from "./TimeInput/useTimeInput";
 import { useTimeFieldNavigation } from "./TimeInput/useTimeFieldNavigation";
 import { TimeFields } from "./TimeInput/TimeFields";
-import dayjs from "dayjs";
 import { formatIntervalValue } from "./TimeInput/formatIntervalValue";
 
 interface TimeInputProps
@@ -33,7 +32,6 @@ interface TimeInputProps
   /** 시간 선택 시 호출되는 함수 */
   onChange?: (time: string) => void;
   ref?: React.RefCallback<HTMLInputElement | null>;
-  format?: "HH:mm" | "HH:mm:ss";
   /** 초 단위 표시 여부 */
   showSeconds?: boolean;
   /** 오전/오후 표시 여부 */
@@ -52,23 +50,26 @@ export const TimeInput = memo(function TimeInput(props: TimeInputProps) {
     errorMessage,
     placeholder = `${josa(label, "을/를")} 선택해주세요.`,
     onChange,
-    format = "HH:mm",
     showSeconds = false,
     showAmPm = false,
     minTime = "",
     maxTime = "",
-    defaultValue = dayjs().format(format),
-    value = defaultValue,
+    defaultValue,
+    value: valueFromProps,
     ref,
     ...rest
   } = props;
+
+  /** DateInput과 같이 비어 있으면 필드 placeholder(HH/MM)만 보이게 함. `value` 미전달 시에만 `defaultValue` 사용 */
+  const value =
+    valueFromProps !== undefined ? valueFromProps : (defaultValue ?? "");
 
   const [isOpen, setIsOpen] = useState(false);
   const [isBelowHalf, setIsBelowHalf] = useState(false);
   const targetRef = useRef<HTMLDivElement>(null);
   // 커스텀 훅들 사용
   const { isValidTime, displayTime, handleFieldInput } = useTimeInput({
-    value: value || defaultValue,
+    value,
     onChange,
     showSeconds,
     showAmPm,
@@ -179,15 +180,13 @@ export const TimeInput = memo(function TimeInput(props: TimeInputProps) {
         )}
         <div
           ref={targetRef}
-          className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] hover:border-grey-500 peer ${
-            !!errorMessage
-              ? "border-red-400"
-              : "border-grey-300 focus-within:border-grey-500"
-          } ${
-            rest.disabled
+          className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] hover:border-grey-500 peer ${!!errorMessage
+            ? "border-red-400"
+            : "border-grey-300 focus-within:border-grey-500"
+            } ${rest.disabled
               ? "bg-grey-100 text-grey-400 cursor-not-allowed"
               : "cursor-pointer"
-          }`}
+            }`}
         >
           {/* 시간 입력 필드들 */}
           <TimeFields
@@ -215,20 +214,18 @@ export const TimeInput = memo(function TimeInput(props: TimeInputProps) {
             readOnly
             {...rest}
             value={value}
-            className={`flex-grow w-full outline-none placeholder-grey-300 text-grey-500 bg-transparent border-none h-full cursor-pointer ${
-              rest.disabled
-                ? "placeholder:bg-grey-100 placeholder-grey-500 cursor-not-allowed"
-                : ""
-            } ${rest.className} `}
+            className={`flex-grow w-full outline-none placeholder-grey-300 text-grey-500 bg-transparent border-none h-full cursor-pointer ${rest.disabled
+              ? "placeholder:bg-grey-100 placeholder-grey-500 cursor-not-allowed"
+              : ""
+              } ${rest.className} `}
           />
 
           {/* 시계 아이콘 */}
           <span
-            className={`size-[32px] p-[4px] flex items-center justify-center text-grey-300 ${
-              rest.disabled
-                ? "cursor-not-allowed"
-                : "cursor-pointer hover:text-grey-500"
-            }`}
+            className={`size-[32px] p-[4px] flex items-center justify-center text-grey-300 ${rest.disabled
+              ? "cursor-not-allowed"
+              : "cursor-pointer hover:text-grey-500"
+              }`}
             onClick={handleIconClick}
           >
             <ClockIcon />
@@ -237,9 +234,8 @@ export const TimeInput = memo(function TimeInput(props: TimeInputProps) {
           {/* 드롭다운 시간 선택기 */}
           {isOpen && (
             <div
-              className={`absolute left-0 right-0 bg-background w-fit border-2 border-grey-300 rounded-lg shadow-lg z-50 ${
-                isBelowHalf ? "bottom-full mb-2" : "top-full mt-2"
-              }`}
+              className={`absolute left-0 right-0 bg-background w-fit border-2 border-grey-300 rounded-lg shadow-lg z-50 ${isBelowHalf ? "bottom-full mb-2" : "top-full mt-2"
+                }`}
               onClick={(e) => e.stopPropagation()}
             >
               <TimePicker
