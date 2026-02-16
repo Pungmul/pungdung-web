@@ -44,12 +44,26 @@ export async function validateUpstreamJsonResponse(
 }
 
 export async function createValidatedUpstreamResponse(
-  response: Response
+  response: Response,
+  options?: {
+    transformEnvelopeResponse?: (response: unknown) => unknown;
+  }
 ): Promise<Response> {
   const parsed = await validateUpstreamJsonResponse(response);
   if (!parsed.ok) {
     return Response.json(parsed.error.body, { status: parsed.error.status });
   }
 
-  return Response.json(parsed.data, { status: response.status });
+  const envelope = parsed.data;
+  const transformedResponse = options?.transformEnvelopeResponse
+    ? options.transformEnvelopeResponse(envelope.response)
+    : envelope.response;
+
+  return Response.json(
+    {
+      ...envelope,
+      response: transformedResponse,
+    },
+    { status: response.status }
+  );
 }

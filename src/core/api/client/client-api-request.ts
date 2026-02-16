@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { ClientApiError } from "./client-api-error";
 import { CLIENT_API_ERROR_CODE } from "./constant";
-import { clientApiEnvelopeSchema } from "./type";
+import { resolveClientApiBody } from "./resolve-client-api-body";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -104,7 +104,7 @@ async function safeFetch(
   init?: RequestInit
 ): Promise<Response> {
   try {
-    return await fetch(input, init);
+    return await fetch(input, {credentials: "include", ...init});
   } catch (error) {
     throw createClientApiError({
       status: 0,
@@ -147,7 +147,7 @@ export async function clientApiRequest<
         status: 0,
         code: CLIENT_API_ERROR_CODE.INVALID_REQUEST_BODY,
         message: "요청 바디 형식이 올바르지 않습니다.",
-        payload: body,
+        payload: JSON.stringify(body),
         details: parsedRequestBody.error.issues,
       });
     }
@@ -165,37 +165,10 @@ export async function clientApiRequest<
   const response = await safeFetch(url, createRequestInit(requestInitInput));
   const parsedJson = await parseJsonSafely(response);
   const raw = parsedJson.ok ? parsedJson.data : null;
-  const envelope = clientApiEnvelopeSchema.safeParse(raw);
-
-  if (!envelope.success) {
-    throw createClientApiError({
-      status: response.status,
-      code: CLIENT_API_ERROR_CODE.INVALID_RESPONSE,
-      message: "응답 형식이 올바르지 않습니다.",
-      payload: raw,
-      details: envelope.error.issues,
-    });
-  }
-
-  if (!response.ok || !envelope.data.isSuccess) {
-    throw createClientApiError({
-      status: response.status,
-      code: envelope.data.code,
-      message: envelope.data.message,
-      payload: envelope.data,
-    });
-  }
-
-  const parsed = responseSchema.safeParse(envelope.data.response);
-  if (!parsed.success) {
-    throw createClientApiError({
-      status: response.status,
-      code: CLIENT_API_ERROR_CODE.INVALID_RESPONSE_SCHEMA,
-      message: "데이터 형식이 올바르지 않습니다.",
-      payload: envelope.data.response,
-      details: parsed.error.issues,
-    });
-  }
-
-  return parsed.data;
+  return resolveClientApiBody(
+    raw,
+    response.ok,
+    response.status,
+    responseSchema
+  );
 }
