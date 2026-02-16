@@ -1,7 +1,9 @@
 "use client";
 import React, { forwardRef, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+
 import { XMarkIcon } from "@heroicons/react/24/outline";
+
 import { cn } from "../../lib";
 
 interface ModalProps {
@@ -67,7 +69,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
         />
         <div
           className={cn(
-            "relative flex flex-col bg-background rounded-md shadow-lg p-4 min-w-[386px]",
+            "relative flex flex-col bg-background rounded-md shadow-lg p-4 min-w-80",
             className
           )}
           style={{ ...style }}

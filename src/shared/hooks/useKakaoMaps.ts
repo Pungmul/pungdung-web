@@ -1,4 +1,7 @@
+"use client";
+
 import { useEffect } from "react";
+
 import { kakaoMapsStore } from "@/shared/store";
 
 const KAKAO_SDK_URL = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_APP_JS_KEY}&libraries=services&autoload=false`;
@@ -40,7 +43,8 @@ export function useKakaoMaps(): UseKakaoMapsReturn {
     }
 
     const scriptSelector = `script[src="${KAKAO_SDK_URL}"]`;
-    const existingScript = document.querySelector<HTMLScriptElement>(scriptSelector);
+    const existingScript =
+      document.querySelector<HTMLScriptElement>(scriptSelector);
 
     const handleLoad = () => {
       window.kakao.maps.load(() => {
@@ -86,15 +90,29 @@ export function useKakaoMaps(): UseKakaoMapsReturn {
   };
 }
 
+type KakaoMapsEffectCallback = () => void | (() => void);
+
 /**
  * 카카오 지도가 로드된 후 콜백을 실행하는 훅
  */
-export function useKakaoMapsEffect(callback: () => void, deps: unknown[] = []) {
+export function useKakaoMapsEffect(callback: KakaoMapsEffectCallback) {
   const { kakaoMapsLoaded } = useKakaoMaps();
 
   useEffect(() => {
+    let cleanup: void | (() => void);
+    let isMounted = true;
+
     if (kakaoMapsLoaded) {
-      window.kakao.maps.load(callback);
+      window.kakao.maps.load(() => {
+        if (!isMounted) return;
+
+        cleanup = callback();
+      });
     }
-  }, [kakaoMapsLoaded, ...deps, callback]);
+
+    return () => {
+      isMounted = false;
+      cleanup?.();
+    };
+  }, [kakaoMapsLoaded, callback]);
 }

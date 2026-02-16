@@ -1,5 +1,5 @@
-import { LinkProps } from "next/link";
 import { ButtonHTMLAttributes } from "react";
+import { LinkProps } from "next/link";
 
 
 export interface LinkButtonProps extends LinkProps {

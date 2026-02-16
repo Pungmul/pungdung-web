@@ -1,9 +1,9 @@
-import { useRef, useEffect } from "react";
+import { useEffect,useRef } from "react";
 
 interface ObserveTriggerProps {
-    trigger: () => void;
-    unmountCondition: boolean;
-    triggerCondition: IntersectionObserverInit;
+  trigger: () => void;
+  unmountCondition: boolean;
+  triggerCondition: IntersectionObserverInit;
 }
 
 export default function ObserveTrigger({ trigger, unmountCondition, triggerCondition }: ObserveTriggerProps) {
@@ -13,7 +13,7 @@ export default function ObserveTrigger({ trigger, unmountCondition, triggerCondi
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry && entry.isIntersecting) {
-            trigger(); // 마지막 항목이 보이면 데이터 로드
+          trigger(); // 마지막 항목이 보이면 데이터 로드
         }
       },
       triggerCondition
@@ -24,8 +24,9 @@ export default function ObserveTrigger({ trigger, unmountCondition, triggerCondi
     }
 
     if (loaderRef.current && unmountCondition) {
-        observer.unobserve(loaderRef.current);
+      observer.unobserve(loaderRef.current);
     }
+
     // Cleanup (컴포넌트가 언마운트 될 때 옵저버 해제)
     return () => {
       if (loaderRef.current) {
@@ -33,6 +34,6 @@ export default function ObserveTrigger({ trigger, unmountCondition, triggerCondi
       }
     };
   }, [unmountCondition, trigger, triggerCondition]);
-  
+
   return <div ref={loaderRef} className="h-[0.5px] w-full" />;
 }

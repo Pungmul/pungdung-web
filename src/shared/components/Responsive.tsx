@@ -1,8 +1,10 @@
-'use client';
+"use client";
+
+import React from "react";
+
+import { match } from "ts-pattern";
 
 import { useView } from "@/shared/lib/useView";
-import React, { useEffect, useState } from "react";
-import { match } from "ts-pattern";
 
 type ResponsiveProps = {
   mobile: React.ReactNode;
@@ -10,21 +12,10 @@ type ResponsiveProps = {
   initialView?: "mobile" | "desktop";
 };
 
-export const Responsive: React.FC<ResponsiveProps> = ({
-  mobile,
-  desktop,
-  initialView,
-}) => {
+export function Responsive({ mobile, desktop }: ResponsiveProps) {
   const view = useView();
-  const [isHydrated, setIsHydrated] = useState(false);
 
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
-  const effectiveView = isHydrated ? view : initialView ?? view;
-
-  return match(effectiveView)
+  return match(view)
     .with("desktop", () => desktop)
     .otherwise(() => mobile);
-};
+}

@@ -1,4 +1,5 @@
 import React from "react";
+
 import { cn } from "@/shared/lib";
 
 function Button({
@@ -7,10 +8,10 @@ function Button({
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button 
-      {...props} 
+    <button
+      {...props}
       className={cn(
-        "w-full h-[48px] text-[16px] rounded-[4px] cursor-pointer flex justify-center items-center flex-row bg-primary disabled:bg-primary-light text-background",
+        "w-full h-[48px] text-[16px] rounded-[4px] cursor-pointer flex justify-center items-center flex-row bg-primary disabled:bg-red-200 text-background",
         className
       )}
     >
@@ -18,6 +19,5 @@ function Button({
     </button>
   );
 }
-
 
 export default React.memo(Button);

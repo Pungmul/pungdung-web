@@ -1,9 +1,13 @@
 "use client";
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef,useState } from "react";
 import ReactDOM from "react-dom";
 import Image from "next/image";
-import { AnimatePresence, motion, PanInfo, useAnimate } from "framer-motion";
+
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { AnimatePresence, motion, PanInfo, useAnimate } from "framer-motion";
+
+import { Responsive } from "../Responsive";
 
 interface ImageModalProps {
   isOpen: boolean;
@@ -46,7 +50,9 @@ const ImageModal: React.FC<ImageModalProps> = ({
   }, [images.length]);
 
   const goToNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : images.length - 1));
+    setCurrentIndex((prev) =>
+      prev < images.length - 1 ? prev + 1 : images.length - 1,
+    );
   }, [images.length]);
 
   const handleKeyDown = useCallback(
@@ -65,7 +71,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
           break;
       }
     },
-    [isOpen, onClose, goToPrevious, goToNext]
+    [isOpen, onClose, goToPrevious, goToNext],
   );
 
   const onBackdropClick = useCallback(
@@ -74,7 +80,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
         onClose();
       }
     },
-    [onClose]
+    [onClose],
   );
 
   // 컨트롤 요소들의 visibility 토글
@@ -97,7 +103,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
           : "none";
       }
     },
-    [imageContainerRef]
+    [imageContainerRef],
   );
 
   // 드래그 중 (터치/마우스 공통)
@@ -106,10 +112,10 @@ const ImageModal: React.FC<ImageModalProps> = ({
       animateImageContainer(
         imageContainerRef.current,
         { y: info.offset.y, opacity: 0.5, scale: 0.9 },
-        { duration: 0 }
+        { duration: 0 },
       );
     },
-    [imageContainerRef]
+    [imageContainerRef],
   );
 
   // 드래그 끝 (터치/마우스 공통)
@@ -124,13 +130,13 @@ const ImageModal: React.FC<ImageModalProps> = ({
         animateImageContainer(
           imageContainerRef.current,
           { y: 0, opacity: 1, scale: 1 },
-          { duration: 0.3, ease: "easeOut" }
+          { duration: 0.3, ease: "easeOut" },
         );
         updateImageTransform(0, true);
         toggleControls(true);
       }
     },
-    [onClose, updateImageTransform, toggleControls, imageContainerRef]
+    [onClose, updateImageTransform, toggleControls, imageContainerRef],
   );
 
   const toggleIndicator = useCallback(() => {
@@ -153,9 +159,18 @@ const ImageModal: React.FC<ImageModalProps> = ({
       <div className="fixed inset-0 z-50 w-dvh h-app justify-center flex flex-col">
         {/* Background overlay */}
         <div
-          className="absolute inset-0 bg-black bg-opacity-80"
+          className="absolute inset-0 bg-black/90"
           onClick={onBackdropClick}
         />
+
+        <div className="absolute top-4 right-4 z-10 ">
+          <button
+            onClick={onClose}
+            className="size-12 p-2 flex items-center justify-center"
+          >
+            <XMarkIcon className="text-white" />
+          </button>
+        </div>
 
         {/* Previous button */}
         {images.length > 1 && currentIndex > 0 && (
@@ -197,16 +212,36 @@ const ImageModal: React.FC<ImageModalProps> = ({
             onDragEnd={handleDragEnd}
             onClick={toggleIndicator}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="relative m-12 md:m-4 rounded-lg overflow-hidden"
+            className="relative w-full h-full rounded-lg overflow-hidden"
           >
-            <div className=" flex-grow flex items-center justify-center">
-              <Image
-                src={currentImage}
-                alt={`이미지 ${currentIndex + 1}`}
-                width={1000}
-                height={1000}
-                draggable={false}
-                className="object-contain aspect-auto"
+            <div className="w-full h-full flex items-center justify-center">
+              <Responsive
+                mobile={
+                  <div className="w-full h-full py-16 px-12">
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={currentImage}
+                        alt={`이미지 ${currentIndex + 1}`}
+                        fill
+                        draggable={false}
+                        className="object-contain"
+                      />
+                    </div>
+                  </div>
+                }
+                desktop={
+                  <div className="w-full h-full py-20 px-64">
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={currentImage}
+                        alt={`이미지 ${currentIndex + 1}`}
+                        fill
+                        draggable={false}
+                        className="object-contain aspect-auto"
+                      />
+                    </div>
+                  </div>
+                }
               />
             </div>
           </motion.div>
@@ -252,7 +287,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
         )}
       </div>
     </AnimatePresence>,
-    document.body
+    document.body,
   );
 };
 

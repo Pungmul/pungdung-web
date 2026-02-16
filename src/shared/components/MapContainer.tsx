@@ -1,6 +1,9 @@
 "use client";
-import { useRef } from "react";
+
+import { useCallback, useRef } from "react";
+
 import { LocationType } from "@/features/location";
+
 import { useKakaoMapsEffect } from "../hooks/useKakaoMaps";
 
 /**
@@ -27,8 +30,8 @@ export default function MapContainer({
   setIsMapReady?: (ready: boolean) => void;
 }) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  // 지도 초기화 (SDK 로드 완료 후)
-  useKakaoMapsEffect(() => {
+
+  const initializeMap = useCallback(() => {
     const container = mapContainerRef.current;
     if (!container) {
       console.error("Map container not found");
@@ -50,7 +53,10 @@ export default function MapContainer({
 
     mapRef.current = mapInstance;
     setIsMapReady?.(true);
-  }, [setIsMapReady]);
+  }, [additionalOptions, initialLocation, mapRef, setIsMapReady]);
+
+  // 지도 초기화 (SDK 로드 완료 후)
+  useKakaoMapsEffect(initializeMap);
 
   return (
     <div ref={mapContainerRef} className={className}>

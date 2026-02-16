@@ -1,4 +1,4 @@
-import "@pThunder/app/globals.css";
+import "@/app/globals.css";
 
 interface SpinnerProps {
   size?: number;
