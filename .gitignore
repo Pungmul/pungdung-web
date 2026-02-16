@@ -28,9 +28,13 @@ yarn-error.log*
 # local env files
 .env*
 
+# FCM 백그라운드 조각(public 템플릿 + ENV, pungdung-sw.js 에서 import)
+/public/pungdung-fcm-background.js
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/docs

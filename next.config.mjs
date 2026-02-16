@@ -15,7 +15,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/firebase-messaging-sw.js",
+        source: "/pungdung-sw.js",
         headers: [
           {
             key: "Content-Type",

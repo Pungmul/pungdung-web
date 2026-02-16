@@ -1,7 +1,8 @@
-export const FCM_SERVICE_WORKER_PATH = "/firebase-messaging-sw.js";
+/** 푸시(FCM)·정적 캐시를 묶은 앱 단일 진입점 (`public/pungdung-sw.js`) */
+export const FCM_SERVICE_WORKER_PATH = "/pungdung-sw.js";
 
 /**
- * scriptURL이 FCM 전용 SW인지 확인
+ * 이 앱이 등록한 푸시용 Service Worker(`/pungdung-sw.js`) 여부.
  */
 function isFCMRegistration(reg: ServiceWorkerRegistration): boolean {
   const sw = reg.active ?? reg.waiting ?? reg.installing;
@@ -15,7 +16,7 @@ function isFCMRegistration(reg: ServiceWorkerRegistration): boolean {
 }
 
 /**
- * 이미 등록된 Service Worker 중 FCM용(firebase-messaging-sw.js) 등록을 반환.
+ * 등록되어 있던 푸시용 등록(`/pungdung-sw.js`) 반환.
  * 없으면 null.
  */
 export async function getFCMServiceWorkerRegistration(): Promise<ServiceWorkerRegistration | null> {
