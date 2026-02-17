@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect } from "react";
 
 interface UseCommentNavigationProps {
@@ -10,13 +12,16 @@ export const useCommentNavigation = ({
   commentsRef,
 }: UseCommentNavigationProps) => {
   const moveToHash = useCallback(() => {
-    if (commentId) {
-      const element = commentsRef.current[parseInt(commentId)];
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+    if (!commentId) {
+      return;
     }
-  }, [commentId]);
+
+    const element = commentsRef.current[parseInt(commentId)];
+
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [commentId, commentsRef]);
 
   useEffect(() => {
     moveToHash();
