@@ -1,9 +1,13 @@
 import { memo } from "react";
 import Link from "next/link";
 
+import { getTimeSincePosted } from "@/shared/lib";
+
 import { MyComment } from "../../types";
 
-function CommentedPostBox({ comment }: { comment: MyComment }) {
+function CommentedPostBoxComponent({ comment }: { comment: MyComment }) {
+  const { timeSincePostedText } = getTimeSincePosted(comment.createdAt);
+
   return (
     <li>
       <Link
@@ -13,10 +17,6 @@ function CommentedPostBox({ comment }: { comment: MyComment }) {
         className="relative w-full bg-background flex flex-col px-[28px] md:px-[32px] py-[24px] gap-[8px] hover:bg-grey-100 cursor-pointer"
       >
         <div className="relative flex flex-col gap-[12px] w-full overflow-hidden">
-          {/* <div className="px-[8px] py-[4px] bg-grey-100 rounded-[4px] text-grey-500 text-[12px] w-fit">
-             {post.categoryName}
-           </div> */}
-
           <div className="text-[14px] text-grey-600 line-clamp-1 text-ellipsis">
             {comment.postTitle}
           </div>
@@ -62,7 +62,7 @@ function CommentedPostBox({ comment }: { comment: MyComment }) {
           <div className="flex flex-row gap-2  items-end">
             <div className="flex flex-row gap-1 items-center">
               <div className="text-grey-400 text-[12px]">
-                {comment.createdAt}
+                {timeSincePostedText}
               </div>
             </div>
           </div>
@@ -72,4 +72,4 @@ function CommentedPostBox({ comment }: { comment: MyComment }) {
   );
 }
 
-export default memo(CommentedPostBox);
+export const CommentedPostBox = memo(CommentedPostBoxComponent);
