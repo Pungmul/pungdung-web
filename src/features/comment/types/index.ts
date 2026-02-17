@@ -1,5 +1,6 @@
-import { CommentReportType } from "@/shared/constants/comment";
 import { ImageObject } from "@/shared/types/image";
+
+import { CommentReportType } from "@/features/comment/constants/comment-report-enum";
 
 export interface Comment {
   commentId: number;
@@ -12,7 +13,7 @@ export interface Comment {
   replies: Comment[];
 }
 
-export type Reply = Exclude<Comment, "replies">;
+export type Reply = Omit<Comment, "replies">;
 
 export interface ReportedComment {
   commentId: number;
