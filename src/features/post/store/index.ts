@@ -1,3 +1,2 @@
-export { postStore } from './postStore';
-export { useReportPost, useReportPostModal } from './ReportPostStore';
-
+export type { ReportedPost } from "./report-post.store";
+export { reportPostStore } from "./report-post.store";
