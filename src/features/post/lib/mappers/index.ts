@@ -1,0 +1,1 @@
+export { mapPostDetailDtoToArticle } from "./map-post-detail";

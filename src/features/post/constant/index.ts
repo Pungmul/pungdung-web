@@ -1,2 +1,0 @@
-export { postQueryKeys } from "./queryKeys";
-
