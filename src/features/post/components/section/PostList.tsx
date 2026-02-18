@@ -1,35 +1,33 @@
 "use client";
 
-import { useRef } from "react";
+import type { ReactNode } from "react";
 
-import ObserveTrigger from "@/shared/components/ObserveTrigger";
 import { ListEmptyView } from "@/shared/components";
-import { Post } from "../../types";
+import ObserveTrigger from "@/shared/components/ObserveTrigger";
 
-import PostBox from "../element/PostBox";
-import PostBoxSkelleton from "../element/PostBoxSkelleton";
+import type { PostSummary } from "../../types";
+import { PostBox } from "../ui/PostBox";
+import { PostBoxSkeleton } from "../ui/PostBoxSkeleton";
 
 interface PostListProps {
-  posts: Post[];
+  posts: PostSummary[];
   isLoading: boolean;
   hasNextPage: boolean;
   onLoadMore: () => void;
-  ListEmptyComponent?: React.ReactNode;
+  ListEmptyComponent?: ReactNode;
 }
 
 const defaultListEmpty = (
   <ListEmptyView message="아직 게시글이 없습니다" />
 );
 
-export default function PostList({
+export function PostList({
   posts,
   isLoading,
   hasNextPage,
   onLoadMore,
   ListEmptyComponent = defaultListEmpty,
 }: PostListProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   if (!isLoading && posts.length === 0) {
     return (
       <div className="flex min-h-0 w-full flex-1 flex-col">
@@ -37,13 +35,21 @@ export default function PostList({
       </div>
     );
   }
+  const firstThumbnailIndex = posts.findIndex((post) => post.thumbnail);
+
   return (
-    <div ref={containerRef} className="flex flex-col w-full max-w-full">
+    <div className="flex flex-col w-full max-w-full">
       <ul className="flex flex-col list-none">
-        {posts.map((post) => (
-          <PostBox post={post} key={post.postId} />
+        {posts.map((post, index) => (
+          <PostBox
+            post={post}
+            key={post.postId}
+            thumbnailPriority={
+              Boolean(post.thumbnail) && index === firstThumbnailIndex
+            }
+          />
         ))}
-        {isLoading && <PostBoxSkelleton length={3} />}
+        {isLoading && <PostBoxSkeleton length={3} />}
         <li>
           <ObserveTrigger
             trigger={onLoadMore}

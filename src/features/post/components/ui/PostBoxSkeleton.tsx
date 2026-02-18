@@ -1,6 +1,6 @@
 import { SkeletonView } from "@/shared/components";
 
-export default function PostBoxSkelleton({ length }: { length: number }) {
+export function PostBoxSkeleton({ length }: { length: number }) {
   return (
     <>
       {Array.from({ length }).map((_, idx) => (

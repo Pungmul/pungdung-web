@@ -1,35 +1,32 @@
 "use client";
-import { useRef } from "react";
+import type { ReactNode } from "react";
 
-import ObserveTrigger from "@/shared/components/ObserveTrigger";
 import { ListEmptyView } from "@/shared/components";
+import ObserveTrigger from "@/shared/components/ObserveTrigger";
 
-import { PostBoxWithCategory } from "@/features/board/components/element/PostBoxWithCategory";
-
-import { PostWithCategoryName } from "../../types";
-import PostBoxSkelleton from "../element/PostBoxSkelleton";
+import type { PostSummaryWithCategory } from "../../types";
+import { PostBoxSkeleton } from "../ui/PostBoxSkeleton";
+import { PostBoxWithCategory } from "../ui/PostBoxWithCategory";
 
 interface PostWithCategoryNameListProps {
-  posts: PostWithCategoryName[];
+  posts: PostSummaryWithCategory[];
   isLoading: boolean;
   hasNextPage: boolean;
   onLoadMore: () => void;
-  ListEmptyComponent?: React.ReactNode;
+  ListEmptyComponent?: ReactNode;
 }
 
 const defaultListEmpty = (
   <ListEmptyView message="아직 게시글이 없습니다" />
 );
 
-export default function PostWithCategoryNameList({
+export function PostWithCategoryNameList({
   posts,
   isLoading,
   hasNextPage,
   onLoadMore,
   ListEmptyComponent = defaultListEmpty,
 }: PostWithCategoryNameListProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   if (!isLoading && posts.length === 0) {
     return (
       <div className="flex min-h-0 w-full flex-1 flex-col">
@@ -37,13 +34,21 @@ export default function PostWithCategoryNameList({
       </div>
     );
   }
+  const firstThumbnailIndex = posts.findIndex((post) => post.thumbnail);
+
   return (
-    <div ref={containerRef} className="flex flex-col w-full max-w-full">
+    <div className="flex flex-col w-full max-w-full">
       <ul className="flex flex-col list-none">
-        {posts.map((post) => (
-          <PostBoxWithCategory post={post} key={post.postId} />
+        {posts.map((post, index) => (
+          <PostBoxWithCategory
+            post={post}
+            key={post.postId}
+            thumbnailPriority={
+              Boolean(post.thumbnail) && index === firstThumbnailIndex
+            }
+          />
         ))}
-        {isLoading && <PostBoxSkelleton length={3} />}
+        {isLoading && <PostBoxSkeleton length={3} />}
         <li>
           <ObserveTrigger
             trigger={onLoadMore}

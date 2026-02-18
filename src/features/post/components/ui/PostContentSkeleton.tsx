@@ -1,6 +1,6 @@
 import { SkeletonView, Space } from "@/shared/components";
 
-const PostContentSkeleton: React.FC = () => {
+export function PostContentSkeleton() {
   return (
     <div className="flex-grow flex flex-col">
       <Space h={16} />
@@ -45,6 +45,4 @@ const PostContentSkeleton: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default PostContentSkeleton;
+}

@@ -1,10 +1,23 @@
-import { Post } from "@pThunder/features/post";
-import { CommentOutline, EyeIcon } from "@pThunder/shared/components/Icons";
-import Link from "next/link";
-import PostThumbnail from "./PostThumbnail";
 import React from "react";
+import Link from "next/link";
 
-function PostBox({ post }: { post: Post }) {
+import { CommentOutline, EyeIcon } from "@/shared/components/Icons";
+import { getTimeSincePosted } from "@/shared/lib";
+
+import { PostThumbnail } from "./PostThumbnail";
+import type { PostSummary } from "../../types";
+
+function PostBoxImpl({
+  post,
+  thumbnailPriority = false,
+}: {
+  post: PostSummary;
+  thumbnailPriority?: boolean;
+}) {
+  const timeLabel = getTimeSincePosted(
+    post.createdAt ?? new Date(Date.now() - post.timeSincePosted * 60_000)
+  ).timeSincePostedText;
+
   return (
     <li>
       <Link
@@ -22,33 +35,37 @@ function PostBox({ post }: { post: Post }) {
               <div className="text-grey-400 text-[11px] max-w-24">
                 {post.author == "Anonymous" ? "익명" : post.author}
               </div>
-              <p className="text-grey-800 text-[12px] line-clamp-2 text-ellipsis py-[4px]">
+              <p className="text-grey-800 text-[12px] line-clamp-2 text-ellipsis py-[4px] whitespace-pre-wrap">
                 {post.content}
               </p>
             </div>
-            {!!post.thumbnail && <PostThumbnail imageData={post.thumbnail} />}
+            {!!post.thumbnail && (
+              <PostThumbnail
+                imageData={post.thumbnail}
+                priority={thumbnailPriority}
+              />
+            )}
           </div>
 
           <div className="flex flex-row items-center justify-between">
             <span className="flex flex-row gap-[12px] items-center">
-              <div className="flex flex-row items-center gap-1">
-                <div className="flex justify-center items-center size-[16px]">
-                  <EyeIcon className="size-[16px] text-grey-500" />
+              <div className="flex flex-row items-end gap-1">
+                <div className="flex justify-center items-center size-5">
+                  <EyeIcon className="text-grey-500" />
                 </div>
 
                 <div className="text-grey-400 text-[12px]">
                   {post.viewCount}
                 </div>
               </div>
-              <div className="flex flex-row items-center gap-1">
-                <div className="flex justify-center items-center size-[16px]">
+              <div className="flex flex-row items-end gap-1">
+                <div className="flex justify-center items-center size-5">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="#FF7B7B"
-                    className="size-6"
                   >
                     <path
                       strokeLinecap="round"
@@ -61,9 +78,9 @@ function PostBox({ post }: { post: Post }) {
                   {post.likedNum}
                 </div>
               </div>
-              <div className="flex flex-row items-center gap-1">
-                <div className="flex justify-center items-center size-[16px]">
-                  <CommentOutline className="size-[16px] text-grey-500" />
+              <div className="flex flex-row items-end gap-1">
+                <div className="flex justify-center items-center size-5">
+                  <CommentOutline className="text-grey-500" />
                 </div>
                 <div className="text-grey-500 text-[12px]">
                   {post.commentNum}
@@ -73,9 +90,7 @@ function PostBox({ post }: { post: Post }) {
             <span className="flex flex-row gap-2 items-end">
               <div className="flex flex-row gap-1 items-center">
                 <span className="text-grey-400 text-[12px]">
-                  {post.timeSincePostedText === "0분 전"
-                    ? "방금"
-                    : post.timeSincePostedText}
+                  {timeLabel}
                 </span>
               </div>
             </span>
@@ -86,4 +101,4 @@ function PostBox({ post }: { post: Post }) {
   );
 }
 
-export default React.memo(PostBox);
+export const PostBox = React.memo(PostBoxImpl);

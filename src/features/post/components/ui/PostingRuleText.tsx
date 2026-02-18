@@ -1,18 +1,25 @@
+"use client";
+
 import React from "react";
+
+import { useFormContext, useWatch } from "react-hook-form";
+
 import { EditorState } from "draft-js";
-import { postStore } from "../../store";
+
+import type { PostEditorFormValues } from "../../types/schemas";
 
 interface PostingRuleTextProps {
   editorState: EditorState;
 }
 
-export default function PostingRuleText({ editorState }: PostingRuleTextProps) {
-  const { imageFiles } = postStore();
+export function PostingRuleText({ editorState }: PostingRuleTextProps) {
+  const { control } = useFormContext<PostEditorFormValues>();
+  const imageFiles = useWatch({ control, name: "imageFiles" }) ?? [];
 
   return (
     editorState.getCurrentContent().getBlockMap().size < 5 &&
     editorState.getCurrentContent().getPlainText().length < 200 &&
-    imageFiles.length == 0 && (
+    imageFiles.length === 0 && (
       <div className="bottom-32 select-none px-[12px]">
         <div className="text-left relative text-grey-500">
           <div>
@@ -69,4 +76,4 @@ export default function PostingRuleText({ editorState }: PostingRuleTextProps) {
       </div>
     )
   );
-} 
+}
