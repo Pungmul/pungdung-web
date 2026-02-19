@@ -1,11 +1,14 @@
 "use client";
-import Link from "next/link";
 
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-import { useFrequentBoard } from "@/features/board/store";
+import { WebViewLink } from "@/shared/components";
 
-export default function FrequentBoards() {
+import { boardHrefSegment } from "../../lib";
+import { useFrequentBoard } from "../../store";
+
+export function FrequentBoards() {
+  // 즐겨 방문 게시판 칩 목록 · 제거
   const { boardList, removeBoard } = useFrequentBoard();
 
   if (boardList.length === 0) return null;
@@ -29,13 +32,12 @@ export default function FrequentBoards() {
             >
               <XMarkIcon className="w-[16px] h-[16px] cursor-pointer" />
             </button>
-            <Link
-              href={`/board/${board.id}`}
+            <WebViewLink
+              href={`/board/${boardHrefSegment(board.id)}`}
               className="text-[14px] cursor-pointer leading-[16px]"
-              prefetch
             >
               {board.name}
-            </Link>
+            </WebViewLink>
           </li>
         ))}
       </ul>

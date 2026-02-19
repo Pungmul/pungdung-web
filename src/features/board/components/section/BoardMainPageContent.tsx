@@ -1,14 +1,20 @@
+"use client";
+
 import Link from "next/link";
-import BoardList from "./BoardList";
-import LastUpdateTime from "../element/LastUpdateTime";
-import { BriefBoardInfo } from "../../types";
+import { useRouter } from "next/navigation";
 
-import { FireIcon, TicketIcon } from "@heroicons/react/24/solid";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
-import { CommentOutline } from "@pThunder/shared/components/Icons";
+import { FireIcon, TicketIcon } from "@heroicons/react/24/solid";
 
+import { CommentOutline } from "@/shared/components/Icons";
+
+import { BoardList } from "./BoardList";
+import type { BoardSummary } from "../../types";
+import { LastUpdateTime } from "../ui/LastUpdateTime";
+
+/** `boardList`는 메인 목록에 쓰이도록 상위(페이지)에서 필터된 배열을 넘긴다. */
 interface BoardMainPageContentProps {
-  boardList: BriefBoardInfo[];
+  boardList: BoardSummary[];
 }
 
 const boardMainPageContentItemList = [
@@ -34,7 +40,7 @@ const boardMainPageContentItemList = [
   },
 ];
 
-export default function BoardMainPageContent({
+export function BoardMainPageContent({
   boardList,
 }: BoardMainPageContentProps) {
   return (
@@ -51,7 +57,7 @@ export default function BoardMainPageContent({
                 <BoardMainPageContentItem key={item.title} {...item} />
               ))}
             </ul>
-            <BoardList boardList={[...boardList.filter((board) => typeof board.id === "number" || board.id === "promote")]} />
+            <BoardList boardList={boardList} />
           </div>
         </div>
       </div>
@@ -68,11 +74,20 @@ const BoardMainPageContentItem = ({
   title: string;
   href: string;
 }) => {
+  const router = useRouter();
+
   return (
     <li>
       <Link
         href={href}
+        prefetch={false}
         className="w-full px-[12px] py-[8px] flex flex-row items-end gap-[12px] cursor-pointer"
+        onMouseEnter={() => {
+          void router.prefetch(href);
+        }}
+        onTouchStart={() => {
+          void router.prefetch(href);
+        }}
       >
         <div className="flex justify-center items-center size-[28px]">
           {icon}

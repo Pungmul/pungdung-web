@@ -1,18 +1,16 @@
 "use client";
 
-import { FireIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
-interface HotPost {
-  postId: number;
-  title: string;
-}
+import { FireIcon } from "@heroicons/react/24/outline";
+
+import type { HotPostBannerPost } from "../../types";
 
 interface HotPostBannerProps {
-  hotPost: HotPost | null;
+  hotPost: HotPostBannerPost | null;
 }
 
-export default function HotPostBanner({ hotPost }: HotPostBannerProps) {
+export function HotPostBanner({ hotPost }: HotPostBannerProps) {
   const content = (
     <div className="bg-red-50 flex flex-row w-full px-[12px] py-[8px] rounded-full items-center gap-2 overflow-hidden">
       <FireIcon
@@ -33,9 +31,9 @@ export default function HotPostBanner({ hotPost }: HotPostBannerProps) {
   );
 
   return (
-    <div className="w-full px-[16px] h-[64px] flex items-center gap-2 flex-row bg-[#F9F8FF] md:bg-transparent">
+    <div className="w-full px-[16px] h-[64px] flex items-center gap-2 flex-row bg-grey-100 md:bg-transparent">
       {hotPost ? (
-        <Link href={`/board/d/${hotPost.postId}`}>
+        <Link href={`/board/d/${hotPost.postId}`} className="w-full">
           {content}
         </Link>
       ) : (

@@ -1,19 +1,28 @@
 "use client";
 
-import { WebViewLink } from "@/shared/components";
-import { BriefBoardInfo } from "../../types"; 
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+
 import { StarIcon as StarIconOutline } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
-import { memo, useCallback, useEffect, useState, useMemo } from "react";
+
+import { WebViewLink } from "@/shared/components";
+
+import { boardHrefSegment } from "../../lib";
+import { sortBoardsWithBookmarks } from "../../services";
+import type { BoardSummary } from "../../types";
 
 interface BoardListProps {
-  boardList: BriefBoardInfo[];
+  boardList: BoardSummary[];
 }
 
 const BoardList = memo(function BoardList({ boardList }: BoardListProps) {
-  const [bookmarkedBoardList, setBookmarkedBoardList] = useState<(number | string)[]>([]);
+  // 즐겨찾기 게시판 id 목록 · 로컬 스토리지 동기화(로드 후에만 저장)
+  const [bookmarkedBoardList, setBookmarkedBoardList] = useState<
+    (number | string)[]
+  >([]);
+  const [hasHydratedBookmarks, setHasHydratedBookmarks] = useState(false);
 
-  const toggleBookmark = useCallback((board: BriefBoardInfo) => {
+  const toggleBookmark = useCallback((board: BoardSummary) => {
     setBookmarkedBoardList((prev) => {
       if (prev.includes(board.id)) {
         return prev.filter((id) => id !== board.id);
@@ -24,38 +33,33 @@ const BoardList = memo(function BoardList({ boardList }: BoardListProps) {
   }, []);
 
   useEffect(() => {
-    const bookmarkedBoard = localStorage.getItem("favoriteBoard");
-    if (bookmarkedBoard) {
-      setBookmarkedBoardList(JSON.parse(bookmarkedBoard));
+    try {
+      const raw = localStorage.getItem("favoriteBoard");
+      if (raw) {
+        setBookmarkedBoardList(JSON.parse(raw));
+      }
+    } catch {
+      localStorage.removeItem("favoriteBoard");
+    } finally {
+      setHasHydratedBookmarks(true);
     }
   }, []);
 
   useEffect(() => {
-    return () => {
-      localStorage.setItem(
-        "favoriteBoard",
-        JSON.stringify(bookmarkedBoardList)
-      );
-    };
-  }, [bookmarkedBoardList]);
+    if (!hasHydratedBookmarks) {
+      return;
+    }
+    localStorage.setItem(
+      "favoriteBoard",
+      JSON.stringify(bookmarkedBoardList)
+    );
+  }, [bookmarkedBoardList, hasHydratedBookmarks]);
 
-  const sortedBoardList = useMemo(() => {
-    return [
-      ...boardList,
-    ].sort((a, b) => {
-      const aBookmarked = bookmarkedBoardList.includes(a.id);
-      const bBookmarked = bookmarkedBoardList.includes(b.id);
-
-      if (aBookmarked && !bBookmarked) return -1;
-      if (!aBookmarked && bBookmarked) return 1;
-
-      if (typeof a.id === "number" && typeof b.id === "number") {
-        return a.id - b.id;
-      } else {
-        return (a.id as string).localeCompare(b.id as string, "ko-KR");
-      }
-    });
-  }, [boardList, bookmarkedBoardList]);
+  // 즐겨찾기가 상단으로 오도록 정렬
+  const sortedBoardList = useMemo(
+    () => sortBoardsWithBookmarks(boardList, bookmarkedBoardList),
+    [boardList, bookmarkedBoardList]
+  );
 
   return (
     <ul className="py-3 px-2 border-0.5 border-background bg-background rounded-md flex flex-col gap-2 list-none flex-grow">
@@ -74,7 +78,7 @@ const BoardList = memo(function BoardList({ boardList }: BoardListProps) {
   );
 });
 
-export default BoardList;
+export { BoardList };
 
 const BoardListItem = memo(
   ({
@@ -83,8 +87,8 @@ const BoardListItem = memo(
     toggleBookmark,
   }: {
     isBookmarked: boolean;
-    board: BriefBoardInfo;
-    toggleBookmark: (board: BriefBoardInfo) => void;
+    board: BoardSummary;
+    toggleBookmark: (board: BoardSummary) => void;
   }) => {
     return (
       <li className="w-full px-[12px] py-[8px] flex flex-row items-end gap-[8px]">
@@ -102,7 +106,7 @@ const BoardListItem = memo(
           )}
         </div>
         <WebViewLink
-          href={`/board/${board.id === 999999 ? "promote" : board.id}`}
+          href={`/board/${boardHrefSegment(board.id)}`}
           className="flex-grow text-[15px] text-grey-600"
           prefetch
         >
