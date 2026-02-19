@@ -43,4 +43,3 @@ const useFrequentBoard = create<FrequentBoardStore>()(
 );
 
 export { useFrequentBoard };
-
