@@ -1,41 +1,5 @@
-import { Post } from "@pThunder/features/post";
-
-export interface PostListResponse {
-  total: number;
-  list: Post[];
-  pageNum: number;
-  pageSize: number;
-  isFirstPage: boolean;
-  isLastPage: boolean;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}
-
-export interface BoardInfo {
-  rootCategoryName: string;
-  childCategoryName: string | null;
-}
-
-export interface PostList {
-  total: number;
-  list: Post[];
-  pageNum: number;
-  pageSize: number;
-  isFirstPage: boolean;
-  isLastPage: boolean;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}
-
-export interface BoardData {
-  boardInfo: BoardInfo;
-  hotPost: Post;
-  recentPostList: PostList;
-}
-
-export type BriefBoardInfo = {
-  id: number | string;
-  parentId: number | null;
-  name: string;
-  description: string;
-};
+export type { BoardHeaderDisplay } from "./board-header-display.types";
+export type { BoardCategoryPath, BoardOverview } from "./board-overview.types";
+export type { BoardSummary } from "./board-summary.types";
+export type { HotPostBannerPost } from "./hot-post-banner.types";
+export type { InfinitePostListPages, PostListPage } from "./post-list-page.types";
