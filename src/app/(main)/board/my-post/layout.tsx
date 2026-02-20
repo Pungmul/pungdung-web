@@ -1,19 +1,23 @@
-import { getQueryClient } from "@pThunder/core";
+import { Metadata } from "next";
+
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
+import { getQueryClient } from "@/core";
+
 import {
   BoardHeader,
   BoardListNav,
-  loadBoardInfoList,
-  loadMyPostList,
-} from "@pThunder/features/board";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { Metadata } from "next";
+  boardQueries,
+  prefetchBoardInfoList,
+} from "@/features/board";
 
-export const dynamic = "force-static";
+import { ScrollToTopButton } from "@/shared/components";
 
 export const metadata: Metadata = {
   title: "풍덩 | 내 게시글",
   description: "내가 작성한 게시글 목록 입니다.",
 };
+
 export default async function MyPostLayout({
   children,
 }: {
@@ -21,25 +25,20 @@ export default async function MyPostLayout({
 }) {
   const queryClient = getQueryClient();
 
-  queryClient.prefetchQuery({
-    queryKey: ["boardList"],
-    queryFn: () => loadBoardInfoList(),
-  });
-
-  queryClient.prefetchQuery({
-    queryKey: ["board", "my-post"],
-    queryFn: () => loadMyPostList(),
+  await queryClient.prefetchQuery({
+    ...boardQueries.list(),
+    queryFn: prefetchBoardInfoList,
   });
 
   const dehydratedState = dehydrate(queryClient);
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex h-full w-full flex-col">
       <HydrationBoundary state={dehydratedState}>
         <BoardHeader boardID={"my-post"} />
-
-        <div className="flex flex-col w-full flex-grow relative items-center">
-          <div className="flex flex-row justify-center w-full h-full">
+        <ScrollToTopButton />
+        <div className="relative flex flex-grow flex-col items-center w-full">
+          <div className="flex h-full w-full flex-row justify-center">
             <BoardListNav />
             <div className="w-full max-w-[768px]">{children}</div>
           </div>

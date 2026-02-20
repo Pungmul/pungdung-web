@@ -1,8 +1,9 @@
-import { Spinner } from "@/shared";
-
 import { notFound } from "next/navigation";
+
+import { Spinner } from "@/shared";
 import { SuspenseComponent as Suspense } from "@/shared";
-import {Editor, ModifyEditor} from "@/features/post";
+
+import { Editor, ModifyEditor } from "./_Editor";
 
 
 export default async function Posting({

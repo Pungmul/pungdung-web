@@ -1,10 +1,13 @@
-import { PostContentSkeleton, PostDetailComponent } from "@/features/post";
-import { Header } from "@pThunder/shared";
-import Suspense from "@pThunder/shared/components/SuspenseComponent";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-static";
+import { getQueryClient } from "@/core";
+
+import { boardQueries, prefetchBoardInfoList } from "@/features/board";
+import { PostContentSkeleton, PostDetailComponent } from "@/features/post";
+
+import { Header } from "@/shared";
+import Suspense from "@/shared/components/SuspenseComponent";
 
 export const metadata: Metadata = {
   title: "풍덩 | 게시글 상세",
@@ -16,6 +19,11 @@ export default async function Page({
   params: Promise<{ postId?: string | number }>;
 }) {
   const { postId } = await params;
+  const queryClient = getQueryClient();
+  await queryClient.prefetchQuery({
+    ...boardQueries.list(),
+    queryFn: prefetchBoardInfoList,
+  });
 
   if (!postId) {
     return notFound();

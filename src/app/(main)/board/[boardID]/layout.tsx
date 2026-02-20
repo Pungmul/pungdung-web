@@ -1,12 +1,18 @@
-import { getQueryClient } from "@pThunder/core";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { getInitialViewFromCookie } from "@pThunder/shared/lib/getInitialViewFromCookie";
 
-import { loadBoardDetails, loadBoardInfoList } from "@/features/board/api";
-import { BoardListNav, BoardHeader } from "@/features/board";
-import PostingButton from "@pThunder/features/board/components/element/PostingButton";
+import { getQueryClient } from "@/core";
 
-export const revalidate = 1800; // 30분(초 단위)
+import {
+  BoardHeader,
+  BoardListNav,
+  boardQueries,
+  PostingButton,
+  prefetchBoardInfoList,
+} from "@/features/board";
+
+import { ScrollToTopButton } from "@/shared/components";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -14,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ boardID: string }>;
 }) {
   const { boardID } = await params;
-  const boardList = await loadBoardInfoList();
+  const boardList = await prefetchBoardInfoList();
   const boardName =
     boardList.find((board) => board.id === Number(boardID))?.name ||
     "알 수 없는 게시판";
@@ -32,28 +38,26 @@ export default async function BoardPageLayout({
     boardID: string;
   }>;
 }) {
-  const { boardID } = await params;
-  const initialView = await getInitialViewFromCookie();
-  const queryClient = getQueryClient();
-  const boardList = await loadBoardInfoList();
-  const initialBoardInfo =
-    boardList.find((board) => board.id === Number(boardID) || board.id === boardID) ??
-    null;
+  const { boardID: boardIdParam } = await params;
 
-  queryClient.setQueryData(["boardList"], boardList);
-  queryClient.prefetchQuery({
-    queryKey: ["board", boardID],
-    queryFn: () => loadBoardDetails(Number(boardID)),
+  const queryClient = getQueryClient();
+
+  const boardList = await queryClient.fetchQuery({
+    ...boardQueries.list(),
+    queryFn: prefetchBoardInfoList,
   });
+
+  const initialBoardInfo =
+    boardList.find((board) => Number(board.id) === Number(boardIdParam)) ??
+    null;
 
   const dehydratedState = dehydrate(queryClient);
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <div className="relative flex flex-col flex-grow">
+      <div className="relative flex flex-grow flex-col">
         <BoardHeader
-          boardID={boardID}
-          initialView={initialView === "desktop" ? "desktop" : "mobile"}
+          boardID={boardIdParam}
           {...(initialBoardInfo
             ? {
                 initialBoardInfo: {
@@ -63,11 +67,12 @@ export default async function BoardPageLayout({
               }
             : {})}
         />
-        <PostingButton boardID={Number(boardID)} />
-        <div className="flex flex-col w-full flex-grow relative">
-          <div className="flex flex-row justify-center w-full h-full">
+        <PostingButton boardID={Number(boardIdParam)} />
+        <ScrollToTopButton />
+        <div className="relative flex flex-grow flex-col w-full">
+          <div className="flex h-full w-full flex-row justify-center">
             <BoardListNav />
-            <div className="w-full md:max-w-[768px] z-10">{children}</div>
+            <div className="z-10 w-full md:max-w-[768px]">{children}</div>
           </div>
         </div>
       </div>

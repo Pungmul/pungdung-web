@@ -1,6 +1,10 @@
+import { getQueryClient } from "@/core";
+
 import {
   BoardMainPageContent,
-  fetchBoardList,
+  boardQueries,
+  filterBoardsForMainPage,
+  prefetchBoardInfoList,
 } from "@/features/board";
 
 export const metadata = {
@@ -12,9 +16,14 @@ export const metadata = {
 export const revalidate = 900;
 
 export default async function BoardMainPage() {
-  // 서버에서 게시판 정보 fetching
-  // const queryClient = prefetchMyPageInfo();
-  const boardList = await fetchBoardList();
-  
-  return <BoardMainPageContent boardList={boardList} />;
+  const queryClient = getQueryClient();
+
+  const boardList = await queryClient.fetchQuery({
+    ...boardQueries.list(),
+    queryFn: prefetchBoardInfoList,
+  });
+
+  const boardsForMain = filterBoardsForMainPage(boardList);
+
+  return <BoardMainPageContent boardList={boardsForMain} />;
 }

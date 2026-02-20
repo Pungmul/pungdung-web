@@ -1,14 +1,17 @@
 import { Metadata } from "next";
+
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { getQueryClient } from "@/core";
 
 import {
-  prefetchHotPostList,
-  loadBoardInfoList,
-  BoardListNav,
   BoardHeader,
+  BoardListNav,
+  boardQueries,
+  prefetchBoardInfoList,
 } from "@/features/board";
+
+import { ScrollToTopButton } from "@/shared/components";
 
 export const metadata: Metadata = {
   title: "풍덩 | 인기 게시글",
@@ -21,26 +24,22 @@ export default async function BoardPageLayout({
 }) {
   const queryClient = getQueryClient();
 
-  queryClient.prefetchQuery({
-    queryKey: ["boardList"],
-    queryFn: () => loadBoardInfoList(),
-  });
-
-  queryClient.prefetchQuery({
-    queryKey: ["board", "hot-post"],
-    queryFn: () => prefetchHotPostList(),
+  await queryClient.prefetchQuery({
+    ...boardQueries.list(),
+    queryFn: prefetchBoardInfoList,
   });
 
   const dehydratedState = dehydrate(queryClient);
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex h-full w-full flex-col">
       <HydrationBoundary state={dehydratedState}>
         <BoardHeader boardID={"hot-post"} />
-        <div className="flex flex-col w-full flex-grow relative">
-          <div className="flex flex-row justify-center w-full h-full">
+        <ScrollToTopButton />
+        <div className="relative flex flex-grow flex-col items-center w-full">
+          <div className="flex h-full w-full flex-row justify-center">
             <BoardListNav />
-            <div className="w-full md:max-w-[768px] z-10">{children}</div>
+            <div className="z-10 w-full md:max-w-[768px]">{children}</div>
           </div>
         </div>
       </HydrationBoundary>

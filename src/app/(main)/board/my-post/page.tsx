@@ -1,14 +1,14 @@
-import { MyPostList } from "@/features/board";
-import { PostBoxSkelleton } from "@pThunder/features/post";
-import { Suspense } from "react";
+import { Suspense } from "@suspensive/react";
 
-export const dynamic = "force-dynamic";
+import { PostBoxSkeleton } from "@/features/post";
+
+import { MyPostListPage } from "./_MyPostListPage";
 
 export default function MyPostPage() {
   return (
-    <section key="my-post-section" className="relative h-full flex flex-col">
-      <Suspense fallback={<PostBoxSkelleton length={8} />}>
-        <MyPostList />
+    <section key="my-post-section" className="relative flex h-full flex-col">
+      <Suspense clientOnly fallback={<PostBoxSkeleton length={8} />}>
+        <MyPostListPage />
       </Suspense>
     </section>
   );

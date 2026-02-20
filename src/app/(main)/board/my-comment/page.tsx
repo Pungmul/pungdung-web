@@ -1,14 +1,16 @@
-import MyCommentList from "@pThunder/features/board/components/widget/MyCommentList";
-import { PostBoxSkelleton } from "@pThunder/features/post";
-import { Suspense } from "react";
+"use client";
 
-export const dynamic = "force-dynamic";
+import { Suspense } from "@suspensive/react";
+
+import { PostBoxSkeleton } from "@/features/post";
+
+import { MyCommentListPage } from "./_MyCommentListPage";
 
 export default function MyCommentPage() {
   return (
-    <section key="my-comment-section" className="relative h-full flex flex-col">
-      <Suspense fallback={<PostBoxSkelleton length={8} />}>
-        <MyCommentList />
+    <section key="my-comment-section" className="relative flex h-full flex-col">
+      <Suspense clientOnly fallback={<PostBoxSkeleton length={8} />}>
+        <MyCommentListPage />
       </Suspense>
     </section>
   );
