@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 
-import { FrequentBoards, HomeHeader, HomeHotPostList } from "@/features/board";
+import { FrequentBoards } from "@/features/board";
+import { HomeHeader, HomeHotPostList } from "@/features/home";
 import { NearLightningContent } from "@/features/lightning";
 import { NotificationPermissionRequestCTA } from "@/features/notification";
 

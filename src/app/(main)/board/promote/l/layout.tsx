@@ -1,40 +1,30 @@
 import { Metadata } from "next";
+
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { getQueryClient } from "@/core";
+
 import {
-  loadBoardDetails,
-  BoardListNav,
   BoardHeader,
-  loadBoardInfoList,
+  BoardListNav,
+  boardQueries,
+  prefetchBoardInfoList,
 } from "@/features/board";
 
 export const metadata: Metadata = {
   title: "풍덩 | 홍보 게시판",
 };
 
-export const dynamic = "force-static";
-
 export default async function BoardPageLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: Promise<{
-    boardID: string;
-  }>;
 }) {
-  const { boardID } = await params;
   const queryClient = getQueryClient();
 
-  queryClient.prefetchQuery({
-    queryKey: ["boardList"],
-    queryFn: () => loadBoardInfoList(),
-  });
-
-  queryClient.prefetchQuery({
-    queryKey: ["board", boardID],
-    queryFn: () => loadBoardDetails(Number(boardID)),
+  await queryClient.prefetchQuery({
+    ...boardQueries.list(),
+    queryFn: prefetchBoardInfoList
   });
 
   const dehydratedState = dehydrate(queryClient);

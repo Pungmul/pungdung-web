@@ -3,6 +3,78 @@ function toKST(date: Date): Date {
   return new Date(utc + 9 * 60 * 60 * 1000);
 }
 
+/** `PostSummary.timeSincePosted`와 동일한 형태 — 경과 **분**(내림)과 한글 상대 시각. */
+export type TimeSincePosted = {
+  timeSincePosted: number;
+  timeSincePostedText: string;
+};
+
+function formatSeoulShortYmd(anchor: Date, nowRef: Date): string {
+  const parts = (d: Date) =>
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+      .format(d)
+      .split("-");
+
+  const [y, mo, da] = parts(anchor);
+  const [ny] = parts(nowRef);
+  return ny === y ? `${mo}.${da}` : `${y}.${mo}.${da}`;
+}
+
+/**
+ * `createdAt`(ISO 등 파싱 가능한 문자열 또는 Date) 기준 경과 시간.
+ * - `timeSincePosted`: 경과 **전체 분**(내림). 시간·일 문구와 숫자가 어긋날 수 있음(예: 172분 → `"2시간 전"`).
+ * - `now`를 넘기면 테스트·스냅샷 고정용.
+ */
+export function getTimeSincePosted(
+  createdAt: string | Date,
+  now: Date = new Date()
+): TimeSincePosted {
+  const input =
+    typeof createdAt === "string" ? new Date(createdAt) : createdAt;
+  if (Number.isNaN(input.getTime())) {
+    return { timeSincePosted: 0, timeSincePostedText: "" };
+  }
+
+  const diffMs = now.getTime() - input.getTime();
+  const totalMinutes = Math.floor(diffMs / (60 * 1000));
+
+  if (totalMinutes < 1) {
+    return { timeSincePosted: Math.max(0, totalMinutes), timeSincePostedText: "방금" };
+  }
+
+  if (totalMinutes < 60) {
+    return {
+      timeSincePosted: totalMinutes,
+      timeSincePostedText: `${totalMinutes}분 전`,
+    };
+  }
+
+  if (totalMinutes < 60 * 24) {
+    return {
+      timeSincePosted: totalMinutes,
+      timeSincePostedText: `${Math.floor(totalMinutes / 60)}시간 전`,
+    };
+  }
+
+  const days = Math.floor(totalMinutes / (60 * 24));
+  if (days < 7) {
+    return {
+      timeSincePosted: totalMinutes,
+      timeSincePostedText: `${days}일 전`,
+    };
+  }
+
+  return {
+    timeSincePosted: totalMinutes,
+    timeSincePostedText: formatSeoulShortYmd(input, now),
+  };
+}
+
 export function formatRelativeDate(inputDate: Date): string {
   const now = toKST(new Date());
   const input = toKST(inputDate);

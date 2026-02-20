@@ -1,8 +1,8 @@
-import type { Post } from "@/features/post";
+import type { PostSummary } from "@/features/post";
 
-export async function loadHotPostList(): Promise<Post[]> {
+export async function loadHotPostList(): Promise<PostSummary[]> {
   try {
-    const proxyUrl = `/api/boards/hot-post`;
+    const proxyUrl = `/api/boards/hot-post?page=1&size=10`;
 
     const proxyResponse = await fetch(proxyUrl, {
       credentials: "include",
