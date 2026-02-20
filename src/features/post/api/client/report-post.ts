@@ -1,8 +1,7 @@
 import { clientApiRequest } from "@/core/api/client";
 
 import { reportPostRequestBodySchema, reportPostResponseDtoSchema } from "./dto.schema";
-
-import type { PostReportType } from "@/shared";
+import type { PostReportType } from "../../constants";
 
 export interface ReportPostParams {
   postId: number;

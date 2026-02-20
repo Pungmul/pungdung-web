@@ -4,8 +4,7 @@ import {
   commentMutationResponseDtoSchema,
   reportCommentRequestDtoSchema,
 } from "./dto.schema";
-
-import type { CommentReportType } from "@/features/comment/constants/comment-report-enum";
+import type { CommentReportType } from "../../constants";
 
 export interface ReportCommentParams {
   commentId: number;
