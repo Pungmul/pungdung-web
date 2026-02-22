@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+
 import dayjs, { Dayjs } from "dayjs";
 import { match } from "ts-pattern";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const REVEAL_YEAR_COUNT = 15;
 

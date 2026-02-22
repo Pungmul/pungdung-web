@@ -56,7 +56,7 @@ export default function LocationModal({
       isOpen={isLocationModalOpen}
       title="주소 선택"
       onClose={closeModal}
-      className="min-w-[200px] w-full max-w-[calc(100dvw-48px)]"
+      className="min-w-[200px] w-full max-w-[calc(100dvw-48px)] sm:max-w-md"
     >
       <div className="space-y-4">
         <LocationMapPicker

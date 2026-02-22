@@ -20,13 +20,13 @@ function RadioSelectSolid({
     cx: "12",
     cy: "12",
     r: "9",
-    stroke: "#A4A6AA",
+    stroke: "currentColor",
     strokeWidth: "2"
   }), /*#__PURE__*/React.createElement("circle", {
     cx: "12",
     cy: "12",
     r: "6",
-    fill: "#A4A6AA"
+    fill: "currentColor"
   }));
 }
 

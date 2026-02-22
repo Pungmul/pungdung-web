@@ -4,7 +4,6 @@ import { InputHTMLAttributes } from "react";
 import { josa } from "es-hangul";
 import Image from "next/image";
 import WarningCircleIcon from "@public/icons/Warning-circle-icon.svg";
-import "@pThunder/app/globals.css";
 
 interface TextAreaProps extends InputHTMLAttributes<HTMLTextAreaElement> {
   placeholder?: string;
@@ -32,15 +31,14 @@ export function TextArea(props: TextAreaProps) {
       <div className="flex-grow">
         {!noLabel && (
           <div
-          className="text-grey-500 pl-[4px] text-[14px]"
-        >
-          {label}
+            className="text-grey-500 pl-[4px] text-[14px]"
+          >
+            {label}
           </div>
         )}
         <div
-          className={`flex flex-row flex-grow border box-border ${bgColor} ${
-            errorMessage ? "border-2 border-red-400" : "border-grey-500"
-          }`}
+          className={`flex flex-row flex-grow border box-border ${bgColor} ${errorMessage ? "border-2 border-red-400" : "border-grey-500"
+            }`}
           style={{ gap: 8, padding: "8px 8px", borderRadius: 5 }}
         >
           <textarea
@@ -53,7 +51,7 @@ export function TextArea(props: TextAreaProps) {
         {errorMessage && (
           <div
             className="flex flex-row items-center"
-            style={{ gap: 4}}
+            style={{ gap: 4 }}
           >
             <Image src={WarningCircleIcon} width={12} alt="" />
             <div

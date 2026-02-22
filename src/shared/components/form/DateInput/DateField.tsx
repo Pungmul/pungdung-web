@@ -1,4 +1,4 @@
-import { FieldType } from "@pThunder/shared/types";
+import { FieldType } from "@/shared/types";
 import { useCallback } from "react";
 
 interface NumericFieldProps<T extends FieldType> {
@@ -91,9 +91,8 @@ export const NumericField = <T extends FieldType>({
       onInput={handleInput}
       onFocus={handleFocus}
       inputMode="numeric"
-      className={`${className} ${
-        disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
-      }`}
+      className={`${className} ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
+        }`}
       data-placeholder={placeholder}
     >
       {value || placeholder}

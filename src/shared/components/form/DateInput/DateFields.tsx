@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { DateField } from "./DateField";
-import { FieldType } from "@pThunder/shared/types";
+import { FieldType } from "@/shared/types";
 
 type DateFieldType = Extract<FieldType, "year" | "month" | "day">;
 
@@ -46,9 +46,8 @@ export const DateFields = forwardRef<HTMLDivElement, DateFieldsProps>(
           onInput={onInput}
           onFocus={onFocus}
           onBeforeInput={onBeforeInput}
-          className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[40px] ${
-            disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
-          }`}
+          className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[40px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
+            }`}
         />
         <span className="text-grey-400 mx-1">/</span>
         <DateField
@@ -59,9 +58,8 @@ export const DateFields = forwardRef<HTMLDivElement, DateFieldsProps>(
           onInput={onInput}
           onFocus={onFocus}
           onBeforeInput={onBeforeInput}
-          className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[24px] ${
-            disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
-          }`}
+          className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[24px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
+            }`}
         />
         <span className="text-grey-400 mx-1">/</span>
         <DateField
@@ -72,9 +70,8 @@ export const DateFields = forwardRef<HTMLDivElement, DateFieldsProps>(
           onInput={onInput}
           onFocus={onFocus}
           onBeforeInput={onBeforeInput}
-          className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[24px] ${
-            disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
-          }`}
+          className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[24px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
+            }`}
         />
       </div>
     );

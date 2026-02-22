@@ -1,4 +1,5 @@
 import { CSSProperties } from "react";
+
 import { cn } from "@/shared/lib";
 
 export const SkeletonView: React.FC<{

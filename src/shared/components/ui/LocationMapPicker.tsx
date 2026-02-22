@@ -1,20 +1,31 @@
 "use client";
-import { useCallback, useEffect,useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { MagnifyingGlassIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import { debounce } from "lodash";
+import { MagnifyingGlassIcon, XCircleIcon } from "@heroicons/react/24/outline";
 
 import type { LocationType } from "@/features/location";
-import { locationStore } from "@/features/location";
+import { locationStore, MAP_LOCATION_FALLBACK } from "@/features/location";
 
-import { useKakaoMaps } from "../../hooks";
 import { Spinner } from "./Spinner";
+import { useKakaoMaps } from "../../hooks";
 
 interface LocationMapPickerProps {
   initialLocation: LocationType | null | undefined;
   onLocationChange?: (location: LocationType, address: string) => void;
   showSearchBar?: boolean;
   className?: string;
+}
+
+/** 폼 등에서 기본값 (0,0) 이 넘어오면 카카오 지도 중심이 대서양으로 깨진다 → 미설정과 동일하게 취급 */
+function isUsableInitialMapLocation(loc: LocationType | null | undefined): loc is LocationType {
+  if (loc == null) return false;
+  const lat = loc.latitude;
+  const lng = loc.longitude;
+  if (typeof lat !== "number" || typeof lng !== "number") return false;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
+  if (lat === 0 && lng === 0) return false;
+  return true;
 }
 
 export function LocationMapPicker({
@@ -39,16 +50,24 @@ export function LocationMapPicker({
   useEffect(() => {
     if (!kakaoMapsLoaded || isInitializedRef.current) return;
 
+    let cancelled = false;
+
     const initializeMap = async () => {
       try {
-        const location = initialLocation || (await getCurrentPosition());
-
-        if (!location) {
-          throw new Error("위치를 가져올 수 없습니다.");
+        let resolved: LocationType | null = isUsableInitialMapLocation(initialLocation)
+          ? initialLocation
+          : null;
+        if (!resolved) {
+          try {
+            resolved = await getCurrentPosition();
+          } catch {
+            // Geolocation 미지원·거부·타임아웃 등
+          }
         }
+        const location = resolved ?? MAP_LOCATION_FALLBACK;
 
         const container = mapContainerRef.current;
-        if (!container) return;
+        if (!container || cancelled) return;
 
         const center = new window.kakao.maps.LatLng(location.latitude, location.longitude);
         const options = { center: center, level: 3 };
@@ -59,6 +78,8 @@ export function LocationMapPicker({
           position: center,
           map: mapInstance,
         });
+
+        if (cancelled) return;
 
         markerRef.current = marker;
         mapRef.current = mapInstance;
@@ -77,13 +98,19 @@ export function LocationMapPicker({
           geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
         };
 
-        const displayAddrInfo = (
-          result: Array<{
-            address: kakao.maps.services.Address;
-            road_address: kakao.maps.services.RoadAaddress | null;
-          }>,
-          status: kakao.maps.services.Status
-        ) => {
+        /** 지도 중심 + 역지오코딩 결과를 폼에 반영 (초기 로드·드래그 공통) */
+        const emitPick = (coords: kakao.maps.LatLng, detailAddr: string) => {
+          setCurrentAddress(detailAddr);
+          onLocationChange?.(
+            {
+              latitude: coords.getLat(),
+              longitude: coords.getLng(),
+            },
+            detailAddr
+          );
+        };
+
+        searchAddrFromCoords(center, (result, status) => {
           if (status === window.kakao.maps.services.Status.OK) {
             let detailAddr = "";
             if (result[0]?.road_address) {
@@ -91,18 +118,17 @@ export function LocationMapPicker({
             } else if (result[0]?.address) {
               detailAddr = result[0].address.address_name;
             }
-            setCurrentAddress(detailAddr);
+            emitPick(center, detailAddr);
+            return;
           }
-        };
-
-        searchAddrFromCoords(center, displayAddrInfo);
+          emitPick(center, "");
+        });
 
         // 지도 드래그 완료 시 콜백 호출
         window.kakao.maps.event.addListener(mapInstance, "dragend", function () {
           const latlng = mapInstance.getCenter();
-          const newLocation = { latitude: latlng.getLat(), longitude: latlng.getLng() };
           marker.setPosition(latlng);
-          
+
           searchAddrFromCoords(latlng, (result, status) => {
             if (status === window.kakao.maps.services.Status.OK) {
               let detailAddr = "";
@@ -111,13 +137,10 @@ export function LocationMapPicker({
               } else if (result[0]?.address) {
                 detailAddr = result[0].address.address_name;
               }
-              setCurrentAddress(detailAddr);
-              
-              // 여기서만 콜백 호출
-              if (onLocationChange) {
-                onLocationChange(newLocation, detailAddr);
-              }
+              emitPick(latlng, detailAddr);
+              return;
             }
+            emitPick(latlng, "");
           });
         });
 
@@ -125,13 +148,19 @@ export function LocationMapPicker({
           const latlng = mapInstance.getCenter();
           marker.setPosition(latlng);
         });
-      } catch (error) {
-        console.error("지도 초기화 에러:", error);
+      } catch (err) {
+        if (!cancelled) {
+          console.error("지도 초기화 에러:", err);
+        }
       }
     };
 
-    initializeMap();
-  }, [kakaoMapsLoaded]);
+    void initializeMap();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [getCurrentPosition, initialLocation, kakaoMapsLoaded, onLocationChange]);
 
   // 장소 검색
   const searchPlaces = useCallback(() => {
@@ -169,7 +198,7 @@ export function LocationMapPicker({
   const handleSelect = useCallback((result: kakao.maps.services.PlacesSearchResultItem) => {
     const newLocation = { latitude: Number(result.y), longitude: Number(result.x) };
     const newAddress = result.place_name;
-    
+
     setCurrentAddress(newAddress);
     setSearchValue("");
 
@@ -248,7 +277,7 @@ export function LocationMapPicker({
 
       <div
         ref={mapContainerRef}
-        className="w-full h-[300px] md:h-[400px] rounded-lg overflow-hidden border border-grey-200"
+        className="w-full aspect-square max-h-[400px] rounded-lg overflow-hidden border border-grey-200"
       />
 
       {currentAddress && (
@@ -256,7 +285,7 @@ export function LocationMapPicker({
           <p className="font-medium">선택된 주소:</p>
           <p className="font-semibold text-grey-800">{currentAddress}</p>
           <p className="text-xs text-grey-500 mt-1">
-            지도를 드래그하여 원하는 위치를 선택하세요
+            필요하면 지도를 드래그해 위치를 조정할 수 있어요
           </p>
         </div>
       )}

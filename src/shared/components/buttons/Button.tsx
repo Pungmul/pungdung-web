@@ -11,7 +11,8 @@ function Button({
     <button
       {...props}
       className={cn(
-        "w-full h-[48px] text-[16px] rounded-[4px] cursor-pointer flex justify-center items-center flex-row bg-primary disabled:bg-red-200 text-background",
+        "w-full h-[48px] text-[16px] rounded-[4px] cursor-pointer flex justify-center items-center flex-row",
+        "bg-red-500 disabled:bg-red-200 text-background disabled:cursor-default",
         className
       )}
     >

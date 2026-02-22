@@ -1,4 +1,5 @@
-import * as React from "react";
+import React from "react";
+
 import { IconProps } from "../../types/type";
 
 function CheckBoxOutline({
@@ -22,13 +23,13 @@ function CheckBoxOutline({
     width: "18.5",
     height: "18.5",
     rx: "1.25",
-    stroke: "#A4A6AA",
+    stroke: "currentColor",
     strokeWidth: "2"
   }), /*#__PURE__*/React.createElement("path", {
     x: "16",
     y: "9",
     d: "M16 9L10.5 15L8 12.2727",
-    stroke: "#A4A6AA",
+    stroke: "currentColor",
     strokeWidth: "2",
     strokeLinecap: "round",
     strokeLinejoin: "round"
