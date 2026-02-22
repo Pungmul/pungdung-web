@@ -1,4 +1,4 @@
-export const searchPromotionAddress = async (address: string) => {
+export async function searchPromotionAddress(address: string) {
   const response = await fetch(
     `https://dapi.kakao.com/v2/local/search/address.json?query=${address}`,
     {
@@ -13,6 +13,4 @@ export const searchPromotionAddress = async (address: string) => {
   }
 
   return response.json();
-};
-
-
+}
