@@ -1,21 +1,27 @@
 import dayjs from "dayjs";
-import ExcelJS from "exceljs";
 
-import {
+import type {
+  PromotionApplicationDetail,
   PromotionDetail,
-  QuestionStatistics,
-  ResponseDto,
+  PromotionQuestionStatistics,
 } from "../types";
+
+/** 엑셀 워크북 헤더·파일명에 쓰이는 최소 정보 */
+export type PromotionExcelWorkbookMeta = Pick<
+  PromotionDetail,
+  "title" | "questions"
+>;
 
 /**
  * 엑셀 파일을 생성하고 다운로드합니다.
  */
 export async function exportToExcel(
-  responses: ResponseDto[],
-  statistics: QuestionStatistics[],
-  promotionDetail: PromotionDetail
+  responses: PromotionApplicationDetail[],
+  statistics: PromotionQuestionStatistics[],
+  workbookMeta: PromotionExcelWorkbookMeta
 ): Promise<void> {
-  const workbook = new ExcelJS.Workbook();
+  const { Workbook } = await import("exceljs");
+  const workbook = new Workbook();
 
   // 시트 1: 신청자별 답변
   const responseSheet = workbook.addWorksheet("신청자별 답변");
@@ -25,7 +31,7 @@ export async function exportToExcel(
     "신청자 이메일",
     "신청자 닉네임",
     "제출일시",
-    ...promotionDetail.questions
+    ...workbookMeta.questions
       .sort((a, b) => a.orderNo - b.orderNo)
       .map((q) => `Q${q.orderNo}. ${q.label}`),
   ];
@@ -51,7 +57,7 @@ export async function exportToExcel(
     ];
 
     // 질문 순서대로 답변 추가
-    promotionDetail.questions
+    workbookMeta.questions
       .sort((a, b) => a.orderNo - b.orderNo)
       .forEach((question) => {
         const answer = response.answerList.find(
@@ -112,9 +118,7 @@ export async function exportToExcel(
     if (stat.questionType === "TEXT") {
       // 텍스트형 질문: 모든 답변 목록
       statisticsSheet.addRow(["답변"]);
-      const answerHeaderRow = statisticsSheet.getRow(
-        statisticsSheet.rowCount
-      );
+      const answerHeaderRow = statisticsSheet.getRow(statisticsSheet.rowCount);
       answerHeaderRow.font = { bold: true };
 
       stat.textAnswers.forEach((text) => {
@@ -182,10 +186,11 @@ export async function exportToExcel(
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${promotionDetail.title}_통계_${dayjs().format("YYYY-MM-DD_HH-mm-ss")}.xlsx`;
+  link.download = `${workbookMeta.title}_통계_${dayjs().format(
+    "YYYY-MM-DD_HH-mm-ss"
+  )}.xlsx`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
 }
-

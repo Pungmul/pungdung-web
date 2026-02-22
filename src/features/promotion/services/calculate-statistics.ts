@@ -1,17 +1,17 @@
-import {
-  OptionStatistics,
-  QuestionDto,
-  QuestionStatistics,
-  ResponseDto,
+import type {
+  PromotionApplicationDetail,
+  PromotionPublishedQuestion,
+  PromotionQuestionOptionStatistic,
+  PromotionQuestionStatistics,
 } from "../types";
 
 /**
  * 응답 데이터와 질문 데이터를 기반으로 통계를 계산합니다.
  */
 export function calculateStatistics(
-  responses: ResponseDto[],
-  questions: QuestionDto[]
-): QuestionStatistics[] {
+  responses: PromotionApplicationDetail[],
+  questions: PromotionPublishedQuestion[]
+): PromotionQuestionStatistics[] {
   return questions.map((question) => {
     const questionAnswers = responses.flatMap((response) =>
       response.answerList.filter((answer) => answer.questionId === question.id)
@@ -33,7 +33,7 @@ export function calculateStatistics(
     } else {
       // CHOICE, CHECKBOX 처리
       const optionCounts = new Map<number, number>();
-      
+
       // 모든 옵션을 0으로 초기화
       question.options.forEach((option) => {
         optionCounts.set(option.id, 0);
@@ -48,7 +48,7 @@ export function calculateStatistics(
       });
 
       const total = questionAnswers.length;
-      const optionStatistics: OptionStatistics[] = Array.from(
+      const optionStatistics: PromotionQuestionOptionStatistic[] = Array.from(
         optionCounts.entries()
       ).map(([optionId, count]) => {
         const option = question.options.find((o) => o.id === optionId);
@@ -73,4 +73,3 @@ export function calculateStatistics(
     }
   });
 }
-

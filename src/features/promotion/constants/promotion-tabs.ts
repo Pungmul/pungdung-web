@@ -1,3 +1,8 @@
+export interface TabItem {
+  label: string;
+  value: string;
+}
+
 export const PROMOTION_TABS: TabItem[] = [
   {
     label: "공연 목록",
@@ -7,4 +12,4 @@ export const PROMOTION_TABS: TabItem[] = [
     label: "내 공연",
     value: "my-promotion-form-list",
   },
-] as const;
+];
