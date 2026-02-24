@@ -15,6 +15,7 @@ import { LastUpdateTime } from "../ui/LastUpdateTime";
 /** `boardList`는 메인 목록에 쓰이도록 상위(페이지)에서 필터된 배열을 넘긴다. */
 interface BoardMainPageContentProps {
   boardList: BoardSummary[];
+  time: number;
 }
 
 const boardMainPageContentItemList = [
@@ -42,6 +43,7 @@ const boardMainPageContentItemList = [
 
 export function BoardMainPageContent({
   boardList,
+  time
 }: BoardMainPageContentProps) {
   return (
     <div className="flex flex-col h-full w-full ">
@@ -49,7 +51,7 @@ export function BoardMainPageContent({
         <div className=" flex flex-col">
           <div className="text-[22px] font-semibold p-[4px]">게시판</div>
           <div className="px-[8px] pb-[8px]">
-            <LastUpdateTime />
+            <LastUpdateTime time={time} />
           </div>
           <div className="flex flex-col lg:flex-row gap-[16px]">
             <ul className="py-3 px-2 border-0.5 border-grey-200 bg-background rounded-md flex flex-col flex-grow gap-[8px] list-none h-fit">

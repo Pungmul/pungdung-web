@@ -14,6 +14,7 @@ export const metadata = {
 
 // ISR 설정: 15분마다 재생성
 export const revalidate = 900;
+export const dynamic = "force-static";
 
 export default async function BoardMainPage() {
   const queryClient = getQueryClient();
@@ -24,6 +25,7 @@ export default async function BoardMainPage() {
   });
 
   const boardsForMain = filterBoardsForMainPage(boardList);
+  const time = Date.now();
 
-  return <BoardMainPageContent boardList={boardsForMain} />;
+  return <BoardMainPageContent boardList={boardsForMain} time={time} />;
 }

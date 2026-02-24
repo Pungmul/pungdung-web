@@ -3,7 +3,7 @@ import {
   proxyFailureError,
 } from "@/core/api/server";
 
-import { BOARD_INFO_LIST_REVALIDATE_SECONDS } from "@/features/board";
+import { BOARD_INFO_LIST_REVALIDATE_SECONDS } from "@/features/board/constants";
 
 export const dynamic = "force-dynamic";
 

@@ -1,10 +1,8 @@
 "use server";
 
-import {
-  resolveClientApiBody,
-  withResponseMapper,
-} from "@/core/api/client";
+import { resolveClientApiBody, withResponseMapper } from "@/core/api/client";
 
+import { BOARD_INFO_LIST_REVALIDATE_SECONDS } from "../../constants";
 import { mapBriefBoardInfoDtoToBoardSummary } from "../../lib/mappers";
 import type { BoardSummary } from "../../types";
 import { briefBoardInfoListDtoSchema } from "../client/dto.schema";
@@ -31,7 +29,11 @@ export const prefetchBoardInfoList = async () =>
   withResponseMapper({
     context: "prefetchBoardInfoList",
     fetchDto: async () => {
-      const response = await fetch(resolveServerBoardsUrl());
+      const response = await fetch(resolveServerBoardsUrl(), {
+        next: {
+          revalidate: BOARD_INFO_LIST_REVALIDATE_SECONDS,
+        },
+      });
       const raw_data = await response.json().catch(() => null);
       return resolveClientApiBody(
         raw_data,
