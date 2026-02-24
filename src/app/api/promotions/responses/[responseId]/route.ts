@@ -1,4 +1,8 @@
-import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
+import {
+  createValidatedUpstreamResponse,
+  fetchWithRefresh,
+  proxyFailureError,
+} from "@/core/api/server";
 
 export const dynamic = "force-dynamic";
 
@@ -9,20 +13,20 @@ export async function GET(
   try {
     const { responseId } = await params;
     if (!responseId) {
-      return new Response("responseId가 없습니다.", { status: 400 });
+      return Response.json(
+        {
+          code: "INVALID_REQUEST",
+          message: "responseId가 없습니다.",
+          response: null,
+          isSuccess: false,
+        },
+        { status: 400 }
+      );
     }
     const proxyUrl = `${process.env.BASE_URL}/api/performances/responses/${responseId}`;
     const proxyResponse = await fetchWithRefresh(proxyUrl);
-    if (!proxyResponse.ok) {
-      const errorText = await proxyResponse.text();
-      console.log("서버 오류:", errorText);
-      throw Error("서버 불안정" + proxyResponse.status);
-    }
-    const { response } = await proxyResponse.json();
-
-    return Response.json(response, { status: 200 });
+    return createValidatedUpstreamResponse(proxyResponse);
   } catch (error) {
-    console.error("프록시 처리 중 에러:", error);
     return proxyFailureError(error);
   }
 }
@@ -38,15 +42,8 @@ export async function DELETE(
     const proxyResponse = await fetchWithRefresh(proxyUrl, {
       method: "DELETE",
     });
-    if (!proxyResponse.ok) {
-      const errorText = await proxyResponse.text();
-      console.log("서버 오류:", errorText);
-      throw Error("서버 불안정" + proxyResponse.status);
-    }
-    const { response } = await proxyResponse.json();
-    return Response.json(response, { status: 200 });
+    return createValidatedUpstreamResponse(proxyResponse);
   } catch (error) {
-    console.error("프록시 처리 중 에러:", error);
     return proxyFailureError(error);
   }
 }
