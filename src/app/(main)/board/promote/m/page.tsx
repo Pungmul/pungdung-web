@@ -1,4 +1,4 @@
-import { PromotionManagePage } from "@/features/promote";
+import { PromotionManagePage } from "./_PromotionManagePage";
 
 export const dynamic = "force-dynamic";
 

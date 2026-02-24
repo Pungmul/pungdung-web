@@ -1,7 +1,5 @@
-import { PromotePage } from "@pThunder/features/promote";
-
-export const dynamic = "force-static";
+import { PromotionListPage } from "./_PromotionListPage";
 
 export default function PromotePageNew() {
-  return <PromotePage />;
+  return <PromotionListPage />;
 }
