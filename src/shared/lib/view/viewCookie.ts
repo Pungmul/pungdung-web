@@ -1,8 +1,11 @@
 import { ViewType } from "@/shared/types";
+
 import { VALID_VIEWS, VIEW_TYPE_COOKIE_NAME } from "./constants";
 
 const isViewType = (value: string): value is ViewType =>
   VALID_VIEWS.includes(value as ViewType);
+
+const VIEW_TYPE_MAX_AGE = 60 * 60 * 24 * 365;
 
 export const resolveCookieView = (): ViewType | null => {
   if (typeof document === "undefined") {
@@ -30,7 +33,10 @@ export const persistViewCookie = (view: ViewType): void => {
     return;
   }
 
-  document.cookie = `${VIEW_TYPE_COOKIE_NAME}=${encodeURIComponent(
-    view
-  )}; path=/; samesite=lax`;
+  document.cookie = [
+    `${VIEW_TYPE_COOKIE_NAME}=${encodeURIComponent(view)}`,
+    "Path=/",
+    `Max-Age=${VIEW_TYPE_MAX_AGE}`,
+    "SameSite=Lax",
+  ].join("; ");
 };
