@@ -4,11 +4,12 @@ import localFont from "next/font/local";
 import { FCMServiceWorkerRegistration } from "@/features/notification";
 
 import {
+  AlertModal,
   PinchZoomPreventionScript,
   ViewDetector,
-  AlertModal,
-  PWAInstallPrompt,
 } from "@/shared/components";
+import { getInitialViewFromCookie } from "@/shared/lib/getInitialViewFromCookie";
+import { ViewStoreProvider } from "@/shared/lib/view/view-store-provider";
 
 import "@/app/globals.css";
 
@@ -31,24 +32,25 @@ export const viewport: Viewport = {
   viewportFit: "cover" /* PWA stand-alone 시 노치/홈 인디케이터 영역 대응 */,
 };
 
-// export const dynamic = "force-static";
-
 export default async function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialView = await getInitialViewFromCookie();
+
   return (
     <html lang="ko" className={nanumSquareNeo.variable}>
       <body>
         <PinchZoomPreventionScript />
         <FCMServiceWorkerRegistration />
-        <PWAInstallPrompt />
-        <ViewDetector />
         <AlertModal />
-        {/* children은 페이지 컴포넌트 */}
-        {/* 페이지 컴포넌트가 서버 컴포넌트라도 오류 없이 렌더링 됨 */}
-        {children}
+        <ViewStoreProvider initialView={initialView}>
+          <ViewDetector />
+          {/* children은 페이지 컴포넌트 */}
+          {/* 페이지 컴포넌트가 서버 컴포넌트라도 오류 없이 렌더링 됨 */}
+          {children}
+        </ViewStoreProvider>
       </body>
     </html>
   );

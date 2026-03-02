@@ -2,22 +2,22 @@
 
 import { useEffect } from "react";
 
-import { useViewStore } from "@/shared/lib/useView";
 import { bindViewportChange } from "@/shared/lib/view/bindViewportChange";
 import { resolveRuntimeView } from "@/shared/lib/view/resolveRuntimeView";
+import { useSetView } from "@/shared/lib/view/view-store-provider";
 
-// ViewDetector - effect 밖에서 즉시 실행
 export default function ViewDetector() {
+  const setView = useSetView();
+
   useEffect(() => {
-    // viewport 변경 감지만 여기서
     const syncViewByViewport = () => {
       const runtimeView = resolveRuntimeView();
-      useViewStore.getState().setView(runtimeView);
+      setView(runtimeView);
     };
 
     syncViewByViewport();
     return bindViewportChange(syncViewByViewport);
-  }, []);
+  }, [setView]);
 
   return null;
 }
