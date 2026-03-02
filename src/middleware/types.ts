@@ -29,6 +29,8 @@ export type CookieMutation =
         httpOnly?: boolean;
         secure?: boolean;
         maxAge?: number;
+        sameSite?: "lax" | "strict" | "none";
+        path?: string;
       };
     }
   | {
@@ -38,5 +40,5 @@ export type CookieMutation =
 
 /** 단일 미들웨어 단계의 표준 핸들러 타입입니다. */
 export type MiddlewareHandler = (
-  ctx: MiddlewareContext,
+  ctx: MiddlewareContext
 ) => Promise<NextResponse | null> | NextResponse | null;

@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { applyCookieMutations } from "./middleware/cookie";
+import { NextResponse } from "next/server";
+
 import { createMiddlewareContext } from "./middleware/context";
+import { applyCookieMutations } from "./middleware/cookie";
 import { middlewarePipeline } from "./middleware/pipeline";
 
 /** 요청을 파이프라인 형태로 처리하는 미들웨어 엔트리입니다. */
