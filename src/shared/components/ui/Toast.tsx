@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
 
+import { AnimatePresence, motion } from "framer-motion";
+
 import { cn } from "@/shared/lib";
-import { useView } from "@/shared/lib/useView";
+import { useView } from "@/shared/lib/view/view-store-provider";
 import { toastStore } from "@/shared/store";
 
 const TOAST_BACKGROUND = {

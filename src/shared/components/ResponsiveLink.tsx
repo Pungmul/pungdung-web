@@ -4,7 +4,7 @@ import { CSSProperties } from "react";
 import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/navigation";
 
-import { useView } from "@/shared/lib/useView";
+import { useView } from "@/shared/lib/view/view-store-provider";
 
 interface CustomLinkProps extends LinkProps {
   className?: string;

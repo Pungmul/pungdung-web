@@ -1,36 +1,35 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { Suspense,useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useView } from "@/shared/lib/useView";
-import { useEffect, useRef, useState, Suspense } from "react";
+import { usePathname } from "next/navigation";
 
-import {
-  HomeIconOutline,
-  HomeIconFilled,
-  ThunderIconOutline,
-  ThunderIconFilled,
-  BoardIconOutline,
-  BoardIconFilled,
-  NotificationIcon,
-} from "@/shared/components/Icons";
-import { AnimatePresence, motion } from "framer-motion";
-import { Spinner, ViewType } from "@pThunder/shared";
-import { Header } from "@/shared/components/layout/Header";
-import { NotificationList } from "@pThunder/features/notification";
-import ProfileCircle from "@pThunder/features/my-page/components/widget/ProfileCircle";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
-import { useGetMyPageInfo } from "@pThunder/features/my-page";
+import { AnimatePresence, motion } from "framer-motion";
+
+import { useGetMyPageInfo } from "@/features/my-page";
+import { NotificationList } from "@/features/notification";
+
+import { Spinner } from "@/shared";
+import {
+  BoardIconFilled,
+  BoardIconOutline,
+  HomeIconFilled,
+  HomeIconOutline,
+  NotificationIcon,
+  ThunderIconFilled,
+  ThunderIconOutline,
+} from "@/shared/components/Icons";
+import { Header } from "@/shared/components/layout/Header";
+import { useView } from "@/shared/lib/view/view-store-provider";
+
 import ChatMenuButton from "./ChatMenuButton/ChatMenuButton";
 
-interface BottomTabsProps {
-  initialView?: ViewType;
-}
+import ProfileCircle from "@/features/my-page/components/widget/ProfileCircle";
 
-export default function BottomTabs({ initialView }: BottomTabsProps) {
+export default function BottomTabs() {
   const view = useView();
-  const [isHydrated, setIsHydrated] = useState(false);
 
   const tabsRef = useRef<HTMLDivElement>(null);
   const notificationOverlayRef = useRef<HTMLDivElement>(null);
@@ -40,10 +39,6 @@ export default function BottomTabs({ initialView }: BottomTabsProps) {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const { data: myPageInfo, isLoading } = useGetMyPageInfo();
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
 
   useEffect(() => {
     if (notificationListRef.current && isNotificationOpen) {
@@ -94,7 +89,6 @@ export default function BottomTabs({ initialView }: BottomTabsProps) {
         });
 
         if (res.ok) {
-          console.log("✅ 쿠키 설정 완료");
           if (typeof window === "undefined" || !window?.ReactNativeWebView) {
             return;
           }
@@ -103,7 +97,6 @@ export default function BottomTabs({ initialView }: BottomTabsProps) {
           );
         } else throw Error("Failed to issue cookies");
       } catch {
-        console.log("⛔ 쿠키 설정 실패");
         if (typeof window === "undefined" || !window?.ReactNativeWebView) {
           return;
         }
@@ -141,14 +134,13 @@ export default function BottomTabs({ initialView }: BottomTabsProps) {
   }, []);
 
   const pathname = usePathname(); // 현재 경로 가져오기
-  const effectiveView = isHydrated ? view : initialView ?? view;
 
-  if (effectiveView === "webview") {
+  if (view === "webview") {
     return null;
   }
 
   if (
-    effectiveView === "mobile" &&
+    view === "mobile" &&
     pathname !== "/home" &&
     pathname !== "/board/main" &&
     pathname !== "/chats/r/inbox" &&
@@ -160,7 +152,7 @@ export default function BottomTabs({ initialView }: BottomTabsProps) {
   return (
     <>
       <nav
-        className={`w-full py-[8px] bg-background flex-shrink-0 border-t sticky z-30 md:border-r md:border-t-0 md:w-auto md:h-app px-[32px] ${effectiveView === "desktop" ? " top-0" : " bottom-0"
+        className={`w-full py-[8px] bg-background flex-shrink-0 border-t sticky z-30 md:border-r md:border-t-0 md:w-auto md:h-app px-[32px] ${view === "desktop" ? " top-0" : " bottom-0"
           }`}
         ref={tabsRef}
       >

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { throttle } from "lodash";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-import { useView } from "@/shared/lib/useView";
+import { useView } from "@/shared/lib/view/view-store-provider";
 
 export function Header({
   title,

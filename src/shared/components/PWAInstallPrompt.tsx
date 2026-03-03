@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+
+import { ArrowUpOnSquareIcon,PlusIcon } from "@heroicons/react/24/outline";
 import { AnimatePresence, motion, useMotionValue } from "framer-motion";
 
-import { PlusIcon, ArrowUpOnSquareIcon } from "@heroicons/react/24/outline";
+import { useView } from "@/shared/lib/view/view-store-provider";
 
-import { useView } from "@/shared/lib/useView";
 import { Button } from "./buttons";
 
 const PWA_PROMPT_HIDE_UNTIL_KEY = "pwa_install_prompt_hide_until";
