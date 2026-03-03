@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-import { useView } from "@/shared/lib/useView";
+import { useView } from "@/shared/lib/view/view-store-provider";
 
 export function LightningBuildLayoutClient({ children }: { children: ReactNode }) {
   const view = useView();

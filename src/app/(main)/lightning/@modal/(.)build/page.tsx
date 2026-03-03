@@ -1,6 +1,6 @@
 "use client";
 
-import { useView } from "@/shared/lib/useView";
+import { useView } from "@/shared/lib/view/view-store-provider";
 
 import { LightningBuildPage } from "../../build/_BuildPage";
 

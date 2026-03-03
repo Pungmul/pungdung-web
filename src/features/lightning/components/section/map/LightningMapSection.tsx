@@ -7,7 +7,7 @@ import type { SwiperRef } from "swiper/react";
 
 import { MapContainer, Spinner } from "@/shared";
 import { GPSOutline } from "@/shared/components/Icons";
-import { useView } from "@/shared/lib/useView";
+import { useView } from "@/shared/lib/view/view-store-provider";
 
 import {
   useLightningCardMapSync,

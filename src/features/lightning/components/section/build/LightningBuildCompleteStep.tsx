@@ -6,17 +6,17 @@ import { useRouter } from "next/navigation";
 import { useFormContext } from "react-hook-form";
 
 import { BottomFixedButton, Spinner } from "@/shared";
-import { useView } from "@/shared/lib/useView";
+import { useView } from "@/shared/lib/view/view-store-provider";
 
-import { LightningCard } from "../../ui";
 import { LIGHTNING_BUILD_MESSAGE } from "../../../constants";
 import { useCreateLightning } from "../../../hooks/actions";
+import { useLightningBuildContext } from "../../../providers";
 import {
   buildCreatedLightningMeetingPreview,
   getLightningCreateErrorMessage,
 } from "../../../services";
-import { useLightningBuildContext } from "../../../providers";
 import type { LightningCreateFormData } from "../../../types/schemas";
+import { LightningCard } from "../../ui";
 
 const MESSAGE = LIGHTNING_BUILD_MESSAGE.COMPLETE;
 

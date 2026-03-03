@@ -1,9 +1,12 @@
 "use client";
-import { notificationStore } from "@/features/notification/store";
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useView } from "@/shared/lib/useView";
+
+import { AnimatePresence, motion } from "framer-motion";
+
+import { useView } from "@/shared/lib/view/view-store-provider";
+
+import { notificationStore } from "@/features/notification/store";
 
 export default function NotificationToast() {
   const view = useView();
