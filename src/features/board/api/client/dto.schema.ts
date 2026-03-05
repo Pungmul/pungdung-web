@@ -35,7 +35,7 @@ export const briefBoardInfoDtoSchema = z.object({
   id: z.union([z.number(), z.string()]),
   parentId: z.number().nullable(),
   name: z.string(),
-  description: z.string(),
+  description: z.string().nullable(),
 });
 
 export const briefBoardInfoListDtoSchema = z.array(briefBoardInfoDtoSchema);
