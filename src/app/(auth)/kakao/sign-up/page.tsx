@@ -6,8 +6,12 @@ import { useRouter } from "next/navigation";
 import { FormProvider } from "react-hook-form";
 
 import { match } from "ts-pattern";
+import { Suspense } from "@suspensive/react";
 
-import { Header } from "@/shared/components";
+import {
+  Header,
+  Spinner,
+} from "@/shared";
 
 import { CompleteStep, KaKaoSignUpStepIndicator, PersonalStep, TermsStep } from "@/features/auth/components";
 import { KAKAO_SIGN_UP_STEP_ORDER } from "@/features/auth/constants";
@@ -28,6 +32,24 @@ const initialKakaoSignUpData: IKakaoSignUpFormData = {
 };
 
 export default function KakaoSignUpPage() {
+  return (
+    <main className="w-full flex flex-col min-h-app">
+      <Header title="회원가입" />
+      <Suspense
+        clientOnly
+        fallback={
+          <div className="flex-grow flex items-center justify-center">
+            <Spinner size={32} />
+          </div>
+        }
+      >
+        <KakaoSignUpPageContent />
+      </Suspense>
+    </main>
+  );
+}
+
+function KakaoSignUpPageContent() {
   const router = useRouter();
   const { currentStep, data: signUpData, onSubmit, onNextStep, onPrevStep } =
     useSignUpStepState({
@@ -66,40 +88,37 @@ export default function KakaoSignUpPage() {
   }, [router]);
 
   return (
-    <main className="w-full flex flex-col min-h-app">
-      <FormProvider {...formMethods}>
-        <Header title="회원가입" />
-        <KaKaoSignUpStepIndicator currentStep={currentStep} />
-        <section className="flex flex-col flex-grow flex-shrink-0">
-          {match(currentStep)
-            .with("약관동의", () => (
-              <TermsStep
-                onSubmit={onNextStep}
-              />
-            ))
-            .with("개인정보입력", () => (
-              <PersonalStep
-                onPrevStep={onPrevStep}
-                onSubmit={(stepData) => {
-                  onSubmit(stepData);
-                  onNextStep();
-                }}
-              />
-            ))
-            .with("완료", () => (
-              <CompleteStep
-                isPending={isPending}
-                error={error}
-                onRetry={() => {
-                  void runFinalSignUp();
-                }}
-                onBackToInput={onPrevStep}
-                onNavigateToLogin={onNavigateToLogin}
-              />
-            ))
-            .exhaustive()}
-        </section>
-      </FormProvider>
-    </main>
+    <FormProvider {...formMethods}>
+      <KaKaoSignUpStepIndicator currentStep={currentStep} />
+      <section className="flex flex-col flex-grow flex-shrink-0">
+        {match(currentStep)
+          .with("약관동의", () => (
+            <TermsStep
+              onSubmit={onNextStep}
+            />
+          ))
+          .with("개인정보입력", () => (
+            <PersonalStep
+              onPrevStep={onPrevStep}
+              onSubmit={(stepData) => {
+                onSubmit(stepData);
+                onNextStep();
+              }}
+            />
+          ))
+          .with("완료", () => (
+            <CompleteStep
+              isPending={isPending}
+              error={error}
+              onRetry={() => {
+                void runFinalSignUp();
+              }}
+              onBackToInput={onPrevStep}
+              onNavigateToLogin={onNavigateToLogin}
+            />
+          ))
+          .exhaustive()}
+      </section>
+    </FormProvider>
   );
 }

@@ -27,10 +27,10 @@ describe("sign-up fullSignUpSchema", () => {
   const validPersonal = {
     name: "홍길동",
     nickname: undefined as string | undefined,
-    club: "어흥" as const,
+    club: 1 as const,
     clubAge: "21",
     tellNumber: "010-1234-5678",
-    inviteCode: "any",
+    inviteCode: "123456",
   };
 
   const validAccount = {

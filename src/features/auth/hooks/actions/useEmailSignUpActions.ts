@@ -18,7 +18,7 @@ type SubmitSignUpOptions = {
 };
 
 export function useEmailSignUpActions() {
-  const { data: clubList = [] } = useClubList();
+  const { data: clubList } = useClubList();
   const [isLoading, setIsLoading] = useState(false);
   const [submissionError, setSubmissionError] = useState<Error | null>(null);
   const {

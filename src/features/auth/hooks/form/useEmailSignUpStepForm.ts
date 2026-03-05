@@ -34,7 +34,7 @@ const initialEmailSignUpData: IEmailSignUpFormData = {
 };
 
 export function useEmailSignUpStepForm() {
-  const { data: clubList = [] } = useClubList();
+  const { data: clubList } = useClubList();
 
   /**
    * `safeExtend(schema.shape)`는 base 객체 구조만 가져오고 refine을 잃는다.
@@ -43,7 +43,7 @@ export function useEmailSignUpStepForm() {
    */
   const fullSignUpSchema = useMemo(() => {
     const clubSchema = createClubFieldSchema(
-      clubList.map((club) => club.groupName)
+      clubList.map((club) => club.clubId)
     );
 
     const dynamicPersonalSchema = personalSchema.safeExtend({

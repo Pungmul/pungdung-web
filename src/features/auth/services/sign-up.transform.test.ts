@@ -1,6 +1,5 @@
 import type { ClubInfo } from "@/features/club";
-import { NO_CLUB_VALUE } from "@/features/club";
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { transformSignUpData } from "./sign-up.transform";
 import type { IEmailSignUpFormData } from "../types/schemas";
@@ -25,7 +24,7 @@ describe("sign-up.transform", () => {
     it("maps fields and strips phone hyphens", () => {
       const result = transformSignUpData(clubList, {
         ...baseForm,
-        club: "어흥",
+        club: 42,
       });
       expect(result).toEqual({
         username: "user@example.com",
@@ -43,23 +42,23 @@ describe("sign-up.transform", () => {
       const result = transformSignUpData(clubList, {
         ...baseForm,
         nickname: undefined,
-        club: "어흥",
+        club: 42,
       });
-      expect(result.clubName).toBe("");
+      expect(result.clubName).toBeNull();
     });
 
-    it("normalizes NO_CLUB_VALUE to 없음 and null clubId", () => {
+    it("null club이면 clubId는 null", () => {
       const result = transformSignUpData(clubList, {
         ...baseForm,
-        club: NO_CLUB_VALUE,
+        club: null,
       });
       expect(result.clubId).toBeNull();
     });
 
-    it("returns null clubId when club is empty", () => {
+    it("returns null clubId when club is undefined", () => {
       const result = transformSignUpData(clubList, {
         ...baseForm,
-        club: "" as unknown as IEmailSignUpFormData["club"],
+        club: undefined,
       });
       expect(result.clubId).toBeNull();
     });

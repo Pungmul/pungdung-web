@@ -1,15 +1,9 @@
 import { z } from "zod";
 
-import { CLUB_NAMES, clubListApi, NO_CLUB_VALUE } from "@/features/club";
+import { clubListApi } from "@/features/club";
 
+import { createClubFieldSchema } from "./club-field.schema";
 import { AUTH_VALIDATION } from "../../constants";
-
-const createClubEnum = (clubNames: string[]) => {
-  if (clubNames.length === 0) {
-    return z.enum(CLUB_NAMES as unknown as [string, ...string[]]);
-  }
-  return z.enum(clubNames as [string, ...string[]]);
-};
 
 const inviteCode = z
   .string()
@@ -34,20 +28,12 @@ const tellNumberField = z
     message: AUTH_VALIDATION.PERSONAL.PHONE_FORMAT,
   });
 
-/** Select `소속패 없음` 값 — `transformSignUpData`에서 `"없음"`으로 정규화된다 */
-const staticClubField = z
-  .union([
-    z.enum(CLUB_NAMES as unknown as [string, ...string[]]),
-    z.literal(NO_CLUB_VALUE),
-  ])
-  .nullable()
-  .optional();
-
 /** refine 콜백에 넘기기 전용 — 실제 스키마 출력은 각 `z.object` 블록에서 추론된다. */
 const isValidNickname = (nickname: string | undefined) =>
   !nickname || /^[가-힣]+$/.test(nickname);
 
-const isClubSelected = (club: string | null | undefined) => club !== undefined;
+/** `undefined`만 미선택. `null`은 소속 없음 명시 선택, 숫자는 클럽 선택. */
+const isClubSelected = (club: number | null | undefined) => club !== undefined;
 
 const NICKNAME_REFINE = {
   message: AUTH_VALIDATION.PERSONAL.NICKNAME_KOREAN,
@@ -63,7 +49,7 @@ function appendPersonalRefines<
   S extends z.ZodObject<{
     name: z.ZodString;
     nickname: z.ZodOptional<z.ZodString>;
-    club: z.ZodType<string | null | undefined>;
+    club: z.ZodType<number | null | undefined>;
     clubAge: z.ZodString;
     tellNumber: z.ZodString;
     inviteCode: z.ZodType<string>;
@@ -74,11 +60,11 @@ function appendPersonalRefines<
     .refine((data) => isClubSelected(data.club), CLUB_REFINE);
 }
 
-function buildDynamicPersonalSchema(clubNames: string[]) {
+function buildDynamicPersonalSchema(clubIds: number[]) {
   const base = z.object({
     name: nameField,
     nickname: z.string().optional(),
-    club: createClubEnum(clubNames).nullable().optional(),
+    club: createClubFieldSchema(clubIds),
     clubAge: clubAgeField,
     tellNumber: tellNumberField,
     inviteCode,
@@ -86,38 +72,34 @@ function buildDynamicPersonalSchema(clubNames: string[]) {
   return appendPersonalRefines(base);
 }
 
-async function loadClubNames(
-  fetchClubs: () => Promise<Array<{ groupName: string }>>
-): Promise<string[]> {
+async function loadClubIds(
+  fetchClubs: () => Promise<Array<{ clubId: number }>>
+): Promise<number[]> {
   try {
     const clubList = await fetchClubs();
-    const clubNames = clubList.map((c) => c.groupName);
-    if (!clubNames.includes("없음")) {
-      clubNames.push("없음");
-    }
-    return clubNames;
+    return clubList.map((c) => c.clubId);
   } catch (error) {
-    console.error("Failed to fetch club list, using default", error);
-    return CLUB_NAMES as unknown as string[];
+    console.error("Failed to fetch club list", error);
+    return [];
   }
 }
 
-/** 클럽 목록을 불러와 enum을 맞춘 뒤 개인정보 스키마를 만든다. */
+/** 클럽 목록을 불러와 id enum을 맞춘 뒤 개인정보 스키마를 만든다. */
 export async function createDynamicPersonalSchema() {
-  const clubNames = await loadClubNames(clubListApi);
-  return buildDynamicPersonalSchema(clubNames);
+  const clubIds = await loadClubIds(clubListApi);
+  return buildDynamicPersonalSchema(clubIds);
 }
 
 const basePersonalSchema = z.object({
   name: nameField,
   nickname: z.string().optional(),
-  club: staticClubField,
+  club: createClubFieldSchema([]),
   clubAge: clubAgeField,
   tellNumber: tellNumberField,
   inviteCode,
 });
 
-/** 가입 개인정보 공통 스키마 — 클럽 목록 동적 주입 전 fallback */
+/** 가입 개인정보 공통 스키마 — `club`은 폼에서 `createClubFieldSchema(clubIds)`로 덮어쓴다 */
 export const personalSchema = appendPersonalRefines(basePersonalSchema);
 
 /** 레거시 alias: 점진적 마이그레이션 호환 */

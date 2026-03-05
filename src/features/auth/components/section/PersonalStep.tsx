@@ -65,13 +65,14 @@ export const PersonalStep: React.FC<PersonalStepProps> = ({
               errorMessage={inputErrors.club?.message || ""}
               hasSearch={true}
               placeholder={PERSONAL_FIELDS_LABEL.CLUB_PLACEHOLDER}
+              onBlur={field.onBlur}
               onChange={(value) => {
                 field.onChange(value);
               }}
               value={field.value}
             >
               {clubOptions.map((option) => (
-                <Select.Option key={option.value} value={option.value}>
+                <Select.Option key={option.label + option.value?.toString()} value={option.value}>
                   {option.label}
                 </Select.Option>
               ))}

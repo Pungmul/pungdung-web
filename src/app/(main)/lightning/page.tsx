@@ -4,6 +4,7 @@ import { useRef } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
+import { Suspense } from "@suspensive/react";
 import { AnimatePresence } from "framer-motion";
 
 import {
@@ -19,10 +20,27 @@ import {
   useWholeLightningSocket,
 } from "@/features/lightning";
 
+import { Spinner } from "@/shared";
+
 import "swiper/css";
 import "swiper/css/pagination";
 
 export default function LightningPage() {
+  return (
+    <Suspense
+      clientOnly
+      fallback={
+        <div className="flex items-center justify-center h-full w-full flex-grow">
+          <Spinner size={32} />
+        </div>
+      }
+    >
+      <LightningPageContent />
+    </Suspense>
+  );
+}
+
+function LightningPageContent() {
   const { data: userParticipationData } = useQuery(
     lightningQueries.participationStatus()
   );

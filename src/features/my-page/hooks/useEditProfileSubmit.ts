@@ -1,31 +1,31 @@
 "use client";
-import { UseFormReturn } from "react-hook-form";
+import { useRouter } from "next/navigation";
+
 import { useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { UseFormReturn } from "react-hook-form";
 
 import {
   EditProfileFormValues,
   EditProfilePasswordFormValues,
 } from "@/features/my-page";
-import { transformEditProfileData } from "@/features/my-page/lib";
-import { myPageQueryKeys } from "@/features/my-page/constant";
-import { useMutation } from "@tanstack/react-query";
-import { authMutationOptions } from "@/features/auth/queries";
-import { ClubInfo } from "@/features/club";
-import { useRouter } from "next/navigation";
+
 import { Toast } from "@/shared";
+
+import { authMutationOptions } from "@/features/auth/queries";
+import { myPageQueryKeys } from "@/features/my-page/constant";
+import { transformEditProfileData } from "@/features/my-page/lib";
 
 interface UseEditProfileSubmitParams {
   form: UseFormReturn<EditProfileFormValues>;
   passwordForm: UseFormReturn<EditProfilePasswordFormValues>;
   changedProfileImageFile: File | null;
-  clubList?: ClubInfo[];
 }
 
 export const useEditProfileSubmit = ({
   form,
   passwordForm,
   changedProfileImageFile,
-  clubList,
 }: UseEditProfileSubmitParams) => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -36,7 +36,7 @@ export const useEditProfileSubmit = ({
 
   const handleSubmitEditProfile = form.handleSubmit((data) => {
     const formData = new FormData();
-    const modifiedProfileData = transformEditProfileData(data, clubList);
+    const modifiedProfileData = transformEditProfileData(data);
 
     const accountData = new Blob(
       [

@@ -1,5 +1,6 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
+
 import { clubListApi } from "../api";
 
 export const clubListQueryKeys = {
@@ -8,11 +9,10 @@ export const clubListQueryKeys = {
 };
 
 export const useClubList = () => {
-  return useQuery({
+  return useSuspenseQuery({
     queryKey: clubListQueryKeys.list(),
     queryFn: clubListApi,
     staleTime: 1000 * 60 * 60, // 1시간
     retry: 2,
   });
 };
-

@@ -1,26 +1,30 @@
 "use client";
 
-import {
-  useEditProfileImage,
-  useEditProfileMainForm,
-  useEditProfilePasswordForm,
-  useEditProfileSchema,
-  useEditProfileSubmit,
-} from "@pThunder/features/my-page/hooks";
-import { useSuspenseGetMyPageInfo } from "@pThunder/features/my-page/queries";
-import { useClubList } from "@pThunder/features/club/queries";
-import { useClubOptions } from "@pThunder/features/club/hooks";
-import { formatPhoneNumber } from "@pThunder/features/auth/lib";
+import Image from "next/image";
+
+import { Controller } from "react-hook-form";
+
+import { CameraIcon } from "@heroicons/react/24/outline";
+
 import {
   BottomFixedButton,
   Input,
   Select,
   Space,
   Spinner,
-} from "@pThunder/shared";
-import { CameraIcon } from "@heroicons/react/24/outline";
-import Image from "next/image";
-import { Controller } from "react-hook-form";
+} from "@/shared";
+
+import { formatPhoneNumber } from "@/features/auth/lib";
+import { useClubOptions } from "@/features/club/hooks";
+import { useClubList } from "@/features/club/queries";
+import {
+  useEditProfileImage,
+  useEditProfileMainForm,
+  useEditProfilePasswordForm,
+  useEditProfileSchema,
+  useEditProfileSubmit,
+} from "@/features/my-page/hooks";
+import { useSuspenseGetMyPageInfo } from "@/features/my-page/queries";
 
 export default function EditProfileForm() {
   const { data: userData } = useSuspenseGetMyPageInfo();
@@ -28,7 +32,7 @@ export default function EditProfileForm() {
   const clubOptions = useClubOptions();
 
   const schema = useEditProfileSchema(clubList);
-  const form = useEditProfileMainForm(schema, userData);
+  const form = useEditProfileMainForm(schema, userData, clubList);
   const passwordForm = useEditProfilePasswordForm();
   const { changedProfileImageFile, handleProfileImageChange } =
     useEditProfileImage(form);
@@ -36,7 +40,6 @@ export default function EditProfileForm() {
     form,
     passwordForm,
     changedProfileImageFile,
-    clubList: clubList ?? [],
   });
 
   const {
@@ -112,7 +115,7 @@ export default function EditProfileForm() {
               errorMessage={formErrors.club?.message || ""}
             >
               {clubOptions.map((option) => (
-                <Select.Option key={option.value} value={option.value}>
+                <Select.Option key={option.label} value={option.value}>
                   {option.label}
                 </Select.Option>
               ))}

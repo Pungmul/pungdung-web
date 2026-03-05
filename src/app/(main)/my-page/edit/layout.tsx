@@ -1,10 +1,8 @@
-import {
-  Header,
-  Space,
-  Spinner,
-  SuspenseComponent as Suspense,
-} from "@pThunder/shared";
 import { Metadata } from "next";
+
+import { Suspense } from "@suspensive/react";
+
+import { Header, Space, Spinner } from "@/shared";
 
 export const metadata: Metadata = {
   title: "풍덩 | 내 정보 수정",

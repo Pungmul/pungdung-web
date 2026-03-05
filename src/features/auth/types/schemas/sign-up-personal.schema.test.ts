@@ -11,8 +11,9 @@ vi.mock("@/features/club", async (importOriginal) => {
   };
 });
 
-import { type ClubInfo,clubListApi, NO_CLUB_VALUE } from "@/features/club";
+import { type ClubInfo, clubListApi } from "@/features/club";
 
+import { createClubFieldSchema } from "./club-field.schema";
 import {
   createDynamicPersonalSchema,
   personalSchema,
@@ -50,7 +51,7 @@ describe("personalSchema", () => {
   const valid = {
     name: "홍길동",
     nickname: undefined as string | undefined,
-    club: "어흥" as const,
+    club: null,
     clubAge: "21",
     tellNumber: "010-1234-5678",
     inviteCode: "123456",
@@ -60,7 +61,16 @@ describe("personalSchema", () => {
     expect(personalSchema.safeParse(valid).success).toBe(true);
   });
 
-  it("club이 null이어도 통과한다", () => {
+  it("카카오/이메일 폼과 동일하게 safeExtend된 스키마는 club 미선택(undefined)을 거부한다", () => {
+    const clubSchema = createClubFieldSchema([1]);
+    const dynamicPersonalSchema = personalSchema.safeExtend({
+      club: clubSchema,
+    });
+    const r = dynamicPersonalSchema.safeParse({ ...valid, club: undefined });
+    expect(r.success).toBe(false);
+  });
+
+  it("club이 null이면 소속 없음 선택으로 통과한다", () => {
     const r = personalSchema.safeParse({ ...valid, club: null });
     expect(r.success).toBe(true);
   });
@@ -75,12 +85,6 @@ describe("personalSchema", () => {
         )
       ).toBe(true);
     }
-  });
-
-  it("소속패 없음(NO_CLUB_VALUE)이면 통과한다", () => {
-    expect(
-      personalSchema.safeParse({ ...valid, club: NO_CLUB_VALUE }).success
-    ).toBe(true);
   });
 
   it("초대 코드가 비어 있으면 실패한다", () => {
@@ -115,7 +119,7 @@ describe("createDynamicPersonalSchema", () => {
     expect(
       schema.safeParse({
         ...baseRow,
-        club: "어흥",
+        club: 1,
         inviteCode: "123456",
       }).success
     ).toBe(true);
@@ -126,7 +130,7 @@ describe("createDynamicPersonalSchema", () => {
     const schema = await createDynamicPersonalSchema();
     const bad = schema.safeParse({
       ...baseRow,
-      club: "어흥",
+      club: 1,
       inviteCode: "x",
     });
     expect(bad.success).toBe(false);

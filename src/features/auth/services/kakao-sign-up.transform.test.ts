@@ -1,6 +1,5 @@
 import type { ClubInfo } from "@/features/club";
-import { NO_CLUB_VALUE } from "@/features/club";
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { transformKakaoSignUpData } from "./kakao-sign-up.transform";
 import type { IKakaoSignUpFormData } from "../types/schemas";
@@ -22,7 +21,7 @@ describe("kakao-sign-up.transform", () => {
     it("maps fields without email/password", () => {
       const result = transformKakaoSignUpData(clubList, {
         ...baseForm,
-        club: "어흥",
+        club: 7,
       });
       expect(result).toEqual({
         name: "홍길동",
@@ -34,10 +33,10 @@ describe("kakao-sign-up.transform", () => {
       });
     });
 
-    it("normalizes NO_CLUB_VALUE to null clubId", () => {
+    it("null club이면 clubId는 null", () => {
       const result = transformKakaoSignUpData(clubList, {
         ...baseForm,
-        club: NO_CLUB_VALUE,
+        club: null,
       });
       expect(result.clubId).toBeNull();
     });

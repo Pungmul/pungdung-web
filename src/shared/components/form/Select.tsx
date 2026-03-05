@@ -3,6 +3,7 @@
 import {
   Children,
   createContext,
+  type FocusEventHandler,
   isValidElement,
   ReactNode,
   useCallback,
@@ -47,7 +48,10 @@ interface SelectContextValue<T extends FieldValues, V extends T[keyof T]> {
 const SelectContext = createContext<SelectContextValue<FieldValues, FieldValues[keyof FieldValues]> | null>(null);
 
 interface SelectProps<T extends FieldValues, V extends T[keyof T]>
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
+  extends Omit<
+    InputHTMLAttributes<HTMLInputElement>,
+    "onChange" | "value" | "disabled" | "onBlur"
+  > {
   name: Path<T>;
   label: string;
   hasSearch?: boolean;
@@ -57,6 +61,8 @@ interface SelectProps<T extends FieldValues, V extends T[keyof T]>
   onChange?: ((value: V | null) => void) | undefined;
   children: ReactNode;
   value: V | null;
+  disabled?: boolean | undefined;
+  onBlur?: FocusEventHandler<HTMLElement> | undefined;
 }
 
 interface SelectOptionProps<V> {
@@ -95,7 +101,8 @@ export function Select<T extends FieldValues, V extends T[keyof T]>({
   value,
   children,
   placeholder,
-  ...rest
+  disabled,
+  onBlur,
 }: SelectProps<T, V>) {
   const [isListOpen, setIsListOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -157,7 +164,7 @@ export function Select<T extends FieldValues, V extends T[keyof T]>({
     setSearchText,
     label,
     errorMessage,
-    disabled: rest.disabled,
+    disabled,
   };
 
   return (
@@ -173,7 +180,11 @@ export function Select<T extends FieldValues, V extends T[keyof T]>({
         <select
           id={name}
           name={name}
-          value={value as string | undefined}
+          value={
+            value === undefined || value === null || value === ""
+              ? "placeholder"
+              : String(value)
+          }
           onChange={(e) => {
             const selectedValue = e.target.value;
             const item = items.find(
@@ -198,24 +209,24 @@ export function Select<T extends FieldValues, V extends T[keyof T]>({
         <button
           ref={buttonRef}
           type="button"
-          role="combobox"
           aria-expanded={isListOpen}
           aria-haspopup="listbox"
           aria-labelledby={label}
-          disabled={rest.disabled}
+          disabled={disabled}
           className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] w-full text-left ${errorMessage
             ? "border-red-400"
             : "border-grey-300 focus:border-grey-500"
-            } ${rest.disabled
+            } ${disabled
               ? "bg-grey-100 text-grey-400 cursor-not-allowed"
               : "cursor-pointer hover:border-grey-400"
             }`}
           onClick={() => {
-            if (!rest.disabled) {
+            if (!disabled) {
               setIsListOpen(!isListOpen);
             }
           }}
           onKeyDown={handleKeyDown}
+          onBlur={onBlur}
         >
           <span
             className={`flex-grow w-full ${!displayValue ? "text-grey-300" : "text-grey-500"

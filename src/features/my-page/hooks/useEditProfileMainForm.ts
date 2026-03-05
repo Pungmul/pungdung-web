@@ -1,29 +1,34 @@
 "use client";
 import { useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+import type { ClubInfo } from "@/features/club";
+import { mapGroupNameToClubId } from "@/features/club";
+
+import { formatPhoneNumber } from "@/features/auth/lib";
 import {
   EditProfileFormValues,
   EditProfileSchema,
   MyPageInfo,
-} from "@pThunder/features/my-page/types";
-import { formatPhoneNumber } from "@pThunder/features/auth/lib";
+} from "@/features/my-page/types";
 
 export const useEditProfileMainForm = (
   schema: EditProfileSchema,
-  userData?: MyPageInfo
+  userData?: MyPageInfo,
+  clubList?: ClubInfo[]
 ) => {
   const defaultValues = useMemo(() => {
     return {
       profileImage: userData?.profile.fullFilePath ?? undefined,
       name: userData?.name ?? "",
-      club: userData?.groupName ?? null,
+      club: mapGroupNameToClubId(userData?.groupName, clubList),
       clubAge: userData?.clubAge?.toString() ?? "",
       nickname: userData?.clubName ?? "",
       tellNumber: formatPhoneNumber(userData?.phoneNumber ?? ""),
-    }
-  }, [userData]);
+    };
+  }, [userData, clubList]);
 
   const form = useForm<EditProfileFormValues>({
     resolver: zodResolver(schema),
