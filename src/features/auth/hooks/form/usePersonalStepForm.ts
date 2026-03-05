@@ -5,11 +5,27 @@ import { useMemo } from "react";
 import { useFormContext, useFormState, useWatch } from "react-hook-form";
 
 import { SIGN_UP_FORM_FIELD } from "../../constants";
-import { type PersonalFormData,personalSchema } from "../../types/schemas";
+import { buildPersonalSchema, type PersonalFormData } from "../../types/schemas";
+
+import { useClubList } from "@/features/club/queries";
 
 const PERSONAL_FIELDS = SIGN_UP_FORM_FIELD.PERSONAL;
 
 export function usePersonalStepForm() {
+  const { data: clubList } = useClubList();
+
+  const personalPickSchema = useMemo(
+    () =>
+      buildPersonalSchema(clubList.map((c) => c.clubId)).pick({
+        name: true,
+        club: true,
+        clubAge: true,
+        tellNumber: true,
+        inviteCode: true,
+      }),
+    [clubList]
+  );
+
   const { register, control, trigger, getValues } =
     useFormContext<PersonalFormData>();
   const { errors: inputErrors } = useFormState({
@@ -31,14 +47,7 @@ export function usePersonalStepForm() {
   const canSubmit = useMemo(() => {
     const [name, club, clubAge, tellNumber, inviteCode] = personalValues;
 
-    return personalSchema
-      .pick({
-        name: true,
-        club: true,
-        clubAge: true,
-        tellNumber: true,
-        inviteCode: true,
-      })
+    return personalPickSchema
       .safeParse({
         name,
         club,
@@ -46,7 +55,7 @@ export function usePersonalStepForm() {
         tellNumber,
         inviteCode,
       }).success;
-  }, [personalValues]);
+  }, [personalValues, personalPickSchema]);
 
   const submitPersonalStep = async (
     onValid: (data: PersonalFormData) => void

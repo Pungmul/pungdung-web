@@ -60,7 +60,8 @@ function appendPersonalRefines<
     .refine((data) => isClubSelected(data.club), CLUB_REFINE);
 }
 
-function buildDynamicPersonalSchema(clubIds: number[]) {
+/** `clubIds`는 API `clubList`의 `clubId` 목록과 동일하게 맞춘다. */
+export function buildPersonalSchema(clubIds: number[]) {
   const base = z.object({
     name: nameField,
     nickname: z.string().optional(),
@@ -87,25 +88,9 @@ async function loadClubIds(
 /** 클럽 목록을 불러와 id enum을 맞춘 뒤 개인정보 스키마를 만든다. */
 export async function createDynamicPersonalSchema() {
   const clubIds = await loadClubIds(clubListApi);
-  return buildDynamicPersonalSchema(clubIds);
+  return buildPersonalSchema(clubIds);
 }
 
-const basePersonalSchema = z.object({
-  name: nameField,
-  nickname: z.string().optional(),
-  club: createClubFieldSchema([]),
-  clubAge: clubAgeField,
-  tellNumber: tellNumberField,
-  inviteCode,
-});
-
-/** 가입 개인정보 공통 스키마 — `club`은 폼에서 `createClubFieldSchema(clubIds)`로 덮어쓴다 */
-export const personalSchema = appendPersonalRefines(basePersonalSchema);
-
-/** 레거시 alias: 점진적 마이그레이션 호환 */
-export const emailPersonalSchema = personalSchema;
-export const kakaoPersonalSchema = personalSchema;
-
-export type PersonalFormData = z.infer<typeof personalSchema>;
+export type PersonalFormData = z.infer<ReturnType<typeof buildPersonalSchema>>;
 export type EmailPersonalFormData = PersonalFormData;
 export type KakaoPersonalFormData = PersonalFormData;

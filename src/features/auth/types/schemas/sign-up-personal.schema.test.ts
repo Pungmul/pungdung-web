@@ -13,10 +13,9 @@ vi.mock("@/features/club", async (importOriginal) => {
 
 import { type ClubInfo, clubListApi } from "@/features/club";
 
-import { createClubFieldSchema } from "./club-field.schema";
 import {
+  buildPersonalSchema,
   createDynamicPersonalSchema,
-  personalSchema,
 } from "./sign-up-personal.schema";
 
 const stubClubRow: ClubInfo = {
@@ -47,7 +46,9 @@ function assertFieldError(
   };
 }
 
-describe("personalSchema", () => {
+describe("buildPersonalSchema", () => {
+  const schemaForList = () => buildPersonalSchema([1]);
+
   const valid = {
     name: "홍길동",
     nickname: undefined as string | undefined,
@@ -58,25 +59,27 @@ describe("personalSchema", () => {
   };
 
   it("유효한 값이면 통과한다", () => {
-    expect(personalSchema.safeParse(valid).success).toBe(true);
+    expect(schemaForList().safeParse(valid).success).toBe(true);
   });
 
-  it("카카오/이메일 폼과 동일하게 safeExtend된 스키마는 club 미선택(undefined)을 거부한다", () => {
-    const clubSchema = createClubFieldSchema([1]);
-    const dynamicPersonalSchema = personalSchema.safeExtend({
-      club: clubSchema,
-    });
-    const r = dynamicPersonalSchema.safeParse({ ...valid, club: undefined });
+  it("club id가 허용 목록에 없으면 실패한다", () => {
+    const s = buildPersonalSchema([2, 3]);
+    expect(s.safeParse({ ...valid, club: 1 }).success).toBe(false);
+  });
+
+  it("동일한 club id 목록으로 빌드한 스키마는 club 미선택(undefined)을 거부한다", () => {
+    const s = buildPersonalSchema([1]);
+    const r = s.safeParse({ ...valid, club: undefined });
     expect(r.success).toBe(false);
   });
 
   it("club이 null이면 소속 없음 선택으로 통과한다", () => {
-    const r = personalSchema.safeParse({ ...valid, club: null });
+    const r = schemaForList().safeParse({ ...valid, club: null });
     expect(r.success).toBe(true);
   });
 
   it("club이 undefined이면 소속패 선택 오류가 club 경로에 잡힌다", () => {
-    const r = personalSchema.safeParse({ ...valid, club: undefined });
+    const r = schemaForList().safeParse({ ...valid, club: undefined });
     expect(r.success).toBe(false);
     if (!r.success) {
       expect(
@@ -88,14 +91,14 @@ describe("personalSchema", () => {
   });
 
   it("초대 코드가 비어 있으면 실패한다", () => {
-    const r = personalSchema.safeParse({ ...valid, inviteCode: "" });
+    const r = schemaForList().safeParse({ ...valid, inviteCode: "" });
     expect(r.success).toBe(false);
     if (!r.success) {
       expect(r.error.issues.some((i) => i.path[0] === "inviteCode")).toBe(true);
     }
   });
   it("초대 코드가 6자리 숫자가 아니면 실패한다", () => {
-    const r = personalSchema.safeParse({ ...valid, inviteCode: "12" });
+    const r = schemaForList().safeParse({ ...valid, inviteCode: "12" });
     expect(r.success).toBe(false);
     if (!r.success) assertFieldError(["inviteCode"], "6자리")(r.error.issues);
   });

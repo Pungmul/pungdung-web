@@ -8,9 +8,8 @@ import { useForm } from "react-hook-form";
 
 import {
   accountSchema,
-  createClubFieldSchema,
+  buildPersonalSchema,
   type IEmailSignUpFormData,
-  personalSchema,
   termsAgreementSchema,
 } from "../../types/schemas";
 
@@ -42,13 +41,8 @@ export function useEmailSignUpStepForm() {
    * `z.intersection`으로 합성한다.
    */
   const fullSignUpSchema = useMemo(() => {
-    const clubSchema = createClubFieldSchema(
-      clubList.map((club) => club.clubId)
-    );
-
-    const dynamicPersonalSchema = personalSchema.safeExtend({
-      club: clubSchema,
-    });
+    const clubIds = clubList.map((club) => club.clubId);
+    const dynamicPersonalSchema = buildPersonalSchema(clubIds);
 
     return z.intersection(
       termsAgreementSchema,

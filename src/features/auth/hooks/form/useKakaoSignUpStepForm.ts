@@ -7,9 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import {
-  createClubFieldSchema,
+  buildPersonalSchema,
   type IKakaoSignUpFormData,
-  personalSchema,
   termsAgreementSchema,
 } from "../../types/schemas";
 
@@ -37,15 +36,8 @@ export function useKakaoSignUpStepForm() {
    * 약관 동의·닉네임/소속패 refine을 모두 보존하기 위해 `z.intersection`으로 합성한다.
    */
   const fullSignUpSchema = useMemo(() => {
-    const clubSchema = createClubFieldSchema(
-      clubList.map((club) => club.clubId)
-    );
-
-    const dynamicPersonalSchema = personalSchema.safeExtend({
-      club: clubSchema,
-    });
-
-    return z.intersection(termsAgreementSchema, dynamicPersonalSchema);
+    const clubIds = clubList.map((club) => club.clubId);
+    return z.intersection(termsAgreementSchema, buildPersonalSchema(clubIds));
   }, [clubList]);
 
   return useForm<KakaoSignUpForm>({

@@ -2,24 +2,26 @@ import { z } from "zod";
 
 import { accountSchema } from "./account.schema";
 import {
+  buildPersonalSchema,
   createDynamicPersonalSchema,
-  personalSchema,
+  type PersonalFormData,
 } from "./sign-up-personal.schema";
 
 export { accountSchema };
-
-export { personalSchema };
+export type { AccountFormData } from "./account.schema";
+export type { PersonalFormData };
+export { buildPersonalSchema, createDynamicPersonalSchema };
 
 export async function createPersonalSchema() {
   return createDynamicPersonalSchema();
 }
 
-/** 이메일 가입: 계정 + 개인정보 */
-export const fullSignUpSchema = accountSchema.safeExtend(personalSchema.shape);
+/** `clubIds`는 `useClubList()` 등에서 온 API 클럽 id 목록과 동일하게 둔다. */
+export function buildEmailSignUpSchema(clubIds: number[]) {
+  return z.intersection(accountSchema, buildPersonalSchema(clubIds));
+}
 
-export type { AccountFormData } from "./account.schema";
-export type PersonalFormData = z.infer<typeof personalSchema>;
-export type FullSignUpFormData = z.infer<typeof fullSignUpSchema>;
+export type FullSignUpFormData = z.infer<ReturnType<typeof buildEmailSignUpSchema>>;
 
 export const stepValidationFields = {
   계정정보입력: ["email", "password", "confirmPassword"] as const,
