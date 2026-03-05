@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { FireIcon, TicketIcon } from "@heroicons/react/24/solid";
 
+import { WebViewLink } from "@/shared/components";
 import { CommentOutline } from "@/shared/components/Icons";
 
 import { BoardList } from "./BoardList";
@@ -76,20 +74,12 @@ const BoardMainPageContentItem = ({
   title: string;
   href: string;
 }) => {
-  const router = useRouter();
-
   return (
     <li>
-      <Link
+      <WebViewLink
         href={href}
-        prefetch={false}
+        prefetch
         className="w-full px-[12px] py-[8px] flex flex-row items-end gap-[12px] cursor-pointer"
-        onMouseEnter={() => {
-          void router.prefetch(href);
-        }}
-        onTouchStart={() => {
-          void router.prefetch(href);
-        }}
       >
         <div className="flex justify-center items-center size-[28px]">
           {icon}
@@ -97,7 +87,7 @@ const BoardMainPageContentItem = ({
         <div className="text-[15px] text-grey-600">
           {title}
         </div>
-      </Link>
+      </WebViewLink>
     </li>
   );
 };

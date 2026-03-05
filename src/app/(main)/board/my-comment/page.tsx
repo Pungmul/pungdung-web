@@ -1,5 +1,3 @@
-"use client";
-
 import { Suspense } from "@suspensive/react";
 
 import { PostBoxSkeleton } from "@/features/post";
