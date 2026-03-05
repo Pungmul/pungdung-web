@@ -28,7 +28,7 @@ export const signUpRequestSchema = z.object({
   username: z.email(),
   password: z.string(),
   name: z.string(),
-  clubName: z.string().optional(),
+  clubName: z.string().nullable().optional(),
   clubId: z.number().nullable().optional(),
   clubAge: z.number(),
   phoneNumber: z.string(),
@@ -38,7 +38,7 @@ export type SignUpRequestForm = z.infer<typeof signUpRequestSchema>;
 
 export const kakaoSignUpRequestSchema = z.object({
   name: z.string(),
-  clubName: z.string().optional(),
+  clubName: z.string().nullable().optional(),
   clubId: z.number().nullable().optional(),
   phoneNumber: z.string(),
   clubAge: z.number(),

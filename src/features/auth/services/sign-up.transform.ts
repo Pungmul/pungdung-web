@@ -33,7 +33,7 @@ export const transformSignUpData = (
     username: email,
     password: password,
     name: name,
-    clubName: nickname || "",
+    clubName: nickname && nickname.trim().length > 0 ? nickname : null,
     clubId: normalizedClub
       ? mapClubToClubId(clubList, normalizedClub as ClubName)
       : null,
