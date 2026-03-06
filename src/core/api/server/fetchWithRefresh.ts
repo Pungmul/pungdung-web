@@ -1,10 +1,11 @@
 "use server";
 
 import { cookies } from "next/headers";
+
 import { AuthError } from "./auth-error.class";
-import { updateTokenCookies } from "./update-token-cookies";
 import { clearTokenCookies } from "./clean-token-cookies";
 import { RefreshTokenResponse } from "./type";
+import { updateTokenCookies } from "./update-token-cookies";
 
 const MAX_RETRY = 5;
 
