@@ -1,14 +1,17 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
+
+import { Friend } from "@/features/friends";
+
+import { default as FindFriends } from "./FindFriendSection";
 import { default as FriendList } from "./FriendList";
 import { default as FriendRequest } from "../element/FriendRequestButton";
-import { default as FindFriends } from "./FindFriendSection";
+
 import {
   acceptFriendRequest,
   rejectFriendRequest,
 } from "@/features/friends/api";
-import { Friend } from "@pThunder/features/friends";
 
 type FriendList = Friend[];
 

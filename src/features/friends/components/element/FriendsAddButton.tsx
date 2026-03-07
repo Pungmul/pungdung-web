@@ -1,8 +1,10 @@
 "use client";
 
-import { requestFriend } from "@pThunder/features/friends/api";
-import { debounce } from "lodash";
 import React, { useMemo } from "react";
+
+import { debounce } from "lodash";
+
+import { requestFriend } from "@/features/friends/api";
 
 function FriendsAddButton({
   friendName,

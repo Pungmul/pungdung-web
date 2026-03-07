@@ -1,6 +1,8 @@
-import { useRejectFriendMutation } from "../../queries";
-import { Toast } from "@/shared/store";
 import { useQueryClient } from "@tanstack/react-query";
+
+import { Toast } from "@/shared/store";
+
+import { useRejectFriendMutation } from "../../queries";
 
 export default function FriendRejectButton({ friendRequestId }: { friendRequestId: number }) {
   const { mutate: rejectFriend } = useRejectFriendMutation();
