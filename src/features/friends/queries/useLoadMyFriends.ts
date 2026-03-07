@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { useDebounce } from "@/shared/lib";
+
 import { friendStore } from "../store";
+
 import { loadMyFriends } from "../api/loadMyFriends";
 
 export const useLoadMyFriends = () => {

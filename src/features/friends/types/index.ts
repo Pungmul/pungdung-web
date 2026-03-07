@@ -1,4 +1,4 @@
-import type { User } from "@/features/member";
+import type { User } from "@/features/user";
 
 export interface Friend {
   friendRequestId: number;

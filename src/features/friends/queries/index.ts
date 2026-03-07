@@ -1,6 +1,6 @@
-export { useFindFriends } from './useFindFriends';
 export { useAcceptFriendMutation } from './useAcceptFriendMutation';
-export { useRequestFriendMutation } from './useRequestFriendMutation';
-export { useRejectFriendMutation } from './useRejectFriendMutation';
+export { useFindFriends } from './useFindFriends';
 export { useLoadMyFriends } from './useLoadMyFriends';
+export { useRejectFriendMutation } from './useRejectFriendMutation';
+export { useRequestFriendMutation } from './useRequestFriendMutation';
 

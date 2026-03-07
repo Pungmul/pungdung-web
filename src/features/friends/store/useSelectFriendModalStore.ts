@@ -1,6 +1,7 @@
 "use client";
 import { create } from "zustand";
-import { createPersonalChatRoom, createMultiChatRoom } from "@/features/chat";
+
+import { createMultiChatRoom,createPersonalChatRoom } from "@/features/chat";
 
 interface SelectFriendModalState {
   isModalOpen: boolean;

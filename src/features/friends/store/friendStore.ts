@@ -1,9 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+
 import {
   type FriendSearchHistoryEntry,
   type FriendSearchHistoryInput,
 } from "../types";
+
 import { FRIEND_SEARCH_HISTORY_STORAGE_KEY } from "../constant/storageKeys";
 
 interface FriendFilter {

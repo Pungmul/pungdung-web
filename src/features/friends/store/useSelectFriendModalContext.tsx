@@ -1,7 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useSelectFriendModalStore } from "./useSelectFriendModalStore";
+
 import { SelectFriendsModal } from "@/features/chat";
+
+import { useSelectFriendModalStore } from "./useSelectFriendModalStore";
 
 export const SelectFriendModal = () => {
   const router = useRouter();
