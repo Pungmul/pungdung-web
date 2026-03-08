@@ -1,5 +1,5 @@
-import { ChatRoomListItemDto } from "../types";
-import { sortChatRoomByDate } from "../lib";
+import { sortChatRoomByDate } from "../../lib";
+import { ChatRoomListItemDto } from "../../types";
 
 export const loadChatRoomList = async (): Promise<ChatRoomListItemDto[]> => {
   try {

@@ -1,4 +1,4 @@
-import { ChatMessageDto } from "@/features/chat";
+import type { ChatMessageDto } from "../../types";
 
 export const loadChatLogs = async (
   roomId: string,

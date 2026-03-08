@@ -1,4 +1,4 @@
-import { ChatRoomDto } from "@/features/chat";
+import type { ChatRoomDto } from "../../types";
 
 export const loadChatRoomInfo = async (
   roomId: string

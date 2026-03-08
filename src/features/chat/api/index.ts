@@ -1,9 +1,11 @@
-// Chat API Barrel Exports
-export { loadChatRoomInfo } from "./loadChatRoomInfo";
-export { loadChatLogs } from "./loadChatLogs";
-export { sendTextMessage } from "./sendTextMessage";
-export { sendImageMessage } from "./sendImageMessage";
-export { exitChat } from "./exitChat";
-export { inviteUser } from "./inviteUser";
-export { loadChatRoomList as loadChatRoomList } from "./loadChatRoomList";
-export { createPersonalChatRoom, createMultiChatRoom } from "./createChatRoom";
+export {
+  createMultiChatRoom,
+  createPersonalChatRoom,
+} from "./client/create-chat-room.api";
+export { exitChat } from "./client/exit-chat.api";
+export { inviteUser } from "./client/invite-user.api";
+export { loadChatLogs } from "./client/load-chat-logs.api";
+export { loadChatRoomInfo } from "./client/load-chat-room-info.api";
+export { loadChatRoomList } from "./client/load-chat-room-list.api";
+export { sendImageMessage } from "./client/send-image-message.api";
+export { sendTextMessage } from "./client/send-text-message.api";
