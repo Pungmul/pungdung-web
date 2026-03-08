@@ -1,1 +1,1 @@
-export { sortChatRoomByDate } from "./sortChatRoomByDate";
+export { sortChatRoomByDate } from "./sort-chat-room-by-date";

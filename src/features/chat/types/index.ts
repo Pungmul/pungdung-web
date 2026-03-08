@@ -1,9 +1,9 @@
 // Type guards
 export * from "./guards";
 // Pending message types
-export * from "./pendingMessage";
+export * from "./pending-message.types";
 
-import { User } from "../../member";
+import type { User } from "@/features/user";
 
 export interface ChatRoomInfo {
   chatRoomUUID: string;
@@ -138,8 +138,27 @@ export interface AlarmMessage {
 
 export interface ChatRoomUpdateMessage {
   chatRoomUUID: string;
-  content: string;
+  content: string | null;
   timestamp: string;
+  /** 예: 새 메시지 알림은 미포함, 읽음 처리는 `"READ"` */
+  type?: string;
+  unreadCount?: number | null;
 }
 
-export * from "./guards";
+/**
+ * 서버에서 내려주는 읽음 처리 STOMP 메시지 (`/sub/chat/read/:roomId`).
+ * `content.messageIds`가 비어 있으면 클라이언트가 메시지 목록의 최신 ID로 보완한다.
+ */
+export interface ReadSocketMessage {
+  messageLogId: number;
+  domainType: string;
+  businessIdentifier: string;
+  /** chatRoomUUID */
+  identifier: string;
+  stompDest: string;
+  content: {
+    userId: number;
+    messageIds: number[];
+    readAt: string;
+  };
+}
