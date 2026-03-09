@@ -1,18 +1,20 @@
 "use client";
 
 import { useMemo } from "react";
-import { User } from "@/features/member";
+
+import { User } from "@/features/user";
+
+import {
+  createUserImageMap,
+  createUserLastReadMessageIdMap,
+  createUserNameMap,
+} from "../services";
 import { ChatRoomDto } from "../types";
 import {
-  createUserLastReadMessageIdMap,
-  createUserImageMap,
-  createUserNameMap,
-} from "../services/createUserMaps";
-import {
-  UserLastReadMessageIdMap,
   UserImageMap,
+  UserLastReadMessageIdMap,
   UserNameMap,
-} from "../types/pendingMessage";
+} from "../types";
 
 interface UseChatRoomUserMapsParams {
   chatRoomData: ChatRoomDto | undefined;

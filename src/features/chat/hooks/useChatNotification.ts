@@ -1,5 +1,8 @@
-import { useChatRoomListQuery } from "../queries";
 import { useMemo } from "react";
+
+import { useQuery } from "@tanstack/react-query";
+
+import { chatQueries } from "../queries";
 
 /**
  * 채팅 알림용 간단한 훅
@@ -7,7 +10,7 @@ import { useMemo } from "react";
  */
 export const useChatNotification = () => {
   // zustand 스토어에서 필요한 값들만 선택적으로 가져오기
-  const { data: queryData } = useChatRoomListQuery();
+  const { data: queryData = [] } = useQuery(chatQueries.roomList());
   const totalUnreadCount = useMemo(() => {
     if (queryData.length === 0 || !(queryData instanceof Array)) return 0;
     return queryData.reduce((acc, room) => acc + (room.unreadCount ?? 0), 0);

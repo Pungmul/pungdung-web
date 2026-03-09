@@ -2,13 +2,14 @@
 
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Alert } from "@/shared";
 
-import { useExitChatMutation } from "../queries";
-import { chatQueryKeys } from "../queries/keys";
-import { removeChatRoom } from "../services/chatRoomListUpdater";
+import { chatMutationOptions, chatQueries } from "../queries";
+import { removeChatRoom } from "../services";
+
 import type { ChatRoomListItemDto } from "../types";
 
 interface UseExitChatRoomOptions {
@@ -30,7 +31,7 @@ export const useExitChatRoom = ({
 }: UseExitChatRoomOptions) => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const exitChatMutation = useExitChatMutation();
+  const exitChatMutation = useMutation(chatMutationOptions.exitChat());
 
   const exitChatRoom = useCallback(() => {
     Alert.confirm({
@@ -42,15 +43,15 @@ export const useExitChatRoom = ({
           onSuccess: async () => {
             // 해당 채팅방 쿼리 캐시 제거
             queryClient.removeQueries({
-              queryKey: chatQueryKeys.room(roomId),
+              queryKey: chatQueries.room(roomId).queryKey,
             });
             queryClient.removeQueries({
-              queryKey: chatQueryKeys.roomInfinite(roomId),
+              queryKey: chatQueries.roomInfinite(roomId).queryKey,
             });
 
             // 채팅방 목록에서 제거
             queryClient.setQueryData(
-              chatQueryKeys.roomList(),
+              chatQueries.roomList().queryKey,
               (old: ChatRoomListItemDto[] | undefined) =>
                 old ? removeChatRoom(old, roomId) : [],
             );

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ChatRoomDto } from "../types";
+import { useEffect,useState } from "react";
+
+import type { ChatRoomDto, ChatRoomListItemDto } from "../types";
 
 interface UseChatRoomTitleParams {
   chatRoomData: ChatRoomDto | undefined;
@@ -71,4 +72,16 @@ export const getChatRoomTitle = (chatRoomData: ChatRoomDto): string => {
   return chatRoomData.chatRoomInfo.group
     ? `${chatRoomData.chatRoomInfo.roomName} (${chatRoomData.userInfoList.length})`
     : chatRoomData.chatRoomInfo.roomName;
+};
+
+/**
+ * 채팅 목록 캐시 아이템에서 헤더 제목 문자열을 만듭니다.
+ * {@link getChatRoomTitle}와 동일한 규칙(그룹일 때 이름 뒤 인원)을 따릅니다.
+ */
+export const getChatRoomTitleFromListItem = (
+  item: ChatRoomListItemDto
+): string => {
+  return item.group
+    ? `${item.roomName} (${item.chatRoomMemberIds.length})`
+    : item.roomName;
 };

@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Toast } from "@/shared";
-import { PendingMessage } from "../types/pendingMessage";
-import {
-  createPendingTextMessage,
-  createPendingImageMessage,
-  updateMessageToFailed,
-  removePendingMessage,
-} from "../services/createPendingMessage";
+import { useCallback,useState } from "react";
 
-interface UsePendingMessagesParams {
+import { Toast } from "@/shared";
+
+import {
+  createPendingImageMessage,
+  createPendingTextMessage,
+  removePendingMessage,
+  updateMessageToFailed,
+} from "../services";
+import { PendingMessage } from "../types";
+
+export interface UsePendingMessagesParams {
   roomId: string;
   senderUsername: string;
   sendTextMessageMutation: {
