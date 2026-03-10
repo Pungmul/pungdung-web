@@ -1,6 +1,6 @@
-import type { Member } from "@/features/member";
-
 import Image from "next/image";
+
+import type { Member } from "@/features/user";
 
 export default function ProfileCircle({myInfo}: {myInfo: Member}) {
 

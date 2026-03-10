@@ -1,4 +1,4 @@
-import type { Member } from "@/features/member";
+import type { Member } from "@/features/user";
 
 export type MyPageInfo = Member;
 

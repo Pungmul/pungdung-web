@@ -1,6 +1,8 @@
 import Image from "next/image";
-import { Space, SkeletonView } from "@/shared";
 import Link from "next/link";
+
+import { SkeletonView,Space } from "@/shared";
+
 import { useSuspenseGetMyPageInfo } from "../../queries";
 
 export function ProfileSectionSkeleton() {

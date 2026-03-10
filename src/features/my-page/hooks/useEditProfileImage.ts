@@ -1,5 +1,6 @@
 "use client";
-import { useCallback, useState, ChangeEvent } from "react";
+import { ChangeEvent,useCallback, useState } from "react";
+
 import { UseFormReturn } from "react-hook-form";
 
 import { EditProfileFormValues } from "@/features/my-page";

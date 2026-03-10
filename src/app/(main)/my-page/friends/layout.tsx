@@ -1,4 +1,6 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+
 export const metadata: Metadata = {
   title: "친구 관리 | 풍덩",
   description: "친구 관리 페이지",
@@ -6,8 +8,15 @@ export const metadata: Metadata = {
 
 export default function FriendsLayout({
   children,
+  modal,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
+  modal: ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      {children}
+      {modal}
+    </>
+  );
 }

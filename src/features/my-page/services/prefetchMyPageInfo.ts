@@ -1,5 +1,7 @@
-import { getQueryClient } from "@pThunder/core";
+import { getQueryClient } from "@/core";
+
 import { getMyPageInfo } from "../api";
+
 import { myPageQueryKeys } from "../constant";
 
 export const prefetchMyPageInfo = () => {

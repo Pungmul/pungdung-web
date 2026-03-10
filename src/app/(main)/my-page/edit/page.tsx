@@ -1,4 +1,4 @@
-import { EditProfileForm } from "@pThunder/features/my-page";
+import { EditProfileForm } from "@/features/my-page";
 
 export default function EditPage() {
   return <EditProfileForm />;

@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 
-import { Space, SkeletonView } from "@/shared";
+import { useLoadMyFriends } from "@/features/friends";
+
+import { SkeletonView,Space } from "@/shared";
+import { SuspenseComponent as Suspense } from "@/shared";
 
 import ProfileSection from "./ProfileSection";
-import { SuspenseComponent as Suspense } from "@/shared";
 import { ProfileSectionSkeleton } from "./ProfileSection";
 import { useSuspenseGetMyPageInfo } from "../../queries";
-import { useLoadMyFriends } from "@pThunder/features/friends";
 
 export default function MyPageClient() {
   return (

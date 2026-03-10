@@ -1,6 +1,8 @@
-import { LoginToggle } from "@pThunder/features/my-page";
-import { BottomFixedButton, Header, Space } from "@/shared";
 import { redirect } from "next/navigation";
+
+import { LoginToggle } from "@/features/my-page";
+
+import { BottomFixedButton, Header, Space } from "@/shared";
 
 export default function LoginSettingPage() {
   async function handleLogout() {

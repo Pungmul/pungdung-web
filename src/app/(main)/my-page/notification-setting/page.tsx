@@ -1,4 +1,5 @@
-import { NotificationToggle } from "@pThunder/features/my-page";
+import { NotificationToggle } from "@/features/my-page";
+
 import { Header, Space } from "@/shared";
 
 export default function LoginSettingPage() {

@@ -1,16 +1,18 @@
 "use client";
-import { Header, Space } from "@pThunder/shared";
-import {
-  FindFriendSection,
-  FriendBox,
-  useLoadMyFriends,
-} from "@pThunder/features/friends";
+
 import Link from "next/link";
+
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { useRouter, useSearchParams } from "next/navigation";
-import { AnimatePresence, motion, PanInfo, useAnimate } from "framer-motion";
-import { FriendReceivedBox } from "@pThunder/features/friends/components/element/FriendBox";
-import { Suspense } from "react";
+
+import {
+  FriendBox,
+  FriendReceivedBox,
+  useLoadMyFriends,
+} from "@/features/friends";
+
+import { Header, Space, UserProfileCardModalHost } from "@/shared";
+import { userProfileModalStore } from "@/shared/store";
+
 export default function FriendsPage() {
   const {
     data: { acceptedFriendList, pendingReceivedList, pendingSentList } = {
@@ -21,11 +23,12 @@ export default function FriendsPage() {
   } = useLoadMyFriends();
   return (
     <div className="bg-grey-100 h-full w-full">
+      <UserProfileCardModalHost />
       <div className="flex flex-col h-full w-full min-w-[360px] max-w-[768px] mx-auto relative bg-grey-100">
         <Header title="친구 관리" />
         <Space h={12} />
         <Link
-          href={"/my-page/friends?findFriend=true"}
+          href="/my-page/friends/find"
           className="text-grey-600 font-semibold text-base p-6 bg-background flex flex-row items-center justify-between"
         >
           <p className="text-grey-600 font-semibold text-base">친구 검색</p>
@@ -48,6 +51,12 @@ export default function FriendsPage() {
                   <FriendBox
                     key={friend.friendRequestId}
                     friend={friend.simpleUserDTO}
+                    onOpen={() =>
+                      userProfileModalStore.getState().open({
+                        user: friend.simpleUserDTO,
+                        relationship: "pending_out",
+                      })
+                    }
                   />
                 ))}
               </details>
@@ -68,6 +77,13 @@ export default function FriendsPage() {
                   key={friend.friendRequestId}
                   friend={friend.simpleUserDTO}
                   friendRequestId={friend.friendRequestId}
+                  onOpenProfile={() =>
+                    userProfileModalStore.getState().open({
+                      user: friend.simpleUserDTO,
+                      relationship: "pending_in",
+                      incomingFriendRequestId: friend.friendRequestId,
+                    })
+                  }
                 />
               ))}
               <Space h={12} />
@@ -80,94 +96,16 @@ export default function FriendsPage() {
             <FriendBox
               key={friend.friendRequestId}
               friend={friend.simpleUserDTO}
+              onOpen={() =>
+                userProfileModalStore.getState().open({
+                  user: friend.simpleUserDTO,
+                  relationship: "friend",
+                })
+              }
             />
           ))}
         </main>
       </div>
-      <Suspense fallback={null}>
-        <FindFriendOverlay />
-      </Suspense>
     </div>
-  );
-}
-
-function FindFriendOverlay() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const isFindFriend = searchParams.get("findFriend") === "true";
-  const [container, containerAnimate] = useAnimate<HTMLDivElement>();
-  const [backdrop, backdropAnimate] = useAnimate<HTMLDivElement>();
-
-  const handleDragEnd = (
-    _: MouseEvent | TouchEvent | PointerEvent,
-    info: PanInfo
-  ) => {
-    if (info.offset.y > 160 || info.velocity.y > 500) {
-      router.back();
-    } else {
-      // 원위치로 돌아가기
-      containerAnimate(
-        container.current,
-        { y: 0 },
-        { duration: 0.3, ease: "easeOut" }
-      );
-      backdropAnimate(
-        backdrop.current,
-        { opacity: 1 },
-        { duration: 0.3, ease: "easeOut" }
-      );
-    }
-  };
-
-  return (
-    <AnimatePresence key="find-friend-overlay" mode="sync">
-      {isFindFriend && (
-        <motion.div
-          key="find-friend-backdrop"
-          ref={backdrop}
-          onClick={() => router.back()}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="absolute top-0 left-0 w-full h-app z-10"
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-          }}
-        />
-      )}
-      {isFindFriend && (
-        <motion.div
-          key="find-friend-container"
-          ref={container}
-          drag="y"
-          dragDirectionLock
-          dragConstraints={{ top: 0, bottom: 200 }}
-          dragElastic={0.1}
-          initial={{ y: "100%" }}
-          animate={{ y: 0 }}
-          exit={{ y: "100%" }}
-          onDragEnd={handleDragEnd}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="absolute top-0 left-0 w-dvw z-50 mt-[6vh] o"
-        >
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            className="relative bg-background h-full pt-[8px] md:max-w-[960px] md:mx-auto z-50"
-            style={{
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }}
-          >
-            <div className="pt-[12px]">
-              <FindFriendSection />
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import { Toggle } from "@/shared/components/form/Toggle";
 
 export default function LoginToggle() {
