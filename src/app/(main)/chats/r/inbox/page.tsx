@@ -1,9 +1,12 @@
-import { lazy, Suspense } from "react";
-import { ChatIconOutline } from "@pThunder/shared/components/Icons";
+import { lazy } from "react";
+
+import { Suspense } from "@suspensive/react";
+
+import { ChatIconOutline } from "@/shared/components/Icons";
 
 // 동적 렌더링 강제 - 프리렌더 에러 해결
 export const dynamic = "force-dynamic";
-const AddChatRoomButton = lazy(() => import("@/features/chat/components/element/AddChatRoomButton"));
+const AddChatRoomButton = lazy(() => import("@/features/chat").then((m) => ({ default: m.AddChatRoomButton })));
 
 function InboxContent() {
   return (

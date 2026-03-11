@@ -1,14 +1,18 @@
+import { lazy } from "react";
 import { Metadata } from "next";
 
-import {
-  RoomContainer,
-  ChatRoomBoxSkeleton,
-  loadChatRoomList,
-} from "@/features/chat";
-import { lazy } from "react";
-import { SuspenseComponent as Suspense } from "@/shared";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { getQueryClient } from "@pThunder/core";
+
+import { getQueryClient } from "@/core";
+
+import {
+  chatQueries,
+  ChatRoomBoxSkeleton,
+  fetchRoomListApi,
+  RoomContainer,
+} from "@/features/chat";
+
+import { SuspenseComponent as Suspense } from "@/shared";
 
 export const metadata: Metadata = {
   title: "풍덩 | 채팅",
@@ -18,13 +22,13 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 const ChatRoomList = lazy(
-  () => import("@pThunder/features/chat/components/widget/ChatRoomList")
+  () => import("@/features/chat/components/section/ChatRoomList")
 );
 
 const SelectFriendModal = lazy(() =>
-  import("@/features/friends/store/useSelectFriendModalContext").then(
-    (module) => ({ default: module.SelectFriendModal })
-  )
+  import("@/features/friends/store").then((module) => ({
+    default: module.SelectFriendModal,
+  }))
 );
 
 function ChatLayoutContent({ children }: { children: React.ReactNode }) {
@@ -39,12 +43,12 @@ function ChatLayoutContent({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 
-  queryClient.prefetchQuery({
-    queryKey: ["chatRoomList"],
-    queryFn: () => loadChatRoomList(),
+  await queryClient.prefetchQuery({
+    ...chatQueries.roomList(),
+    queryFn: () => fetchRoomListApi(),
   });
 
   const dehydratedState = dehydrate(queryClient);

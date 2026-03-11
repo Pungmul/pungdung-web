@@ -1,11 +1,10 @@
 import { cookies } from "next/headers";
 
-import { ErrorBoundary } from "react-error-boundary";
+import { ErrorBoundary } from "@suspensive/react";
 
-import Suspense from "@/shared/components/SuspenseComponent";
+import { ChatLoadFailFallback } from "@/features/chat";
 
 import { TokenProvider } from "@/features/auth/providers";
-import { ChatLoadFailFallback } from "@/features/chat/components/widget/ChatLoadFailFallback";
 
 export default async function ChatsLayout({
   children,
@@ -16,11 +15,9 @@ export default async function ChatsLayout({
 
   return (
     <ErrorBoundary
-      FallbackComponent={ChatLoadFailFallback}
+      fallback={ChatLoadFailFallback}
     >
-      <Suspense>
-        <TokenProvider token={token}>{children}</TokenProvider>
-      </Suspense>
+      <TokenProvider token={token}>{children}</TokenProvider>
     </ErrorBoundary>
   );
 }
