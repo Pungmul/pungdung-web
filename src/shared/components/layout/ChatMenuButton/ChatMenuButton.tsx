@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ChatTabBadge } from "@/features/chat/components/element/ChatTabBadge";
-import { ChatIconFilled, ChatIconOutline } from "@/shared/components/Icons";
 import { usePathname } from "next/navigation";
+
+import { ChatTabBadge } from "@/features/chat";
+
 import { SuspenseComponent as Suspense } from "@/shared";
+import { ChatIconFilled, ChatIconOutline } from "@/shared/components/Icons";
 
 export default function ChatMenuButton() {
   const pathname = usePathname();

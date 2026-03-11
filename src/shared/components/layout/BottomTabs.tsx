@@ -1,5 +1,5 @@
 "use client";
-import { Suspense,useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -8,7 +8,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { useGetMyPageInfo } from "@/features/my-page";
+import { ProfileCircle, useGetMyPageInfo } from "@/features/my-page";
 import { NotificationList } from "@/features/notification";
 
 import { Spinner } from "@/shared";
@@ -25,8 +25,6 @@ import { Header } from "@/shared/components/layout/Header";
 import { useView } from "@/shared/lib/view/view-store-provider";
 
 import ChatMenuButton from "./ChatMenuButton/ChatMenuButton";
-
-import ProfileCircle from "@/features/my-page/components/widget/ProfileCircle";
 
 export default function BottomTabs() {
   const view = useView();
