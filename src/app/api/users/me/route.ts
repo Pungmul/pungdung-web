@@ -11,7 +11,6 @@ export async function GET() {
 
     // 프록시 응답 받기
     const proxyResponse = await response.json();
-    console.log(proxyResponse);
 
     // 클라이언트에 프록시 응답 반환
     return Response.json({ ...proxyResponse.response }, { status: 200 });

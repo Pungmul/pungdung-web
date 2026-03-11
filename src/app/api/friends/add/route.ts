@@ -11,7 +11,12 @@ export async function POST(req: Request) {
       method: "POST",
     });
 
-    if (!response.ok) throw Error("서버 불안정" + response.status);
+    if (!response.ok) {
+      console.error("서버 불안정", response.status);
+      const errorText = await response.text();
+      console.error("서버 오류:", errorText);
+      throw Error("서버 불안정" + response.status);
+    }
     // 클라이언트에 프록시 응답 반환
     return Response.json("Success", { status: 200 });
   } catch (error) {
