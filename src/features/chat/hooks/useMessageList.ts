@@ -45,12 +45,12 @@ export const useMessageList = ({
       messageMap.set(String(msg.id), msg);
     }
 
-    for (const msg of pendingMessages) {
-      messageMap.set(String(msg.id), msg);
-    }
-
-    return Array.from(messageMap.values()).sort((a, b) =>
+    const sortedConfirmed = Array.from(messageMap.values()).sort((a, b) =>
       a.createdAt.localeCompare(b.createdAt)
     );
+
+    // pending은 `YYYY-MM-DD HH:mm:ss`, 서버는 ISO 등 다른 형식일 수 있어
+    // `localeCompare`만으로는 최신 말풍선 아래에 고정되지 않는다. 전송 큐는 항상 하단.
+    return [...sortedConfirmed, ...pendingMessages];
   }, [chatRoomData, infiniteData, socketMessages, pendingMessages]);
 };
