@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function SignUpLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="bg-background h-full w-full">
-            <div className="flex flex-col h-full w-full min-w-[360px] max-w-[768px] mx-auto relative bg-grey-100">
+            <div className="flex flex-col h-full w-full min-w-[360px] max-w-[768px] mx-auto relative bg-background">
                 {children}
             </div>
         </div>)
