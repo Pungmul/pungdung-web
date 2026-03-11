@@ -19,6 +19,7 @@ export function ChatRoomHeader({
 }: ChatRoomHeaderProps) {
   return (
     <Header
+      className="shrink-0 sticky top-0 z-10 bg-background"
       title={
         <div className="flex items-center gap-2 h-full">
           <div className="text-sm lg:text-base max-w-[160px] lg:max-w-[300px] truncate">

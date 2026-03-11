@@ -1,13 +1,13 @@
 "use client";
 
-import React from "react";
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 
 import { Spinner } from "@/shared/components";
 import ObserveTrigger from "@/shared/components/ObserveTrigger";
 
 import { MessageList as ChatMessageList } from "./MessageList";
+import { ChatSendForm } from "./ChatSendForm";
 import {
   useChatRoomFetchOlderPageTrigger,
   useChatRoomMessageList,
@@ -17,17 +17,11 @@ import {
 } from "../../hooks";
 import { chatMutationOptions } from "../../queries";
 
-type SendFormHandlers = {
-  onSendMessage: (message: string) => Promise<void>;
-  onSendImage: (files: FileList) => Promise<void>;
-};
-
 type ChatRoomTimelinePanelProps = {
   roomId: string;
   myInfo?: { username: string };
   readSign: () => void;
   isConnected: boolean;
-  renderSendForm: (handlers: SendFormHandlers) => React.ReactNode;
 };
 
 export function ChatRoomTimelinePanel({
@@ -35,9 +29,9 @@ export function ChatRoomTimelinePanel({
   myInfo,
   readSign,
   isConnected,
-  renderSendForm,
 }: ChatRoomTimelinePanelProps) {
   const queryClient = useQueryClient();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const sendTextMessageMutation = useMutation(
     chatMutationOptions.sendTextMessage(queryClient),
@@ -47,12 +41,11 @@ export function ChatRoomTimelinePanel({
   );
 
   const {
-    wholeRef,
     messageContainerRef,
     saveScrollPosition,
     maintainScrollPosition,
     scrollToTop,
-  } = useScrollPosition();
+  } = useScrollPosition({ scrollContainerRef });
 
   const {
     messageList,
@@ -88,18 +81,22 @@ export function ChatRoomTimelinePanel({
 
   return (
     <>
-      {blockMainArea ? (
-        <div className="flex justify-center items-center h-full bg-background">
-          <Spinner size={36} />
-        </div>
-      ) : (
-        <div
-          ref={wholeRef}
-          className="h-full flex flex-col-reverse gap-2 flex-grow overflow-y-auto"
-        >
+      <div
+        ref={scrollContainerRef}
+        className="
+          flex min-h-0 flex-col-reverse overflow-y-auto overscroll-contain
+          [-webkit-overflow-scrolling:touch]
+          [overflow-anchor:none]
+        "
+      >
+        {blockMainArea ? (
+          <div className="flex min-h-0 flex-1 items-center justify-center bg-background">
+            <Spinner size={36} />
+          </div>
+        ) : (
           <div
             ref={messageContainerRef}
-            className="flex-grow bg-background py-[24px] px-[16px]"
+            className="w-full flex flex-col shrink-0 grow-1 bg-background px-[16px] py-[24px]"
           >
             {Boolean(hasNextPage) && (
               <>
@@ -109,7 +106,7 @@ export function ChatRoomTimelinePanel({
                   triggerCondition={{ rootMargin: "100px" }}
                 />
                 {isFetchingNextPage && (
-                  <div className="flex justify-center py-4 flex-col items-center">
+                  <div className="flex flex-col items-center justify-center py-4">
                     <Spinner size={36} />
                   </div>
                 )}
@@ -126,9 +123,12 @@ export function ChatRoomTimelinePanel({
               onDeletePending={onDeleteMessage}
             />
           </div>
-        </div>
-      )}
-      {renderSendForm({ onSendMessage, onSendImage })}
+        )}
+      </div>
+      <ChatSendForm
+        onSendMessage={onSendMessage}
+        onSendImage={onSendImage}
+      />
     </>
   );
 }

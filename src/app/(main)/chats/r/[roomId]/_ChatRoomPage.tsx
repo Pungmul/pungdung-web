@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -14,7 +14,6 @@ import {
   chatQueries,
   ChatRoomHeader,
   ChatRoomTimelinePanel,
-  ChatSendForm,
   InviteUserModal,
   useChatRoomTitle,
   useChatRoomUserMaps,
@@ -27,7 +26,7 @@ import { useSuspenseGetMyPageInfo } from "@/features/my-page";
 import type { Member, User } from "@/features/user";
 
 import { UserProfileCardModalHost } from "@/shared";
-import { useBodyScrollLock } from "@/shared/hooks";
+import { useBodyScrollLock, useViewportHeightVar } from "@/shared/hooks";
 import { userProfileModalStore } from "@/shared/store";
 
 /** 채팅방 `userInfoList`는 오래될 수 있어, 본인 모달에는 최신 `Member`로 덮어쓴다. */
@@ -45,7 +44,7 @@ export function ChatRoomPage() {
   const { roomId } = useParams();
   const router = useRouter();
   const { data: myInfo } = useSuspenseGetMyPageInfo();
-  const myInfoRef = React.useRef(myInfo);
+  const myInfoRef = useRef(myInfo);
   myInfoRef.current = myInfo;
 
   const isConnected = useSocketConnection();
@@ -59,6 +58,9 @@ export function ChatRoomPage() {
   useSyncChatRoomFocusOnRoomId(roomId as string);
   useBodyScrollLock(true);
 
+  const mainRef = useRef<HTMLElement>(null);
+  useViewportHeightVar(mainRef);
+
   const { data: chatRoomData } = useSuspenseQuery(
     chatQueries.room(roomId as string),
   );
@@ -66,9 +68,11 @@ export function ChatRoomPage() {
   const { title } = useChatRoomTitle({ chatRoomData });
   const { userList } = useChatRoomUserMaps({ chatRoomData });
 
-  const memberCount = chatRoomData?.userInfoList.length ? chatRoomData?.userInfoList.length - 1 : 0;
+  const memberCount = chatRoomData?.userInfoList.length
+    ? chatRoomData?.userInfoList.length - 1
+    : 0;
 
-  const handleMemberProfileClick = React.useCallback(async (user: User) => {
+  const handleMemberProfileClick = useCallback(async (user: User) => {
     const me = myInfoRef.current;
     if (user.username === me.username) {
       userProfileModalStore.getState().open({
@@ -83,26 +87,28 @@ export function ChatRoomPage() {
 
   return (
     <AnimatePresence mode="wait">
-      <div className="flex flex-col h-full bg-background relative overflow-y-auto overflow-x-hidden">
+      <main
+        ref={mainRef}
+        className="relative h-full min-h-0 overflow-hidden bg-background max-md:h-[var(--app-height,100dvh)]"
+      >
+        <div className="h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)_auto]">
+          <ChatRoomHeader
+            title={title}
+            memberCount={memberCount}
+            onBack={() => router.push("/chats/r/inbox")}
+            onOpenDrawer={() => setDrawerOpen(true)}
+          />
+
+          <ChatRoomTimelinePanel
+            roomId={roomId as string}
+            myInfo={myInfo}
+            readSign={readSign}
+            isConnected={isConnected}
+          />
+        </div>
+
         <UserProfileCardModalHost />
-        <ChatRoomHeader
-          title={title}
-          memberCount={memberCount}
-          onBack={() => router.push("/chats/r/inbox")}
-          onOpenDrawer={() => setDrawerOpen(true)}
-        />
-        <ChatRoomTimelinePanel
-          roomId={roomId as string}
-          myInfo={myInfo}
-          readSign={readSign}
-          isConnected={isConnected}
-          renderSendForm={(handlers) => (
-            <ChatSendForm
-              onSendMessage={handlers.onSendMessage}
-              onSendImage={handlers.onSendImage}
-            />
-          )}
-        />
+
         <ChatDrawer
           drawerOpen={drawerOpen}
           onExitChat={exitChatRoom}
@@ -121,7 +127,7 @@ export function ChatRoomPage() {
             setInviteUserModalOpen(false);
           }}
         />
-      </div>
+      </main>
     </AnimatePresence>
   );
 }

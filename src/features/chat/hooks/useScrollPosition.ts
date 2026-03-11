@@ -1,9 +1,17 @@
 "use client";
+
+import type { RefObject } from "react";
 import { useCallback, useRef } from "react";
 
-export const useScrollPosition = () => {
+type UseScrollPositionOptions = {
+  /** 스크롤 컨테이너(ref.current에 scrollTop이 있는 요소). 없으면 훅 내부 ref를 사용합니다. */
+  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+};
+
+export const useScrollPosition = (opts?: UseScrollPositionOptions) => {
   const scrollRef = useRef<number>(0);
-  const wholeRef = useRef<HTMLDivElement>(null);
+  const internalScrollContainerRef = useRef<HTMLDivElement>(null);
+  const wholeRef = opts?.scrollContainerRef ?? internalScrollContainerRef;
   const messageContainerRef = useRef<HTMLDivElement>(null);
 
   const saveScrollPosition = useCallback(() => {
@@ -13,26 +21,29 @@ export const useScrollPosition = () => {
   }, []);
 
   const maintainScrollPosition = useCallback(() => {
-    if (
-      scrollRef.current > 0 &&
-      wholeRef.current &&
-      messageContainerRef.current
-    ) {
+    const scrollEl = wholeRef.current;
+    if (scrollRef.current > 0 && scrollEl && messageContainerRef.current) {
       const newHeight = messageContainerRef.current.scrollHeight;
       const prevHeight = scrollRef.current;
       const delta = newHeight - prevHeight;
 
-      wholeRef.current.scrollTo({
-        top: wholeRef.current.scrollTop + delta,
+      scrollEl.scrollTo({
+        top: scrollEl.scrollTop + delta,
       });
 
       scrollRef.current = newHeight;
     }
-  }, []);
+  }, [wholeRef]);
 
   const scrollToTop = useCallback(() => {
-    wholeRef.current?.scrollTo({ top: 0 });
-  }, []);
+    const el = wholeRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.scrollTo({ top: 0 });
+      });
+    });
+  }, [wholeRef]);
 
   return {
     scrollRef,
