@@ -1,7 +1,7 @@
 "use client";
 import { create } from "zustand";
 
-import { createMultiChatRoom,createPersonalChatRoom } from "@/features/chat";
+import { createMultiChatRoom, createPersonalChatRoom } from "@/features/chat";
 
 interface SelectFriendModalState {
   isModalOpen: boolean;
@@ -57,4 +57,3 @@ export const useSelectFriendModalStore = create<SelectFriendModalState>(
     },
   })
 );
-

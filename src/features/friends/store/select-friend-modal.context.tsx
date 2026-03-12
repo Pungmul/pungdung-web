@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 
 import { SelectFriendsModal } from "@/features/chat";
 
-import { useSelectFriendModalStore } from "./useSelectFriendModalStore";
+import { useSelectFriendModalStore } from "./select-friend-modal.store";
 
 export const SelectFriendModal = () => {
   const router = useRouter();
@@ -29,4 +29,3 @@ export const useSelectFriendModal = () => {
   const { openModalToSelectFriend } = useSelectFriendModalStore();
   return { openModalToSelectFriend };
 };
-
