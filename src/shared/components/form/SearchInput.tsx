@@ -1,19 +1,35 @@
 "use client";
 
-import React, { useMemo, useCallback, forwardRef } from "react";
-import {
-  MagnifyingGlassIcon,
-  ChevronLeftIcon,
-} from "@heroicons/react/24/outline";
-import { XCircleIcon } from "@heroicons/react/24/solid";
+import React, { forwardRef,useCallback, useMemo } from "react";
 import { InputHTMLAttributes } from "react";
 
+import {
+  ChevronLeftIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
+import { XCircleIcon } from "@heroicons/react/24/solid";
+
+import { cn } from "@/shared/lib";
+
+export type SearchInputVariant = "default" | "mutedBar";
+
 interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
-  onClose: () => void;
+  onClose?: () => void;
+  variant?: SearchInputVariant;
 }
 
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ value, onChange, onClose, placeholder = "검색", ...rest }, ref) => {
+  (
+    {
+      value,
+      onChange,
+      onClose,
+      placeholder = "검색",
+      variant = "default",
+      ...rest
+    },
+    ref
+  ) => {
     const isSearching = useMemo(
       () => value && typeof value === "string" && value.trim().length > 0,
       [value]
@@ -27,19 +43,41 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       } as React.ChangeEvent<HTMLInputElement>);
     }, [onChange]);
 
+    const isMutedBar = variant === "mutedBar";
+
     return (
       <label
         htmlFor="search"
-        className="flex flex-row items-center justify-between w-full bg-grey-100 rounded-[8px] px-[8px]"
+        className={cn(
+          "flex w-full flex-row items-center justify-between",
+          isMutedBar
+            ? cn(
+              "relative h-12 rounded-xl bg-grey-200 py-0 pl-12",
+              isSearching ? "pr-2" : "pr-6"
+            )
+            : "rounded-[8px] bg-grey-100 px-[8px]"
+        )}
       >
-        <div className="flex items-center justify-center size-[24px] bg-grey-100 rounded-full">
-          {isSearching ? (
+        <div
+          className={cn(
+            "flex items-center justify-center",
+            isMutedBar
+              ? "pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2"
+              : "size-[24px] rounded-full bg-grey-100"
+          )}
+        >
+          {onClose && isSearching ? (
             <ChevronLeftIcon
-              className="size-[20px] text-grey-500 cursor-pointer"
+              className={cn(
+                "cursor-pointer text-grey-500",
+                isMutedBar ? "size-[18px]" : "size-[20px]"
+              )}
               onClick={onClose}
             />
           ) : (
-            <MagnifyingGlassIcon className="size-[20px] text-grey-500" />
+            <MagnifyingGlassIcon
+              className={cn("text-grey-500", isMutedBar ? "size-[18px]" : "size-[20px]")}
+            />
           )}
         </div>
         <input
@@ -49,14 +87,24 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           id="search"
           value={value}
           onChange={onChange}
-          className="w-full h-full bg-transparent rounded-[8px] px-[4px] py-[12px] outline-none border-none"
+          className={cn(
+            "h-full w-full flex-1 min-w-0 border-none bg-transparent outline-none",
+            isMutedBar
+              ? "py-0 text-base text-grey-800 placeholder:text-grey-500"
+              : "rounded-[8px] px-[4px] py-[12px]"
+          )}
           placeholder={placeholder}
           {...rest}
         />
         {isSearching && (
-          <div className="flex items-center justify-center size-[24px] bg-grey-100 rounded-full cursor-pointer">
+          <div
+            className={cn(
+              "flex cursor-pointer items-center justify-center",
+              isMutedBar ? "shrink-0 pr-2" : "size-[24px] rounded-full bg-grey-100"
+            )}
+          >
             <XCircleIcon
-              className="size-[22px] fill-grey-500"
+              className={cn("fill-grey-500", isMutedBar ? "size-[20px]" : "size-[22px]")}
               onClick={handleClear}
             />
           </div>

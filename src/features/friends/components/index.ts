@@ -1,13 +1,16 @@
-// Friends Element Components
-export { default as FriendAcceptButton } from "./element/FriendAcceptButton";
-export { default as FriendBox } from "./element/FriendBox";
-export { FriendReceivedBox } from "./element/FriendBox";
-export { default as FriendRequestButton } from "./element/FriendRequestButton";
-// Friends Widget Components
-export {
-  default as FindFriendSection,
-  default as ResponsiveFindFriend,
-} from "./widget/FindFriendSection";
-export { default as FindFriendPanel } from "./widget/FindFriendSection/FindFriendPanel";
-export { default as FriendList } from "./widget/FriendList";
-export { default as FriendsClientComponent } from "./widget/FriendsClientComponent";
+// Friends UI
+export { default as CancelSentFriendRequestButton } from "./ui/CancelSentFriendRequestButton";
+export type { FindFriendHistoryItemProps } from "./ui/FindFriendHistoryItem";
+export { default as FindFriendHistoryItem } from "./ui/FindFriendHistoryItem";
+export { default as FriendAcceptButton } from "./ui/FriendAcceptButton";
+export { default as FriendBox } from "./ui/FriendBox";
+export { FriendMenu } from "./ui/FriendMenu";
+export { default as FriendMessageButton } from "./ui/FriendMessageButton";
+export { default as FriendRejectButton } from "./ui/FriendRejectButton";
+export type { FriendResultItemProps } from "./ui/FriendResultItem";
+export { default as FriendResultItem } from "./ui/FriendResultItem";
+// Sections & shells
+export { FindFriendSection } from "./section/FindFriendSection";
+export { FriendsAcceptedSection } from "./section/FriendsAcceptedSection";
+export { FriendsReceivedSection } from "./section/FriendsReceivedSection";
+export { FriendsSentSection } from "./section/FriendsSentSection";
