@@ -12,6 +12,7 @@ export { useChatRoomUserMaps } from "./useChatRoomUserMaps";
 export { useExitChatRoom } from "./useExitChatRoom";
 export { useMaintainScrollOnRoomMessageListChange } from "./useMaintainScrollOnRoomMessageListChange";
 export { useMessageList } from "./useMessageList";
+export { useOpenPersonalChatNavigation } from "./useOpenPersonalChatNavigation";
 export { usePendingMessages } from "./usePendingMessages";
 export { useResetRoomUnreadCount } from "./useResetRoomUnreadCount";
 export { useScrollPosition } from "./useScrollPosition";

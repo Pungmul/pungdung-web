@@ -39,6 +39,7 @@ export {
   useExitChatRoom,
   useMaintainScrollOnRoomMessageListChange,
   useMessageList,
+  useOpenPersonalChatNavigation,
   usePendingMessages,
   useResetRoomUnreadCount,
   useScrollPosition,
