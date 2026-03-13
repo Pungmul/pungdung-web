@@ -5,16 +5,9 @@ import React, { memo, useRef, useState } from "react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 import { useClickOutside } from "@/shared/hooks";
+import { Toast } from "@/shared/store";
 
-type UserProfileKebabMenuProps = {
-  onReport: () => void;
-  onBlock: () => void;
-};
-
-function UserProfileKebabMenuImpl({
-  onReport,
-  onBlock,
-}: UserProfileKebabMenuProps) {
+function UserProfileKebabMenuImpl() {
   const [isOpen, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   useClickOutside({
@@ -22,6 +15,20 @@ function UserProfileKebabMenuImpl({
     enabled: isOpen,
     onOutsideClick: () => setOpen(false),
   });
+
+  const handleReport = () => {
+    Toast.show({
+      message: "신고 기능은 준비 중입니다.",
+      type: "success",
+    });
+  };
+
+  const handleBlock = () => {
+    Toast.show({
+      message: "차단 기능은 준비 중입니다.",
+      type: "success",
+    });
+  };
 
   return (
     <div
@@ -38,7 +45,7 @@ function UserProfileKebabMenuImpl({
           <li
             className="cursor-pointer text-right text-sm text-grey-800"
             onClick={() => {
-              onReport();
+              handleReport();
               setOpen(false);
             }}
           >
@@ -47,7 +54,7 @@ function UserProfileKebabMenuImpl({
           <li
             className="cursor-pointer text-right text-sm text-red-400"
             onClick={() => {
-              onBlock();
+              handleBlock();
               setOpen(false);
             }}
           >
