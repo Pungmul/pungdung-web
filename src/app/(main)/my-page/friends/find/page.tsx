@@ -1,6 +1,12 @@
-"use client";
+import type { Metadata } from "next";
+
 import { FindFriendPage } from "./_FindFriendPage";
-/** `/my-page/friends/find` — 전체 페이지·모달 인터셉트에서 공통으로 쓰는 화면 */
+
+export const metadata: Metadata = {
+    title: "친구 검색 | 풍덩",
+    description: "친구를 검색하고 요청합니다.",
+};
+
 export default function Page() {
     return <FindFriendPage />;
 }

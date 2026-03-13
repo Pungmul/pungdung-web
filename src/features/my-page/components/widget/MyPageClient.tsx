@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 
-import { useLoadMyFriends } from "@/features/friends";
+import { useQuery } from "@tanstack/react-query";
+
+import {
+  friendQueries,
+  normalizeFriendsLoadData,
+} from "@/features/friends";
 
 import { SkeletonView,Space } from "@/shared";
 import { SuspenseComponent as Suspense } from "@/shared";
@@ -108,25 +113,34 @@ function AccountSectionSkeleton() {
 }
 
 function FriendsSection() {
-  const {
-    data: { acceptedFriendList, pendingReceivedList } = {
-      acceptedFriendList: [],
-      pendingReceivedList: [],
-    },
-    isLoading,
-  } = useLoadMyFriends();
+  const { data, isPending, isError } = useQuery(friendQueries.loadMyFriends());
+  const { acceptedFriendList, pendingReceivedList } =
+    normalizeFriendsLoadData(data);
+
+  const acceptedCount = acceptedFriendList.length;
+  const showSkeleton = isPending && data === undefined;
+
   return (
     <Link
       href="/my-page/friends"
       className="text-[16px] text-grey-600 font-semibold p-[8px] hover:text-grey-800 flex flex-row items-center justify-between gap-[8px]"
     >
-      친구 관리 {!isLoading && acceptedFriendList?.length}
-      {isLoading ? (
+      <span className="flex min-w-0 flex-row items-center gap-2">
+        <span className="truncate">친구 관리</span>
+        {!showSkeleton && !isError ? (
+          <span className="text-grey-400 font-normal tabular-nums shrink-0">
+            {acceptedCount}
+          </span>
+        ) : null}
+      </span>
+      {showSkeleton ? (
         <SkeletonView className="h-[20px] w-[120px] md:w-[160px] rounded" />
+      ) : isError ? (
+        <span className="text-grey-400 text-[14px] shrink-0">오류</span>
       ) : (
-        pendingReceivedList?.length > 0 && (
-          <p className="text-blue-400 text-[14px]">
-            {pendingReceivedList?.length} 개의 새로운 친구 요청
+        pendingReceivedList.length > 0 && (
+          <p className="text-blue-400 text-[14px] shrink-0">
+            {pendingReceivedList.length} 개의 새로운 친구 요청
           </p>
         )
       )}

@@ -2,108 +2,109 @@
 
 import Link from "next/link";
 
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 import {
-  FriendBox,
-  FriendReceivedBox,
-  useLoadMyFriends,
+  FRIENDS_PAGE_TAB_ITEMS,
+  FriendsAcceptedSection,
+  FriendsReceivedSection,
+  FriendsSentSection,
+  useFriendPageTabViewModel,
+  useLoadFriendListsViewModel,
 } from "@/features/friends";
+import { UserProfileCardModalHost } from "@/features/user";
 
-import { Header, Space, UserProfileCardModalHost } from "@/shared";
-import { userProfileModalStore } from "@/shared/store";
+import {
+  cn,
+  Header,
+  Space,
+  Spinner,
+} from "@/shared";
 
 export default function FriendsPage() {
-  const {
-    data: { acceptedFriendList, pendingReceivedList, pendingSentList } = {
-      acceptedFriendList: [],
-      pendingReceivedList: [],
-      pendingSentList: [],
-    },
-  } = useLoadMyFriends();
+  const { lists, showInitialSpinner, isError, refetch } =
+    useLoadFriendListsViewModel();
+
+  const { tab, setTab, tabCounts } = useFriendPageTabViewModel(lists);
+
+  const { acceptedFriendList, pendingReceivedList, pendingSentList } = lists;
+
   return (
-    <div className="bg-grey-100 h-full w-full">
+    <div className="h-full w-full bg-grey-100 ">
       <UserProfileCardModalHost />
-      <div className="flex flex-col h-full w-full min-w-[360px] max-w-[768px] mx-auto relative bg-grey-100">
+      <div className="relative mx-auto flex h-full w-full min-w-[360px] max-w-[768px] flex-col bg-background">
         <Header title="친구 관리" />
-        <Space h={12} />
+        <Space h={16} />
         <Link
           href="/my-page/friends/find"
-          className="text-grey-600 font-semibold text-base p-6 bg-background flex flex-row items-center justify-between"
+          className="relative mx-6 flex h-12 flex-row items-center rounded-xl bg-grey-200 py-3 pl-12 pr-6"
         >
-          <p className="text-grey-600 font-semibold text-base">친구 검색</p>
-          <ChevronRightIcon className="w-4 h-4" />
+          <MagnifyingGlassIcon className="absolute left-4 size-[18px] text-grey-500" />
+          <span className="text-base text-grey-500">친구 검색</span>
+          <ChevronRightIcon className="ml-auto size-4 text-grey-500" />
         </Link>
-        <main className="bg-background px-6 flex-grow flex flex-col">
-          <Space h={12} />
+        <Space h={16} />
 
-          {pendingSentList?.length > 0 && (
-            <>
-              <details>
-                <summary className="text-grey-600 font-semibold text-base cursor-pointer">
-                  대기중인 요청{" "}
-                  <span className="text-primary">
-                    {pendingSentList?.length}
-                  </span>
-                </summary>
-                <Space h={12} />
-                {pendingSentList?.map((friend) => (
-                  <FriendBox
-                    key={friend.friendRequestId}
-                    friend={friend.simpleUserDTO}
-                    onOpen={() =>
-                      userProfileModalStore.getState().open({
-                        user: friend.simpleUserDTO,
-                        relationship: "pending_out",
-                      })
-                    }
-                  />
-                ))}
-              </details>
-              <Space h={16} />
-            </>
-          )}
-          {pendingReceivedList?.length > 0 && (
-            <>
-              <h3 className="text-grey-600 font-semibold text-base">
-                친구 요청{" "}
-                <span className="text-primary">
-                  {pendingReceivedList?.length}
-                </span>
-              </h3>
-              <Space h={12} />
-              {pendingReceivedList?.map((friend) => (
-                <FriendReceivedBox
-                  key={friend.friendRequestId}
-                  friend={friend.simpleUserDTO}
-                  friendRequestId={friend.friendRequestId}
-                  onOpenProfile={() =>
-                    userProfileModalStore.getState().open({
-                      user: friend.simpleUserDTO,
-                      relationship: "pending_in",
-                      incomingFriendRequestId: friend.friendRequestId,
-                    })
-                  }
-                />
-              ))}
-              <Space h={12} />
-            </>
-          )}
+        <div className="sticky top-0 z-10 bg-grey-100/85 px-6 pb-2 pt-1 backdrop-blur-sm">
+          <div className="flex w-full flex-row items-stretch gap-1.5">
+            {FRIENDS_PAGE_TAB_ITEMS.map(({ id, label }) => {
+              const active = tab === id;
+              const count = tabCounts[id];
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className={cn(
+                    "flex min-w-0 flex-1 flex-row items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium transition-colors",
+                    active
+                      ? "bg-primary text-white"
+                      : "text-grey-700 hover:bg-grey-100 hover:text-grey-800"
+                  )}
+                  onClick={() => setTab(id)}
+                >
+                  <span>{label}</span>
+                  {count > 0 ? (
+                    <span
+                      className={cn(
+                        "tabular-nums text-xs font-semibold",
+                        active ? "text-white/90" : "text-primary"
+                      )}
+                    >
+                      {count}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-          <h3 className="text-grey-600 font-semibold text-base">친구 목록</h3>
-          <Space h={12} />
-          {acceptedFriendList?.map((friend) => (
-            <FriendBox
-              key={friend.friendRequestId}
-              friend={friend.simpleUserDTO}
-              onOpen={() =>
-                userProfileModalStore.getState().open({
-                  user: friend.simpleUserDTO,
-                  relationship: "friend",
-                })
-              }
-            />
-          ))}
+        <main className="flex flex-grow flex-col bg-background px-6 pb-24 pt-4">
+          {showInitialSpinner ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
+              <Spinner />
+              <p className="text-sm text-grey-500">친구 목록 불러오는 중…</p>
+            </div>
+          ) : isError ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 px-2 py-16">
+              <p className="text-center text-sm text-grey-600">
+                친구 목록을 불러오지 못했습니다.
+              </p>
+              <button
+                type="button"
+                className="rounded-md bg-red-500 px-4 py-2 text-[12px] font-medium text-white hover:bg-red-600"
+                onClick={() => refetch()}
+              >
+                다시 시도
+              </button>
+            </div>
+          ) : tab === "friends" ? (
+            <FriendsAcceptedSection acceptedFriendList={acceptedFriendList} />
+          ) : tab === "sent" ? (
+            <FriendsSentSection pendingSentList={pendingSentList} />
+          ) : (
+            <FriendsReceivedSection pendingReceivedList={pendingReceivedList} />
+          )}
         </main>
       </div>
     </div>
