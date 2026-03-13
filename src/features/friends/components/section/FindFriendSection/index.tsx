@@ -32,6 +32,7 @@ export function FindFriendSection() {
     <section>
       <div className="w-full px-6 py-4">
         <SearchInput
+          autoFocus
           variant="mutedBar"
           placeholder="친구 검색"
           value={searchKeyword}

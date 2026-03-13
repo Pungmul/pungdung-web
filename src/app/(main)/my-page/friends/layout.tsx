@@ -8,15 +8,12 @@ export const metadata: Metadata = {
 
 export default function FriendsLayout({
   children,
-  modal,
 }: {
   children: ReactNode;
-  modal: ReactNode;
 }) {
   return (
     <>
       {children}
-      {modal}
     </>
   );
 }

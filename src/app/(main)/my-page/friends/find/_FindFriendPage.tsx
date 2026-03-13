@@ -1,5 +1,3 @@
-"use client";
-
 import { FindFriendSection } from "@/features/friends";
 import { UserProfileCardModalHost } from "@/features/user";
 
@@ -19,5 +17,3 @@ export function FindFriendPage() {
     </div>
   );
 }
-
-export default FindFriendPage;
