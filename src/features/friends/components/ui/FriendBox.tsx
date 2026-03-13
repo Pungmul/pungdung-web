@@ -73,7 +73,7 @@ export default function FriendBox({
             className="object-cover object-center"
           />
         </div>
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
+        <div className="flex min-w-0 flex-1 flex-col justify-center">
           <div className="text-[13px] font-medium text-grey-800">{friend.name}</div>
           {Boolean(subtitle) && <div className="truncate text-[11px] text-grey-400">{subtitle}</div>}
           <div className="truncate text-[11px] text-grey-400">{friend.username}</div>

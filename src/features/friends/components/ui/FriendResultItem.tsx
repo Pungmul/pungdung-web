@@ -47,7 +47,7 @@ const FriendResultItem: React.FC<FriendResultItemProps> = ({
             className="object-cover w-full h-full"
           />
         </div>
-        <div className="flex min-w-0 flex-grow flex-col gap-0.5 justify-center">
+        <div className="flex min-w-0 flex-grow flex-col justify-center">
           <div className="text-[13px] font-medium text-grey-800">{user.name}</div>
           {Boolean(subtitle) && <div className="truncate text-[11px] text-grey-400">{subtitle}</div>}
           <div className="truncate text-[11px] text-grey-400">{user.username}</div>
