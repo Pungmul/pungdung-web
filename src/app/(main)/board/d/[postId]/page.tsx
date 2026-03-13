@@ -1,13 +1,14 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { Suspense } from "@suspensive/react";
+
 import { getQueryClient } from "@/core";
 
 import { boardQueries, prefetchBoardInfoList } from "@/features/board";
 import { PostContentSkeleton, PostDetailComponent } from "@/features/post";
 
 import { Header } from "@/shared";
-import Suspense from "@/shared/components/SuspenseComponent";
 
 export const metadata: Metadata = {
   title: "풍덩 | 게시글 상세",

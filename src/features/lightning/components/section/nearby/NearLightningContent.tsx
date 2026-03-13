@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { useQueryClient } from "@tanstack/react-query";
 
+import { Suspense } from "@suspensive/react";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { FreeMode, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -13,7 +14,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { useNearLightningQuery } from "@/features/home";
 import { useUserLocation } from "@/features/location";
 
-import { SuspenseComponent as Suspense } from "@/shared";
 import { ThunderIconFilled } from "@/shared/components/Icons";
 
 import { NearLightningCard } from "../../ui/nearby/NearLightningCard";

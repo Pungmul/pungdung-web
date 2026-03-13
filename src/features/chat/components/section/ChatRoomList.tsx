@@ -1,8 +1,9 @@
 "use client";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
+import { Suspense } from "@suspensive/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getChoseong } from "es-hangul";
 

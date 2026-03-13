@@ -1,6 +1,6 @@
 import { lazy } from "react";
 
-import { SuspenseComponent as Suspense } from "@/shared";
+import { Suspense } from "@suspensive/react";
 
 const RoomPageContent = lazy(() => import("./RoomContent"));
 

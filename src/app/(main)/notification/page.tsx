@@ -1,9 +1,13 @@
-import { Header } from "@pThunder/shared";
-import { prefetchNotReadMessageList } from "@pThunder/features/home";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { SuspenseComponent as Suspense } from "@/shared";
-import { NotificationList } from "@/features/notification";
 import { Metadata } from "next";
+
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
+import { Suspense } from "@suspensive/react";
+
+import { prefetchNotReadMessageList } from "@/features/home";
+import { NotificationList } from "@/features/notification";
+
+import { Header } from "@/shared";
 
 export const metadata: Metadata = {
   title: "풍덩 | 알림",
@@ -21,7 +25,7 @@ export default async function NotificationPage() {
       <Header title="알림" />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense clientOnly>
-          <NotificationList/>
+          <NotificationList />
         </Suspense>
       </HydrationBoundary>
     </div>

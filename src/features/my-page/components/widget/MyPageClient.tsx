@@ -4,13 +4,14 @@ import Link from "next/link";
 
 import { useQuery } from "@tanstack/react-query";
 
+import { Suspense } from "@suspensive/react";
+
 import {
   friendQueries,
   normalizeFriendsLoadData,
 } from "@/features/friends";
 
-import { SkeletonView,Space } from "@/shared";
-import { SuspenseComponent as Suspense } from "@/shared";
+import { SkeletonView, Space } from "@/shared";
 
 import ProfileSection from "./ProfileSection";
 import { ProfileSectionSkeleton } from "./ProfileSection";

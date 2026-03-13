@@ -3,6 +3,8 @@ import { Metadata } from "next";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import { Suspense } from "@suspensive/react";
+
 import { getQueryClient } from "@/core";
 
 import {
@@ -11,8 +13,6 @@ import {
   fetchRoomListApi,
   RoomContainer,
 } from "@/features/chat";
-
-import { SuspenseComponent as Suspense } from "@/shared";
 
 export const metadata: Metadata = {
   title: "풍덩 | 채팅",

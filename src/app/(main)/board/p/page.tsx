@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 
+import { Suspense } from "@suspensive/react";
+
 import { Spinner } from "@/shared";
-import { SuspenseComponent as Suspense } from "@/shared";
 
 import { Editor, ModifyEditor } from "./_Editor";
 

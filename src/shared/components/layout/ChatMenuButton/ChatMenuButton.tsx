@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { Suspense } from "@suspensive/react";
+
 import { ChatTabBadge } from "@/features/chat";
 
-import { SuspenseComponent as Suspense } from "@/shared";
 import { ChatIconFilled, ChatIconOutline } from "@/shared/components/Icons";
 
 export default function ChatMenuButton() {

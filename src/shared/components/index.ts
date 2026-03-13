@@ -6,7 +6,6 @@ export { default as HeaderProgressBar } from "./layout/HeaderProgressBar";
 export { Space } from "./layout/Space";
 
 // UI Components
-export { default as SuspenseComponent } from "./SuspenseComponent";
 export { AlertModal } from "./ui/AlertModal";
 export { ListEmptyView } from "./ui/ListEmptyView";
 export { LoadingSpinner } from "./ui/LoadingSpinner";
@@ -15,7 +14,6 @@ export { default as Modal } from "./ui/Modal";
 export { ScrollToTopButton } from "./ui/ScrollToTopButton";
 export { SkeletonView } from "./ui/SkeletonView";
 export { Spinner } from "./ui/Spinner";
-export { SuspenseBoundary } from "./ui/SuspenseBoundary";
 export { default as ToastContainer } from "./ui/Toast";
 
 // Form Components

@@ -1,11 +1,12 @@
 import dayjs from "dayjs";
+import { Suspense } from "@suspensive/react";
 
 import { FrequentBoards } from "@/features/board";
 import { HomeHeader, HomeHotPostList } from "@/features/home";
 import { NearLightningContent } from "@/features/lightning";
 import { NotificationPermissionRequestCTA } from "@/features/notification";
 
-import { SkeletonView, SuspenseComponent as Suspense } from "@/shared";
+import { SkeletonView } from "@/shared";
 
 export default function Home() {
   const timeString = dayjs().format("YYYY.MM.DD HH:mm");
