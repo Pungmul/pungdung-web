@@ -2,13 +2,17 @@
 import { useCallback, useState } from "react";
 import Link from "next/link";
 
-import { FriendBox } from "@/features/friends";
-import { Friend } from "@/features/friends";
+import { useQuery } from "@tanstack/react-query";
+
+import {
+  type AcceptedFriendEntry,
+  FriendBox,
+  friendQueries,
+} from "@/features/friends";
 
 import { cn } from "@/shared";
 import { Button, Modal, SearchInput, Spinner } from "@/shared/components";
 
-import { useLoadMyFriends } from "@/features/friends/queries";
 import { friendStore } from "@/features/friends/store";
 
 const SelectFriendsModal = ({
@@ -22,26 +26,28 @@ const SelectFriendsModal = ({
 }) => {
   const setSearchKeyword = friendStore((state) => state.setSearchKeyword);
   const searchKeyword = friendStore((state) => state.friendsFilter.keyword);
-  const { data: friends } = useLoadMyFriends();
+  const { data: friends } = useQuery(friendQueries.loadMyFriends());
 
-  const [selectedFriends, setSelectedFriends] = useState<Friend[]>([]);
+  const [selectedFriends, setSelectedFriends] = useState<AcceptedFriendEntry[]>(
+    []
+  );
 
   const handleSelect = (friendId: number) => {
     if (
       selectedFriends.some(
-        (friend: Friend) => friend.simpleUserDTO.userId === friendId
+        (friend: AcceptedFriendEntry) => friend.user.userId === friendId
       )
     ) {
       setSelectedFriends((prev) =>
         prev.filter(
-          (friend: Friend) => friend.simpleUserDTO.userId !== friendId
+          (friend: AcceptedFriendEntry) => friend.user.userId !== friendId
         )
       );
     } else {
       setSelectedFriends((prev) => [
         ...prev,
         friends!.acceptedFriendList.find(
-          (friend: Friend) => friend.simpleUserDTO.userId === friendId
+          (friend: AcceptedFriendEntry) => friend.user.userId === friendId
         )!,
       ]);
     }
@@ -76,14 +82,14 @@ const SelectFriendsModal = ({
 
         <div className="flex flex-col flex-grow overflow-y-auto">
           {friends ? (
-            friends.acceptedFriendList.map((friend: Friend) => (
+            friends.acceptedFriendList.map((friend: AcceptedFriendEntry) => (
               <FriendBox
-                key={friend.simpleUserDTO.userId}
-                friend={friend.simpleUserDTO}
+                key={friend.user.userId}
+                friend={friend.user}
                 onSelect={handleSelect}
                 className={
                   cn("cursor-pointer p-3",
-                    selectedFriends.includes(friend)
+                    selectedFriends.some((f) => f.user.userId === friend.user.userId)
                       ? "bg-red-100"
                       : ""
                   )
@@ -103,7 +109,7 @@ const SelectFriendsModal = ({
             onClick={(e) => {
               e.preventDefault();
               onConfirm(
-                selectedFriends.map((friend) => friend.simpleUserDTO.username)
+                selectedFriends.map((friend) => friend.user.username)
               );
               handleClose();
             }}

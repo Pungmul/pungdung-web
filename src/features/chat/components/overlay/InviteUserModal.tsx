@@ -3,12 +3,15 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 
-import { type Friend,useLoadMyFriends } from "@/features/friends";
+import {
+  type AcceptedFriendEntry,
+  friendQueries,
+} from "@/features/friends";
 import { User } from "@/features/user";
 
 import { Button, Modal, Spinner, Toast } from "@/shared";
@@ -35,7 +38,7 @@ export default function InviteUserModal({
   myUsername,
 }: InviteUserModalProps) {
   const router = useRouter();
-  const { data: friends, isLoading } = useLoadMyFriends();
+  const { data: friends, isLoading } = useQuery(friendQueries.loadMyFriends());
   const { mutate: inviteUser, isPending } = useMutation(
     chatMutationOptions.inviteUser(),
   );
@@ -171,12 +174,12 @@ export default function InviteUserModal({
             </div>
           ) : acceptedFriends.length > 0 ? (
             <ul className="flex flex-col list-none">
-              {acceptedFriends.map((friend: Friend) => {
+              {acceptedFriends.map((friend: AcceptedFriendEntry) => {
                 const isInRoom = currentUsernames.includes(
-                  friend.simpleUserDTO.username
+                  friend.user.username
                 );
                 const isSelected = selectedUsers.some(
-                  (u) => u.username === friend.simpleUserDTO.username
+                  (u) => u.username === friend.user.username
                 );
 
                 return (
@@ -252,7 +255,7 @@ export default function InviteUserModal({
 }
 
 interface InviteFriendItemProps {
-  friend: Friend;
+  friend: AcceptedFriendEntry;
   isInRoom: boolean;
   isSelected: boolean;
   onToggle: (user: User) => void;
@@ -264,7 +267,7 @@ const InviteFriendItem: React.FC<InviteFriendItemProps> = ({
   isSelected,
   onToggle,
 }) => {
-  const user = friend.simpleUserDTO;
+  const user = friend.user;
 
   return (
     <div
