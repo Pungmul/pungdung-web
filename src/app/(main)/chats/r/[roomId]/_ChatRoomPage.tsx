@@ -24,10 +24,11 @@ import {
 import { buildUserProfileOpenPayload } from "@/features/friends";
 import { useSuspenseGetMyPageInfo } from "@/features/my-page";
 import type { Member, User } from "@/features/user";
+import { UserProfileCardModalHost } from "@/features/user";
 
-import { UserProfileCardModalHost } from "@/shared";
 import { useBodyScrollLock, useViewportHeightVar } from "@/shared/hooks";
-import { userProfileModalStore } from "@/shared/store";
+
+import { userProfileModalStore } from "@/features/user/store";
 
 /** 채팅방 `userInfoList`는 오래될 수 있어, 본인 모달에는 최신 `Member`로 덮어쓴다. */
 function mergeMemberIntoUserForSelfModal(roomUser: User, member: Member): User {
