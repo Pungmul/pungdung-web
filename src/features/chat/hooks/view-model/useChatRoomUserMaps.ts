@@ -8,16 +8,16 @@ import {
   createUserImageMap,
   createUserLastReadMessageIdMap,
   createUserNameMap,
-} from "../services";
-import { ChatRoomDto } from "../types";
+} from "../../services";
 import {
   UserImageMap,
   UserLastReadMessageIdMap,
   UserNameMap,
-} from "../types";
+} from "../../types";
+import type { ChatRoom } from "../../types/domain/chat-room.types";
 
 interface UseChatRoomUserMapsParams {
-  chatRoomData: ChatRoomDto | undefined;
+  chatRoomData: ChatRoom | undefined;
 }
 
 interface UseChatRoomUserMapsReturn {

@@ -1,16 +1,24 @@
 "use client";
 
-import { type RefObject,useCallback, useRef, useState } from "react";
+import { type RefObject, useCallback, useRef, useState } from "react";
 
 import { useSocketSubscription } from "@/core/socket/hooks/useSocketSubscribe";
 
-import { isImageMessage, isMessage, isTextMessage } from "../types";
-
+import { mapStompTimelineEnvelopeToMessage } from "../../lib/mappers";
 import {
   normalizeSocketImageMessage,
   normalizeSocketTextMessage,
-} from "../services/socket-chat-incoming.service";
-import type { Message } from "../types";
+} from "../../services/socket-chat-incoming.service";
+import {
+  type StompAlarmEnvelope,
+  stompAlarmEnvelopeSchema,
+  stompTimelineMessageEnvelopeSchema,
+} from "../../socket/socket-message.schema";
+import {
+  isImageMessage,
+  isTextMessage,
+  type Message,
+} from "../../types";
 
 /**
  * STOMP 구독 + 방 단위 소켓 버퍼 state를 **훅 내부**에서 관리합니다.
@@ -57,27 +65,31 @@ export function useChatRoomSocketMessages({
       }
       if (isImageMessage(message)) {
         append(normalizeSocketImageMessage(message));
+        return;
       }
+      append(message);
     },
     [append],
   );
 
-  const onAlarm = useCallback((message: Message) => {
-    console.log(message, "alarm message");
+  const onAlarm = useCallback((payload: StompAlarmEnvelope) => {
+    console.log(payload, "alarm message");
   }, []);
 
   const handleAlarmPayload = useCallback(
-    (message: unknown) => {
-      if (!isMessage(message)) return;
-      onAlarm(message);
+    (raw: unknown) => {
+      const parsed = stompAlarmEnvelopeSchema.safeParse(raw);
+      if (!parsed.success) return;
+      onAlarm(parsed.data);
     },
     [onAlarm],
   );
 
   const handleMessagePayload = useCallback(
-    (message: unknown) => {
-      if (!isMessage(message)) return;
-      onSocketTypedMessage(message);
+    (raw: unknown) => {
+      const parsed = stompTimelineMessageEnvelopeSchema.safeParse(raw);
+      if (!parsed.success) return;
+      onSocketTypedMessage(mapStompTimelineEnvelopeToMessage(parsed.data));
     },
     [onSocketTypedMessage],
   );

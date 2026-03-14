@@ -4,9 +4,9 @@ import { useCallback } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 
-import { chatQueries } from "../queries";
-import { resetUnreadCount } from "../services";
-import { ChatRoomListItemDto } from "../types";
+import { chatQueries } from "../../queries";
+import { resetUnreadCount } from "../../services";
+import type { ChatRoomListItem } from "../../types";
 
 /**
  * 채팅방 리스트에서 특정 방의 안 읽은 메시지 수를 리셋하는 훅
@@ -24,7 +24,7 @@ export const useResetRoomUnreadCount = () => {
     (roomId: string) => {
       queryClient.setQueryData(
         chatQueries.roomList().queryKey,
-        (oldData: ChatRoomListItemDto[] | undefined) => {
+        (oldData: ChatRoomListItem[] | undefined) => {
           if (!oldData) return oldData;
           return resetUnreadCount(oldData, roomId);
         },

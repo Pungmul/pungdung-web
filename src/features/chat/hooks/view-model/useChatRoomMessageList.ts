@@ -4,15 +4,11 @@ import { useLayoutEffect, useRef } from "react";
 
 import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 
-import { chatQueries } from "../queries";
-
-import { useChatRoomSocketMessages } from "./useChatRoomSocketMessages";
 import { useMessageList } from "./useMessageList";
-import {
-  usePendingMessages,
-  type UsePendingMessagesParams,
-} from "./usePendingMessages";
-import { removePendingMatchedBySocketTextEcho } from "../services/socket-chat-incoming.service";
+import { chatQueries } from "../../queries";
+import { removePendingMatchedBySocketTextEcho } from "../../services/socket-chat-incoming.service";
+import { usePendingMessages, type UsePendingMessagesParams } from "../actions/usePendingMessages";
+import { useChatRoomSocketMessages } from "../state/useChatRoomSocketMessages";
 
 type UseChatRoomMessageListParams = Omit<
   UsePendingMessagesParams,

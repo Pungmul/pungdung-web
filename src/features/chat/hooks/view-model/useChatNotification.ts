@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { chatQueries } from "../queries";
+import { chatQueries } from "../../queries";
 
 /**
  * 채팅 알림용 간단한 훅

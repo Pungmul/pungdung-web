@@ -7,10 +7,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Alert } from "@/shared";
 
-import { chatMutationOptions, chatQueries } from "../queries";
-import { removeChatRoom } from "../services";
-
-import type { ChatRoomListItemDto } from "../types";
+import { chatMutationOptions, chatQueries } from "../../queries";
+import { removeChatRoom } from "../../services";
+import type { ChatRoomListItem } from "../../types/domain/chat-room.types";
 
 interface UseExitChatRoomOptions {
   roomId: string;
@@ -38,34 +37,30 @@ export const useExitChatRoom = ({
       title: "채팅방 나가기",
       message: "채팅방을 나가시겠습니까?",
       confirmColor: "var(--color-red-500)",
-      onConfirm: () => {
-        exitChatMutation.mutate(roomId, {
-          onSuccess: async () => {
-            // 해당 채팅방 쿼리 캐시 제거
-            queryClient.removeQueries({
-              queryKey: chatQueries.room(roomId).queryKey,
-            });
-            queryClient.removeQueries({
-              queryKey: chatQueries.roomInfinite(roomId).queryKey,
-            });
+      onConfirm: async () => {
+        try {
+          router.replace(redirectPath);
+          await exitChatMutation.mutateAsync(roomId);
 
-            // 채팅방 목록에서 제거
-            queryClient.setQueryData(
-              chatQueries.roomList().queryKey,
-              (old: ChatRoomListItemDto[] | undefined) =>
-                old ? removeChatRoom(old, roomId) : [],
-            );
+          queryClient.removeQueries({
+            queryKey: chatQueries.room(roomId).queryKey,
+          });
 
-            // 목록 페이지로 이동
-            router.replace(redirectPath);
-          },
-          onError: () => {
-            Alert.alert({
-              title: "채팅방 나가기 실패",
-              message: "채팅방 나가기에 실패했습니다.\n다시 시도해주세요.",
-            });
-          },
-        });
+          queryClient.removeQueries({
+            queryKey: chatQueries.roomInfinite(roomId).queryKey,
+          });
+
+          queryClient.setQueryData(
+            chatQueries.roomList().queryKey,
+            (old: ChatRoomListItem[] | undefined) =>
+              old ? removeChatRoom(old, roomId) : []
+          );
+        } catch {
+          Alert.alert({
+            title: "채팅방 나가기 실패",
+            message: "채팅방 나가기에 실패했습니다.\n다시 시도해주세요.",
+          });
+        }
       },
     });
   }, [roomId, redirectPath, router, queryClient, exitChatMutation]);

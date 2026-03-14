@@ -2,15 +2,12 @@ import { useMemo } from "react";
 
 import { InfiniteData } from "@tanstack/react-query";
 
-import type {
-  ChatRoomDto,
-  Message,
-  MessageList,
-  PendingMessage,
-} from "../types";
+import type { Message, MessageList } from "../../types/domain/chat-message.types";
+import type { ChatRoom } from "../../types/domain/chat-room.types";
+import type { PendingMessage } from "../../types/pending-message.types";
 
 interface UseMessageListProps {
-  chatRoomData?: ChatRoomDto;
+  chatRoomData?: ChatRoom;
   infiniteData?: InfiniteData<MessageList, unknown> | undefined;
   socketMessages: Message[];
   pendingMessages?: PendingMessage[];

@@ -1,7 +1,8 @@
 "use client";
 
-import type { RefObject } from "react";
 import { useCallback, useRef } from "react";
+
+import type { RefObject } from "react";
 
 type UseScrollPositionOptions = {
   /** 스크롤 컨테이너(ref.current에 scrollTop이 있는 요소). 없으면 훅 내부 ref를 사용합니다. */

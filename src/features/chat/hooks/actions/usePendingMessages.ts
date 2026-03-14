@@ -1,16 +1,19 @@
 "use client";
 
-import { useCallback,useState } from "react";
+import { useCallback, useState } from "react";
+
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Toast } from "@/shared";
 
+import { chatQueries } from "../../queries";
 import {
   createPendingImageMessage,
   createPendingTextMessage,
   removePendingMessage,
   updateMessageToFailed,
-} from "../services";
-import { PendingMessage } from "../types";
+} from "../../services";
+import { PendingMessage } from "../../types";
 
 export interface UsePendingMessagesParams {
   roomId: string;
@@ -21,7 +24,7 @@ export interface UsePendingMessagesParams {
       options?: {
         onSuccess?: () => void;
         onError?: () => void;
-      },
+      }
     ) => void;
   };
   sendImageMessageMutation: {
@@ -30,7 +33,7 @@ export interface UsePendingMessagesParams {
       options?: {
         onSuccess?: () => void;
         onError?: () => void;
-      },
+      }
     ) => void;
   };
   onMessageSent?: () => void;
@@ -73,6 +76,7 @@ export const usePendingMessages = ({
   onMessageSent,
   onMessageSuccess,
 }: UsePendingMessagesParams): UsePendingMessagesReturn => {
+  const queryClient = useQueryClient();
   const [pendingMessages, setPendingMessages] = useState<PendingMessage[]>([]);
 
   const onSendMessage = useCallback(
@@ -96,16 +100,19 @@ export const usePendingMessages = ({
           {
             onSuccess: () => {
               setPendingMessages((prev) =>
-                removePendingMessage(prev, pendingId),
+                removePendingMessage(prev, pendingId)
               );
+              void queryClient.invalidateQueries({
+                queryKey: chatQueries.room(roomId).queryKey,
+              });
               onMessageSuccess?.();
             },
             onError: () => {
               setPendingMessages((prev) =>
-                updateMessageToFailed(prev, pendingId),
+                updateMessageToFailed(prev, pendingId)
               );
             },
-          },
+          }
         );
       } catch {
         Toast.show({
@@ -119,9 +126,10 @@ export const usePendingMessages = ({
       roomId,
       senderUsername,
       sendTextMessageMutation,
+      queryClient,
       onMessageSent,
       onMessageSuccess,
-    ],
+    ]
   );
 
   const onSendImage = useCallback(
@@ -151,16 +159,19 @@ export const usePendingMessages = ({
           {
             onSuccess: () => {
               setPendingMessages((prev) =>
-                removePendingMessage(prev, pendingId),
+                removePendingMessage(prev, pendingId)
               );
+              void queryClient.invalidateQueries({
+                queryKey: chatQueries.room(roomId).queryKey,
+              });
               onMessageSuccess?.();
             },
             onError: () => {
               setPendingMessages((prev) =>
-                updateMessageToFailed(prev, pendingId),
+                updateMessageToFailed(prev, pendingId)
               );
             },
-          },
+          }
         );
       } catch (error) {
         const errorMessage =
@@ -179,9 +190,10 @@ export const usePendingMessages = ({
       roomId,
       senderUsername,
       sendImageMessageMutation,
+      queryClient,
       onMessageSent,
       onMessageSuccess,
-    ],
+    ]
   );
 
   const onDeleteMessage = useCallback((message: PendingMessage) => {

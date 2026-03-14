@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 
-import type { ChatRoomDto, ChatRoomListItemDto } from "../types";
+import type { ChatRoom, ChatRoomListItem } from "../../types/domain/chat-room.types";
 
 interface UseChatRoomTitleParams {
-  chatRoomData: ChatRoomDto | undefined;
+  chatRoomData: ChatRoom | undefined;
   defaultTitle?: string;
 }
 
@@ -68,7 +68,7 @@ export const useChatRoomTitle = ({
  * const title = getChatRoomTitle(chatRoomData);
  * // "개발팀 (5)" or "홍길동"
  */
-export const getChatRoomTitle = (chatRoomData: ChatRoomDto): string => {
+export const getChatRoomTitle = (chatRoomData: ChatRoom): string => {
   return chatRoomData.chatRoomInfo.group
     ? `${chatRoomData.chatRoomInfo.roomName} (${chatRoomData.userInfoList.length})`
     : chatRoomData.chatRoomInfo.roomName;
@@ -79,7 +79,7 @@ export const getChatRoomTitle = (chatRoomData: ChatRoomDto): string => {
  * {@link getChatRoomTitle}와 동일한 규칙(그룹일 때 이름 뒤 인원)을 따릅니다.
  */
 export const getChatRoomTitleFromListItem = (
-  item: ChatRoomListItemDto
+  item: ChatRoomListItem
 ): string => {
   return item.group
     ? `${item.roomName} (${item.chatRoomMemberIds.length})`

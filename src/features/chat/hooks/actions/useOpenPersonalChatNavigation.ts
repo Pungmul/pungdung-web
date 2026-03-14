@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { Toast } from "@/shared/store";
 
-import { createPersonalChatRoom } from "../api";
+import { createPersonalChatRoom } from "../../api";
 
 type OpenPersonalChatOptions = {
   /** 라우팅 직전에 호출 (예: 프로필 모달 닫기) */
@@ -22,15 +22,14 @@ export function useOpenPersonalChatNavigation() {
       setPending(true);
       try {
         const res = await createPersonalChatRoom({ receiverName });
-        const roomUUID = (res as { roomUUID?: string })?.roomUUID;
-        if (roomUUID) {
-          options?.onBeforeNavigate?.();
-          router.push(`/chats/r/${roomUUID}`);
-        } else {
-          Toast.show({ message: "채팅방을 열 수 없습니다.", type: "error" });
-        }
-      } catch {
-        Toast.show({ message: "채팅방을 열 수 없습니다.", type: "error" });
+        options?.onBeforeNavigate?.();
+        router.push(`/chats/r/${res.roomUUID}`);
+      } catch (e) {
+        Toast.show({
+          message:
+            e instanceof Error ? e.message : "채팅방을 열 수 없습니다.",
+          type: "error",
+        });
       } finally {
         setPending(false);
       }
