@@ -6,23 +6,9 @@ import { PhotoIcon } from "@heroicons/react/24/outline";
 import { SkeletonView } from "@/shared/components";
 import { formatRelativeDate } from "@/shared/lib/parseDateString";
 
-interface ChatRoomDto {
-  chatRoomUUID: string;
-  lastMessageTime: string | null;
-  lastMessageContent: string | null;
-  unreadCount: number | null;
-  senderId: number | null;
-  senderName: string | null;
-  receiverId: number | null;
-  receiverName: string | null;
-  chatRoomMemberIds: number[];
-  chatRoomMemberNames: string[];
-  roomName: string;
-  profileImageUrl: string | null;
-  group: boolean;
-}
+import type { ChatRoomListItem } from "../../types/domain/chat-room.types";
 
-const ChatRoomBox = ({ room }: { room: ChatRoomDto }) => {
+const ChatRoomBox = ({ room }: { room: ChatRoomListItem }) => {
   return (
     <Link
       className="flex flex-row items-center cursor-pointer bg-background hover:bg-grey-100 px-[28px] py-[12px] gap-[12px]"

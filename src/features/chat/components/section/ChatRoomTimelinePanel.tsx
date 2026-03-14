@@ -1,20 +1,23 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
+
+import { useMutation } from "@tanstack/react-query";
 
 import { Spinner } from "@/shared/components";
 import ObserveTrigger from "@/shared/components/ObserveTrigger";
 
-import { MessageList as ChatMessageList } from "./MessageList";
 import { ChatSendForm } from "./ChatSendForm";
+import { MessageList as ChatMessageList } from "./MessageList";
 import {
   useChatRoomFetchOlderPageTrigger,
-  useChatRoomMessageList,
-  useChatRoomUserMaps,
   useMaintainScrollOnRoomMessageListChange,
   useScrollPosition,
-} from "../../hooks";
+} from "../../hooks/state";
+import {
+  useChatRoomMessageList,
+  useChatRoomUserMaps,
+} from "../../hooks/view-model";
 import { chatMutationOptions } from "../../queries";
 
 type ChatRoomTimelinePanelProps = {
@@ -30,14 +33,13 @@ export function ChatRoomTimelinePanel({
   readSign,
   isConnected,
 }: ChatRoomTimelinePanelProps) {
-  const queryClient = useQueryClient();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const sendTextMessageMutation = useMutation(
-    chatMutationOptions.sendTextMessage(queryClient),
+    chatMutationOptions.sendTextMessage(),
   );
   const sendImageMessageMutation = useMutation(
-    chatMutationOptions.sendImageMessage(queryClient),
+    chatMutationOptions.sendImageMessage(),
   );
 
   const {

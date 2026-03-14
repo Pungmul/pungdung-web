@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
 import { useQuery } from "@tanstack/react-query";
@@ -19,10 +19,13 @@ const SelectFriendsModal = ({
   onConfirm,
   isOpen,
   onClose,
+  isConfirmPending = false,
 }: {
-  onConfirm: (friendEmails: string[]) => void;
+  onConfirm: (friendEmails: string[]) => void | Promise<void>;
   isOpen: boolean;
   onClose: () => void;
+  /** 채팅방 생성 요청 중 UI(완료 버튼·목록) 비활성화 및 표시용 */
+  isConfirmPending?: boolean;
 }) => {
   const setSearchKeyword = friendStore((state) => state.setSearchKeyword);
   const searchKeyword = friendStore((state) => state.friendsFilter.keyword);
@@ -62,6 +65,12 @@ const SelectFriendsModal = ({
     setSelectedFriends([]);
   }, [onClose]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedFriends([]);
+    }
+  }, [isOpen]);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -76,11 +85,15 @@ const SelectFriendsModal = ({
             placeholder="친구를 검색하세요"
             value={searchKeyword}
             onChange={onChangeSearch}
-            onClose={() => setSearchKeyword("")}
           />
         </div>
 
-        <div className="flex flex-col flex-grow overflow-y-auto">
+        <div
+          className={cn(
+            "flex flex-col flex-grow overflow-y-auto",
+            isConfirmPending && "pointer-events-none opacity-60"
+          )}
+        >
           {friends ? (
             friends.acceptedFriendList.map((friend: AcceptedFriendEntry) => (
               <FriendBox
@@ -102,21 +115,26 @@ const SelectFriendsModal = ({
             </div>
           )}
         </div>
-        {(
-          <Button
-            type="button"
-            disabled={selectedFriends.length < 1}
-            onClick={(e) => {
-              e.preventDefault();
-              onConfirm(
-                selectedFriends.map((friend) => friend.user.username)
-              );
-              handleClose();
-            }}
-          >
-            완료
-          </Button>
-        )}
+        <Button
+          type="button"
+          disabled={selectedFriends.length < 1 || isConfirmPending}
+          onClick={async (e) => {
+            e.preventDefault();
+            if (isConfirmPending) return;
+            await onConfirm(
+              selectedFriends.map((friend) => friend.user.username)
+            );
+          }}
+        >
+          {isConfirmPending ? (
+            <span className="flex items-center justify-center gap-2">
+              <Spinner size={20} />
+              생성 중…
+            </span>
+          ) : (
+            "완료"
+          )}
+        </Button>
         <Link href="/my-page/friends" className="px-1">
           <u className="text-grey-500 text-sm">친구를 새롭게 추가하시나요?</u>
         </Link>

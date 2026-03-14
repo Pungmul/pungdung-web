@@ -77,16 +77,7 @@ export default function InviteUserModal({
           const invited = selectedUsers.map((user) => user.username);
           const receiverNameList = [...new Set([...others, ...invited])];
 
-          const response = await createMultiChatRoom({ receiverNameList });
-          const roomUUID = response?.roomUUID as string | undefined;
-
-          if (!roomUUID) {
-            Toast.show({
-              message: "그룹 채팅방을 만들지 못했습니다.",
-              type: "error",
-            });
-            return;
-          }
+          const { roomUUID } = await createMultiChatRoom({ receiverNameList });
 
           setSelectedUsers([]);
           handleClose();
@@ -104,6 +95,14 @@ export default function InviteUserModal({
             queryKey: chatQueries.roomList().queryKey,
           });
           router.replace(`/chats/r/${roomUUID}`);
+        } catch (e) {
+          Toast.show({
+            message:
+              e instanceof Error
+                ? e.message
+                : "그룹 채팅방을 만들지 못했습니다.",
+            type: "error",
+          });
         } finally {
           setIsMultiCreatePending(false);
         }

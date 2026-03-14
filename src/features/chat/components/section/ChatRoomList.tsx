@@ -15,9 +15,8 @@ import {
 
 import { ChatRoomBox, ChatRoomBoxSkeleton } from "./ChatRoomBox";
 import { chatQueries } from "../../queries";
+import { useSelectFriendModal } from "../../store/select-friend-modal.context";
 import AddChatRoomButton from "../ui/AddChatRoomButton";
-
-import { useSelectFriendModal } from "@/features/friends/store";
 
 export default function ChatRoomList() {
   const { data: chatRooms = [], isLoading } = useSuspenseQuery(
