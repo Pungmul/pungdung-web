@@ -1,4 +1,4 @@
-import { Message } from "./index";
+import type { Message } from "./domain/chat-message.types";
 
 /**
  * 전송 대기 중이거나 실패한 메시지의 상태
