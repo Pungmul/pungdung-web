@@ -10,7 +10,9 @@ import { useGetMyPageInfo } from "@/features/my-page";
 import { chatQueries } from "../queries";
 import { mergeRoomListSocketNotification } from "../services";
 import { useChatRoomStore } from "../store";
-import { ChatRoomListItemDto, isChatRoomUpdateMessage } from "../types";
+
+import { chatRoomUpdateMessageSchema } from "./socket-message.schema";
+import type { ChatRoomListItem } from "../types/domain/chat-room.types";
 
 export function useRoomListSocket() {
   const { data: userData } = useGetMyPageInfo();
@@ -25,13 +27,14 @@ export function useRoomListSocket() {
 
   const receiveMessage = useCallback(
     (raw: unknown) => {
-      if (!isChatRoomUpdateMessage(raw)) return;
+      const parsed = chatRoomUpdateMessageSchema.safeParse(raw);
+      if (!parsed.success) return;
 
       const listKey = chatQueries.roomList().queryKey;
-      const oldData = queryClient.getQueryData<ChatRoomListItemDto[]>(listKey);
+      const oldData = queryClient.getQueryData<ChatRoomListItem[]>(listKey);
       const result = mergeRoomListSocketNotification(
         oldData,
-        raw,
+        parsed.data,
         idRef.current ?? undefined
       );
 

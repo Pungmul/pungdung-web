@@ -11,12 +11,13 @@ import {
 } from "@/core/socket";
 
 import { chatQueries } from "../queries";
-import { mergeChatRoomWithReadSocketMessage } from "../services";
 import {
-  ChatRoomDto,
-  ChatRoomListItemDto,
-  isReadSocketMessage,
-} from "../types";
+  mergeChatRoomWithReadSocketMessage,
+  resetUnreadCount,
+} from "../services";
+
+import { readSocketMessageSchema } from "./socket-message.schema";
+import type { ChatRoom, ChatRoomListItem } from "../types/domain/chat-room.types";
 
 import { authQueries } from "@/features/auth/queries";
 
@@ -70,11 +71,13 @@ export function useRoomReadSocket(roomId: string) {
   /** 타인 읽음 브로드캐스트: `mergeChatRoomWithReadSocketMessage`로 캐시만 갱신 */
   const handleReadMessage = useCallback(
     (message: unknown) => {
-      if (!isReadSocketMessage(message)) return;
+      const parsed = readSocketMessageSchema.safeParse(message);
+      if (!parsed.success) return;
 
-      queryClient.setQueryData<ChatRoomDto>(
+      queryClient.setQueryData<ChatRoom>(
         chatQueries.room(roomId).queryKey,
-        (prev) => mergeChatRoomWithReadSocketMessage(prev, message) ?? prev
+        (prev) =>
+          mergeChatRoomWithReadSocketMessage(prev, parsed.data) ?? prev
       );
     },
     [queryClient, roomId]
@@ -106,13 +109,11 @@ export function useRoomReadSocket(roomId: string) {
     }
 
     // ChatRoomList의 unreadCount 즉시 업데이트 (낙관적 업데이트)
-    queryClient.setQueryData<ChatRoomListItemDto[]>(
+    queryClient.setQueryData<ChatRoomListItem[]>(
       chatQueries.roomList().queryKey,
       (prevData) => {
         if (!prevData) return [];
-        return prevData.map((room) =>
-          room.chatRoomUUID === roomId ? { ...room, unreadCount: 0 } : room
-        );
+        return resetUnreadCount(prevData, roomId);
       }
     );
   }, [token, canSendNow, isConnected, queryClient, roomId, sendReadSign]);
