@@ -1,7 +1,8 @@
-import type { QueryClient } from "@tanstack/react-query";
 import { mutationOptions } from "@tanstack/react-query";
 
 import {
+  createMultiChatRoom,
+  createPersonalChatRoom,
   exitChat,
   inviteUser,
   sendImageMessage,
@@ -14,6 +15,20 @@ const root = chatQueryInternal.all();
 
 /** useMutation에 넘길 옵션. useMutation(chatMutationOptions.inviteUser()) */
 export const chatMutationOptions = {
+  createPersonalChatRoom: () =>
+    mutationOptions({
+      mutationKey: [...root, "createPersonalChatRoom"],
+      mutationFn: (body: { receiverName: string }) =>
+        createPersonalChatRoom(body),
+    }),
+
+  createMultiChatRoom: () =>
+    mutationOptions({
+      mutationKey: [...root, "createMultiChatRoom"],
+      mutationFn: (body: { receiverNameList: string[] }) =>
+        createMultiChatRoom(body),
+    }),
+
   exitChat: () =>
     mutationOptions({
       mutationKey: [...root, "exitChat"],
@@ -32,7 +47,7 @@ export const chatMutationOptions = {
       }) => inviteUser(roomId, data),
     }),
 
-  sendTextMessage: (queryClient: QueryClient) =>
+  sendTextMessage: () =>
     mutationOptions({
       mutationKey: [...root, "sendTextMessage"],
       mutationFn: ({
@@ -42,17 +57,9 @@ export const chatMutationOptions = {
         roomId: string;
         message: { content: string };
       }) => sendTextMessage(roomId, message),
-      onSuccess: (_data, { roomId }) => {
-        void queryClient.invalidateQueries({
-          queryKey: chatQueryInternal.room(roomId),
-        });
-      },
-      onError: (error) => {
-        console.error("텍스트 메시지 전송 실패:", error);
-      },
     }),
 
-  sendImageMessage: (queryClient: QueryClient) =>
+  sendImageMessage: () =>
     mutationOptions({
       mutationKey: [...root, "sendImageMessage"],
       mutationFn: ({
@@ -62,13 +69,5 @@ export const chatMutationOptions = {
         roomId: string;
         formData: FormData;
       }) => sendImageMessage(roomId, formData),
-      onSuccess: (_data, { roomId }) => {
-        void queryClient.invalidateQueries({
-          queryKey: chatQueryInternal.room(roomId),
-        });
-      },
-      onError: (error) => {
-        console.error("이미지 메시지 전송 실패:", error);
-      },
     }),
 };
