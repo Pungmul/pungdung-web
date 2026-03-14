@@ -12,6 +12,7 @@ import {
   ChatRoomBoxSkeleton,
   fetchRoomListApi,
   RoomContainer,
+  SelectFriendModalProvider,
 } from "@/features/chat";
 
 export const metadata: Metadata = {
@@ -26,9 +27,11 @@ const ChatRoomList = lazy(
 );
 
 const SelectFriendModal = lazy(() =>
-  import("@/features/friends/store").then((module) => ({
-    default: module.SelectFriendModal,
-  }))
+  import("@/features/chat/store/select-friend-modal.context").then(
+    (module) => ({
+      default: module.SelectFriendModal,
+    })
+  )
 );
 
 function ChatLayoutContent({ children }: { children: React.ReactNode }) {
@@ -54,7 +57,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const dehydratedState = dehydrate(queryClient);
   return (
     <HydrationBoundary state={dehydratedState}>
-      <ChatLayoutContent>{children}</ChatLayoutContent>
+      <SelectFriendModalProvider>
+        <ChatLayoutContent>{children}</ChatLayoutContent>
+      </SelectFriendModalProvider>
     </HydrationBoundary>
   );
 }

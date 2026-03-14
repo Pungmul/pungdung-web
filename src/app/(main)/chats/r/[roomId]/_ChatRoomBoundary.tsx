@@ -14,7 +14,7 @@ import {
 
 import { Button, Spinner } from "@/shared";
 
-import { ChatRoomListItemDto } from "@/features/chat/types";
+import type { ChatRoomListItem } from "@/features/chat/types";
 
 function ChatRoomSuspenseFallback() {
   const params = useParams();
@@ -24,9 +24,9 @@ function ChatRoomSuspenseFallback() {
 
   const roomId = params.roomId as string;
 
-  const chatRooms = queryClient.getQueryData<
-    ChatRoomListItemDto[]
-  >(chatQueries.roomList().queryKey);
+  const chatRooms = queryClient.getQueryData<ChatRoomListItem[]>(
+    chatQueries.roomList().queryKey
+  );
   const roomFromList = chatRooms?.find((r) => r.chatRoomUUID === roomId);
 
   if (!roomFromList) {
