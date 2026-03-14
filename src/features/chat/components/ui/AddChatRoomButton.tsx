@@ -2,7 +2,10 @@
 
 import { useCallback } from "react";
 
-import { SelectFriendModal,useSelectFriendModal } from "@/features/friends/store";
+import {
+  SelectFriendModal,
+  useSelectFriendModal,
+} from "../../store/select-friend-modal.context";
 
 export default function AddChatRoomButton() {
   const { openModalToSelectFriend } = useSelectFriendModal();

@@ -1,5 +1,5 @@
 "use client";
-import { useChatNotification } from "../../hooks/useChatNotification";
+import { useChatNotification } from "../../hooks/view-model";
 
 interface ChatTabBadgeProps {
   children: React.ReactNode;
