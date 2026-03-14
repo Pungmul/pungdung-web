@@ -1,13 +1,14 @@
-import type { ChatRoomDto, ReadSocketMessage } from "../types";
+import type { ReadSocketMessage } from "../socket/socket-message.schema";
+import type { ChatRoom } from "../types/domain/chat-room.types";
 
 /**
- * 현재 방 스냅샷(`ChatRoomDto`)과 읽음 소켓 페이로드로 다음 상태를 계산합니다.
+ * 현재 방 스냅샷(`ChatRoom`)과 읽음 소켓 페이로드로 다음 상태를 계산합니다.
  * `lastReadMessageId`를 정할 수 없으면 `undefined`를 반환합니다(캐시는 그대로 둠).
  */
 export function mergeChatRoomWithReadSocketMessage(
-  prev: ChatRoomDto | undefined,
+  prev: ChatRoom | undefined,
   readMessage: ReadSocketMessage
-): ChatRoomDto | undefined {
+): ChatRoom | undefined {
   if (!prev) return undefined;
 
   const { userId, messageIds } = readMessage.content;
@@ -27,7 +28,6 @@ export function mergeChatRoomWithReadSocketMessage(
   }
 
   if (lastReadMessageId === null) {
-    console.warn("Cannot determine lastReadMessageId, skipping update");
     return undefined;
   }
 

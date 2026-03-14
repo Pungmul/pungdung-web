@@ -1,5 +1,7 @@
 import { sortChatRoomByDate } from "../lib";
-import { ChatRoomListItemDto, ChatRoomUpdateMessage } from "../types";
+
+import type { ChatRoomUpdateMessage } from "../socket/socket-message.schema";
+import type { ChatRoomListItem } from "../types/domain/chat-room.types";
 
 /**
  * 채팅방 리스트에서 특정 방의 안 읽은 메시지 수를 0으로 리셋합니다.
@@ -12,9 +14,9 @@ import { ChatRoomListItemDto, ChatRoomUpdateMessage } from "../types";
  * const updatedRooms = resetUnreadCount(rooms, "room-123");
  */
 export const resetUnreadCount = (
-  rooms: ChatRoomListItemDto[],
+  rooms: ChatRoomListItem[],
   roomId: string
-): ChatRoomListItemDto[] => {
+): ChatRoomListItem[] => {
   return rooms.map((room) =>
     room.chatRoomUUID === roomId ? { ...room, unreadCount: 0 } : room
   );
@@ -31,9 +33,9 @@ export const resetUnreadCount = (
  * const updatedRooms = removeChatRoom(rooms, "room-123");
  */
 export const removeChatRoom = (
-  rooms: ChatRoomListItemDto[],
+  rooms: ChatRoomListItem[],
   roomId: string
-): ChatRoomListItemDto[] => {
+): ChatRoomListItem[] => {
   return rooms.filter((room) => room.chatRoomUUID !== roomId);
 };
 
@@ -47,11 +49,11 @@ export const removeChatRoom = (
  * @returns 업데이트된 새 배열
  */
 export const updateLastMessage = (
-  rooms: ChatRoomListItemDto[],
+  rooms: ChatRoomListItem[],
   roomId: string,
   lastMessageContent: string,
   lastMessageTime: string
-): ChatRoomListItemDto[] => {
+): ChatRoomListItem[] => {
   return rooms.map((room) =>
     room.chatRoomUUID === roomId
       ? { ...room, lastMessageContent, lastMessageTime }
@@ -68,10 +70,10 @@ export const updateLastMessage = (
  * @returns unreadCount가 증가된 새 배열
  */
 export const incrementUnreadCount = (
-  rooms: ChatRoomListItemDto[],
+  rooms: ChatRoomListItem[],
   roomId: string,
   increment: number = 1
-): ChatRoomListItemDto[] => {
+): ChatRoomListItem[] => {
   return rooms.map((room) =>
     room.chatRoomUUID === roomId
       ? { ...room, unreadCount: (room.unreadCount ?? 0) + increment }
@@ -82,14 +84,14 @@ export const incrementUnreadCount = (
 export type MergeRoomListSocketNotificationResult =
   | { kind: "noop" }
   | { kind: "invalidate" }
-  | { kind: "data"; rooms: ChatRoomListItemDto[] };
+  | { kind: "data"; rooms: ChatRoomListItem[] };
 
 /**
  * 알림 소켓 메시지에 맞춰 방 목록 캐시 스냅샷을 계산합니다.
  * `queryClient`에 반영은 호출부에서 합니다.
  */
 export function mergeRoomListSocketNotification(
-  oldList: ChatRoomListItemDto[] | undefined,
+  oldList: ChatRoomListItem[] | undefined,
   message: ChatRoomUpdateMessage,
   focusingRoomId: string | undefined
 ): MergeRoomListSocketNotificationResult {
@@ -103,6 +105,10 @@ export function mergeRoomListSocketNotification(
       kind: "data",
       rooms: resetUnreadCount(oldList, message.chatRoomUUID),
     };
+  }
+
+  if (!("timestamp" in message && "content" in message)) {
+    return { kind: "noop" };
   }
 
   const { chatRoomUUID: roomId, content, timestamp } = message;
