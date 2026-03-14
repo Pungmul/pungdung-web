@@ -1,9 +1,12 @@
+import { chatRoomListResponseEnvelopeSchema } from "./dto.schema";
 import { sortChatRoomByDate } from "../../lib";
-import { ChatRoomListItemDto } from "../../types";
+import {
+  mapChatRoomListItemDtoToDomain,
+} from "../../lib/mappers";
+import type { ChatRoomListItem } from "../../types/domain/chat-room.types";
 
-export const loadChatRoomList = async (): Promise<ChatRoomListItemDto[]> => {
+export const loadChatRoomList = async (): Promise<ChatRoomListItem[]> => {
   try {
-    // 서버/클라이언트 환경에 따라 URL 분기
     const proxyUrl = `${process.env.NEXT_PUBLIC_LOCAL_URL}/api/chats/roomlist`;
 
     const response = await fetch(proxyUrl, {
@@ -12,9 +15,10 @@ export const loadChatRoomList = async (): Promise<ChatRoomListItemDto[]> => {
 
     if (!response.ok) throw Error("서버 불안정" + response.status);
 
-    const { list: data } = await response.json();
+    const json: unknown = await response.json();
+    const { list } = chatRoomListResponseEnvelopeSchema.parse(json);
 
-    return sortChatRoomByDate(data);
+    return sortChatRoomByDate(list.map(mapChatRoomListItemDtoToDomain));
   } catch (e) {
     throw e;
   }

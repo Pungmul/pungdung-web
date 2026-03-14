@@ -1,0 +1,190 @@
+import { z } from "zod";
+
+/** 채팅 로그/방 상세에 포함되는 단일 메시지(REST 응답) */
+const messageTextDtoSchema = z.object({
+  id: z.union([z.number(), z.string()]),
+  senderUsername: z.string(),
+  content: z.string(),
+  chatType: z.literal("TEXT"),
+  imageUrlList: z.null(),
+  chatRoomUUID: z.string(),
+  createdAt: z.string(),
+});
+
+const messageImageDtoSchema = z.object({
+  id: z.union([z.number(), z.string()]),
+  senderUsername: z.string(),
+  content: z.null(),
+  chatType: z.literal("IMAGE"),
+  imageUrlList: z.array(z.string()),
+  chatRoomUUID: z.string(),
+  createdAt: z.string(),
+});
+
+const messageLeaveDtoSchema = z.object({
+  id: z.union([z.number(), z.string()]),
+  senderUsername: z.string(),
+  content: z.null(),
+  chatType: z.literal("LEAVE"),
+  imageUrlList: z.null(),
+  chatRoomUUID: z.string(),
+  createdAt: z.string(),
+});
+
+const messageJoinDtoSchema = z.object({
+  id: z.union([z.number(), z.string()]),
+  senderUsername: z.string(),
+  content: z.string(),
+  chatType: z.literal("JOIN"),
+  imageUrlList: z.null(),
+  chatRoomUUID: z.string(),
+  createdAt: z.string(),
+});
+
+export const messageDtoSchema = z.discriminatedUnion("chatType", [
+  messageTextDtoSchema,
+  messageImageDtoSchema,
+  messageLeaveDtoSchema,
+  messageJoinDtoSchema,
+]);
+
+export type MessageDto = z.infer<typeof messageDtoSchema>;
+
+export const messageListDtoSchema = z.object({
+  total: z.number(),
+  list: z.array(messageDtoSchema),
+  pageNum: z.number(),
+  pageSize: z.number(),
+  size: z.number(),
+  startRow: z.number(),
+  endRow: z.number(),
+  pages: z.number(),
+  prePage: z.number(),
+  nextPage: z.number(),
+  isFirstPage: z.boolean(),
+  isLastPage: z.boolean(),
+  hasPreviousPage: z.boolean(),
+  hasNextPage: z.boolean(),
+  navigatePages: z.number(),
+  navigatepageNums: z.array(z.number()),
+  navigateFirstPage: z.number(),
+  navigateLastPage: z.number(),
+});
+
+export type MessageListDto = z.infer<typeof messageListDtoSchema>;
+
+export const chatRoomInfoDtoSchema = z.object({
+  chatRoomUUID: z.string(),
+  roomName: z.string(),
+  profileImageUrl: z.string().nullable(),
+  group: z.boolean(),
+});
+
+export type ChatRoomInfoDto = z.infer<typeof chatRoomInfoDtoSchema>;
+
+const profileImageDtoSchema = z.object({
+  id: z.number(),
+  originalFilename: z.string(),
+  convertedFileName: z.string(),
+  fullFilePath: z.string(),
+  fileType: z.string(),
+  fileSize: z.number(),
+  createdAt: z.string(),
+});
+
+export const chatRoomUserDtoSchema = z
+  .object({
+    userId: z.number(),
+    username: z.string(),
+    name: z.string(),
+    clubName: z.string().nullable().optional(),
+    groupName: z.string().nullable().optional(),
+    profileImage: profileImageDtoSchema,
+  })
+  .passthrough();
+
+export type ChatRoomUserDto = z.infer<typeof chatRoomUserDtoSchema>;
+
+export const userLastReadMessageIdDtoSchema = z.object({
+  userId: z.number(),
+  lastReadMessageId: z.number().nullable(),
+});
+
+export type UserLastReadMessageIdDto = z.infer<
+  typeof userLastReadMessageIdDtoSchema
+>;
+
+export const chatRoomDtoSchema = z.object({
+  chatRoomInfo: chatRoomInfoDtoSchema,
+  userInfoList: z.array(chatRoomUserDtoSchema),
+  messageList: messageListDtoSchema,
+  userInitReadList: z.array(userLastReadMessageIdDtoSchema),
+});
+
+export type ChatRoomDto = z.infer<typeof chatRoomDtoSchema>;
+
+export const chatRoomListItemDtoSchema = z.object({
+  chatRoomUUID: z.string(),
+  lastMessageTime: z.string().nullable(),
+  lastMessageContent: z.string().nullable(),
+  unreadCount: z.number().nullable(),
+  senderId: z.number().nullable(),
+  senderName: z.string().nullable(),
+  receiverId: z.number().nullable(),
+  receiverName: z.string().nullable(),
+  /** 백엔드가 빈/미로딩 상태에서 null을 줄 수 있음 */
+  chatRoomMemberIds: z
+    .array(z.number())
+    .nullish()
+    .transform((v) => v ?? []),
+  chatRoomMemberNames: z
+    .array(z.string())
+    .nullish()
+    .transform((v) => v ?? []),
+  roomName: z.string(),
+  profileImageUrl: z.string().nullable(),
+  group: z.boolean(),
+});
+
+export type ChatRoomListItemDto = z.infer<typeof chatRoomListItemDtoSchema>;
+
+export const chatRoomListResponseEnvelopeSchema = z.object({
+  list: z.array(chatRoomListItemDtoSchema),
+});
+
+/** 채팅방 생성 등에서 `isSuccess: false`로 내려오는 백엔드 실패 본문 (예: CHAT-009 요청 횟수 초과) */
+export const createChatRoomFailureDtoSchema = z.object({
+  code: z.string(),
+  message: z.string(),
+  response: z.null(),
+  isSuccess: z.literal(false),
+});
+
+export type CreateChatRoomFailureDto = z.infer<
+  typeof createChatRoomFailureDtoSchema
+>;
+
+export const createChatRoomSuccessDtoSchema = z
+  .object({
+    roomUUID: z.string(),
+  })
+  .passthrough();
+
+export type CreateChatRoomSuccessDto = z.infer<
+  typeof createChatRoomSuccessDtoSchema
+>;
+
+export const createChatRoomResponseDtoSchema = z.union([
+  createChatRoomFailureDtoSchema,
+  createChatRoomSuccessDtoSchema,
+]);
+
+export type CreateChatRoomResponseDto = z.infer<
+  typeof createChatRoomResponseDtoSchema
+>;
+
+export function isCreateChatRoomFailure(
+  value: CreateChatRoomResponseDto
+): value is CreateChatRoomFailureDto {
+  return "isSuccess" in value && value.isSuccess === false;
+}
