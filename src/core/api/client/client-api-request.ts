@@ -10,6 +10,8 @@ type ClientApiRequestBaseOptions<TResponse> = {
   url: string;
   method?: HttpMethod;
   headers?: HeadersInit;
+  /** `AbortController`와 함께 타임아웃·취소에 사용 */
+  signal?: AbortSignal;
   responseSchema: z.ZodType<TResponse>;
 };
 
@@ -104,7 +106,7 @@ async function safeFetch(
   init?: RequestInit
 ): Promise<Response> {
   try {
-    return await fetch(input, {credentials: "include", ...init});
+    return await fetch(input, { credentials: "include", ...init });
   } catch (error) {
     throw createClientApiError({
       status: 0,
@@ -139,6 +141,7 @@ export async function clientApiRequest<
   body,
   requestBodySchema,
   responseSchema,
+  signal,
 }: ClientApiRequestOptions<TResponse, TRequestSchema>): Promise<TResponse> {
   if (body !== undefined && requestBodySchema) {
     const parsedRequestBody = requestBodySchema.safeParse(body);
@@ -162,7 +165,12 @@ export async function clientApiRequest<
     requestInitInput.headers = headers;
   }
 
-  const response = await safeFetch(url, createRequestInit(requestInitInput));
+  const init: RequestInit = createRequestInit(requestInitInput);
+  if (signal !== undefined) {
+    init.signal = signal;
+  }
+
+  const response = await safeFetch(url, init);
   const parsedJson = await parseJsonSafely(response);
   const raw = parsedJson.ok ? parsedJson.data : null;
   return resolveClientApiBody(

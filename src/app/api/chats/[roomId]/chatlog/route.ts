@@ -1,5 +1,11 @@
-import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
+import {
+  createValidatedUpstreamResponse,
+  fetchWithRefresh,
+  proxyFailureError,
+} from "@/core/api/server";
+
 export const dynamic = "force-dynamic";
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ roomId: string }> }
@@ -7,17 +13,20 @@ export async function GET(
   try {
     const { roomId } = await params;
     const { searchParams } = new URL(request.url);
-    const page = searchParams.get("page") || "1";
-    const proxyUrl = `${process.env.BASE_URL}/api/chat/${roomId}/message?page=${page}&size=20`;
+    const size = searchParams.get("size") ?? "20";
+    const beforeId = searchParams.get("beforeId");
+    const upstream = new URL(
+      `${process.env.BASE_URL}/api/chat/${roomId}/message`
+    );
+    upstream.searchParams.set("size", size);
+    if (beforeId) {
+      upstream.searchParams.set("beforeId", beforeId);
+    }
+    const proxyUrl = upstream.toString();
 
     const proxyResponse = await fetchWithRefresh(proxyUrl);
 
-    if (!proxyResponse.ok) throw Error("서버 불안정" + proxyResponse.status);
-
-    const data = await proxyResponse.json();
-    const { response } = await data;
-
-    return Response.json(response, { status: 200 });
+    return createValidatedUpstreamResponse(proxyResponse);
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
     return proxyFailureError(error);

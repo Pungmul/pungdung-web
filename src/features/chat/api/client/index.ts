@@ -1,37 +1,12 @@
-export {
-  createMultiChatRoom,
-  createPersonalChatRoom,
-} from "./create-chat-room.api";
-export type {
-  ChatRoomDto,
-  ChatRoomInfoDto,
-  ChatRoomListItemDto,
-  ChatRoomUserDto,
-  CreateChatRoomFailureDto,
-  CreateChatRoomResponseDto,
-  CreateChatRoomSuccessDto,
-  MessageDto,
-  MessageListDto,
-  UserLastReadMessageIdDto,
-} from "./dto.schema";
-export {
-  chatRoomDtoSchema,
-  chatRoomInfoDtoSchema,
-  chatRoomListItemDtoSchema,
-  chatRoomListResponseEnvelopeSchema,
-  chatRoomUserDtoSchema,
-  createChatRoomFailureDtoSchema,
-  createChatRoomResponseDtoSchema,
-  createChatRoomSuccessDtoSchema,
-  isCreateChatRoomFailure,
-  messageDtoSchema,
-  messageListDtoSchema,
-  userLastReadMessageIdDtoSchema,
-} from "./dto.schema";
-export { exitChat } from "./exit-chat.api";
-export { inviteUser } from "./invite-user.api";
-export { loadChatLogs } from "./load-chat-logs.api";
-export { loadChatRoomInfo } from "./load-chat-room-info.api";
-export { loadChatRoomList } from "./load-chat-room-list.api";
-export { sendImageMessage } from "./send-image-message.api";
-export { sendTextMessage } from "./send-text-message.api";
+/**
+ * 브라우저 전용 채팅 API (`clientApiRequest` + zod).
+ */
+export * from "./create-chat-room.api";
+export * from "./dto.schema";
+export * from "./exit-chat.api";
+export * from "./invite-user.api";
+export * from "./load-chat-logs.api";
+export * from "./load-chat-room-info.api";
+export * from "./load-chat-room-list.api";
+export * from "./send-image-message.api";
+export * from "./send-text-message.api";

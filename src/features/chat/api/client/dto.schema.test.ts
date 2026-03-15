@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  chatLogCursorPageDtoSchema,
   chatRoomListItemDtoSchema,
   chatRoomListResponseEnvelopeSchema,
   createChatRoomFailureDtoSchema,
@@ -70,6 +71,35 @@ describe("chat dto.schema — messageDtoSchema", () => {
       createdAt: "2026-01-01T00:00:00Z",
     });
     expect(parsed.success).toBe(false);
+  });
+});
+
+describe("chat dto.schema — chatLogCursorPageDtoSchema", () => {
+  it("messages, hasMore, nextCursor를 통과시킨다", () => {
+    const parsed = chatLogCursorPageDtoSchema.safeParse({
+      messages: [
+        {
+          id: 1,
+          senderUsername: "u1",
+          content: "a",
+          chatType: "TEXT",
+          imageUrlList: null,
+          chatRoomUUID: "r",
+          createdAt: "2026-01-01",
+        },
+      ],
+      hasMore: true,
+      nextCursor: 1234,
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it("nextCursor 생략 시에도 통과한다", () => {
+    const parsed = chatLogCursorPageDtoSchema.safeParse({
+      messages: [],
+      hasMore: false,
+    });
+    expect(parsed.success).toBe(true);
   });
 });
 

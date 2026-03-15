@@ -1,26 +1,25 @@
-/** 이미지 업로드 타임아웃 (30초) */
+import { clientApiRequest } from "@/core/api/client";
+
+import { chatMutationVoidResponseSchema } from "./dto.schema";
+
 const IMAGE_UPLOAD_TIMEOUT_MS = 30 * 1000;
 
-export const sendImageMessage = async (
+export const sendImageMessage = (
   roomId: string,
-  formData: FormData,
+  formData: FormData
 ): Promise<void> => {
   const controller = new AbortController();
   const timeout = setTimeout(() => {
     controller.abort();
   }, IMAGE_UPLOAD_TIMEOUT_MS);
 
-  const signal = controller.signal;
-  const response = await fetch(`/api/chats/${roomId}/images`, {
-    credentials: "include",
+  return clientApiRequest({
+    url: `/api/chats/${roomId}/images`,
     method: "POST",
-    signal,
     body: formData,
+    signal: controller.signal,
+    responseSchema: chatMutationVoidResponseSchema,
+  }).finally(() => {
+    clearTimeout(timeout);
   });
-
-  clearTimeout(timeout);
-
-  if (!response.ok) {
-    throw new Error("이미지 전송에 실패했습니다.");
-  }
 };

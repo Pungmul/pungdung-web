@@ -1,19 +1,19 @@
-import { chatRoomDtoSchema } from "./dto.schema";
+import { clientApiRequest, withResponseMapper } from "@/core/api/client";
+
 import {
   mapChatRoomDtoToDomain,
 } from "../../lib/mappers";
 import type { ChatRoom } from "../../types/domain/chat-room.types";
+import { chatRoomDtoSchema } from "./dto.schema";
 
-export const loadChatRoomInfo = async (roomId: string): Promise<ChatRoom> => {
-  const response = await fetch(`/api/chats/${roomId}/info`, {
-    credentials: "include",
-    method: "GET",
+export const loadChatRoomInfo = (roomId: string): Promise<ChatRoom> =>
+  withResponseMapper({
+    context: "loadChatRoomInfo",
+    fetchDto: () =>
+      clientApiRequest({
+        url: `/api/chats/${roomId}/info`,
+        method: "GET",
+        responseSchema: chatRoomDtoSchema,
+      }),
+    map: mapChatRoomDtoToDomain,
   });
-
-  if (!response.ok) {
-    throw new Error("채팅방 정보를 불러오는데 실패했습니다.");
-  }
-
-  const dto = chatRoomDtoSchema.parse(await response.json());
-  return mapChatRoomDtoToDomain(dto);
-};

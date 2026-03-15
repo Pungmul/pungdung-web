@@ -1,4 +1,8 @@
-import { fetchWithRefresh, proxyFailureError } from "@/core/api/server";
+import {
+  createValidatedUpstreamResponse,
+  fetchWithRefresh,
+  proxyFailureError,
+} from "@/core/api/server";
 
 export async function POST(
   req: Request,
@@ -16,12 +20,9 @@ export async function POST(
       body: formData,
     });
 
-    if (!proxyResponse.ok) throw Error("서버 불안정" + proxyResponse.status);
-
-    return Response.json({ status: 200 });
+    return createValidatedUpstreamResponse(proxyResponse);
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
     return proxyFailureError(error);
   }
 }
-//

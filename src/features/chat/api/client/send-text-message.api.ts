@@ -1,25 +1,25 @@
-export const sendTextMessage = async (
+import { clientApiRequest } from "@/core/api/client";
+
+import { chatMutationVoidResponseSchema } from "./dto.schema";
+
+const TEXT_SEND_TIMEOUT_MS = 5000;
+
+export const sendTextMessage = (
   roomId: string,
   message: { content: string }
 ): Promise<void> => {
   const controller = new AbortController();
   const timeout = setTimeout(() => {
     controller.abort();
-  }, 5000);
-  const signal = controller.signal;
-  const response = await fetch(`/api/chats/${roomId}/text`, {
-    credentials: "include",
+  }, TEXT_SEND_TIMEOUT_MS);
+
+  return clientApiRequest({
+    url: `/api/chats/${roomId}/text`,
     method: "POST",
-    signal,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(message),
+    body: message,
+    signal: controller.signal,
+    responseSchema: chatMutationVoidResponseSchema,
+  }).finally(() => {
+    clearTimeout(timeout);
   });
-
-  clearTimeout(timeout);
-
-  if (!response.ok) {
-    throw new Error("메시지 전송에 실패했습니다.");
-  }
 };

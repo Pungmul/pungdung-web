@@ -1,22 +1,27 @@
-import { messageListDtoSchema } from "./dto.schema";
-import {
-  mapMessageListDtoToDomain,
-} from "../../lib/mappers";
-import type { MessageList } from "../../types/domain/chat-message.types";
+import { clientApiRequest, withResponseMapper } from "@/core/api/client";
 
-export const loadChatLogs = async (
+import { mapChatLogCursorPageDtoToDomain } from "../../lib/mappers";
+import type { ChatLogCursorPage } from "../../types/domain/chat-message.types";
+import { CHAT_LOG_PAGE_SIZE } from "../../constants";
+import { chatLogCursorPageDtoSchema } from "./dto.schema";
+
+export const loadChatLogs = (
   roomId: string,
-  page: number = 2
-): Promise<MessageList> => {
-  const response = await fetch(`/api/chats/${roomId}/chatlog?page=${page}`, {
-    credentials: "include",
-    method: "GET",
+  beforeId: number | undefined,
+  size: number = CHAT_LOG_PAGE_SIZE
+): Promise<ChatLogCursorPage> =>
+  withResponseMapper({
+    context: "loadChatLogs",
+    fetchDto: () => {
+      const qs = new URLSearchParams({ size: String(size) });
+      if (beforeId !== undefined) {
+        qs.set("beforeId", String(beforeId));
+      }
+      return clientApiRequest({
+        url: `/api/chats/${roomId}/chatlog?${qs.toString()}`,
+        method: "GET",
+        responseSchema: chatLogCursorPageDtoSchema,
+      });
+    },
+    map: mapChatLogCursorPageDtoToDomain,
   });
-
-  if (!response.ok) {
-    throw new Error("채팅 로그를 불러오는데 실패했습니다.");
-  }
-
-  const dto = messageListDtoSchema.parse(await response.json());
-  return mapMessageListDtoToDomain({ ...dto, pageNum: page });
-};

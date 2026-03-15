@@ -2,6 +2,8 @@
 
 import { cookies } from "next/headers";
 
+import { resolveClientApiBody } from "@/core/api/client";
+
 import {
   mapChatRoomListItemDtoToDomain,
 } from "../../lib/mappers";
@@ -23,10 +25,13 @@ export const fetchRoomListApi = async (): Promise<ChatRoomListItem[]> => {
     }
   );
 
-  if (!response.ok) throw Error("서버 불안정" + response.status);
-
-  const json: unknown = await response.json();
-  const { list } = chatRoomListResponseEnvelopeSchema.parse(json);
+  const raw: unknown = await response.json();
+  const { list } = resolveClientApiBody(
+    raw,
+    response.ok,
+    response.status,
+    chatRoomListResponseEnvelopeSchema
+  );
 
   return sortChatRoomByDate(list.map(mapChatRoomListItemDtoToDomain));
 };

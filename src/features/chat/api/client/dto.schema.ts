@@ -50,6 +50,15 @@ export const messageDtoSchema = z.discriminatedUnion("chatType", [
 
 export type MessageDto = z.infer<typeof messageDtoSchema>;
 
+/** GET .../message — 커서 페이지(오래된→최신 순) */
+export const chatLogCursorPageDtoSchema = z.object({
+  messages: z.array(messageDtoSchema),
+  hasMore: z.boolean(),
+  nextCursor: z.coerce.number().nullable().optional(),
+});
+
+export type ChatLogCursorPageDto = z.infer<typeof chatLogCursorPageDtoSchema>;
+
 export const messageListDtoSchema = z.object({
   total: z.number(),
   list: z.array(messageDtoSchema),
@@ -147,6 +156,11 @@ export const chatRoomListItemDtoSchema = z.object({
 });
 
 export type ChatRoomListItemDto = z.infer<typeof chatRoomListItemDtoSchema>;
+
+/** 초대·퇴장·메시지 전송 등 성공 시 envelope.response — 업스트림이 null·객체 등 혼재할 수 있음 */
+export const chatMutationVoidResponseSchema = z
+  .unknown()
+  .transform(() => undefined);
 
 export const chatRoomListResponseEnvelopeSchema = z.object({
   list: z.array(chatRoomListItemDtoSchema),
