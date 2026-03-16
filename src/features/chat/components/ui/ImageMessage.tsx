@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 
+import { PhotoIcon } from "@heroicons/react/24/outline";
+
 import { ImageModal } from "@/shared/components/ui";
 
 interface ImageMessageProps {
@@ -23,6 +25,9 @@ const ImageMessageComponent: React.FC<ImageMessageProps> = ({
 }: ImageMessageProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [loadStateByUrl, setLoadStateByUrl] = useState<
+    Record<string, "loading" | "loaded" | "error">
+  >({});
 
   const handleImageClick = (index: number) => {
     setSelectedImageIndex(index);
@@ -31,6 +36,14 @@ const ImageMessageComponent: React.FC<ImageMessageProps> = ({
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  const markLoaded = (url: string) => {
+    setLoadStateByUrl((prev) => ({ ...prev, [url]: "loaded" }));
+  };
+
+  const markError = (url: string) => {
+    setLoadStateByUrl((prev) => ({ ...prev, [url]: "error" }));
   };
 
   return (
@@ -60,15 +73,33 @@ const ImageMessageComponent: React.FC<ImageMessageProps> = ({
           ))}
         <div className="flex flex-row flex-wrap columns-3 gap-2">
           {imageList.map((imageUrl, index) => (
-            <Image
-              key={imageUrl}
-              src={imageUrl}
-              alt="image"
-              height={128}
-              width={128}
-              className="object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => handleImageClick(index)}
-            />
+            <div
+              key={`${imageUrl}-${index}`}
+              className="relative h-[128px] w-[128px] overflow-hidden rounded-md bg-grey-100"
+            >
+              {loadStateByUrl[imageUrl] !== "loaded" && (
+                <div className="absolute inset-0 flex items-center justify-center bg-grey-100 text-grey-500">
+                  {loadStateByUrl[imageUrl] === "error" ? (
+                    <div className="flex flex-col items-center gap-1 text-[11px]">
+                      <PhotoIcon className="size-5" />
+                      <span>이미지 로드 실패</span>
+                    </div>
+                  ) : (
+                    <div className="h-full w-full animate-pulse bg-grey-200" />
+                  )}
+                </div>
+              )}
+              <Image
+                src={imageUrl}
+                alt="image"
+                height={128}
+                width={128}
+                className="object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => handleImageClick(index)}
+                onLoad={() => markLoaded(imageUrl)}
+                onError={() => markError(imageUrl)}
+              />
+            </div>
           ))}
         </div>
         {sideContent && <>{sideContent}</>}

@@ -2,18 +2,16 @@
 
 import { useCallback, useLayoutEffect } from "react";
 
-import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
-
 import { useMessageList } from "./useMessageList";
-import { chatQueries } from "../../queries";
+import { usePendingMessages } from "./usePendingMessages";
 import { removePendingMatchedBySocketTextEcho } from "../../services/socket-chat-incoming.service";
+import { useChatRoomSocket } from "../../socket/useChatRoomSocket";
 import type {
   ChatRoomOutgoingMessageHandlers,
   Message,
   PendingMessage,
 } from "../../types";
-import { usePendingMessages } from "./usePendingMessages";
-import { useChatRoomSocket } from "../../socket/useChatRoomSocket";
+import { useChatRoomMessagesIndexedDB } from "../state/useChatRoomMessagesIndexedDB";
 
 export type UseChatRoomMessageListParams = {
   roomId: string;
@@ -32,16 +30,10 @@ export function useChatRoomMessageList({
   myInfo,
   readSign,
 }: UseChatRoomMessageListParams) {
-  const { data: chatRoomData, isLoading: isChatRoomLoading } = useSuspenseQuery(
-    chatQueries.room(roomId)
-  );
-  const {
-    data: infiniteData,
-    isLoading: isInfiniteLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(chatQueries.roomInfinite(roomId));
+  const { cachedMessages, roomQuery, roomInfiniteQuery, hydrated } =
+    useChatRoomMessagesIndexedDB(roomId);
+  const chatRoomData = roomQuery.data;
+  const infiniteData = roomInfiniteQuery.data;
 
   const {
     pendingMessages,
@@ -159,6 +151,7 @@ export function useChatRoomMessageList({
   };
 
   const messageList = useMessageList({
+    cachedMessages,
     socketMessages,
     pendingMessages,
     ...(chatRoomData !== undefined ? { chatRoomData } : {}),
@@ -169,11 +162,11 @@ export function useChatRoomMessageList({
     messageList,
     chatRoomData,
     infiniteData,
-    isChatRoomLoading,
-    isInfiniteLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
+    isChatRoomLoading: !hydrated || roomQuery.isLoading,
+    isInfiniteLoading: !hydrated || roomInfiniteQuery.isLoading,
+    fetchNextPage: roomInfiniteQuery.fetchNextPage,
+    hasNextPage: roomInfiniteQuery.hasNextPage,
+    isFetchingNextPage: roomInfiniteQuery.isFetchingNextPage,
     socketMessages,
     outgoingMessageHandlers,
     onDeleteMessage: dismiss,

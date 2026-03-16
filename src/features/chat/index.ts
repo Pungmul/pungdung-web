@@ -54,6 +54,7 @@ export {
   useScrollPosition,
   useSyncChatRoomFocusOnRoomId,
 } from "./hooks/state";
+export type { UseChatRoomMessageListParams } from "./hooks/view-model";
 export {
   getChatRoomTitle,
   getChatRoomTitleFromListItem,
@@ -64,7 +65,6 @@ export {
   useMessageList,
   usePendingMessages,
 } from "./hooks/view-model";
-export type { UseChatRoomMessageListParams } from "./hooks/view-model";
 export { chatMutationOptions, chatQueries } from "./queries";
 export { useRoomListSocket, useRoomReadSocket } from "./socket";
 export {

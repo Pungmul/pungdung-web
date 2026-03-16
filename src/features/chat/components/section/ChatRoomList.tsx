@@ -1,8 +1,6 @@
 "use client";
 import { useState } from "react";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
-
 import { Suspense } from "@suspensive/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getChoseong } from "es-hangul";
@@ -14,14 +12,12 @@ import {
 } from "@/shared/components/Icons";
 
 import { ChatRoomBox, ChatRoomBoxSkeleton } from "./ChatRoomBox";
-import { chatQueries } from "../../queries";
+import { useChatRoomListIndexedDB } from "../../hooks/state";
 import { useSelectFriendModal } from "../../store/select-friend-modal.context";
 import AddChatRoomButton from "../ui/AddChatRoomButton";
 
 export default function ChatRoomList() {
-  const { data: chatRooms = [], isLoading } = useSuspenseQuery(
-    chatQueries.roomList(),
-  );
+  const { rooms: chatRooms, isLoading } = useChatRoomListIndexedDB();
   const { openModalToSelectFriend } = useSelectFriendModal();
   const clickAddChatButton = () => {
     openModalToSelectFriend();

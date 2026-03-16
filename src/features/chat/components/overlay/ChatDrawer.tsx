@@ -2,10 +2,12 @@
 
 import React, { useCallback } from "react";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
+
 import { AnimatePresence, motion, PanInfo, useAnimate } from "framer-motion";
 
-import { useSuspenseGetMyPageInfo } from "@/features/my-page";
-import { User } from "@/features/user";
+import { buildUserProfileOpenPayload } from "@/features/friends";
+import { Member, User } from "@/features/user";
 
 import { Header } from "@/shared/components";
 
@@ -15,13 +17,27 @@ import {
   ChatSettingsButton,
 } from "../ui";
 
+import { getMyPageInfo } from "@/features/my-page/api";
+import { myPageQueryKeys } from "@/features/my-page/constant";
+import { userProfileModalStore } from "@/features/user/store";
+
 interface ChatDrawerProps {
   drawerOpen: boolean;
   onClose: () => void;
   onExitChat: () => void;
   userList: User[];
   onInviteUser: () => void;
-  onMemberProfileClick?: (user: User) => void;
+}
+
+/** 채팅방 `userInfoList`는 오래될 수 있어, 본인 모달에는 최신 `Member`로 덮어쓴다. */
+function mergeMemberIntoUserForSelfModal(roomUser: User, member: Member): User {
+  return {
+    ...roomUser,
+    username: member.username,
+    name: member.name,
+    profileImage: member.profile,
+    clubName: member.clubName,
+  } as User;
 }
 
 export const ChatDrawer = ({
@@ -30,9 +46,29 @@ export const ChatDrawer = ({
   onExitChat,
   userList,
   onInviteUser,
-  onMemberProfileClick,
 }: ChatDrawerProps) => {
-  const { data: myInfo } = useSuspenseGetMyPageInfo();
+  const { data: myInfo } = useSuspenseQuery({
+    queryKey: myPageQueryKeys.info(),
+    queryFn: getMyPageInfo,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const handleMemberProfileClick = useCallback(async (user: User) => {
+    const me = myInfo;
+    // 본인 정보가 없으면 모달을 우선 열지 않는다.
+    if (!me) return;
+    if (user.username === me.username) {
+      userProfileModalStore.getState().open({
+        user: mergeMemberIntoUserForSelfModal(user, me),
+        relationship: "self",
+      });
+      return;
+    }
+    // 본인이 아니면 일반 프로필 모달을 연다.
+    const payload = await buildUserProfileOpenPayload(user);
+    userProfileModalStore.getState().open(payload);
+  }, [myInfo]);
+
 
   // useAnimate 훅으로 애니메이션 제어
   const [containerScope, animateContainer] = useAnimate<HTMLDivElement>();
@@ -102,11 +138,9 @@ export const ChatDrawer = ({
           <div className="flex flex-col flex-grow">
             <ChatMemberList
               userList={userList}
-              currentUsername={myInfo?.username}
+              currentUsername={myInfo?.username ?? ""}
               onInviteUser={onInviteUser}
-              {...(onMemberProfileClick
-                ? { onMemberProfileClick }
-                : {})}
+              onMemberProfileClick={handleMemberProfileClick}
             />
             <ChatExitButton onClick={onExitChat} />
           </div>

@@ -1,11 +1,10 @@
 "use client";
 import { useCallback, useEffect, useRef } from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { useSocketSubscription } from "@/core/socket/hooks/useSocketSubscribe";
-
-import { useGetMyPageInfo } from "@/features/my-page";
 
 import { chatQueries } from "../queries";
 import { mergeRoomListSocketNotification } from "../services";
@@ -14,8 +13,14 @@ import { useChatRoomStore } from "../store";
 import { chatRoomUpdateMessageSchema } from "./socket-message.schema";
 import type { ChatRoomListItem } from "../types/domain/chat-room.types";
 
+import { getMyPageInfo } from "@/features/my-page/api";
+import { myPageQueryKeys } from "@/features/my-page/constant";
+
 export function useRoomListSocket() {
-  const { data: userData } = useGetMyPageInfo();
+  const { data: userData } = useQuery({
+    queryKey: myPageQueryKeys.info(),
+    queryFn: getMyPageInfo,
+  });
   const queryClient = useQueryClient();
 
   const currentChatRoomId = useChatRoomStore((state) => state.focusingRoomId);

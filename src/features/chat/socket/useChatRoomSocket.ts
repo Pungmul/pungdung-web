@@ -4,17 +4,18 @@ import { useCallback, useState } from "react";
 
 import { useSocketSubscription } from "@/core/socket/hooks/useSocketSubscribe";
 
-import { mapStompTimelineSocketPayloadToMessage } from "../lib/mappers";
-import {
-  normalizeSocketImageMessage,
-  normalizeSocketTextMessage,
-} from "../services/socket-chat-incoming.service";
+import { isImageMessage, isTextMessage, type Message } from "../types";
+
 import {
   type StompAlarmEnvelope,
   stompAlarmEnvelopeSchema,
   stompTimelineSocketPayloadSchema,
 } from "./socket-message.schema";
-import { isImageMessage, isTextMessage, type Message } from "../types";
+import { mapStompTimelineSocketPayloadToMessage } from "../lib/mappers";
+import {
+  normalizeSocketImageMessage,
+  normalizeSocketTextMessage,
+} from "../services/socket-chat-incoming.service";
 
 /**
  * STOMP 구독 + 방 단위 소켓 버퍼 state를 **훅 내부**에서 관리합니다.

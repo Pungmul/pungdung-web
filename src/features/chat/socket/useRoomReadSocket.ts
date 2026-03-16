@@ -112,7 +112,7 @@ export function useRoomReadSocket(roomId: string) {
     queryClient.setQueryData<ChatRoomListItem[]>(
       chatQueries.roomList().queryKey,
       (prevData) => {
-        if (!prevData) return [];
+        if (!prevData) return prevData;
         return resetUnreadCount(prevData, roomId);
       }
     );

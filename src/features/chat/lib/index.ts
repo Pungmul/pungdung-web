@@ -1,4 +1,10 @@
 export {
+  getChatRoomListCache,
+  getChatRoomMessagesCache,
+  setChatRoomListCache,
+  setChatRoomMessagesCache,
+} from "./chat-indexedDB-cache";
+export {
   mapChatRoomDtoToDomain,
   mapChatRoomInfoDtoToDomain,
   mapChatRoomListItemDtoToDomain,

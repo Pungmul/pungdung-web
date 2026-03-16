@@ -224,7 +224,8 @@ describe("chat dto.schema — createChatRoom 응답", () => {
       roomUUID: "x",
     });
     expect(success.success).toBe(true);
-    if (success.success) expect(isCreateChatRoomFailure(success.data)).toBe(false);
+    if (success.success)
+      expect(isCreateChatRoomFailure(success.data)).toBe(false);
 
     const failure = createChatRoomResponseDtoSchema.safeParse({
       code: "E",
@@ -233,6 +234,7 @@ describe("chat dto.schema — createChatRoom 응답", () => {
       isSuccess: false,
     });
     expect(failure.success).toBe(true);
-    if (failure.success) expect(isCreateChatRoomFailure(failure.data)).toBe(true);
+    if (failure.success)
+      expect(isCreateChatRoomFailure(failure.data)).toBe(true);
   });
 });
