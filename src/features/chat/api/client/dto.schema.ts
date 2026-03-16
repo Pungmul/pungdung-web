@@ -27,7 +27,8 @@ const messageLeaveDtoSchema = z.object({
   id: z.union([z.number(), z.string()]),
   clientId: z.string().nullable().optional(),
   senderUsername: z.string(),
-  content: z.null(),
+  /** REST는 시스템 문구 문자열, STOMP/구버전은 null일 수 있음 */
+  content: z.string().nullable(),
   chatType: z.literal("LEAVE"),
   imageUrlList: z.null(),
   chatRoomUUID: z.string(),

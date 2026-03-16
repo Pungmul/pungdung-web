@@ -290,7 +290,7 @@ const MessageItemComponent: React.FC<MessageItemProps> = ({
           />
         )}
         <li key={_message.id}>
-          <LogMessage>{`${_message.content}`}</LogMessage>
+          <LogMessage>{_message.content ?? ""}</LogMessage>
         </li>
       </React.Fragment>
     );

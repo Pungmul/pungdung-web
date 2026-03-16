@@ -42,6 +42,34 @@ describe("chat dto.schema — messageDtoSchema", () => {
     expect(parsed.success).toBe(true);
   });
 
+  it("LEAVE 메시지는 시스템 문구(content 문자열)로 통과한다", () => {
+    const parsed = messageDtoSchema.safeParse({
+      id: 207,
+      clientId: null,
+      senderUsername: "u1",
+      content: "강윤호 님이 나갔습니다.",
+      chatType: "LEAVE",
+      imageUrlList: null,
+      chatRoomUUID: "room-1",
+      createdAt: "2026-05-12T19:51:16",
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.chatType).toBe("LEAVE");
+  });
+
+  it("LEAVE 메시지는 content null도 통과한다", () => {
+    const parsed = messageDtoSchema.safeParse({
+      id: 207,
+      senderUsername: "u1",
+      content: null,
+      chatType: "LEAVE",
+      imageUrlList: null,
+      chatRoomUUID: "room-1",
+      createdAt: "2026-05-12T19:51:16",
+    });
+    expect(parsed.success).toBe(true);
+  });
+
   it("chatType이 잘못되면 discriminated union에서 실패한다", () => {
     const parsed = messageDtoSchema.safeParse({
       id: 1,

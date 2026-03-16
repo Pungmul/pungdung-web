@@ -27,7 +27,7 @@ export type Message =
       id: number | string;
       clientId?: string | null | undefined;
       senderUsername: string;
-      content: null;
+      content: string | null;
       chatType: "LEAVE";
       imageUrlList: null;
       chatRoomUUID: string;
