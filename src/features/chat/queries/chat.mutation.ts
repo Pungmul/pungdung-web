@@ -55,7 +55,7 @@ export const chatMutationOptions = {
         message,
       }: {
         roomId: string;
-        message: { content: string };
+        message: { content: string; clientId: string };
       }) => sendTextMessage(roomId, message),
     }),
 

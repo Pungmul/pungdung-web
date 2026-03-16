@@ -2,13 +2,12 @@
 
 import { useRef } from "react";
 
-import { useMutation } from "@tanstack/react-query";
-
 import { Spinner } from "@/shared/components";
 import ObserveTrigger from "@/shared/components/ObserveTrigger";
 
 import { ChatSendForm } from "./ChatSendForm";
 import { MessageList as ChatMessageList } from "./MessageList";
+import { useSendMessageAction } from "../../hooks/actions";
 import {
   useChatRoomFetchOlderPageTrigger,
   useMaintainScrollOnRoomMessageListChange,
@@ -18,7 +17,6 @@ import {
   useChatRoomMessageList,
   useChatRoomUserMaps,
 } from "../../hooks/view-model";
-import { chatMutationOptions } from "../../queries";
 
 type ChatRoomTimelinePanelProps = {
   roomId: string;
@@ -35,13 +33,6 @@ export function ChatRoomTimelinePanel({
 }: ChatRoomTimelinePanelProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const sendTextMessageMutation = useMutation(
-    chatMutationOptions.sendTextMessage(),
-  );
-  const sendImageMessageMutation = useMutation(
-    chatMutationOptions.sendImageMessage(),
-  );
-
   const {
     messageContainerRef,
     saveScrollPosition,
@@ -56,15 +47,23 @@ export function ChatRoomTimelinePanel({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    onSendMessage,
-    onSendImage,
+    outgoingMessageHandlers,
     onDeleteMessage,
   } = useChatRoomMessageList({
     roomId,
     ...(myInfo !== undefined ? { myInfo } : {}),
     readSign,
-    sendTextMessageMutation,
-    sendImageMessageMutation,
+  });
+
+  const {
+    onSendMessage,
+    onSendImage,
+    onRetryTextFailed,
+    onRetryImageFailed,
+  } = useSendMessageAction({
+    roomId,
+    readSign,
+    outgoingMessageHandlers,
     onMessageSent: scrollToTop,
   });
 
@@ -120,8 +119,8 @@ export function ChatRoomTimelinePanel({
               userLastReadMessageIdMap={userLastReadMessageIdMap}
               userImageMap={userImageMap}
               userNameMap={userNameMap}
-              onResendText={onSendMessage}
-              onResendImage={onSendImage}
+              onRetryFailedText={onRetryTextFailed}
+              onRetryFailedImage={onRetryImageFailed}
               onDeletePending={onDeleteMessage}
             />
           </div>

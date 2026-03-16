@@ -21,6 +21,7 @@ describe("create-pending-message.service", () => {
       chatRoomUUID: "room-1",
     });
     expect(m.id).toBe("fixed-uuid");
+    expect(m.clientId).toBe("fixed-uuid");
     expect(m.chatType).toBe("TEXT");
     expect(m.state).toBe("pending");
     expect(m.content).toBe("안녕");
@@ -30,6 +31,7 @@ describe("create-pending-message.service", () => {
   it("markMessageAsFailed는 state만 failed로 바꾼다", () => {
     const base: PendingMessage = {
       id: "1",
+      clientId: "c1",
       senderUsername: "u",
       content: "x",
       chatType: "TEXT",
@@ -43,8 +45,8 @@ describe("create-pending-message.service", () => {
 
   it("updateMessageToFailed는 id가 일치하는 항목만 failed로", () => {
     const list: PendingMessage[] = [
-      { id: "a", senderUsername: "u", content: "1", chatType: "TEXT", imageUrlList: null, chatRoomUUID: "r", createdAt: "t", state: "pending" },
-      { id: "b", senderUsername: "u", content: "2", chatType: "TEXT", imageUrlList: null, chatRoomUUID: "r", createdAt: "t", state: "pending" },
+      { id: "a", clientId: "a", senderUsername: "u", content: "1", chatType: "TEXT", imageUrlList: null, chatRoomUUID: "r", createdAt: "t", state: "pending" },
+      { id: "b", clientId: "b", senderUsername: "u", content: "2", chatType: "TEXT", imageUrlList: null, chatRoomUUID: "r", createdAt: "t", state: "pending" },
     ];
     const next = updateMessageToFailed(list, "a");
     expect(next.find((x) => x.id === "a")?.state).toBe("failed");
@@ -53,7 +55,7 @@ describe("create-pending-message.service", () => {
 
   it("removePendingMessage는 해당 id를 제거한다", () => {
     const list: PendingMessage[] = [
-      { id: 1, senderUsername: "u", content: "1", chatType: "TEXT", imageUrlList: null, chatRoomUUID: "r", createdAt: "t", state: "pending" },
+      { id: 1, clientId: "1", senderUsername: "u", content: "1", chatType: "TEXT", imageUrlList: null, chatRoomUUID: "r", createdAt: "t", state: "pending" },
     ];
     expect(removePendingMessage(list, 1)).toEqual([]);
   });

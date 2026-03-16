@@ -25,6 +25,8 @@ const minimalChatRoom = (list: ReturnType<typeof textMsg>[]): ChatRoom => ({
   },
   userInfoList: [],
   messageList: {
+    hasMore: false,
+    nextCursor: null,
     total: list.length,
     list: [...list],
     pageNum: 1,

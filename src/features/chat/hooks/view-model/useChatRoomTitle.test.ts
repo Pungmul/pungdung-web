@@ -13,7 +13,7 @@ const chatRoom = (group: boolean, roomName: string, memberCount: number): ChatRo
       group,
     },
     userInfoList: Array.from({ length: memberCount }, (_, i) => ({ userId: i })),
-    messageList: { list: [] },
+    messageList: { list: [], hasMore: false, nextCursor: null },
     userInitReadList: [],
   }) as unknown as ChatRoom;
 

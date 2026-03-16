@@ -61,6 +61,7 @@ export type StompAlarmEnvelope = z.infer<typeof stompAlarmEnvelopeSchema>;
 
 const stompTimelineInnerSchema = z.object({
   id: z.number(),
+  clientId: z.string().nullable().optional(),
   senderUsername: z.string(),
   content: z.string(),
   chatType: z.enum(CHAT_STOMP_INNER_CHAT_LINE_KINDS),
@@ -81,4 +82,29 @@ export const stompTimelineMessageEnvelopeSchema = z.object({
 
 export type StompTimelineMessageEnvelope = z.infer<
   typeof stompTimelineMessageEnvelopeSchema
+>;
+
+/** 일부 경로에서 envelope 없이 도메인 메시지 형태로 전달되는 payload */
+export const stompTimelineDirectDomainMessageSchema = z.object({
+  id: z.union([z.number(), z.string()]),
+  clientId: z.string().nullable().optional(),
+  senderUsername: z.string(),
+  content: z.string().nullable(),
+  chatType: z.enum(["TEXT", "IMAGE", "JOIN", "LEAVE"]),
+  imageUrlList: z.array(z.string()).nullable(),
+  chatRoomUUID: z.string(),
+  createdAt: z.string(),
+});
+
+export type StompTimelineDirectDomainMessage = z.infer<
+  typeof stompTimelineDirectDomainMessageSchema
+>;
+
+export const stompTimelineSocketPayloadSchema = z.union([
+  stompTimelineMessageEnvelopeSchema,
+  stompTimelineDirectDomainMessageSchema,
+]);
+
+export type StompTimelineSocketPayload = z.infer<
+  typeof stompTimelineSocketPayloadSchema
 >;

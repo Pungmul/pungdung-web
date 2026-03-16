@@ -5,6 +5,7 @@ import type { Message, PendingMessage } from "../types";
 export function normalizeSocketTextMessage(message: Message): Message {
   return {
     id: message.id,
+    clientId: message.clientId ?? null,
     senderUsername: message.senderUsername,
     content: message.content || "",
     chatType: "TEXT",
@@ -17,6 +18,7 @@ export function normalizeSocketTextMessage(message: Message): Message {
 export function normalizeSocketImageMessage(message: Message): Message {
   return {
     id: message.id,
+    clientId: message.clientId ?? null,
     senderUsername: message.senderUsername,
     content: null,
     chatType: "IMAGE",
@@ -33,13 +35,27 @@ export function normalizeSocketImageMessage(message: Message): Message {
 export function removePendingMatchedBySocketTextEcho(
   pending: PendingMessage[],
   socketMessage: Message,
-  myUsername: string,
+  myUsername: string
 ): PendingMessage[] {
   if (socketMessage.senderUsername !== myUsername) return pending;
+  if (socketMessage.clientId) {
+    const byClientId = pending.findIndex(
+      (msg) => msg.state === "pending" && msg.clientId === socketMessage.clientId
+    );
+    if (byClientId === -1) return pending;
+    return [...pending.slice(0, byClientId), ...pending.slice(byClientId + 1)];
+  }
   if (socketMessage.chatType !== "TEXT") return pending;
 
   const text = socketMessage.content;
-  const idx = pending.findIndex((msg) => msg.content === text);
+  const idx = pending.findIndex(
+    (msg) =>
+      msg.state === "pending" &&
+      msg.senderUsername === myUsername &&
+      msg.chatRoomUUID === socketMessage.chatRoomUUID &&
+      msg.chatType === "TEXT" &&
+      msg.content === text
+  );
   if (idx === -1) return pending;
   return [...pending.slice(0, idx), ...pending.slice(idx + 1)];
 }

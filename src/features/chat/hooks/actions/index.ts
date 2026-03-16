@@ -2,6 +2,6 @@ export { useCreateChatRoomFromFriendEmails } from "./useCreateChatRoomFromFriend
 export { useExitChatRoom } from "./useExitChatRoom";
 export { useOpenPersonalChatNavigation } from "./useOpenPersonalChatNavigation";
 export {
-  usePendingMessages,
-  type UsePendingMessagesParams,
-} from "./usePendingMessages";
+  useSendMessageAction,
+  type UseSendMessageActionParams,
+} from "./useSendMessageAction";

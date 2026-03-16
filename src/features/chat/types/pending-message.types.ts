@@ -11,6 +11,7 @@ export type PendingMessageState = "pending" | "failed";
  * - failed: 전송 실패
  */
 export type PendingMessage = Message & {
+  clientId?: string;
   state: PendingMessageState;
 };
 

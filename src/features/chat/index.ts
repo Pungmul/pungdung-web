@@ -10,6 +10,7 @@ export {
   sendTextMessage,
 } from "./api";
 export type {
+  ChatLogCursorPageDto,
   ChatRoomDto,
   ChatRoomInfoDto,
   ChatRoomListItemDto,
@@ -43,12 +44,11 @@ export {
   useCreateChatRoomFromFriendEmails,
   useExitChatRoom,
   useOpenPersonalChatNavigation,
-  usePendingMessages,
-  type UsePendingMessagesParams,
+  useSendMessageAction,
+  type UseSendMessageActionParams,
 } from "./hooks/actions";
 export {
   useChatRoomFetchOlderPageTrigger,
-  useChatRoomSocketMessages,
   useMaintainScrollOnRoomMessageListChange,
   useResetRoomUnreadCount,
   useScrollPosition,
@@ -62,7 +62,9 @@ export {
   useChatRoomTitle,
   useChatRoomUserMaps,
   useMessageList,
+  usePendingMessages,
 } from "./hooks/view-model";
+export type { UseChatRoomMessageListParams } from "./hooks/view-model";
 export { chatMutationOptions, chatQueries } from "./queries";
 export { useRoomListSocket, useRoomReadSocket } from "./socket";
 export {
@@ -72,5 +74,9 @@ export {
   useSelectFriendModal,
   useSelectFriendModalStore,
 } from "./store";
-export type { Message } from "./types";
+export type {
+  ChatLogCursorPage,
+  ChatRoomOutgoingMessageHandlers,
+  Message,
+} from "./types";
 export { isImageMessage, isTextMessage } from "./types";

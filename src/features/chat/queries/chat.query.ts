@@ -2,7 +2,6 @@ import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
 import { loadChatLogs,loadChatRoomInfo, loadChatRoomList } from "../api";
 import {
-  CHAT_LOG_INITIAL_PAGE,
   CHAT_LOG_PAGE_SIZE,
   DEFAULT_GC_TIME_MS,
   DEFAULT_STALE_TIME_MS,
@@ -49,17 +48,17 @@ export const chatQueries = {
   roomInfinite: (roomId: string) =>
     infiniteQueryOptions({
       queryKey: chatQueryInternal.roomInfinite(roomId),
-      queryFn: ({ pageParam = CHAT_LOG_INITIAL_PAGE }) =>
-        loadChatLogs(roomId, pageParam),
+      queryFn: ({ pageParam }) =>
+        loadChatLogs(roomId, pageParam, CHAT_LOG_PAGE_SIZE),
       getNextPageParam: (lastPage) => {
-        if (lastPage.size < CHAT_LOG_PAGE_SIZE) {
-          return undefined;
-        }
-        return (lastPage.pageNum ?? CHAT_LOG_INITIAL_PAGE) + 1;
+        if (!lastPage.hasMore) return undefined;
+        if (lastPage.nextCursor == null) return undefined;
+        return lastPage.nextCursor;
       },
-      initialPageParam: CHAT_LOG_INITIAL_PAGE,
+      initialPageParam: undefined as number | undefined,
       staleTime: DEFAULT_STALE_TIME_MS,
       gcTime: DEFAULT_GC_TIME_MS,
-      refetchOnMount: "always",
+      /** `"always"`는 Strict Mode 마운트·언마운트·재마운트마다 재요청되어 chatlog가 2번 찍히기 쉬움 */
+      refetchOnMount: true,
     }),
 };

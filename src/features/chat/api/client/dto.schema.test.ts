@@ -12,30 +12,11 @@ import {
   messageListDtoSchema,
 } from "./dto.schema";
 
-const emptyPageMeta = {
-  total: 0,
-  pageNum: 1,
-  pageSize: 20,
-  size: 0,
-  startRow: 0,
-  endRow: 0,
-  pages: 0,
-  prePage: 0,
-  nextPage: 0,
-  isFirstPage: true,
-  isLastPage: true,
-  hasPreviousPage: false,
-  hasNextPage: false,
-  navigatePages: 8,
-  navigatepageNums: [] as number[],
-  navigateFirstPage: 1,
-  navigateLastPage: 1,
-};
-
 describe("chat dto.schema — messageDtoSchema", () => {
   it("TEXT 메시지를 통과시킨다", () => {
     const parsed = messageDtoSchema.safeParse({
       id: 1,
+      clientId: "c1",
       senderUsername: "u1",
       content: "hello",
       chatType: "TEXT",
@@ -50,6 +31,7 @@ describe("chat dto.schema — messageDtoSchema", () => {
   it("IMAGE 메시지를 통과시킨다", () => {
     const parsed = messageDtoSchema.safeParse({
       id: "2",
+      clientId: null,
       senderUsername: "u1",
       content: null,
       chatType: "IMAGE",
@@ -101,13 +83,44 @@ describe("chat dto.schema — chatLogCursorPageDtoSchema", () => {
     });
     expect(parsed.success).toBe(true);
   });
+
+  it("실제 응답 유사 페이로드(추가 메타 포함)도 통과한다", () => {
+    const parsed = chatLogCursorPageDtoSchema.safeParse({
+      total: 59,
+      messages: [
+        {
+          id: 248,
+          senderUsername: "ajtwoddl1236@naver.com",
+          content: "a",
+          chatType: "TEXT",
+          imageUrlList: null,
+          chatRoomUUID: "60f7bcf4-47d6-43b9-a886-43b0fd49cb22",
+          isDeleted: false,
+          createdAt: "2026-05-16T03:07:31",
+        },
+        {
+          id: 267,
+          senderUsername: "ajtwoddl1236@naver.com",
+          content: "b",
+          chatType: "TEXT",
+          imageUrlList: null,
+          chatRoomUUID: "60f7bcf4-47d6-43b9-a886-43b0fd49cb22",
+          isDeleted: false,
+          createdAt: "2026-05-16T14:01:28",
+        },
+      ],
+      hasMore: true,
+      nextCursor: 248,
+    });
+
+    expect(parsed.success).toBe(true);
+  });
 });
 
 describe("chat dto.schema — messageListDtoSchema", () => {
-  it("페이지 메타와 메시지 리스트를 통과시킨다", () => {
+  it("messages, hasMore, nextCursor를 통과시킨다", () => {
     const parsed = messageListDtoSchema.safeParse({
-      ...emptyPageMeta,
-      list: [
+      messages: [
         {
           id: 1,
           senderUsername: "u1",
@@ -118,6 +131,8 @@ describe("chat dto.schema — messageListDtoSchema", () => {
           createdAt: "2026-01-01",
         },
       ],
+      hasMore: true,
+      nextCursor: 1,
     });
     expect(parsed.success).toBe(true);
   });

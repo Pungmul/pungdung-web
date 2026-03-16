@@ -1,4 +1,8 @@
-import type { StompTimelineMessageEnvelope } from "../../socket/socket-message.schema";
+import type {
+  StompTimelineDirectDomainMessage,
+  StompTimelineMessageEnvelope,
+  StompTimelineSocketPayload,
+} from "../../socket/socket-message.schema";
 import type { Message } from "../../types/domain/chat-message.types";
 
 /**
@@ -16,6 +20,7 @@ export function mapStompTimelineEnvelopeToMessage(
     case "ENTER":
       return {
         id: inner.id,
+        clientId: inner.clientId ?? null,
         senderUsername: inner.senderUsername,
         content: inner.content,
         chatType: "JOIN",
@@ -26,6 +31,7 @@ export function mapStompTimelineEnvelopeToMessage(
     case "LEAVE":
       return {
         id: inner.id,
+        clientId: inner.clientId ?? null,
         senderUsername: inner.senderUsername,
         content: null,
         chatType: "LEAVE",
@@ -41,6 +47,7 @@ export function mapStompTimelineEnvelopeToMessage(
             : [];
         return {
           id: inner.id,
+          clientId: inner.clientId ?? null,
           senderUsername: inner.senderUsername,
           content: null,
           chatType: "IMAGE",
@@ -51,6 +58,7 @@ export function mapStompTimelineEnvelopeToMessage(
       }
       return {
         id: inner.id,
+        clientId: inner.clientId ?? null,
         senderUsername: inner.senderUsername,
         content: inner.content,
         chatType: "TEXT",
@@ -63,5 +71,60 @@ export function mapStompTimelineEnvelopeToMessage(
       const x: never = inner.chatType;
       throw new Error(`Unhandled stomp inner chatType: ${String(x)}`);
     }
+  }
+}
+
+export function mapStompTimelineSocketPayloadToMessage(
+  payload: StompTimelineSocketPayload,
+): Message {
+  if ("messageLogId" in payload) {
+    return mapStompTimelineEnvelopeToMessage(payload);
+  }
+  const direct = payload as StompTimelineDirectDomainMessage;
+  switch (direct.chatType) {
+    case "TEXT":
+      return {
+        id: direct.id,
+        clientId: direct.clientId ?? null,
+        senderUsername: direct.senderUsername,
+        content: direct.content ?? "",
+        chatType: "TEXT",
+        imageUrlList: null,
+        chatRoomUUID: direct.chatRoomUUID,
+        createdAt: direct.createdAt,
+      };
+    case "IMAGE":
+      return {
+        id: direct.id,
+        clientId: direct.clientId ?? null,
+        senderUsername: direct.senderUsername,
+        content: null,
+        chatType: "IMAGE",
+        imageUrlList: direct.imageUrlList ?? [],
+        chatRoomUUID: direct.chatRoomUUID,
+        createdAt: direct.createdAt,
+      };
+    case "JOIN":
+      return {
+        id: direct.id,
+        clientId: direct.clientId ?? null,
+        senderUsername: direct.senderUsername,
+        content: direct.content ?? "",
+        chatType: "JOIN",
+        imageUrlList: null,
+        chatRoomUUID: direct.chatRoomUUID,
+        createdAt: direct.createdAt,
+      };
+    case "LEAVE":
+      return {
+        id: direct.id,
+        clientId: direct.clientId ?? null,
+        senderUsername: direct.senderUsername,
+        content: null,
+        chatType: "LEAVE",
+        imageUrlList: null,
+        chatRoomUUID: direct.chatRoomUUID,
+        createdAt: direct.createdAt,
+      };
   }
 }

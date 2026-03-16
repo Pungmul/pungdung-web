@@ -1,4 +1,9 @@
-export type { Message, MessageList } from "./domain/chat-message.types";
+export type {
+  ChatLogCursorPage,
+  Message,
+  MessageList,
+} from "./domain/chat-message.types";
+export type { ChatRoomOutgoingMessageHandlers } from "./outgoing-message-handler.types";
 export type {
   ChatRoom,
   ChatRoomInfo,

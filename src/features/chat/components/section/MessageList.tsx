@@ -25,8 +25,8 @@ interface MessageListProps {
   userLastReadMessageIdMap: UserLastReadMessageIdMap;
   userImageMap: UserImageMap;
   userNameMap: UserNameMap;
-  onResendText: (message: string) => void;
-  onResendImage: (files: FileList) => void;
+  onRetryFailedText: (failed: PendingMessage) => void;
+  onRetryFailedImage: (failed: PendingMessage) => void;
   onDeletePending: (message: PendingMessage) => void;
 }
 
@@ -40,8 +40,8 @@ const MessageListComponent: React.FC<MessageListProps> = ({
   userLastReadMessageIdMap,
   userImageMap,
   userNameMap,
-  onResendText,
-  onResendImage,
+  onRetryFailedText,
+  onRetryFailedImage,
   onDeletePending,
 }) => {
   const dateRefs = useRef<Map<string, HTMLLIElement | null>>(new Map());
@@ -135,8 +135,8 @@ const MessageListComponent: React.FC<MessageListProps> = ({
             userImageUrl={userImageMap[message.senderUsername] ?? null}
             senderDisplayName={userNameMap[message.senderUsername] ?? ""}
             onDateClick={handleDateClick}
-            onResendText={onResendText}
-            onResendImage={onResendImage}
+            onRetryFailedText={onRetryFailedText}
+            onRetryFailedImage={onRetryFailedImage}
             onDeletePending={onDeletePending}
             dateRef={
               !isSameDate

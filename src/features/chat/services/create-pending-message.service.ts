@@ -33,8 +33,10 @@ export const createPendingTextMessage = ({
   content,
   chatRoomUUID,
 }: CreatePendingTextMessageParams): PendingMessage => {
+  const clientId = uuidv4();
   return {
-    id: uuidv4(),
+    id: clientId,
+    clientId,
     senderUsername,
     content,
     chatType: "TEXT",
@@ -64,8 +66,10 @@ export const createPendingImageMessage = ({
   files,
   chatRoomUUID,
 }: CreatePendingImageMessageParams): PendingMessage => {
+  const clientId = uuidv4();
   return {
-    id: uuidv4(),
+    id: clientId,
+    clientId,
     senderUsername,
     content: null,
     chatType: "IMAGE",

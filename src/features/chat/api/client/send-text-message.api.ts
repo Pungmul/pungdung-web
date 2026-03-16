@@ -6,7 +6,7 @@ const TEXT_SEND_TIMEOUT_MS = 5000;
 
 export const sendTextMessage = (
   roomId: string,
-  message: { content: string }
+  message: { content: string; clientId: string }
 ): Promise<void> => {
   const controller = new AbortController();
   const timeout = setTimeout(() => {

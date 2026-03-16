@@ -23,8 +23,8 @@ interface MessageItemProps {
   senderDisplayName: string;
   onDateClick: (dateKey: string) => void;
   dateRef: ((el: HTMLLIElement | null) => void) | undefined;
-  onResendText: (message: string) => void;
-  onResendImage: (files: FileList) => void;
+  onRetryFailedText: (failed: PendingMessage) => void;
+  onRetryFailedImage: (failed: PendingMessage) => void;
   onDeletePending: (message: PendingMessage) => void;
 }
 
@@ -54,8 +54,8 @@ const MessageItemComponent: React.FC<MessageItemProps> = ({
   senderDisplayName,
   onDateClick,
   dateRef,
-  onResendText,
-  onResendImage,
+  onRetryFailedText,
+  onRetryFailedImage,
   onDeletePending,
 }) => {
   const isUser = _message.senderUsername === currentUserId;
@@ -117,7 +117,7 @@ const MessageItemComponent: React.FC<MessageItemProps> = ({
               width={16}
               height={16}
               onClick={() => {
-                onResendText(_message.content);
+                onRetryFailedText(_message);
               }}
               style={{ cursor: "pointer" }}
             />
@@ -201,11 +201,7 @@ const MessageItemComponent: React.FC<MessageItemProps> = ({
               height={16}
               color="#ff6767"
               onClick={() => {
-                onResendImage(
-                  _message.imageUrlList.map(
-                    (url) => new File([], url),
-                  ) as unknown as FileList,
-                );
+                void onRetryFailedImage(_message);
               }}
               style={{ cursor: "pointer" }}
             />

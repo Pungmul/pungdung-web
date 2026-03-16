@@ -3,6 +3,7 @@ import { z } from "zod";
 /** 채팅 로그/방 상세에 포함되는 단일 메시지(REST 응답) */
 const messageTextDtoSchema = z.object({
   id: z.union([z.number(), z.string()]),
+  clientId: z.string().nullable().optional(),
   senderUsername: z.string(),
   content: z.string(),
   chatType: z.literal("TEXT"),
@@ -13,6 +14,7 @@ const messageTextDtoSchema = z.object({
 
 const messageImageDtoSchema = z.object({
   id: z.union([z.number(), z.string()]),
+  clientId: z.string().nullable().optional(),
   senderUsername: z.string(),
   content: z.null(),
   chatType: z.literal("IMAGE"),
@@ -23,6 +25,7 @@ const messageImageDtoSchema = z.object({
 
 const messageLeaveDtoSchema = z.object({
   id: z.union([z.number(), z.string()]),
+  clientId: z.string().nullable().optional(),
   senderUsername: z.string(),
   content: z.null(),
   chatType: z.literal("LEAVE"),
@@ -33,6 +36,7 @@ const messageLeaveDtoSchema = z.object({
 
 const messageJoinDtoSchema = z.object({
   id: z.union([z.number(), z.string()]),
+  clientId: z.string().nullable().optional(),
   senderUsername: z.string(),
   content: z.string(),
   chatType: z.literal("JOIN"),
@@ -60,24 +64,9 @@ export const chatLogCursorPageDtoSchema = z.object({
 export type ChatLogCursorPageDto = z.infer<typeof chatLogCursorPageDtoSchema>;
 
 export const messageListDtoSchema = z.object({
-  total: z.number(),
-  list: z.array(messageDtoSchema),
-  pageNum: z.number(),
-  pageSize: z.number(),
-  size: z.number(),
-  startRow: z.number(),
-  endRow: z.number(),
-  pages: z.number(),
-  prePage: z.number(),
-  nextPage: z.number(),
-  isFirstPage: z.boolean(),
-  isLastPage: z.boolean(),
-  hasPreviousPage: z.boolean(),
-  hasNextPage: z.boolean(),
-  navigatePages: z.number(),
-  navigatepageNums: z.array(z.number()),
-  navigateFirstPage: z.number(),
-  navigateLastPage: z.number(),
+  messages: z.array(messageDtoSchema),
+  hasMore: z.boolean(),
+  nextCursor: z.coerce.number().nullable().optional(),
 });
 
 export type MessageListDto = z.infer<typeof messageListDtoSchema>;

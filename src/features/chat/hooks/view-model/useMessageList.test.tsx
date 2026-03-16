@@ -8,15 +8,21 @@ import type { PendingMessage } from "../../types/pending-message.types";
 
 import { useMessageList } from "./useMessageList";
 
-const text = (id: number | string, createdAt: string): Message => ({
-  id,
-  senderUsername: "u",
-  content: "c",
-  chatType: "TEXT",
-  imageUrlList: null,
-  chatRoomUUID: "r",
-  createdAt,
-});
+const text = (
+  id: number | string,
+  createdAt: string,
+  overrides: Partial<Message> = {}
+): Message =>
+  ({
+    id,
+    senderUsername: "u",
+    content: "c",
+    chatType: "TEXT",
+    imageUrlList: null,
+    chatRoomUUID: "r",
+    createdAt,
+    ...overrides,
+  } as Message);
 
 describe("useMessageList", () => {
   const wrapper = ({ children }: PropsWithChildren) => <>{children}</>;
@@ -28,10 +34,12 @@ describe("useMessageList", () => {
           infiniteData: {
             pages: [
               {
-                list: [text(1, "2026-01-01T09:00:00Z")],
-              } as never,
+                messages: [text(1, "2026-01-01T09:00:00Z")],
+                hasMore: true,
+                nextCursor: 2,
+              },
             ],
-            pageParams: [1],
+            pageParams: [undefined],
           },
           socketMessages: [text(1, "2026-01-01T10:00:00Z")],
         }),
@@ -46,6 +54,7 @@ describe("useMessageList", () => {
     const pending: PendingMessage[] = [
       {
         id: "p1",
+        clientId: "p1",
         senderUsername: "u",
         content: "q",
         chatType: "TEXT",
@@ -60,6 +69,8 @@ describe("useMessageList", () => {
         useMessageList({
           chatRoomData: {
             messageList: {
+              hasMore: false,
+              nextCursor: null,
               list: [
                 text(2, "2026-01-02T00:00:00Z"),
                 text(1, "2026-01-01T00:00:00Z"),
@@ -72,5 +83,41 @@ describe("useMessageList", () => {
       { wrapper }
     );
     expect(result.current.map((m) => m.id)).toEqual([1, 2, "p1"]);
+  });
+
+  it("confirmed 메시지와 매칭되는 pending은 렌더 결과에서 숨긴다", () => {
+    const pending: PendingMessage[] = [
+      {
+        id: "p1",
+        clientId: "c1",
+        senderUsername: "u",
+        content: "c",
+        chatType: "TEXT",
+        imageUrlList: null,
+        chatRoomUUID: "r",
+        createdAt: "2026-01-01 00:00:00",
+        state: "pending",
+      },
+    ];
+    const { result } = renderHook(
+      () =>
+        useMessageList({
+          infiniteData: {
+            pages: [
+              {
+                messages: [text(1, "2026-01-01T00:00:01Z", { clientId: "c1" })],
+                hasMore: false,
+                nextCursor: null,
+              },
+            ],
+            pageParams: [undefined],
+          },
+          socketMessages: [],
+          pendingMessages: pending,
+        }),
+      { wrapper }
+    );
+
+    expect(result.current.map((m) => m.id)).toEqual([1]);
   });
 });
