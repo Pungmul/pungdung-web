@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { use } from "react";
 import { useParams, useRouter } from "next/navigation";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { AnimatePresence } from "framer-motion";
 
@@ -21,32 +22,27 @@ import {
   useRoomReadSocket,
   useSyncChatRoomFocusOnRoomId,
 } from "@/features/chat";
-import { buildUserProfileOpenPayload } from "@/features/friends";
-import { useSuspenseGetMyPageInfo } from "@/features/my-page";
-import type { Member, User } from "@/features/user";
 import { UserProfileCardModalHost } from "@/features/user";
 
 import { useBodyScrollLock, useViewportHeightVar } from "@/shared/hooks";
 
-import { userProfileModalStore } from "@/features/user/store";
+import { getMyPageInfo } from "@/features/my-page/api";
+import { myPageQueryKeys } from "@/features/my-page/constant";
 
-/** 채팅방 `userInfoList`는 오래될 수 있어, 본인 모달에는 최신 `Member`로 덮어쓴다. */
-function mergeMemberIntoUserForSelfModal(roomUser: User, member: Member): User {
-  return {
-    ...roomUser,
-    username: member.username,
-    name: member.name,
-    profileImage: member.profile,
-    clubName: member.clubName,
-  } as User;
-}
+type ChatRoomPageProps = {
+  decodedUsernamePromise: Promise<string | undefined>;
+};
 
-export function ChatRoomPage() {
+export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
   const { roomId } = useParams();
   const router = useRouter();
-  const { data: myInfo } = useSuspenseGetMyPageInfo();
-  const myInfoRef = useRef(myInfo);
-  myInfoRef.current = myInfo;
+  const decodedUsername = use(decodedUsernamePromise);
+  const { data: myInfo } = useQuery({
+    queryKey: myPageQueryKeys.info(),
+    queryFn: getMyPageInfo,
+  });
+  const myUsername =
+    decodedUsername ?? myInfo?.username ?? "";
 
   const isConnected = useSocketConnection();
 
@@ -62,7 +58,7 @@ export function ChatRoomPage() {
   const mainRef = useRef<HTMLElement>(null);
   useViewportHeightVar(mainRef);
 
-  const { data: chatRoomData } = useSuspenseQuery(
+  const { data: chatRoomData } = useQuery(
     chatQueries.room(roomId as string),
   );
 
@@ -73,18 +69,6 @@ export function ChatRoomPage() {
     ? chatRoomData?.userInfoList.length - 1
     : 0;
 
-  const handleMemberProfileClick = useCallback(async (user: User) => {
-    const me = myInfoRef.current;
-    if (user.username === me.username) {
-      userProfileModalStore.getState().open({
-        user: mergeMemberIntoUserForSelfModal(user, me),
-        relationship: "self",
-      });
-      return;
-    }
-    const payload = await buildUserProfileOpenPayload(user);
-    userProfileModalStore.getState().open(payload);
-  }, []);
 
   return (
     <AnimatePresence mode="wait">
@@ -102,7 +86,7 @@ export function ChatRoomPage() {
 
           <ChatRoomTimelinePanel
             roomId={roomId as string}
-            myInfo={myInfo}
+            {...(myUsername ? { myInfo: { username: myUsername } } : {})}
             readSign={readSign}
             isConnected={isConnected}
           />
@@ -116,13 +100,12 @@ export function ChatRoomPage() {
           userList={userList}
           onClose={() => setDrawerOpen(false)}
           onInviteUser={() => setInviteUserModalOpen(true)}
-          onMemberProfileClick={handleMemberProfileClick}
         />
         <InviteUserModal
           roomId={roomId as string}
           currentUsernames={userList.map((user) => user.username)}
           isGroupRoom={chatRoomData?.chatRoomInfo.group ?? false}
-          myUsername={myInfo.username}
+          myUsername={myUsername}
           isOpen={inviteUserModalOpen}
           onClose={() => {
             setInviteUserModalOpen(false);
