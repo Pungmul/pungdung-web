@@ -1,32 +1,36 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { useMutation } from "@tanstack/react-query";
-import { UseFormReturn } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { type UseFormReturn } from "react-hook-form";
 
-import {
-  EditProfileFormValues,
-  EditProfilePasswordFormValues,
-} from "@/features/my-page";
+import { chatQueries } from "@/features/chat";
+import { userQueries } from "@/features/user";
 
 import { Toast } from "@/shared";
 
+import { transformEditProfileData } from "../../lib";
+import { myPageQueries } from "../../queries";
+import type {
+  EditProfileFormValues,
+  EditProfilePasswordFormValues,
+} from "../../types";
+
 import { authMutationOptions } from "@/features/auth/queries";
-import { chatQueries } from "@/features/chat/queries";
-import { myPageQueryKeys } from "@/features/my-page/constant";
-import { transformEditProfileData } from "@/features/my-page/lib";
 
 interface UseEditProfileSubmitParams {
   form: UseFormReturn<EditProfileFormValues>;
   passwordForm: UseFormReturn<EditProfilePasswordFormValues>;
   changedProfileImageFile: File | null;
+  serverClubAgeFallback: number;
 }
 
 export const useEditProfileSubmit = ({
   form,
   passwordForm,
   changedProfileImageFile,
+  serverClubAgeFallback,
 }: UseEditProfileSubmitParams) => {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -37,7 +41,9 @@ export const useEditProfileSubmit = ({
 
   const handleSubmitEditProfile = form.handleSubmit((data) => {
     const formData = new FormData();
-    const modifiedProfileData = transformEditProfileData(data);
+    const modifiedProfileData = transformEditProfileData(data, {
+      serverClubAgeFallback,
+    });
 
     const accountData = new Blob(
       [
@@ -60,18 +66,14 @@ export const useEditProfileSubmit = ({
     formData.append("accountData", accountData);
     formData.append("profile", profileImage);
 
-    console.log(profileImage);
-
     updateProfile(formData, {
       onSuccess: async () => {
-        // 채팅 등 다른 화면이 언마운트된 동안에는 observer가 없어 `active`만으로는 refetch가 스킵된다.
-        // 프로필 수정 직후 캐시를 확실히 갱신해야 drawer/모달에 최신 `Member`가 반영된다.
         await queryClient.invalidateQueries({
-          queryKey: myPageQueryKeys.all,
+          ...myPageQueries.all(),
           refetchType: "all",
         });
         await queryClient.invalidateQueries({
-          queryKey: ["users", "profile-info"],
+          ...userQueries.all(),
           refetchType: "all",
         });
         await queryClient.invalidateQueries({

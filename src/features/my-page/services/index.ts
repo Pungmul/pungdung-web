@@ -1,2 +1,0 @@
-export { prefetchMyPageInfo } from "./prefetchMyPageInfo";
-

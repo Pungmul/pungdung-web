@@ -27,22 +27,34 @@ export type EditProfilePasswordFormValues = z.infer<
 
 export const baseEditProfileSchema = baseSchema;
 
+function isEditProfileNicknameValid(
+  nickname: string | undefined,
+  hasDynamicClubList: boolean
+): boolean {
+  return !hasDynamicClubList || !nickname || /^[가-힣]+$/.test(nickname);
+}
+
+function isEditProfileClubSelectedWhenLoaded(
+  club: number | null | undefined,
+  hasDynamicClubList: boolean
+): boolean {
+  return !hasDynamicClubList || club !== undefined;
+}
+
 export const createEditProfileSchema = (clubIds: number[]) => {
   const hasDynamicClubList = clubIds.length > 0;
 
   return buildEditProfilePartialSchema(clubIds)
     .refine(
-      (data) =>
-        !hasDynamicClubList ||
-        !data.nickname ||
-        /^[가-힣]+$/.test(data.nickname ?? ""),
+      (data) => isEditProfileNicknameValid(data.nickname, hasDynamicClubList),
       {
         message: "올바른 형식의 한글 패명을 입력하세요",
         path: ["nickname"],
       }
     )
     .refine(
-      (data) => !hasDynamicClubList || data.club !== undefined,
+      (data) =>
+        isEditProfileClubSelectedWhenLoaded(data.club, hasDynamicClubList),
       {
         message: "소속패를 선택해주세요",
         path: ["club"],
