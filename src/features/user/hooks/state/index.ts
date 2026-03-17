@@ -1,0 +1,1 @@
+export { useModalEscapeKey } from "./useModalEscapeKey";

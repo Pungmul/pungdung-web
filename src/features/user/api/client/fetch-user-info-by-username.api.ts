@@ -1,23 +1,12 @@
-import type { ProfileImage, User, UserProfileCardDetail } from "../../types";
+import { clientApiRequest } from "@/core/api/client";
 
-function isUserShape(v: unknown): v is User {
-  if (!v || typeof v !== "object") return false;
-  const o = v as Record<string, unknown>;
-  return (
-    typeof o.userId === "number" &&
-    typeof o.username === "string" &&
-    typeof o.name === "string" &&
-    o.profileImage !== null &&
-    typeof o.profileImage === "object"
-  );
-}
-
-function parseProfileImage(v: unknown): ProfileImage | null {
-  if (!v || typeof v !== "object") return null;
-  const o = v as Record<string, unknown>;
-  if (typeof o.fullFilePath !== "string") return null;
-  return v as ProfileImage;
-}
+import {
+  parseUserFromUnknown,
+  profileImageDtoSchema,
+  usersInfoResponseSchema,
+} from "./dto.schema";
+import type { UserProfileCardDetail } from "../../types";
+import type { User } from "../../types";
 
 function optionalString(v: unknown): string | undefined {
   return typeof v === "string" && v.trim() !== "" ? v : undefined;
@@ -45,17 +34,15 @@ export async function fetchUserProfileCardDetailByUsername(
 ): Promise<UserProfileCardDetail | null> {
   try {
     const qs = new URLSearchParams({ username });
-    const response = await fetch(`/api/users/info?${qs.toString()}`, {
-      method: "GET",
-      credentials: "include",
+    const data = await clientApiRequest({
+      url: `/api/users/info?${qs.toString()}`,
+      responseSchema: usersInfoResponseSchema,
     });
-    if (!response.ok) throw Error("비정상 동작");
-    const data: unknown = await response.json();
-    if (!data || typeof data !== "object") return null;
 
-    const row = flattenPayload(data as Record<string, unknown>);
-    const profileImage =
-      parseProfileImage(row.profileImage) ?? parseProfileImage(row.profile);
+    const row = flattenPayload(data);
+    const rawImg = row.profileImage ?? row.profile;
+    const parsedImg = profileImageDtoSchema.safeParse(rawImg);
+    const profileImage = parsedImg.success ? parsedImg.data : null;
 
     const clubName = optionalString(row.clubName);
     const school = optionalString(row.school);
@@ -71,8 +58,7 @@ export async function fetchUserProfileCardDetailByUsername(
       ...(clubAge != null ? { clubAge } : {}),
       ...(email ? { email } : {}),
     };
-  } catch (e) {
-    console.error(e);
+  } catch {
     return null;
   }
 }
@@ -82,16 +68,19 @@ export async function fetchUserInfoByUsername(
 ): Promise<User | null> {
   try {
     const qs = new URLSearchParams({ username });
-    const response = await fetch(`/api/users/info?${qs.toString()}`, {
-      method: "GET",
-      credentials: "include",
+    const data = await clientApiRequest({
+      url: `/api/users/info?${qs.toString()}`,
+      responseSchema: usersInfoResponseSchema,
     });
-    if (!response.ok) throw Error("비정상 동작");
-    const data: unknown = await response.json();
-    if (isUserShape(data)) return data;
-    return null;
-  } catch (e) {
-    console.error(e);
+
+    const direct = parseUserFromUnknown(data);
+    if (direct) return direct;
+
+    if (!data || typeof data !== "object") return null;
+    return parseUserFromUnknown(
+      flattenPayload(data as Record<string, unknown>)
+    );
+  } catch {
     return null;
   }
 }

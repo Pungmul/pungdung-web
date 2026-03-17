@@ -1,14 +1,12 @@
-import type { ClubName } from "@/features/club";
-
 import type { ProfileImage } from "./profile-image.types";
 
 export interface Member {
-  loginId: string;
+  loginId?: string;
   name: string;
-  groupName?: ClubName;
+  groupName?: string;
   clubName?: string;
-  birth: string;
-  clubAge: number;
+  birth?: string;
+  clubAge?: number;
   phoneNumber: string;
   email: string;
   area?: string;

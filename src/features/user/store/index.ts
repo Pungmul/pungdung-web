@@ -1,5 +1,1 @@
-export {
-  type OpenUserProfilePayload,
-  userProfileModalStore,
-  type UserProfileRelationship,
-} from "./userProfileModal.store";
+export { userProfileModalStore } from "./user-profile-modal.store";
