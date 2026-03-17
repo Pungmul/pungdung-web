@@ -13,8 +13,8 @@ import {
 import { useLightningBuildContext } from "../../providers";
 import { zodIssuesToStepFieldMessages } from "../../services";
 import {
-  lightningSelectLocationStepSchema,
   type LightningCreateFormData,
+  lightningSelectLocationStepSchema,
 } from "../../types/schemas";
 
 const FIELDS = LIGHTNING_CREATE_FORM_FIELD;

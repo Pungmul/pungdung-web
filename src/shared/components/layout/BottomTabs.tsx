@@ -4,12 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { useQuery } from "@tanstack/react-query";
+
 import { Suspense } from "@suspensive/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { ProfileCircle, useGetMyPageInfo } from "@/features/my-page";
+import { myPageQueries, ProfileCircle } from "@/features/my-page";
 import { NotificationList } from "@/features/notification";
 
 import { Spinner } from "@/shared";
@@ -37,7 +39,7 @@ export default function BottomTabs() {
   const [tabsWidth, setTabsWidth] = useState(0);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
-  const { data: myPageInfo, isLoading } = useGetMyPageInfo();
+  const { data: myPageInfo, isLoading } = useQuery(myPageQueries.info());
 
   useEffect(() => {
     if (notificationListRef.current && isNotificationOpen) {

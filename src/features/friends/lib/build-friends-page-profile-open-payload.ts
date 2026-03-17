@@ -1,6 +1,6 @@
 import type { FriendItem, FriendsPageProfileTab } from "../types";
 
-import type { OpenUserProfilePayload } from "@/features/user/store";
+import type { OpenUserProfilePayload } from "@/features/user/types";
 
 /** 친구 관리 탭별 `userProfileModalStore.open` 페이로드. */
 export function buildFriendsPageProfileOpenPayload(

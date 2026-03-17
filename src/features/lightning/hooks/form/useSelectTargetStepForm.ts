@@ -11,8 +11,8 @@ import {
 import { useLightningBuildContext } from "../../providers";
 import { zodIssuesToStepFieldMessages } from "../../services";
 import {
-  lightningSelectTargetStepSchema,
   type LightningCreateFormData,
+  lightningSelectTargetStepSchema,
 } from "../../types/schemas";
 
 const FIELDS = LIGHTNING_CREATE_FORM_FIELD;

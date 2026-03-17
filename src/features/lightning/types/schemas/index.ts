@@ -1,6 +1,7 @@
 export {
   lightningBuildSchema,
   lightningCreateFieldsSchema,
+  type LightningCreateFormData,
   lightningCreateSchema,
   lightningLocationPointSchema,
   lightningSelectLocationStepSchema,
@@ -8,5 +9,4 @@ export {
   lightningSelectTimeAndPersonnelStepSchema,
   lightningSelectTypeStepSchema,
   lightningSummaryTitleStepSchema,
-  type LightningCreateFormData,
 } from "./lightning-create.schemas";

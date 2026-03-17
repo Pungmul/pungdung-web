@@ -2,17 +2,18 @@
 
 import { useMemo } from "react";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useFormContext, useFormState, useWatch } from "react-hook-form";
+
+import { clubQueries } from "@/features/club";
 
 import { SIGN_UP_FORM_FIELD } from "../../constants";
 import { buildPersonalSchema, type PersonalFormData } from "../../types/schemas";
 
-import { useClubList } from "@/features/club/queries";
-
 const PERSONAL_FIELDS = SIGN_UP_FORM_FIELD.PERSONAL;
 
 export function usePersonalStepForm() {
-  const { data: clubList } = useClubList();
+  const { data: clubList } = useSuspenseQuery(clubQueries.list());
 
   const personalPickSchema = useMemo(
     () =>

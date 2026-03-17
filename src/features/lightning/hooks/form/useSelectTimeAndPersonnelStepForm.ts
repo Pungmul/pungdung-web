@@ -2,8 +2,9 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import dayjs from "dayjs";
 import { useFormContext, useWatch } from "react-hook-form";
+
+import dayjs from "dayjs";
 
 import {
   LIGHTNING_CREATE_FORM_FIELD,
@@ -12,8 +13,8 @@ import {
 import { useLightningBuildContext } from "../../providers";
 import { zodIssuesToStepFieldMessages } from "../../services";
 import {
-  lightningSelectTimeAndPersonnelStepSchema,
   type LightningCreateFormData,
+  lightningSelectTimeAndPersonnelStepSchema,
 } from "../../types/schemas";
 
 const FIELDS = LIGHTNING_CREATE_FORM_FIELD;

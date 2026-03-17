@@ -16,7 +16,7 @@ export async function createPersonalSchema() {
   return createDynamicPersonalSchema();
 }
 
-/** `clubIds`는 `useClubList()` 등에서 온 API 클럽 id 목록과 동일하게 둔다. */
+/** `clubIds`는 `clubQueries.list()` 등에서 온 API 클럽 id 목록과 동일하게 둔다. */
 export function buildEmailSignUpSchema(clubIds: number[]) {
   return z.intersection(accountSchema, buildPersonalSchema(clubIds));
 }

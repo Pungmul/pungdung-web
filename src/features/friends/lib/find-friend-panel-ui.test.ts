@@ -1,9 +1,21 @@
 import { describe, expect, it } from "vitest";
 
+import type { User } from "@/features/user";
+
 import {
   isKeyboardActivationKey,
   resolveSearchKeywordFromHistoryEntry,
 } from "./find-friend-panel-ui";
+
+const mockProfileImage = (): User["profileImage"] => ({
+  id: 1,
+  originalFilename: "a.png",
+  convertedFileName: "a.webp",
+  fullFilePath: "/a",
+  fileType: "image/png",
+  fileSize: 1,
+  createdAt: "2026-01-01T00:00:00.000Z",
+});
 
 describe("resolveSearchKeywordFromHistoryEntry", () => {
   it("keyword 타입은 keyword 필드", () => {
@@ -25,10 +37,7 @@ describe("resolveSearchKeywordFromHistoryEntry", () => {
           userId: 1,
           username: "kim",
           name: "Kim",
-          profileImage: {
-            fullFilePath: "/a",
-            originalFilename: "a",
-          },
+          profileImage: mockProfileImage(),
           clubName: null,
           groupName: null,
         },

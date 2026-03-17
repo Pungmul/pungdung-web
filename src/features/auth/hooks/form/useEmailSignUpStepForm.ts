@@ -3,8 +3,11 @@
 import { useMemo } from "react";
 
 import { z } from "zod";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+
+import { clubQueries } from "@/features/club";
 
 import {
   accountSchema,
@@ -12,8 +15,6 @@ import {
   type IEmailSignUpFormData,
   termsAgreementSchema,
 } from "../../types/schemas";
-
-import { useClubList } from "@/features/club/queries";
 
 type EmailSignUpForm = IEmailSignUpFormData & {
   usingTermAgree: boolean;
@@ -33,7 +34,7 @@ const initialEmailSignUpData: IEmailSignUpFormData = {
 };
 
 export function useEmailSignUpStepForm() {
-  const { data: clubList } = useClubList();
+  const { data: clubList } = useSuspenseQuery(clubQueries.list());
 
   /**
    * `safeExtend(schema.shape)`는 base 객체 구조만 가져오고 refine을 잃는다.

@@ -2,13 +2,15 @@
 
 import { useRouter } from "next/navigation";
 
-import { useSuspenseGetMyPageInfo } from "../../../my-page/queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
+
+import { myPageQueries } from "@/features/my-page";
 
 import { NotificationIcon } from "@/features/notification/components";
 
 export function HomeHeader() {
   const router = useRouter();
-  const { data: myInfo } = useSuspenseGetMyPageInfo();
+  const { data: myInfo } = useSuspenseQuery(myPageQueries.info());
 
   return (
     <div className="flex flex-row justify-between items-end px-[24px]">

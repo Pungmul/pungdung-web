@@ -1,6 +1,9 @@
 "use client";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Controller } from "react-hook-form";
+
+import { clubQueries, useClubOptions } from "@/features/club";
 
 import { Button, Input, Select, Space } from "@/shared";
 
@@ -8,8 +11,6 @@ import { AUTH_UI_MESSAGE, SIGN_UP_FORM_FIELD } from "../../constants";
 import { usePersonalStepForm } from "../../hooks/form";
 import { formatPhoneNumber } from "../../lib";
 import type { PersonalFormData } from "../../types/schemas/email-sign-up.schema";
-
-import { useClubOptions } from "@/features/club/hooks";
 
 const PERSONAL_FIELDS = SIGN_UP_FORM_FIELD.PERSONAL;
 const PERSONAL_FIELDS_LABEL = AUTH_UI_MESSAGE.PERSONAL_STEP;
@@ -23,7 +24,8 @@ export const PersonalStep: React.FC<PersonalStepProps> = ({
   onSubmit,
   onPrevStep,
 }) => {
-  const clubOptions = useClubOptions();
+  const { data: clubList } = useSuspenseQuery(clubQueries.list());
+  const clubOptions = useClubOptions(clubList);
   const { register, inputErrors, canSubmit, control, submitPersonalStep } =
     usePersonalStepForm();
 

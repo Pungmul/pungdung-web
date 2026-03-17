@@ -1,2 +1,1 @@
-export { useClubList, clubListQueryKeys } from "./useClubList";
-
+export { clubListQueryKeys, clubQueries } from "./club-list.query";

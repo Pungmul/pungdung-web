@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
-import { useClubList } from "@/features/club";
+import { clubQueries } from "@/features/club";
 
 import { fetchEmailExists } from "../../api/client";
 import { AUTH_VALIDATION } from "../../constants";
@@ -18,7 +18,7 @@ type SubmitSignUpOptions = {
 };
 
 export function useEmailSignUpActions() {
-  const { data: clubList } = useClubList();
+  const { data: clubList } = useSuspenseQuery(clubQueries.list());
   const [isLoading, setIsLoading] = useState(false);
   const [submissionError, setSubmissionError] = useState<Error | null>(null);
   const {

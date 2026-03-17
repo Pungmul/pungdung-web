@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import type { User } from "@/features/user";
+import type { z } from "zod";
+
+import { userDtoSchema } from "../../api/client/dto.schema";
 
 import { mapUserDto } from "./map-user-dto";
 
-const profileImage: User["profileImage"] = {
+type UserDtoParsed = z.infer<typeof userDtoSchema>;
+
+const profileImage: UserDtoParsed["profileImage"] = {
   id: 1,
   originalFilename: "a.jpg",
   convertedFileName: "a.webp",

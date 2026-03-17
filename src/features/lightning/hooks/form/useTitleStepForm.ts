@@ -2,23 +2,24 @@
 
 import { useMemo, useState } from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { useFormContext, useWatch } from "react-hook-form";
 
-import { useGetMyPageInfo } from "@/features/my-page";
+import { myPageQueries } from "@/features/my-page";
 
 import { LIGHTNING_CREATE_FORM_FIELD } from "../../constants";
 import { useLightningBuildContext } from "../../providers";
 import { zodIssuesToStepFieldMessages } from "../../services";
 import {
-  lightningSummaryTitleStepSchema,
   type LightningCreateFormData,
+  lightningSummaryTitleStepSchema,
 } from "../../types/schemas";
 
 const FIELDS = LIGHTNING_CREATE_FORM_FIELD;
 const TITLE_STEP_FIELDS = [FIELDS.TITLE] as const;
 
 export const useTitleStepForm = () => {
-  const { data: user } = useGetMyPageInfo();
+  const { data: user } = useQuery(myPageQueries.info());
   const form = useFormContext<LightningCreateFormData>();
   const { setBuildStep } = useLightningBuildContext();
   const [showValidationErrors, setShowValidationErrors] = useState(false);

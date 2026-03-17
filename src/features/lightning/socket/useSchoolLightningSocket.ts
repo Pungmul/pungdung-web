@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 
 import { useSocketSubscription } from "@/core/socket";
 
-import { mapClubToSchoolName, useClubList } from "@/features/club";
-import { useGetMyPageInfo } from "@/features/my-page";
+import { clubQueries, mapClubToSchoolName } from "@/features/club";
+import { myPageQueries } from "@/features/my-page";
 
 import { applyLightningListSocketPayload } from "../services/apply-lightning-list-socket-payload";
 import { isLightningMeetingMessage } from "../services/is-lightning-meeting-message";
@@ -20,8 +20,8 @@ interface UseSchoolLightningSocketProps {
 export const useSchoolLightningSocket = ({
   userParticipationData,
 }: UseSchoolLightningSocketProps) => {
-  const { data: myInfo } = useGetMyPageInfo();
-  const { data: clubList } = useClubList();
+  const { data: myInfo } = useQuery(myPageQueries.info());
+  const { data: clubList } = useSuspenseQuery(clubQueries.list());
 
   const schoolTopic = useMemo(
     () =>

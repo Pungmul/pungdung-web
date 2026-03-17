@@ -1,4 +1,4 @@
-import type { OpenUserProfilePayload } from "@/features/user/store";
+import type { OpenUserProfilePayload } from "@/features/user/types";
 
 /**
  * `/api/friends/load`·`/api/friends/search` 등에서 오는 `friendStatus` 문자열과 동일한 계약을 전제로 한다.
@@ -11,7 +11,9 @@ export type FriendApiRelationKind =
   | "NONE"
   | "UNKNOWN";
 
-export function parseFriendApiRelationKind(status: string): FriendApiRelationKind {
+export function parseFriendApiRelationKind(
+  status: string
+): FriendApiRelationKind {
   const normalized = status.trim().toUpperCase();
   if (
     normalized === "ACCEPTED" ||

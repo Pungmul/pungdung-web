@@ -7,7 +7,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, PanInfo, useAnimate } from "framer-motion";
 
 import { buildUserProfileOpenPayload } from "@/features/friends";
-import { Member, User } from "@/features/user";
+import { myPageQueries } from "@/features/my-page";
+import { Member, User, userProfileModalStore } from "@/features/user";
 
 import { Header } from "@/shared/components";
 
@@ -16,10 +17,6 @@ import {
   ChatMemberList,
   ChatSettingsButton,
 } from "../ui";
-
-import { getMyPageInfo } from "@/features/my-page/api";
-import { myPageQueryKeys } from "@/features/my-page/constant";
-import { userProfileModalStore } from "@/features/user/store";
 
 interface ChatDrawerProps {
   drawerOpen: boolean;
@@ -47,11 +44,7 @@ export const ChatDrawer = ({
   userList,
   onInviteUser,
 }: ChatDrawerProps) => {
-  const { data: myInfo } = useSuspenseQuery({
-    queryKey: myPageQueryKeys.info(),
-    queryFn: getMyPageInfo,
-    staleTime: 1000 * 60 * 5,
-  });
+  const { data: myInfo } = useSuspenseQuery(myPageQueries.info());
 
   const handleMemberProfileClick = useCallback(async (user: User) => {
     const me = myInfo;

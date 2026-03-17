@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { RefObject } from "react";
 import type { SwiperRef } from "swiper/react";
 
-import { useGetMyPageInfo } from "@/features/my-page";
+import { myPageQueries } from "@/features/my-page";
 
 import { Responsive } from "@/shared";
 
@@ -39,7 +39,7 @@ export function LightningListOverlay({
   mapPanToCurrentRef,
   setTarget,
 }: LightningListOverlayProps) {
-  const { data: myInfo } = useGetMyPageInfo();
+  const { data: myInfo } = useQuery(myPageQueries.info());
   const { data: userPartinLightning } = useQuery(
     lightningQueries.participationStatus()
   );

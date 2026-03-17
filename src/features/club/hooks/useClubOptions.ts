@@ -4,12 +4,12 @@ import { useMemo } from "react";
 
 import { SelectorItem } from "@/shared/components/form/Selector";
 
-import { useClubList } from "../queries/useClubList";
+import type { ClubInfo } from "../types";
 
-export const useClubOptions = (): SelectorItem<number | null>[] => {
-  const { data: clubList } = useClubList();
-
-  return useMemo(
+export const useClubOptions = (
+  clubList: ClubInfo[],
+): SelectorItem<number | null>[] =>
+  useMemo(
     () => [
       { label: "소속패 없음", value: null },
       ...clubList.map((club) => ({
@@ -17,6 +17,5 @@ export const useClubOptions = (): SelectorItem<number | null>[] => {
         value: club.clubId,
       })),
     ],
-    [clubList]
+    [clubList],
   );
-};

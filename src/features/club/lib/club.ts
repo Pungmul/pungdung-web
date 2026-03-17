@@ -4,7 +4,7 @@ import { ClubName, clubToClubIdMap } from "../constant";
 
 /** 마이페이지 등 `groupName`만 있을 때 Select value(`clubId`)로 환산한다. */
 export const mapGroupNameToClubId = (
-  groupName: ClubName | undefined,
+  groupName: string | undefined,
   clubList?: ClubInfo[]
 ): number | null | undefined => {
   if (groupName == null) {
@@ -22,7 +22,7 @@ export const mapGroupNameToClubId = (
 
 export const mapClubToClubId = (
   clubList: ClubInfo[],
-  club: ClubName
+  club: string
 ): number | null => {
   if (club === "없음") {
     return null;
@@ -33,7 +33,7 @@ export const mapClubToClubId = (
 
 export const mapClubToSchoolName = (
   clubList: ClubInfo[],
-  club: ClubName
+  club: string
 ): string => {
   if (club === "없음") {
     return "없음";

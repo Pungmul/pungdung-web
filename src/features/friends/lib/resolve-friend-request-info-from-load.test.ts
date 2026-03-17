@@ -1,19 +1,28 @@
 import { describe, expect, it } from "vitest";
 
+import type { User } from "@/features/user";
+
 import type { FriendsLoadData } from "../types";
 import {
   buildFriendRequestInfoByUserIdMap,
   resolveFriendRequestInfoFromFriendsLoad,
 } from "./resolve-friend-request-info-from-load";
 
+const mockProfileImage = (): User["profileImage"] => ({
+  id: 1,
+  originalFilename: "x.png",
+  convertedFileName: "x.webp",
+  fullFilePath: "/x.png",
+  fileType: "image/png",
+  fileSize: 1,
+  createdAt: "2026-01-01T00:00:00.000Z",
+});
+
 const baseUser = (userId: number) => ({
   userId,
   username: `u${userId}`,
   name: `User ${userId}`,
-  profileImage: {
-    fullFilePath: "/x.png",
-    originalFilename: "x.png",
-  },
+  profileImage: mockProfileImage(),
 });
 
 describe("resolveFriendRequestInfoFromFriendsLoad", () => {

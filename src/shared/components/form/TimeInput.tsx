@@ -2,23 +2,27 @@
 
 import {
   InputHTMLAttributes,
-  useState,
+  memo,
+  useCallback,
   useEffect,
   useRef,
-  useCallback,
-  memo,
+  useState,
 } from "react";
-import { WarningCircleIcon } from "@/shared/components/Icons";
-import "@/app/globals.css";
-import { ClockIcon } from "@heroicons/react/24/outline";
+
 import { throttle } from "lodash";
-import { TimePicker } from "./TimePicker";
+import { ClockIcon } from "@heroicons/react/24/outline";
 import { josa } from "es-hangul";
-import { useTimeInput } from "./TimeInput/useTimeInput";
-import { useTimeFieldNavigation } from "./TimeInput/useTimeFieldNavigation";
-import { TimeFields } from "./TimeInput/TimeFields";
-import { formatIntervalValue } from "./TimeInput/formatIntervalValue";
+
+import { WarningCircleIcon } from "@/shared/components/Icons";
 import { useClickOutside } from "@/shared/hooks";
+
+import { formatIntervalValue } from "./TimeInput/formatIntervalValue";
+import { TimeFields } from "./TimeInput/TimeFields";
+import { useTimeFieldNavigation } from "./TimeInput/useTimeFieldNavigation";
+import { useTimeInput } from "./TimeInput/useTimeInput";
+import { TimePicker } from "./TimePicker";
+
+import "@/app/globals.css";
 
 interface TimeInputProps
   extends Omit<
