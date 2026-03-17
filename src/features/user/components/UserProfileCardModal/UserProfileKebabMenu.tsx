@@ -19,15 +19,20 @@ function UserProfileKebabMenuImpl() {
   const handleReport = () => {
     Toast.show({
       message: "신고 기능은 준비 중입니다.",
-      type: "success",
+      type: "info",
     });
   };
 
   const handleBlock = () => {
     Toast.show({
       message: "차단 기능은 준비 중입니다.",
-      type: "success",
+      type: "info",
     });
+  };
+
+  const runMenuAction = (action: () => void) => {
+    action();
+    setOpen(false);
   };
 
   return (
@@ -44,19 +49,13 @@ function UserProfileKebabMenuImpl() {
         >
           <li
             className="cursor-pointer text-right text-sm text-grey-800"
-            onClick={() => {
-              handleReport();
-              setOpen(false);
-            }}
+            onClick={() => runMenuAction(handleReport)}
           >
             신고
           </li>
           <li
             className="cursor-pointer text-right text-sm text-red-400"
-            onClick={() => {
-              handleBlock();
-              setOpen(false);
-            }}
+            onClick={() => runMenuAction(handleBlock)}
           >
             차단
           </li>

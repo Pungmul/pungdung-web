@@ -2,9 +2,13 @@
 
 import Image from "next/image";
 
-import { Controller } from "react-hook-form";
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { CameraIcon } from "@heroicons/react/24/outline";
+
+import { clubQueries, useClubOptions } from "@/features/club";
 
 import {
   BottomFixedButton,
@@ -15,39 +19,48 @@ import {
 } from "@/shared";
 
 import { formatPhoneNumber } from "@/features/auth/lib";
-import { useClubOptions } from "@/features/club/hooks";
-import { useClubList } from "@/features/club/queries";
-import {
-  useEditProfileImage,
-  useEditProfileMainForm,
-  useEditProfilePasswordForm,
-  useEditProfileSchema,
-  useEditProfileSubmit,
-} from "@/features/my-page/hooks";
-import { useSuspenseGetMyPageInfo } from "@/features/my-page/queries";
+import { useEditProfileSubmit } from "@/features/my-page/hooks/actions";
+import { useEditProfileMainForm } from "@/features/my-page/hooks/form";
+import { useEditProfileImage } from "@/features/my-page/hooks/state";
+import { getEditProfileSubmitUiState } from "@/features/my-page/lib/get-edit-profile-submit-ui-state";
+import { myPageQueries } from "@/features/my-page/queries";
+import type { EditProfilePasswordFormValues } from "@/features/my-page/types";
+import { editProfilePasswordSchema } from "@/features/my-page/types";
 
-export default function EditProfileForm() {
-  const { data: userData } = useSuspenseGetMyPageInfo();
-  const { data: clubList } = useClubList();
-  const clubOptions = useClubOptions();
+export function EditProfileForm() {
+  const [{ data: userData }, { data: clubList }] = useSuspenseQueries({
+    queries: [myPageQueries.info(), clubQueries.list()],
+  });
+  const clubOptions = useClubOptions(clubList);
 
-  const schema = useEditProfileSchema(clubList);
-  const form = useEditProfileMainForm(schema, userData, clubList);
-  const passwordForm = useEditProfilePasswordForm();
+  const form = useEditProfileMainForm(userData, clubList);
+  const passwordForm = useForm<EditProfilePasswordFormValues>({
+    resolver: zodResolver(editProfilePasswordSchema),
+    mode: "onChange",
+    defaultValues: {
+      oldPassword: "",
+    },
+  });
   const { changedProfileImageFile, handleProfileImageChange } =
     useEditProfileImage(form);
+
   const { handleSubmitEditProfile, isPending } = useEditProfileSubmit({
     form,
     passwordForm,
     changedProfileImageFile,
+    serverClubAgeFallback: userData.clubAge ?? 0,
   });
 
   const {
     register,
     control,
-    watch,
     formState: { errors: formErrors },
   } = form;
+
+  const profileImageSrc = useWatch({
+    control: form.control,
+    name: "profileImage",
+  });
 
   const {
     register: registerPassword,
@@ -57,6 +70,13 @@ export default function EditProfileForm() {
       isValid: passwordIsValid,
     },
   } = passwordForm;
+
+  // 버튼 정책을 순수 함수로 분리해 렌더링 책임만 남긴다.
+  const submitUiState = getEditProfileSubmitUiState({
+    isPending,
+    passwordIsDirty,
+    passwordIsValid,
+  });
 
   return (
     <form
@@ -75,15 +95,14 @@ export default function EditProfileForm() {
             id="profile-image"
             name="profile-image"
             accept="image/*"
-            size={1024 * 1024 * 2}
             onChange={handleProfileImageChange}
           />
         </label>
         <div className="w-36 aspect-[1] rounded-md border-grey-300 bg-grey-200 border-2 overflow-hidden">
           <div className="relative w-full h-full bg-grey-200">
-            {!!watch("profileImage") && (
+            {!!profileImageSrc && (
               <Image
-                src={watch("profileImage")!}
+                src={profileImageSrc}
                 alt="profile"
                 fill
                 className="object-cover object-center rounded-sm"
@@ -157,16 +176,10 @@ export default function EditProfileForm() {
       </div>
       <BottomFixedButton
         type="submit"
-        disabled={isPending || !passwordIsDirty || !passwordIsValid}
+        disabled={submitUiState.disabled}
         className="bg-primary text-background"
       >
-        {isPending ? (
-          <Spinner />
-        ) : !passwordIsValid ? (
-          "비밀번호를 입력해주세요"
-        ) : (
-          "프로필 수정"
-        )}
+        {submitUiState.showSpinner ? <Spinner /> : submitUiState.label}
       </BottomFixedButton>
     </form>
   );

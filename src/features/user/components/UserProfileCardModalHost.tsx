@@ -3,9 +3,9 @@
 import React from "react";
 import { createPortal } from "react-dom";
 
-import { UserProfileCardModal } from "./UserProfileCardModal";
+import { userProfileModalStore } from "../store";
 
-import { userProfileModalStore } from "@/features/user/store";
+import { UserProfileCardModal } from "./UserProfileCardModal";
 
 /** 친구·채팅 화면에서 프로필 모달(스토어 구독)을 한 번 마운트한다. */
 export function UserProfileCardModalHost() {

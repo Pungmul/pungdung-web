@@ -6,12 +6,13 @@ import { useAcceptFriendRequestAction } from "@/features/friends";
 
 import { Button } from "@/shared/components";
 
-import { userProfileModalStore } from "@/features/user/store";
+type ProfileAcceptIncomingButtonProps = {
+  incomingFriendRequestId: number | null;
+};
 
-export function ProfileAcceptIncomingButton() {
-  const incomingFriendRequestId = userProfileModalStore(
-    (s) => s.incomingFriendRequestId
-  );
+export function ProfileAcceptIncomingButton({
+  incomingFriendRequestId,
+}: ProfileAcceptIncomingButtonProps) {
   const { handleReceiveFriend, isPending } = useAcceptFriendRequestAction();
   const disabled = isPending || incomingFriendRequestId == null;
 

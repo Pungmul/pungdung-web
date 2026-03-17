@@ -2,25 +2,27 @@
 
 import React from "react";
 
-import type { User } from "@/features/user";
-
 import { cn } from "@/shared/lib";
 
 import { ProfileAcceptIncomingButton } from "./ProfileAcceptIncomingButton";
 import { ProfileOpenChatButton } from "./ProfileOpenChatButton";
 import { ProfileSendFriendRequestButton } from "./ProfileSendFriendRequestButton";
-
-import type { UserProfileRelationship } from "@/features/user/store";
+import type { User } from "../../types/user.types";
+import type { UserProfileRelationship } from "../../types/user-profile-modal.types";
 
 export function ProfileRelationshipFooter({
   relationship,
   user,
+  incomingFriendRequestId,
+  close,
 }: {
   relationship: UserProfileRelationship;
   user: User;
+  incomingFriendRequestId: number | null;
+  close: () => void;
 }) {
   if (relationship === "friend") {
-    return <ProfileOpenChatButton username={user.username} />;
+    return <ProfileOpenChatButton username={user.username} onBeforeNavigate={close} />;
   }
 
   if (relationship === "pending_out") {
@@ -38,7 +40,11 @@ export function ProfileRelationshipFooter({
   }
 
   if (relationship === "pending_in") {
-    return <ProfileAcceptIncomingButton />;
+    return (
+      <ProfileAcceptIncomingButton
+        incomingFriendRequestId={incomingFriendRequestId}
+      />
+    );
   }
 
   return <ProfileSendFriendRequestButton user={user} />;

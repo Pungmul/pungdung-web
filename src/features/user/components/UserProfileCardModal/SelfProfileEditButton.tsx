@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 
 import { cn } from "@/shared/lib";
 
-import { userProfileModalStore } from "@/features/user/store";
+type SelfProfileEditButtonProps = {
+  close: () => void;
+};
 
-export function SelfProfileEditButton() {
+export function SelfProfileEditButton({ close }: SelfProfileEditButtonProps) {
   const router = useRouter();
-  const close = userProfileModalStore((s) => s.close);
 
   return (
     <button
