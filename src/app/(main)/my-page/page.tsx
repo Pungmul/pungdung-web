@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
-import { MyPageClient } from "@/features/my-page";
-
 import { Header, Space } from "@/shared";
+
+import { MyPageClient } from "./_MyPage";
 
 // 서버 사이드 렌더링 완전 비활성화
 export const dynamic = "force-dynamic";

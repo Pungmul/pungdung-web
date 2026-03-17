@@ -22,12 +22,11 @@ import {
   useRoomReadSocket,
   useSyncChatRoomFocusOnRoomId,
 } from "@/features/chat";
+import { myPageQueries } from "@/features/my-page";
 import { UserProfileCardModalHost } from "@/features/user";
 
 import { useBodyScrollLock, useViewportHeightVar } from "@/shared/hooks";
 
-import { getMyPageInfo } from "@/features/my-page/api";
-import { myPageQueryKeys } from "@/features/my-page/constant";
 
 type ChatRoomPageProps = {
   decodedUsernamePromise: Promise<string | undefined>;
@@ -37,10 +36,7 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
   const { roomId } = useParams();
   const router = useRouter();
   const decodedUsername = use(decodedUsernamePromise);
-  const { data: myInfo } = useQuery({
-    queryKey: myPageQueryKeys.info(),
-    queryFn: getMyPageInfo,
-  });
+  const { data: myInfo } = useQuery(myPageQueries.info());
   const myUsername =
     decodedUsername ?? myInfo?.username ?? "";
 
