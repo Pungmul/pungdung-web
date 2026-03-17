@@ -194,6 +194,93 @@
   }
 }
 
+/* 사용자 선택 테마 강제 적용 (media 규칙보다 우선) */
+:root[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #171717;
+
+  --color-primary-light: #ff8b8b;
+
+  --color-grey-100: var(--color-grey-100-light);
+  --color-grey-200: var(--color-grey-200-light);
+  --color-grey-300: var(--color-grey-300-light);
+  --color-grey-400: var(--color-grey-400-light);
+  --color-grey-500: var(--color-grey-500-light);
+  --color-grey-600: var(--color-grey-600-light);
+  --color-grey-700: var(--color-grey-700-light);
+  --color-grey-800: var(--color-grey-800-light);
+
+  --color-purple-100: var(--color-purple-100-light);
+  --color-purple-200: var(--color-purple-200-light);
+  --color-purple-300: var(--color-purple-300-light);
+  --color-purple-400: var(--color-purple-400-light);
+  --color-purple-500: var(--color-purple-500-light);
+  --color-purple-600: var(--color-purple-600-light);
+  --color-purple-700: var(--color-purple-700-light);
+  --color-purple-800: #232424;
+
+  --color-red-100: var(--color-red-100-light);
+  --color-red-200: var(--color-red-200-light);
+  --color-red-300: var(--color-red-300-light);
+  --color-red-400: var(--color-red-400-light);
+  --color-red-500: var(--color-red-500-light);
+  --color-red-600: var(--color-red-600-light);
+  --color-red-700: var(--color-red-700-light);
+  --color-red-800: var(--color-red-800-light);
+
+  --color-lime-100: var(--color-lime-100-light);
+  --color-lime-200: var(--color-lime-200-light);
+  --color-lime-300: var(--color-lime-300-light);
+  --color-lime-400: var(--color-lime-400-light);
+  --color-lime-500: var(--color-lime-500-light);
+  --color-lime-600: var(--color-lime-600-light);
+  --color-lime-700: var(--color-lime-700-light);
+  --color-lime-800: var(--color-lime-800-light);
+}
+
+:root[data-theme="dark"] {
+  --background: #232424;
+  --foreground: #f7f7f8;
+
+  --color-primary-light: var(--color-primary-dark);
+
+  --color-grey-100: var(--color-grey-100-dark);
+  --color-grey-200: var(--color-grey-200-dark);
+  --color-grey-300: var(--color-grey-300-dark);
+  --color-grey-400: var(--color-grey-400-dark);
+  --color-grey-500: var(--color-grey-500-dark);
+  --color-grey-600: var(--color-grey-600-dark);
+  --color-grey-700: var(--color-grey-700-dark);
+  --color-grey-800: var(--color-grey-800-dark);
+
+  --color-purple-100: var(--color-purple-100-dark);
+  --color-purple-200: var(--color-purple-200-dark);
+  --color-purple-300: var(--color-purple-300-dark);
+  --color-purple-400: var(--color-purple-400-dark);
+  --color-purple-500: var(--color-purple-500-dark);
+  --color-purple-600: var(--color-purple-600-dark);
+  --color-purple-700: var(--color-purple-700-dark);
+  --color-purple-800: var(--color-purple-800-dark);
+
+  --color-red-100: var(--color-red-100-dark);
+  --color-red-200: var(--color-red-200-dark);
+  --color-red-300: var(--color-red-300-dark);
+  --color-red-400: var(--color-red-400-dark);
+  --color-red-500: var(--color-red-500-dark);
+  --color-red-600: var(--color-red-600-dark);
+  --color-red-700: var(--color-red-700-dark);
+  --color-red-800: var(--color-red-800-dark);
+
+  --color-lime-100: var(--color-lime-100-dark);
+  --color-lime-200: var(--color-lime-200-dark);
+  --color-lime-300: var(--color-lime-300-dark);
+  --color-lime-400: var(--color-lime-400-dark);
+  --color-lime-500: var(--color-lime-500-dark);
+  --color-lime-600: var(--color-lime-600-dark);
+  --color-lime-700: var(--color-lime-700-dark);
+  --color-lime-800: var(--color-lime-800-dark);
+}
+
 html {
   height: 100%;
   overflow: hidden;
@@ -343,12 +430,10 @@ input {
 
 .ligtning-card-sign {
   overflow: hidden;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(154, 255, 65, 0.8) 0%,
-    rgba(26, 255, 68, 0.2) 50%,
-    rgba(179, 255, 28, 0.629) 60%
-  );
+  background: radial-gradient(ellipse at center,
+      rgba(154, 255, 65, 0.8) 0%,
+      rgba(26, 255, 68, 0.2) 50%,
+      rgba(179, 255, 28, 0.629) 60%);
   background-size: 100% 100%;
   width: calc(100% + 128px);
   height: calc(100% + 128px);
@@ -373,12 +458,10 @@ input {
   --bg-default: var(--color-grey-300);
   --highlight: var(--color-grey-100);
   will-change: transform;
-  background: linear-gradient(
-    to right,
-    var(--bg-default),
-    var(--highlight),
-    var(--bg-default)
-  );
+  background: linear-gradient(to right,
+      var(--bg-default),
+      var(--highlight),
+      var(--bg-default));
   animation: loading 3s infinite linear;
 }
 
@@ -427,6 +510,7 @@ input {
   font-size: var(--text-m1);
   font-family: var(--font-nanum-neo);
   font-weight: 400;
+  line-height: 1.2;
   /* regular */
 }
 
@@ -434,6 +518,7 @@ input {
   font-size: var(--text-m2);
   font-family: var(--font-nanum-neo);
   font-weight: 400;
+  line-height: 1.2;
   /* regular */
 }
 
@@ -441,6 +526,7 @@ input {
   font-size: var(--text-m3);
   font-family: var(--font-nanum-neo);
   font-weight: 400;
+  line-height: 1.2;
   /* regular */
 }
 
@@ -448,6 +534,7 @@ input {
   font-size: var(--text-m4);
   font-family: var(--font-nanum-neo);
   font-weight: 300;
+  line-height: 1.2;
   /* light */
 }
 
@@ -574,11 +661,9 @@ input {
 
 /* 버튼 스타일 */
 .btn-primary {
-  background: linear-gradient(
-    135deg,
-    var(--color-primary),
-    var(--color-primary-light)
-  );
+  background: linear-gradient(135deg,
+      var(--color-primary),
+      var(--color-primary-light));
   color: white;
   padding: 14px 28px;
   border-radius: 12px;
@@ -593,11 +678,9 @@ input {
 }
 
 .btn-primary:hover {
-  background: linear-gradient(
-    135deg,
-    var(--color-primary-light),
-    var(--color-primary-dark)
-  );
+  background: linear-gradient(135deg,
+      var(--color-primary-light),
+      var(--color-primary-dark));
   box-shadow: 0 4px 16px rgba(129, 109, 255, 0.4);
   transform: translateY(-2px);
 }

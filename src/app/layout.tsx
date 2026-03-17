@@ -6,9 +6,12 @@ import { FCMServiceWorkerRegistration } from "@/features/notification";
 import {
   AlertModal,
   PinchZoomPreventionScript,
+  ThemePreferenceBootScript,
+  ThemePreferenceInitializer,
   ViewDetector,
 } from "@/shared/components";
 import { getInitialViewFromCookie } from "@/shared/lib/getInitialViewFromCookie";
+import { getThemePreferenceFromCookie } from "@/shared/lib/getThemePreferenceFromCookie";
 import { ViewStoreProvider } from "@/shared/lib/view/view-store-provider";
 
 import "@/app/globals.css";
@@ -38,10 +41,22 @@ export default async function Layout({
   children: React.ReactNode;
 }>) {
   const initialView = await getInitialViewFromCookie();
+  const initialThemePreference = await getThemePreferenceFromCookie();
 
   return (
-    <html lang="ko" className={nanumSquareNeo.variable}>
+    <html
+      lang="ko"
+      className={nanumSquareNeo.variable}
+      data-theme={
+        initialThemePreference === "system" ? undefined : initialThemePreference
+      }
+    >
+      <head>
+        {/* board/main 전용이 아니라 static/cached 라우트 전반의 초기 테마 깜빡임을 막기 위해 전역에 둔다. */}
+        <ThemePreferenceBootScript />
+      </head>
       <body>
+        <ThemePreferenceInitializer />
         <PinchZoomPreventionScript />
         <FCMServiceWorkerRegistration />
         <AlertModal />

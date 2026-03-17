@@ -50,4 +50,6 @@ export { PinchZoomPreventionScript } from "./PreventPinchZoom";
 export { default as PromotionList } from "./PromotionList";
 export { default as PWAInstallPrompt } from "./PWAInstallPrompt";
 export { WebViewLink } from "./ResponsiveLink";
+export { ThemePreferenceBootScript } from "./theme/ThemePreferenceBootScript";
+export { ThemePreferenceInitializer } from "./theme/ThemePreferenceInitializer";
 export { default as ViewDetector } from "./ViewDetector";
