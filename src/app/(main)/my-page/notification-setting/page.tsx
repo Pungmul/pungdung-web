@@ -2,7 +2,7 @@ import { NotificationToggle } from "@/features/my-page";
 
 import { Header, Space } from "@/shared";
 
-export default function LoginSettingPage() {
+export default function NotificationSettingPage() {
   return (
     <div className="bg-grey-100 h-full w-full">
       <div className="flex flex-col h-full w-full min-w-[360px] max-w-[768px] mx-auto relative bg-background">

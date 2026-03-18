@@ -3,13 +3,15 @@
 import {
   useFCMForeground,
   useRegisterFCMTokenIfGranted,
+  useSyncFCMTokenWithPermission,
   useSyncNotificationPermission,
-} from "../../hooks";
+} from "../../hooks/actions";
 
 export default function FCMClient() {
   useFCMForeground();
   useSyncNotificationPermission();
   useRegisterFCMTokenIfGranted();
+  useSyncFCMTokenWithPermission();
 
   return null;
 }

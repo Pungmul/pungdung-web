@@ -2,29 +2,23 @@
 
 import { useCallback, useState } from "react";
 
+import { BellIcon } from "@heroicons/react/24/solid";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Button } from "@/shared/components";
 
-import { registerFCMToken } from "../../api";
-import { requestFCMToken } from "../../services";
-import { useNotificationPermission } from "../../hooks";
-import { supportsNotification } from "../../lib/guards";
-import { BellIcon } from "@heroicons/react/24/solid";
+import { useNotificationToggleAction } from "../../../hooks/actions";
+import { supportsNotification } from "../../../lib";
+import { notificationPermissionStore } from "../../../store/notification-permission.store";
 
 export default function NotificationPermissionRequestCTA() {
   const [open, setOpen] = useState(true);
-  const permission = useNotificationPermission();
+  const permission = notificationPermissionStore((state) => state.permission);
+  const toggleNotification = useNotificationToggleAction();
 
   const handleEnableNotification = useCallback(async () => {
-    const deviceInfo = navigator.userAgent;
-
-    const token = await requestFCMToken();
-    if (!token) return;
-
-    await registerFCMToken(token, deviceInfo);
-    console.log("FCM 알림 활성화 완료");
-  }, []);
+    await toggleNotification(true);
+  }, [toggleNotification]);
 
   const handleClose = useCallback(() => {
     setOpen(false);

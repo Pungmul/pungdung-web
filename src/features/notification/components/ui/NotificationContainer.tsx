@@ -8,7 +8,7 @@ export default function NotificationContainer() {
       <AnimatePresence mode="sync">
         <div
           id="notification-container"
-          className="fixed bottom-[96px] lg:top-4 lg:right-4 flex flex-col lg:flex-col-reverse gap-[4px] z-50"
+          className="fixed bottom-[96px] right-4 lg:bottom-4 flex flex-col gap-[4px] z-50"
         />
       </AnimatePresence>
     </div>

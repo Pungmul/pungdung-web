@@ -1,15 +1,15 @@
 // Notification Components Barrel Exports
 
-// Notification Element Components
-export { default as NotificationBadge } from "./element/NotificationBadge";
-export { default as NotificationIcon } from "./element/NotificationIcon";
-export { default as NotificationContainer } from "./element/NotificationContainer";
+// Notification UI Components
+export { default as NotificationBadge } from "./ui/NotificationBadge";
+export { default as NotificationContainer } from "./ui/NotificationContainer";
+export { default as NotificationIcon } from "./ui/NotificationIcon";
 
-// Notification Widget Components
-export { default as NotificationList } from "./widget/NotificationList";
-export { default as NotificationToast } from "./widget/NotificationToast";
-export { default as NotificationPermissionRequestCTA } from "./widget/NotificationPermissionRequestCTA.client";
+// Notification Section Components
+export { default as NotificationList } from "./section/NotificationList";
+export { default as NotificationPermissionRequestCTA } from "./section/NotificationPermissionRequestCTA";
 
-// Notification Module Components
-export { default as FCMClient } from "./module/FCMClient";
-export { default as FCMServiceWorkerRegistration } from "./module/FCMServiceWorkerRegistration";
+// Notification Overlay Components
+export { default as FCMClient } from "./overlay/FCMClient";
+export { default as FCMServiceWorkerRegistration } from "./overlay/FCMServiceWorkerRegistration";
+export { default as NotificationToast } from "./overlay/NotificationToast";
