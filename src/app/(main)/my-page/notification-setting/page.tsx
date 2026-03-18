@@ -1,4 +1,4 @@
-import { NotificationToggle } from "@/features/my-page";
+import { NotificationToggle } from "@/features/notification";
 
 import { Header, Space } from "@/shared";
 

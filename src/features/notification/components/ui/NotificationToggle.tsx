@@ -2,14 +2,12 @@
 
 import { useCallback } from "react";
 
-import {
-  notificationPermissionStore,
-  useNotificationToggleAction,
-} from "@/features/notification";
-
 import { Toggle } from "@/shared/components/form/Toggle";
 
-export function NotificationToggle() {
+import { useNotificationToggleAction } from "../../hooks/actions";
+import { notificationPermissionStore } from "../../store/notification-permission.store";
+
+export default function NotificationToggle() {
   const enabled = notificationPermissionStore((state) => state.enabled);
   const pending = notificationPermissionStore((state) => state.togglePending);
   const toggleNotification = useNotificationToggleAction();

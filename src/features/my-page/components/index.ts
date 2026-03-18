@@ -4,5 +4,4 @@ export { MyPageAccountSection } from "./section/MyPageAccountSection";
 export { MyPageFriendsSection } from "./section/MyPageFriendsSection";
 export { ProfileSection } from "./section/ProfileSection";
 export { LoginToggle } from "./ui/LoginToggle";
-export { NotificationToggle } from "./ui/NotificationToggle";
 export { ProfileCircle } from "./ui/ProfileCircle";

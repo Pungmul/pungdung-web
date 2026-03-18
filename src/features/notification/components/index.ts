@@ -4,6 +4,7 @@
 export { default as NotificationBadge } from "./ui/NotificationBadge";
 export { default as NotificationContainer } from "./ui/NotificationContainer";
 export { default as NotificationIcon } from "./ui/NotificationIcon";
+export { default as NotificationToggle } from "./ui/NotificationToggle";
 
 // Notification Section Components
 export { default as NotificationList } from "./section/NotificationList";
