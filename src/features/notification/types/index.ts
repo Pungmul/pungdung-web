@@ -4,4 +4,7 @@ export interface NotificationData {
   receivedAt: Date;
 }
 
+export interface UnreadNotificationData extends NotificationData {
+  logId: number;
+}
 

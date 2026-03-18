@@ -1,1 +1,0 @@
-export { registerFCMToken } from "./registerFCMToken";
