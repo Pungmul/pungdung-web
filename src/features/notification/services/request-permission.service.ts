@@ -1,11 +1,17 @@
 import { getToken } from "firebase/messaging";
-import { getFirebaseMessaging } from "./firebaseClient";
+
+import { supportsPushNotification } from "../lib";
+
+import { getFirebaseMessaging } from "./firebase-client.service";
 import {
-  getFCMServiceWorkerRegistration,
   FCM_SERVICE_WORKER_PATH,
-} from "./getFCMServiceWorkerRegistration";
-import { notificationPermissionStore } from "../store";
-import { supportsPushNotification } from "../lib/guards";
+  getFCMServiceWorkerRegistration,
+} from "./get-fcm-service-worker-registration.service";
+
+export interface RequestFCMTokenResult {
+  permission: NotificationPermission;
+  token: string | null;
+}
 
 async function fetchFCMTokenWithRegistration(): Promise<string | null> {
   const messaging = getFirebaseMessaging();
@@ -32,22 +38,21 @@ export async function getFCMTokenWhenGranted(): Promise<string | null> {
   if (!supportsPushNotification()) return null;
   if (Notification.permission !== "granted") return null;
 
-  notificationPermissionStore.getState().setPermission("granted");
-
   return fetchFCMTokenWithRegistration();
 }
 
-export async function requestFCMToken(): Promise<string | null> {
-  if (!supportsPushNotification()) return null;
+export async function requestFCMToken(): Promise<RequestFCMTokenResult> {
+  if (!supportsPushNotification()) {
+    return { permission: "default", token: null };
+  }
 
   const permission = await Notification.requestPermission();
 
-  notificationPermissionStore.getState().setPermission(permission);
-
   if (permission !== "granted") {
     console.log("알림 권한 거부");
-    return null;
+    return { permission, token: null };
   }
 
-  return fetchFCMTokenWithRegistration();
+  const token = await fetchFCMTokenWithRegistration();
+  return { permission, token };
 }

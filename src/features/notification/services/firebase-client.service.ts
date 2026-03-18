@@ -1,6 +1,7 @@
-import { FirebaseOptions, initializeApp, getApps } from "firebase/app";
+import { FirebaseOptions, getApps,initializeApp } from "firebase/app";
 import { getMessaging, Messaging } from "firebase/messaging";
-import { supportsPushNotification } from "../lib/guards";
+
+import { supportsPushNotification } from "../lib";
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
