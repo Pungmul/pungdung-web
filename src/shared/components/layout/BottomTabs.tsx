@@ -4,17 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-import { Suspense } from "@suspensive/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
-import { AnimatePresence, motion } from "framer-motion";
 
 import { myPageQueries, ProfileCircle } from "@/features/my-page";
-import { NotificationList, notificationQueries } from "@/features/notification";
+import { NotificationPanelOverlay } from "@/features/notification";
 
-import { Spinner } from "@/shared";
 import {
   BoardIconFilled,
   BoardIconOutline,
@@ -24,14 +20,12 @@ import {
   ThunderIconFilled,
   ThunderIconOutline,
 } from "@/shared/components/Icons";
-import { Header } from "@/shared/components/layout/Header";
 import { useView } from "@/shared/lib/view/view-store-provider";
 
 import ChatMenuButton from "./ChatMenuButton/ChatMenuButton";
 
 export default function BottomTabs() {
   const view = useView();
-  const queryClient = useQueryClient();
 
   const tabsRef = useRef<HTMLDivElement>(null);
   const notificationOverlayRef = useRef<HTMLDivElement>(null);
@@ -40,14 +34,6 @@ export default function BottomTabs() {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const { data: myPageInfo, isLoading } = useQuery(myPageQueries.info());
-
-  useEffect(() => {
-    if (isNotificationOpen) {
-      queryClient.invalidateQueries({
-        queryKey: notificationQueries.unreadList().queryKey,
-      });
-    }
-  }, [isNotificationOpen, queryClient]);
 
   useEffect(() => {
     const element = tabsRef.current;
@@ -268,44 +254,12 @@ export default function BottomTabs() {
           </ul>
         </div>
       </nav>
-      <AnimatePresence mode="wait">
-        {isNotificationOpen && (
-          <motion.div
-            key="notification-overlay"
-            ref={notificationOverlayRef}
-            initial={{ x: -360 + tabsWidth }}
-            animate={{ x: tabsWidth }}
-            exit={{ x: -360 + tabsWidth }}
-            transition={{ duration: 0.5 }}
-            className="md:flex hidden fixed left-0 top-0 bottom-0 w-[360px] h-app flex-shrink-0 flex-col bg-background border backdrop-blur-sm z-20"
-          >
-            <div className="flex flex-col h-full w-full min-h-0">
-              <Header
-                title="알림"
-                isBackBtn={false}
-                rightBtn={
-                  <div
-                    className="w-[36px] h-[36px] flex items-center justify-center cursor-pointer"
-                    onClick={() => setIsNotificationOpen(false)}
-                  >
-                    <XMarkIcon className="w-[24px] h-[24px]" />
-                  </div>
-                }
-              />
-              <Suspense
-                clientOnly
-                fallback={
-                  <div className="flex items-center justify-center h-full">
-                    <Spinner size={32} />
-                  </div>
-                }
-              >
-                <NotificationList />
-              </Suspense>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <NotificationPanelOverlay
+        isOpen={isNotificationOpen}
+        tabsWidth={tabsWidth}
+        onClose={() => setIsNotificationOpen(false)}
+        overlayRef={notificationOverlayRef}
+      />
     </>
   );
 }

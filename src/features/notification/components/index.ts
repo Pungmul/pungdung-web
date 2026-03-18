@@ -13,4 +13,5 @@ export { default as NotificationPermissionRequestCTA } from "./section/Notificat
 // Notification Overlay Components
 export { default as FCMClient } from "./overlay/FCMClient";
 export { default as FCMServiceWorkerRegistration } from "./overlay/FCMServiceWorkerRegistration";
+export { default as NotificationPanelOverlay } from "./overlay/NotificationPanelOverlay";
 export { default as NotificationToast } from "./overlay/NotificationToast";
