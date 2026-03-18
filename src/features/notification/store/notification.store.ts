@@ -1,5 +1,6 @@
-import { NotificationData } from "@pThunder/features/notification";
 import { create } from "zustand";
+
+import type { NotificationData } from "../types";
 
 interface NotificationState {
   notifications: NotificationData[];
@@ -13,4 +14,3 @@ export const notificationStore = create<NotificationState>((set) => ({
     set((state) => ({ notifications: [n, ...state.notifications] })),
   clearNotifications: () => set({ notifications: [] }),
 }));
-
