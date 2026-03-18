@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
+
 import { onMessage } from "firebase/messaging";
-import { getFirebaseMessaging } from "../services";
-import { notificationStore } from "../store";
-import { supportsNotification } from "../lib/guards";
+
+import { supportsNotification } from "../../lib";
+import { getFirebaseMessaging } from "../../services/firebase-client.service";
+import { notificationStore } from "../../store/notification.store";
 
 export function useFCMForeground() {
   const addNotification = notificationStore((s) => s.addNotification);

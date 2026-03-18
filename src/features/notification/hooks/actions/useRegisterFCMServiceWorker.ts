@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+
 import {
-  getFCMServiceWorkerRegistration,
   FCM_SERVICE_WORKER_PATH,
-} from "../services/getFCMServiceWorkerRegistration";
+  getFCMServiceWorkerRegistration,
+} from "../../services/get-fcm-service-worker-registration.service";
 
 /**
  * FCM용 Service Worker를 등록하는 훅.
