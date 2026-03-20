@@ -29,9 +29,10 @@ export {
   ChatLoadFailFallback,
   ChatMessageList,
   ChatNotificationSocket,
-  ChatRoomBoxSkeleton,
   ChatRoomHeader,
-  ChatRoomList,
+  ChatRoomPanel,
+  ChatRoomPanelErrorFallback,
+  ChatRoomPanelSkeleton,
   ChatRoomTimelinePanel,
   ChatSendForm,
   ChatTabBadge,
@@ -41,6 +42,7 @@ export {
 } from "./components";
 export { INFINITE_SCROLL_DEBOUNCE_MS } from "./constants";
 export {
+  useChatNotificationSettingAction,
   useCreateChatRoomFromFriendEmails,
   useExitChatRoom,
   useOpenPersonalChatNavigation,

@@ -19,6 +19,7 @@ import {
 } from "../ui";
 
 interface ChatDrawerProps {
+  roomId: string;
   drawerOpen: boolean;
   onClose: () => void;
   onExitChat: () => void;
@@ -38,6 +39,7 @@ function mergeMemberIntoUserForSelfModal(roomUser: User, member: Member): User {
 }
 
 export const ChatDrawer = ({
+  roomId,
   drawerOpen,
   onClose,
   onExitChat,
@@ -137,7 +139,7 @@ export const ChatDrawer = ({
             />
             <ChatExitButton onClick={onExitChat} />
           </div>
-          <ChatSettingsButton />
+          <ChatSettingsButton roomId={roomId} />
         </motion.div>
       )}
     </AnimatePresence>
