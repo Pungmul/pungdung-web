@@ -1,4 +1,5 @@
 export { useChatNotificationSettingAction } from "./useChatNotificationSettingAction";
+export { useChatRoomForegroundReconciliation } from "./useChatRoomForegroundReconciliation";
 export { useCreateChatRoomFromFriendEmails } from "./useCreateChatRoomFromFriendEmails";
 export { useExitChatRoom } from "./useExitChatRoom";
 export { useOpenPersonalChatNavigation } from "./useOpenPersonalChatNavigation";

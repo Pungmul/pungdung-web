@@ -16,6 +16,7 @@ import {
   ChatRoomHeader,
   ChatRoomTimelinePanel,
   InviteUserModal,
+  useChatRoomForegroundReconciliation,
   useChatRoomTitle,
   useChatRoomUserMaps,
   useExitChatRoom,
@@ -48,6 +49,10 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
   const { readSign } = useRoomReadSocket(roomId as string);
   const { exitChatRoom } = useExitChatRoom({ roomId: roomId as string });
 
+  useChatRoomForegroundReconciliation({
+    roomId: roomId as string,
+    readSign,
+  });
   useSyncChatRoomFocusOnRoomId(roomId as string);
   useBodyScrollLock(true);
 

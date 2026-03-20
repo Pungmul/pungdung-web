@@ -43,6 +43,7 @@ export {
 export { INFINITE_SCROLL_DEBOUNCE_MS } from "./constants";
 export {
   useChatNotificationSettingAction,
+  useChatRoomForegroundReconciliation,
   useCreateChatRoomFromFriendEmails,
   useExitChatRoom,
   useOpenPersonalChatNavigation,
