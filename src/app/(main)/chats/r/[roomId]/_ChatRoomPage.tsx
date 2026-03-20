@@ -91,6 +91,7 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
         <UserProfileCardModalHost />
 
         <ChatDrawer
+          roomId={roomId as string}
           drawerOpen={drawerOpen}
           onExitChat={exitChatRoom}
           userList={userList}
