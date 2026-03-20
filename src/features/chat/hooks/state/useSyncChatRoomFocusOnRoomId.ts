@@ -13,5 +13,10 @@ export function useSyncChatRoomFocusOnRoomId(roomId: string) {
   useEffect(() => {
     setFocusingRoomId(roomId);
     resetRoomUnreadCount(roomId);
+
+    return () => {
+      if (useChatRoomStore.getState().focusingRoomId !== roomId) return;
+      setFocusingRoomId(null);
+    };
   }, [roomId, resetRoomUnreadCount, setFocusingRoomId]);
 }
