@@ -1,6 +1,9 @@
 export { mapChatRoomDtoToDomain } from "./chat-room.mapper";
 export { mapChatRoomInfoDtoToDomain } from "./chat-room-info.mapper";
-export { mapChatRoomListItemDtoToDomain } from "./chat-room-list-item.mapper";
+export {
+  mapChatRoomListItemDtoToDomain,
+  mapChatRoomListItemIndexedDBToDomain,
+} from "./chat-room-list-item.mapper";
 export { mapChatRoomUserDtoToDomain } from "./chat-room-user.mapper";
 export {
   mapChatLogCursorPageDtoToDomain,

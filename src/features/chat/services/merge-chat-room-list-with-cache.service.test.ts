@@ -6,6 +6,7 @@ import { mergeChatRoomListWithCache } from "./merge-chat-room-list-with-cache.se
 
 const room = (override: Partial<ChatRoomListItem>): ChatRoomListItem => ({
   chatRoomUUID: override.chatRoomUUID ?? "room-default",
+  isMuted: override.isMuted ?? false,
   lastMessageTime: "2026-05-17T10:00:00.000Z",
   lastMessageContent: null,
   unreadCount: 0,

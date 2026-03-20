@@ -30,6 +30,7 @@ describe("getChatRoomTitle", () => {
 describe("getChatRoomTitleFromListItem", () => {
   const item = (over: Partial<ChatRoomListItem>): ChatRoomListItem => ({
     chatRoomUUID: "r",
+    isMuted: false,
     lastMessageTime: null,
     lastMessageContent: null,
     unreadCount: 0,

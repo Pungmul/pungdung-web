@@ -24,6 +24,7 @@ export interface ChatRoom {
 /** 채팅방 목록 한 줄(도메인). 목록 API DTO는 `ChatRoomListItemDto`. */
 export interface ChatRoomListItem {
   chatRoomUUID: string;
+  isMuted: boolean;
   lastMessageTime: string | null;
   lastMessageContent: string | null;
   unreadCount: number | null;

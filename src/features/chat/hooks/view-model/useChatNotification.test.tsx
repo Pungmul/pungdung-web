@@ -11,6 +11,7 @@ import { useChatNotification } from "./useChatNotification";
 
 const room = (unread: number | null): ChatRoomListItem => ({
   chatRoomUUID: "r1",
+  isMuted: false,
   lastMessageTime: null,
   lastMessageContent: null,
   unreadCount: unread,

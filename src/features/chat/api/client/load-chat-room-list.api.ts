@@ -2,9 +2,7 @@ import { clientApiRequest, withResponseMapper } from "@/core/api/client";
 
 import { chatRoomListResponseEnvelopeSchema } from "./dto.schema";
 import { sortChatRoomByDate } from "../../lib";
-import {
-  mapChatRoomListItemDtoToDomain,
-} from "../../lib/mappers";
+import { mapChatRoomListItemDtoToDomain } from "../../lib/mappers";
 import type { ChatRoomListItem } from "../../types/domain/chat-room.types";
 
 export const loadChatRoomList = (): Promise<ChatRoomListItem[]> =>
@@ -12,7 +10,7 @@ export const loadChatRoomList = (): Promise<ChatRoomListItem[]> =>
     context: "loadChatRoomList",
     fetchDto: () =>
       clientApiRequest({
-        url: `${process.env.NEXT_PUBLIC_LOCAL_URL}/api/chats/roomlist`,
+        url: "/api/chats/roomlist",
         method: "GET",
         responseSchema: chatRoomListResponseEnvelopeSchema,
       }),

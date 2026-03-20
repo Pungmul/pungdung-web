@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   chatLogCursorPageDtoSchema,
+  chatNotificationEnabledDtoSchema,
+  chatRoomNotificationMutedDtoSchema,
+  chatRoomNotificationStateDtoSchema,
   chatRoomListItemDtoSchema,
   chatRoomListResponseEnvelopeSchema,
   createChatRoomFailureDtoSchema,
@@ -170,6 +173,7 @@ describe("chat dto.schema — chatRoomListItemDtoSchema", () => {
   it("chatRoomMemberIds/Names가 null이면 빈 배열로 변환한다", () => {
     const parsed = chatRoomListItemDtoSchema.safeParse({
       chatRoomUUID: "r1",
+      isMuted: false,
       lastMessageTime: null,
       lastMessageContent: null,
       unreadCount: 0,
@@ -188,6 +192,104 @@ describe("chat dto.schema — chatRoomListItemDtoSchema", () => {
       expect(parsed.data.chatRoomMemberIds).toEqual([]);
       expect(parsed.data.chatRoomMemberNames).toEqual([]);
     }
+  });
+
+  it("muted만 있어도 isMuted로 정규화한다", () => {
+    const parsed = chatRoomListItemDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      muted: true,
+      lastMessageTime: null,
+      lastMessageContent: null,
+      unreadCount: 0,
+      senderId: null,
+      senderName: null,
+      receiverId: null,
+      receiverName: null,
+      chatRoomMemberIds: [],
+      chatRoomMemberNames: [],
+      roomName: "방",
+      profileImageUrl: null,
+      group: false,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.isMuted).toBe(true);
+  });
+
+  it("isMuted만 있어도 그대로 통과한다", () => {
+    const parsed = chatRoomListItemDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      isMuted: false,
+      lastMessageTime: null,
+      lastMessageContent: null,
+      unreadCount: 0,
+      senderId: null,
+      senderName: null,
+      receiverId: null,
+      receiverName: null,
+      chatRoomMemberIds: [],
+      chatRoomMemberNames: [],
+      roomName: "방",
+      profileImageUrl: null,
+      group: false,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.isMuted).toBe(false);
+  });
+
+  it("isMuted와 muted가 함께 오면 isMuted를 우선한다", () => {
+    const parsed = chatRoomListItemDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      isMuted: false,
+      muted: true,
+      lastMessageTime: null,
+      lastMessageContent: null,
+      unreadCount: 0,
+      senderId: null,
+      senderName: null,
+      receiverId: null,
+      receiverName: null,
+      chatRoomMemberIds: [],
+      chatRoomMemberNames: [],
+      roomName: "방",
+      profileImageUrl: null,
+      group: false,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.isMuted).toBe(false);
+  });
+});
+
+describe("chat dto.schema — notification", () => {
+  it("global notification payload를 통과시킨다", () => {
+    const parsed = chatNotificationEnabledDtoSchema.safeParse({
+      enabled: false,
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it("room mute payload를 통과시킨다", () => {
+    const parsed = chatRoomNotificationMutedDtoSchema.safeParse({
+      muted: true,
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it("room notification 상태 스키마를 통과시킨다", () => {
+    const parsed = chatRoomNotificationStateDtoSchema.safeParse({
+      isMuted: true,
+      globalEnabled: true,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.isMuted).toBe(true);
+  });
+
+  it("room notification 상태에서 muted만 와도 isMuted로 정규화한다", () => {
+    const parsed = chatRoomNotificationStateDtoSchema.safeParse({
+      muted: false,
+      globalEnabled: true,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.isMuted).toBe(false);
   });
 });
 

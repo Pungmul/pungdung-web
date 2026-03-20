@@ -12,6 +12,7 @@ import {
 
 const baseRoom = (id: string, unread: number | null = 1): ChatRoomListItem => ({
   chatRoomUUID: id,
+  isMuted: false,
   lastMessageTime: "2026-01-01T12:00:00Z",
   lastMessageContent: "old",
   unreadCount: unread,

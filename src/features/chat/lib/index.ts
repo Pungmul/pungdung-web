@@ -3,6 +3,7 @@ export {
   getChatRoomMessagesCache,
   setChatRoomListCache,
   setChatRoomMessagesCache,
+  subscribeChatRoomListCacheUpdated,
 } from "./chat-indexedDB-cache";
 export {
   mapChatRoomDtoToDomain,

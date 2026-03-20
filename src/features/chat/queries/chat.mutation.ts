@@ -7,6 +7,8 @@ import {
   inviteUser,
   sendImageMessage,
   sendTextMessage,
+  updateChatRoomNotificationMuted,
+  updateGlobalChatNotification,
 } from "../api";
 
 import { chatQueryInternal } from "./chat-query-internal";
@@ -69,5 +71,24 @@ export const chatMutationOptions = {
         roomId: string;
         formData: FormData;
       }) => sendImageMessage(roomId, formData),
+    }),
+
+  updateGlobalNotification: () =>
+    mutationOptions({
+      mutationKey: [...root, "updateGlobalNotification"],
+      mutationFn: (body: { enabled: boolean }) =>
+        updateGlobalChatNotification(body),
+    }),
+
+  updateRoomNotification: () =>
+    mutationOptions({
+      mutationKey: [...root, "updateRoomNotification"],
+      mutationFn: ({
+        roomId,
+        body,
+      }: {
+        roomId: string;
+        body: { muted: boolean };
+      }) => updateChatRoomNotificationMuted(roomId, body),
     }),
 };

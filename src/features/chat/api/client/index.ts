@@ -8,5 +8,6 @@ export * from "./invite-user.api";
 export * from "./load-chat-logs.api";
 export * from "./load-chat-room-info.api";
 export * from "./load-chat-room-list.api";
+export * from "./notification.api";
 export * from "./send-image-message.api";
 export * from "./send-text-message.api";

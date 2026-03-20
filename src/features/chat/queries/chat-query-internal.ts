@@ -12,4 +12,7 @@ export const chatQueryInternal = {
   roomInfinites: () => [...CHAT_QUERY_ROOT, "room-infinite"] as const,
   roomInfinite: (roomId: string) =>
     [...chatQueryInternal.roomInfinites(), roomId] as const,
+  roomNotifications: () => [...CHAT_QUERY_ROOT, "room-notification"] as const,
+  roomNotification: (roomId: string) =>
+    [...chatQueryInternal.roomNotifications(), roomId] as const,
 };

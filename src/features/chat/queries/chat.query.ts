@@ -1,6 +1,11 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
-import { loadChatLogs,loadChatRoomInfo, loadChatRoomList } from "../api";
+import {
+  loadChatLogs,
+  loadChatRoomInfo,
+  loadChatRoomList,
+  loadChatRoomNotificationState,
+} from "../api";
 import {
   CHAT_LOG_PAGE_SIZE,
   DEFAULT_GC_TIME_MS,
@@ -60,5 +65,15 @@ export const chatQueries = {
       gcTime: DEFAULT_GC_TIME_MS,
       /** `"always"`는 Strict Mode 마운트·언마운트·재마운트마다 재요청되어 chatlog가 2번 찍히기 쉬움 */
       refetchOnMount: true,
+    }),
+
+  roomNotification: (roomId: string) =>
+    queryOptions({
+      queryKey: chatQueryInternal.roomNotification(roomId),
+      queryFn: () => loadChatRoomNotificationState(roomId),
+      retry: 0,
+      staleTime: DEFAULT_STALE_TIME_MS,
+      gcTime: DEFAULT_GC_TIME_MS,
+      refetchOnMount: "always",
     }),
 };

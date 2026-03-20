@@ -5,7 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { DEFAULT_STALE_TIME_MS } from "../../constants";
-import { getChatRoomListCache, setChatRoomListCache } from "../../lib";
+import {
+  getChatRoomListCache,
+  setChatRoomListCache,
+  subscribeChatRoomListCacheUpdated,
+} from "../../lib";
 import { chatQueries } from "../../queries";
 import { mergeChatRoomListWithCache } from "../../services/merge-chat-room-list-with-cache.service";
 import type { ChatRoomListItem } from "../../types";
@@ -36,6 +40,13 @@ export function useChatRoomListIndexedDB() {
     return () => {
       active = false;
     };
+  }, []);
+
+  useEffect(() => {
+    return subscribeChatRoomListCacheUpdated((record) => {
+      setCachedRooms(record.rooms);
+      setCacheUpdatedAt(record.updatedAt);
+    });
   }, []);
 
   const isCacheFresh = useMemo(() => {
@@ -73,12 +84,15 @@ export function useChatRoomListIndexedDB() {
   useEffect(() => {
     if (!roomListQuery.data) return;
 
-    void setChatRoomListCache({
-      key: CHAT_ROOM_LIST_CACHE_KEY,
-      rooms: roomListQuery.data,
-      updatedAt: Date.now(),
-      validatedAt: Date.now(),
-    });
+    void setChatRoomListCache(
+      {
+        key: CHAT_ROOM_LIST_CACHE_KEY,
+        rooms: roomListQuery.data,
+        updatedAt: Date.now(),
+        validatedAt: Date.now(),
+      },
+      { emitUpdatedEvent: false }
+    );
   }, [roomListQuery.data]);
 
   const rooms = useMemo(() => {

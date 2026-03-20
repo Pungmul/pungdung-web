@@ -122,30 +122,88 @@ export const chatRoomDtoSchema = z.object({
 
 export type ChatRoomDto = z.infer<typeof chatRoomDtoSchema>;
 
-export const chatRoomListItemDtoSchema = z.object({
-  chatRoomUUID: z.string(),
-  lastMessageTime: z.string().nullable(),
-  lastMessageContent: z.string().nullable(),
-  unreadCount: z.number().nullable(),
-  senderId: z.number().nullable(),
-  senderName: z.string().nullable(),
-  receiverId: z.number().nullable(),
-  receiverName: z.string().nullable(),
-  /** 백엔드가 빈/미로딩 상태에서 null을 줄 수 있음 */
-  chatRoomMemberIds: z
-    .array(z.number())
-    .nullish()
-    .transform((v) => v ?? []),
-  chatRoomMemberNames: z
-    .array(z.string())
-    .nullish()
-    .transform((v) => v ?? []),
-  roomName: z.string(),
-  profileImageUrl: z.string().nullable(),
-  group: z.boolean(),
-});
+export const chatRoomListItemDtoSchema = z
+  .object({
+    chatRoomUUID: z.string(),
+    isMuted: z.boolean().optional(),
+    muted: z.boolean().optional(),
+    lastMessageTime: z.string().nullable(),
+    lastMessageContent: z.string().nullable(),
+    unreadCount: z.number().nullable(),
+    senderId: z.number().nullable(),
+    senderName: z.string().nullable(),
+    receiverId: z.number().nullable(),
+    receiverName: z.string().nullable(),
+    /** 백엔드가 빈/미로딩 상태에서 null을 줄 수 있음 */
+    chatRoomMemberIds: z
+      .array(z.number())
+      .nullish()
+      .transform((v) => v ?? []),
+    chatRoomMemberNames: z
+      .array(z.string())
+      .nullish()
+      .transform((v) => v ?? []),
+    roomName: z.string(),
+    profileImageUrl: z.string().nullable(),
+    group: z.boolean(),
+  })
+  .superRefine((value, ctx) => {
+    if (typeof value.isMuted === "boolean" || typeof value.muted === "boolean") {
+      return;
+    }
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Either isMuted or muted must be provided",
+      path: ["isMuted"],
+    });
+  })
+  .transform(({ muted: _muted, ...rest }) => ({
+    ...rest,
+    isMuted: rest.isMuted ?? _muted ?? false,
+  }));
 
 export type ChatRoomListItemDto = z.infer<typeof chatRoomListItemDtoSchema>;
+
+export const chatNotificationEnabledDtoSchema = z.object({
+  enabled: z.boolean(),
+});
+
+export type ChatNotificationEnabledDto = z.infer<
+  typeof chatNotificationEnabledDtoSchema
+>;
+
+export const chatRoomNotificationMutedDtoSchema = z.object({
+  muted: z.boolean(),
+});
+
+export type ChatRoomNotificationMutedDto = z.infer<
+  typeof chatRoomNotificationMutedDtoSchema
+>;
+
+export const chatRoomNotificationStateDtoSchema = z
+  .object({
+    isMuted: z.boolean().optional(),
+    muted: z.boolean().optional(),
+    globalEnabled: z.boolean(),
+  })
+  .superRefine((value, ctx) => {
+    if (typeof value.isMuted === "boolean" || typeof value.muted === "boolean") {
+      return;
+    }
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Either isMuted or muted must be provided",
+      path: ["isMuted"],
+    });
+  })
+  .transform(({ muted: _muted, ...rest }) => ({
+    ...rest,
+    isMuted: rest.isMuted ?? _muted ?? false,
+  }));
+
+export type ChatRoomNotificationStateDto = z.infer<
+  typeof chatRoomNotificationStateDtoSchema
+>;
 
 /** 초대·퇴장·메시지 전송 등 성공 시 envelope.response — 업스트림이 null·객체 등 혼재할 수 있음 */
 export const chatMutationVoidResponseSchema = z

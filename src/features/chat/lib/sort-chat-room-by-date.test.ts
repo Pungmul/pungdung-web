@@ -6,6 +6,7 @@ import { sortChatRoomByDate } from "./sort-chat-room-by-date";
 
 const room = (over: Partial<ChatRoomListItem>): ChatRoomListItem => ({
   chatRoomUUID: "r",
+  isMuted: false,
   lastMessageTime: "2026-01-01T00:00:00Z",
   lastMessageContent: null,
   unreadCount: 0,

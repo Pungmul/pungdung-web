@@ -1,3 +1,4 @@
+import { mapChatRoomListItemIndexedDBToDomain } from "./mappers";
 import type {
   ChatRoomListCacheRecord,
   ChatRoomMessagesCacheRecord,
@@ -7,6 +8,7 @@ import type {
 const DB_NAME = "pungdung-chat-cache";
 const DB_VERSION = 1;
 const STORE_NAME = "chat-cache";
+const CHAT_ROOM_LIST_CACHE_UPDATED_EVENT = "chat-room-list-cache-updated";
 
 function isBrowser() {
   return typeof window !== "undefined" && "indexedDB" in window;
@@ -53,13 +55,62 @@ async function withStore<T>(
 }
 
 export async function getChatRoomListCache() {
-  return withStore<ChatRoomListCacheRecord | undefined>("readonly", (store) =>
-    store.get("chat-room-list")
+  const record = await withStore<ChatRoomListCacheRecord | undefined>(
+    "readonly",
+    (store) => store.get("chat-room-list")
   );
+
+  if (!record) return undefined;
+  const rooms = Array.isArray(record.rooms) ? record.rooms : [];
+
+  return {
+    ...record,
+    rooms: rooms.map(mapChatRoomListItemIndexedDBToDomain),
+  };
 }
 
-export async function setChatRoomListCache(record: ChatRoomListCacheRecord) {
-  return withStore<IDBValidKey>("readwrite", (store) => store.put(record));
+export async function setChatRoomListCache(
+  record: ChatRoomListCacheRecord,
+  options?: { emitUpdatedEvent?: boolean }
+) {
+  const result = await withStore<IDBValidKey>("readwrite", (store) =>
+    store.put(record)
+  );
+
+  if (isBrowser() && options?.emitUpdatedEvent !== false) {
+    window.dispatchEvent(
+      new CustomEvent<ChatRoomListCacheRecord>(
+        CHAT_ROOM_LIST_CACHE_UPDATED_EVENT,
+        {
+          detail: record,
+        }
+      )
+    );
+  }
+
+  return result;
+}
+
+export function subscribeChatRoomListCacheUpdated(
+  listener: (record: ChatRoomListCacheRecord) => void
+) {
+  if (!isBrowser()) return () => {};
+
+  const handler = (event: Event) => {
+    const customEvent = event as CustomEvent<ChatRoomListCacheRecord>;
+    const detail = customEvent.detail;
+    if (!detail) return;
+    const rooms = Array.isArray(detail.rooms) ? detail.rooms : [];
+    listener({
+      ...detail,
+      rooms: rooms.map(mapChatRoomListItemIndexedDBToDomain),
+    });
+  };
+
+  window.addEventListener(CHAT_ROOM_LIST_CACHE_UPDATED_EVENT, handler);
+  return () => {
+    window.removeEventListener(CHAT_ROOM_LIST_CACHE_UPDATED_EVENT, handler);
+  };
 }
 
 export async function getChatRoomMessagesCache(roomId: string) {
