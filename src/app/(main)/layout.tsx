@@ -36,7 +36,10 @@ export default function RootLayout({
           <Suspense clientOnly fallback={null}>
             <HeaderProgressBar />
           </Suspense>
-          <div className="flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-dvh">
+          <div
+            id="main-shell"
+            className="flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-app"
+          >
             <BottomTabs />
             {children}
           </div>

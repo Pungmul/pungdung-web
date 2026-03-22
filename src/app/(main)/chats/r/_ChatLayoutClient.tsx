@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useParams } from "next/navigation";
 
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 
@@ -9,6 +10,8 @@ import { ErrorBoundary, Suspense } from "@suspensive/react";
 import {
   SelectFriendModalProvider,
 } from "@/features/chat";
+
+import { Responsive } from "@/shared/components/Responsive";
 
 import { ChatRoomPanelSkeleton } from "@/features/chat/components/section/ChatRoomPanel";
 
@@ -35,32 +38,56 @@ const ChatRoomPanelErrorFallbackAsync = dynamic(
 );
 
 export function ChatLayoutClient({ children }: { children: React.ReactNode }) {
+  const { roomId } = useParams<{ roomId?: string }>();
+  const shouldShowPanelOnMobile = !roomId;
+
+  const chatRoomPanel = (
+    <QueryErrorResetBoundary>
+      {({ reset }) => (
+        <ErrorBoundary
+          onReset={reset}
+          fallback={(props) => (
+            <ChatRoomPanelErrorFallbackAsync
+              {...props}
+              onRetry={() => {
+                reset();
+                props.reset();
+              }}
+            />
+          )}
+        >
+          <Suspense fallback={<ChatRoomPanelSkeleton />}>
+            <ChatRoomPanelAsync key="chat-panel" />
+          </Suspense>
+        </ErrorBoundary>
+      )}
+    </QueryErrorResetBoundary>
+  );
+
   return (
     <SelectFriendModalProvider>
-      <div className="relative block md:flex md:flex-row w-full flex-grow">
-        <QueryErrorResetBoundary>
-          {({ reset }) => (
-            <ErrorBoundary
-              onReset={reset}
-              fallback={(props) => (
-                <ChatRoomPanelErrorFallbackAsync
-                  {...props}
-                  onRetry={() => {
-                    reset();
-                    props.reset();
-                  }}
-                />
-              )}
-            >
-              <Suspense fallback={<ChatRoomPanelSkeleton />}>
-                <ChatRoomPanelAsync key="chat-panel" />
-              </Suspense>
-            </ErrorBoundary>
-          )}
-        </QueryErrorResetBoundary>
-        {children}
-        <SelectFriendModal />
-      </div>
+      <Responsive
+        mobile={
+          shouldShowPanelOnMobile ? (
+            <div className="relative block w-full flex-grow">
+              {chatRoomPanel}
+              <SelectFriendModal />
+            </div>
+          ) : (
+            <div id="chat-room-slot" className="flex min-h-0 w-full flex-1 flex-col">
+              {children}
+              <SelectFriendModal />
+            </div>
+          )
+        }
+        desktop={
+          <div className="relative w-full flex-grow md:flex md:flex-row">
+            {chatRoomPanel}
+            {children}
+            <SelectFriendModal />
+          </div>
+        }
+      />
     </SelectFriendModalProvider>
   );
 }

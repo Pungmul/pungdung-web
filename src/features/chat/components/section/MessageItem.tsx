@@ -111,26 +111,22 @@ const MessageItemComponent: React.FC<MessageItemProps> = ({
           <div className="text-grey-300 text-[11px] lg:text-[12px]">전송중</div>
         ) : (
           <div className="flex flex-row gap-2">
-            <PaperAirplaneIcon
-              className="w-4 h-4  "
-              color="#ff6767"
-              width={16}
-              height={16}
+            <span
+              className="flex size-4 cursor-pointer items-center justify-center"
               onClick={() => {
                 onRetryFailedText(_message);
               }}
-              style={{ cursor: "pointer" }}
-            />
-            <XMarkIcon
-              className="w-4 h-4  "
-              color="#ff6767"
-              width={16}
-              height={16}
+            >
+              <PaperAirplaneIcon className="size-full text-[#ff6767]" />
+            </span>
+            <span
+              className="flex size-4 cursor-pointer items-center justify-center"
               onClick={() => {
                 onDeletePending(_message);
               }}
-              style={{ cursor: "pointer" }}
-            />
+            >
+              <XMarkIcon className="size-full text-[#ff6767]" />
+            </span>
           </div>
         );
       return (
@@ -183,38 +179,31 @@ const MessageItemComponent: React.FC<MessageItemProps> = ({
       const pendingSide =
         _message.state === "pending" ? (
           <div className="flex flex-row gap-2">
-            <PaperAirplaneIcon
-              className="w-4 h-4  "
-              width={16}
-              height={16}
-              color="#ff6767"
-            />
+            <span className="flex size-4 items-center justify-center">
+              <PaperAirplaneIcon className="size-full text-[#ff6767]" />
+            </span>
             <div className="text-grey-300 text-[11px] lg:text-[12px]">
               전송중
             </div>
           </div>
         ) : (
           <div className="flex flex-row gap-2">
-            <PaperAirplaneIcon
-              className="w-4 h-4  "
-              width={16}
-              height={16}
-              color="#ff6767"
+            <span
+              className="flex size-4 cursor-pointer items-center justify-center"
               onClick={() => {
                 void onRetryFailedImage(_message);
               }}
-              style={{ cursor: "pointer" }}
-            />
-            <XMarkIcon
-              className="w-4 h-4  "
-              width={16}
-              height={16}
-              color="#ff6767"
+            >
+              <PaperAirplaneIcon className="size-full text-[#ff6767]" />
+            </span>
+            <span
+              className="flex size-4 cursor-pointer items-center justify-center"
               onClick={() => {
                 onDeletePending(_message);
               }}
-              style={{ cursor: "pointer" }}
-            />
+            >
+              <XMarkIcon className="size-full text-[#ff6767]" />
+            </span>
           </div>
         );
       return (

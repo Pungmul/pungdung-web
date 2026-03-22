@@ -47,18 +47,22 @@ export const ChatSettingsButton = ({ roomId, onClick }: ChatSettingsButtonProps)
         disabled={isUpdatingRoomNotification}
         aria-label={isMuted ? "채팅방 알림 켜기" : "채팅방 알림 끄기"}
       >
-        {isMuted ? (
-          <BellSlashIcon className="size-[24px] text-grey-500" />
-        ) : (
-          <BellIcon className="size-[24px] text-grey-500" />
-        )}
+        <span className="flex size-6 items-center justify-center">
+          {isMuted ? (
+            <BellSlashIcon className="size-full text-grey-500" />
+          ) : (
+            <BellIcon className="size-full text-grey-500" />
+          )}
+        </span>
       </button>
       <button
         type="button"
         className="cursor-pointer flex items-center justify-center"
         onClick={onClick}
       >
-        <Cog8ToothIcon className="size-[24px] text-grey-500" />
+        <span className="flex size-6 items-center justify-center">
+          <Cog8ToothIcon className="size-full text-grey-500" />
+        </span>
       </button>
     </div>
   );

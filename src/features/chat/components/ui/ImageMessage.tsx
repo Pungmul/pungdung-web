@@ -81,7 +81,9 @@ const ImageMessageComponent: React.FC<ImageMessageProps> = ({
                 <div className="absolute inset-0 flex items-center justify-center bg-grey-100 text-grey-500">
                   {loadStateByUrl[imageUrl] === "error" ? (
                     <div className="flex flex-col items-center gap-1 text-[11px]">
-                      <PhotoIcon className="size-5" />
+                      <span className="size-5 flex items-center justify-center">
+                        <PhotoIcon className="size-full" />
+                      </span>
                       <span>이미지 로드 실패</span>
                     </div>
                   ) : (

@@ -57,7 +57,10 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
   useBodyScrollLock(true);
 
   const mainRef = useRef<HTMLElement>(null);
-  useViewportHeightVar(mainRef);
+  useViewportHeightVar(mainRef, {
+    syncHtml: true,
+    chatRoomLayout: true,
+  });
 
   const { data: chatRoomData } = useQuery(
     chatQueries.room(roomId as string),
@@ -74,6 +77,7 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
   return (
     <AnimatePresence mode="wait">
       <main
+        id="chat-room-main"
         ref={mainRef}
         className="relative h-full min-h-0 overflow-hidden bg-background max-md:h-[var(--app-height,100dvh)]"
       >

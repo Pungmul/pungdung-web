@@ -12,7 +12,9 @@ function InboxContent() {
   return (
     <div className="flex flex-col flex-grow h-full w-full justify-center items-center">
       <div className="flex flex-col items-center gap-[24px]">
-        <ChatIconOutline className="w-[64px] h-[64px]" />
+        <span className="size-16 p-2 flex items-center justify-center">
+          <ChatIconOutline className="size-full" />
+        </span>
         <div className="text-[24px] font-semibold text-grey-800">
           채팅을 선택해서 대화를 시작해보세요
         </div>

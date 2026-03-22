@@ -17,7 +17,9 @@ export function ChatRoomPanelErrorFallback({
       mobile={
         <div className="flex flex-col h-full w-full justify-center items-center px-6">
           <div className="flex flex-col items-center gap-[24px] text-center">
-            <ChatIconOutline className="w-[64px] h-[64px]" />
+            <span className="size-16 p-2 flex items-center justify-center">
+              <ChatIconOutline className="size-full" />
+            </span>
             <div className="text-[15px] text-grey-600 whitespace-pre-line">
               {"오류가 발생했어요.\n다시 시도해주세요."}
             </div>

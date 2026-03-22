@@ -35,7 +35,7 @@ const ChatRoomBox = ({ room }: { room: ChatRoomListItem }) => {
             </div>
             <span className="inline-flex w-[14px] h-[14px] flex-shrink-0 items-center justify-center">
               <BellSlashIcon
-                className={`size-[14px] text-grey-500 ${room.isMuted ? "visible" : "invisible"}`}
+                className={`size-full text-grey-500 ${room.isMuted ? "visible" : "invisible"}`}
                 aria-label={room.isMuted ? "알림 음소거됨" : undefined}
                 aria-hidden={!room.isMuted}
               />
@@ -53,7 +53,9 @@ const ChatRoomBox = ({ room }: { room: ChatRoomListItem }) => {
           <div className="flex-grow text-ellipsis overflow-hidden text-grey-600 text-[13px] leading-[125%] whitespace-pre-line line-clamp-2">
             {room.lastMessageContent?.includes("이미지") ? (
               <span className="flex flex-row items-center gap-[4px]">
-                <PhotoIcon className="size-[16px] text-grey-600" />
+                <span className="size-6 p-1 flex items-center justify-center">
+                  <PhotoIcon className="size-full text-grey-600" />
+                </span>
                 {"이미지를 보냈습니다."}
               </span>
             ) : (

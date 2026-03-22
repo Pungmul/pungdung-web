@@ -11,7 +11,9 @@ export const ChatInviteButton = ({ onClick }: ChatInviteButtonProps) => {
       onClick={onClick}
     >
       <div className="size-[36px] bg-background rounded-full flex items-center justify-center">
-        <PlusIcon className="size-[24px] text-blue-500" />
+        <span className="flex size-6 items-center justify-center">
+          <PlusIcon className="size-full text-blue-500" />
+        </span>
       </div>
       <div className="text-sm font-medium text-blue-500">초대하기</div>
     </button>

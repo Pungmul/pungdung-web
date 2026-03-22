@@ -14,7 +14,7 @@ export default function ChatRoomPanelHeader({
   onClickAddChat,
 }: ChatRoomPanelHeaderProps) {
   return (
-    <div className="flex flex-row items-center justify-between flex-shrink-0 h-[56px] px-[24px]">
+    <div className="sticky top-0 z-10 bg-background flex flex-row items-center justify-between flex-shrink-0 h-[56px] px-[24px]">
       <div className="flex-grow" style={{ fontSize: 16, fontWeight: 700 }}>
         채팅 목록
         <span className="text-grey-500 text-[13px] ml-4">
@@ -22,14 +22,18 @@ export default function ChatRoomPanelHeader({
         </span>
       </div>
       <div className="flex flex-row gap-1">
-        <MagnifyingGlassIcon
-          className="size-[32px] cursor-pointer p-[4px]"
+        <span
+          className="size-8 p-1 flex items-center justify-center cursor-pointer"
           onClick={onStartSearch}
-        />
-        <ChatAddIcon
-          className="size-[32px] p-[4px] text-grey-800 cursor-pointer"
+        >
+          <MagnifyingGlassIcon className="size-full" />
+        </span>
+        <span
+          className="size-8 p-1 flex items-center justify-center cursor-pointer"
           onClick={onClickAddChat}
-        />
+        >
+          <ChatAddIcon className="size-full text-grey-800" />
+        </span>
       </div>
     </div>
   );

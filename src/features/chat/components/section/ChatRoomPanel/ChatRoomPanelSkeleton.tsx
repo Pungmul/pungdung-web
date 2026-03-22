@@ -1,7 +1,7 @@
 import { SkeletonView } from "@/shared/components";
 
 const CHAT_ROOM_PANEL_CLASS_NAME =
-  "flex flex-col h-[calc(100vh-65px)] md:h-app w-full md:w-[360px] md:min-w-[360px] md:shrink-0 lg:w-[400px] lg:min-w-[400px] md:border-r md:border-grey-200";
+  "flex flex-col md:h-app w-full md:w-[360px] md:min-w-[360px] md:shrink-0 lg:w-[400px] lg:min-w-[400px] md:border-r md:border-grey-200";
 
 const CHAT_ROOM_PANEL_SKELETON_COUNT = 8;
 

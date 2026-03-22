@@ -99,7 +99,7 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
     <form
       ref={formRef}
       className="
-        z-20 shrink-0 bg-background
+ z-20 shrink-0 bg-background
         max-md:pb-[max(0.75rem,env(safe-area-inset-bottom))]
         max-md:focus-within:pb-0
       "
@@ -119,7 +119,9 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
               multiple
               onChange={onImageChange}
             />
-            <PhotoIcon className="size-5 text-white" />
+            <span className="flex size-4 items-center justify-center">
+              <PhotoIcon className="size-full text-white" />
+            </span>
           </label>
 
           <div className="min-w-0 flex-grow px-4 py-[8px]">
@@ -132,7 +134,7 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
               onKeyDown={handleKeyDown}
               placeholder="메시지 입력"
               className="
-                block box-border min-h-[20px] w-full resize-none overflow-y-hidden
+ block box-border min-h-[20px] w-full resize-none overflow-y-hidden
                 border-none bg-transparent p-0 text-[12px] leading-[20px]
                 outline-none scrollbar-thin scrollbar-track-transparent
                 scrollbar-thumb-grey-300 hover:scrollbar-thumb-grey-400

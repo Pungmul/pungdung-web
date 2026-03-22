@@ -215,13 +215,15 @@ export default function InviteUserModal({
                 />
               </div>
               <div className="text-sm text-grey-700">{user.name}</div>
-              <XCircleIcon
-                className="size-5 text-grey-500 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemoveUser(user);
-                }}
-              />
+              <span className="size-5 flex items-center justify-center cursor-pointer">
+                <XCircleIcon
+                  className="size-full text-grey-500"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveUser(user);
+                  }}
+                />
+              </span>
             </div>
           ))}
         </div>
@@ -311,7 +313,11 @@ const InviteFriendItem: React.FC<InviteFriendItemProps> = ({
                 : "border-grey-400 bg-background"
               }`}
           >
-            {isSelected && <CheckIcon className="w-4 h-4 text-background" />}
+            {isSelected && (
+              <span className="size-4 flex items-center justify-center">
+                <CheckIcon className="size-full text-background" />
+              </span>
+            )}
           </div>
         )}
       </div>

@@ -34,7 +34,9 @@ export function ChatRoomHeader({
           className="w-10 h-10 flex items-center justify-center cursor-pointer"
           onClick={onOpenDrawer}
         >
-          <Bars3Icon className="size-6 text-grey-500" />
+          <span className="flex size-6 items-center justify-center">
+            <Bars3Icon className="size-full text-grey-500" />
+          </span>
         </div>
       }
     />
