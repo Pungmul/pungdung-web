@@ -12,7 +12,7 @@ const Reply = ({ reply }: { reply: ReplyType }) => {
   });
 
   return (
-    <div className="w-full py-5 pl-8 pr-5 md:pr-6 border-b border-b-grey-300 bg-grey-100 gap-[8px] flex flex-col">
+    <div className="w-full py-5 pl-8 pr-5 md:pr-6 bg-grey-100 gap-[8px] flex flex-col">
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row gap-2 items-center text-[12px] md:text-[13px]">
           <div className="text-grey-800 max-w-20 truncate">
@@ -25,7 +25,7 @@ const Reply = ({ reply }: { reply: ReplyType }) => {
             className="size-7 p-1 cursor-pointer flex items-center justify-center"
             onClick={handleLikeClick}
           >
-            <HandThumbUpIcon className="text-red-500" />
+            <HandThumbUpIcon className="size-full text-red-500" />
           </div>
           <div className="size-7 p-1 cursor-pointer">
             <CommentMenu comment={reply} />

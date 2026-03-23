@@ -1,5 +1,6 @@
 import { HandThumbUpIcon } from "@heroicons/react/24/outline";
 
+import { cn } from "@/shared";
 import { CommentOutline } from "@/shared/components/Icons";
 
 import { CommentMenu } from "./CommentMenu";
@@ -14,16 +15,19 @@ const Comment = ({
   replyTarget,
   setReplyTarget,
   composerTextareaRef,
+  applyComposerFocusRef,
 }: {
   comment: CommentType;
   replyTarget: CommentType | null;
   setReplyTarget: (comment: CommentType) => void;
   composerTextareaRef: React.RefObject<HTMLTextAreaElement | null>;
+  applyComposerFocusRef: React.RefObject<(() => boolean) | null>;
 }) => {
   // 대댓글: 확인 후 입력 포커스·답글 대상으로 등록
   const handleReplyClick = useCommentReplyPrompt({
     comment,
     composerTextareaRef,
+    applyComposerFocusRef,
     setReplyTarget,
   });
   // 추천: 확인 다이얼로그·토스트 (현재 서버 mutation 없음)
@@ -34,10 +38,8 @@ const Comment = ({
   return (
     <div
       className={
-        "w-full p-5 md:px-6 gap-[8px] flex flex-col border-b border-b-grey-300 " +
-        (replyTarget?.commentId == comment.commentId
-          ? " bg-red-100"
-          : " bg-background")
+        cn("w-full p-5 md:px-6 gap-[8px] flex flex-col bg-background",
+          replyTarget?.commentId == comment.commentId && "bg-red-100")
       }
     >
       <div className="flex flex-row justify-between items-center">
@@ -52,13 +54,13 @@ const Comment = ({
             className="size-7 p-1 cursor-pointer flex items-center justify-center"
             onClick={handleReplyClick}
           >
-            <CommentOutline className="text-grey-400" />
+            <CommentOutline className="size-full text-grey-400" />
           </div>
           <div
             className="size-7 p-1 cursor-pointer flex items-center justify-center"
             onClick={handleLikeClick}
           >
-            <HandThumbUpIcon className="text-red-500" />
+            <HandThumbUpIcon className="size-full text-red-500" />
           </div>
           <div className="size-7 p-1 cursor-pointer">
             <CommentMenu comment={comment} />

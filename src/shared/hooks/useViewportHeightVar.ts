@@ -1,6 +1,6 @@
 "use client";
 
-import { type RefObject, useEffect } from "react";
+import { type RefObject, useEffect, useMemo } from "react";
 
 const MOBILE_MAX_WIDTH_QUERY = "(max-width: 767px)";
 
@@ -37,6 +37,8 @@ export type UseViewportHeightVarOptions = {
   syncHtml?: boolean;
   /** (main) layout shell용 data-chat-room + CSS 변수 */
   chatRoomLayout?: boolean;
+  /** 게시글 상세: data-post-detail + CSS 변수 (채팅과 동일한 vv/html 조작) */
+  postDetailLayout?: boolean;
 };
 
 /**
@@ -47,7 +49,16 @@ export function useViewportHeightVar(
   targetRef: RefObject<HTMLElement | null>,
   options: UseViewportHeightVarOptions = {}
 ) {
-  const { syncHtml = false, chatRoomLayout = false } = options;
+  const {
+    syncHtml = false,
+    chatRoomLayout = false,
+    postDetailLayout = false,
+  } = options;
+
+  const fixedViewportShell = useMemo(
+    () => chatRoomLayout || postDetailLayout,
+    [chatRoomLayout, postDetailLayout]
+  );
 
   useEffect(() => {
     const el = targetRef.current;
@@ -63,7 +74,7 @@ export function useViewportHeightVar(
         el.style.setProperty("--app-height", heightValue);
       }
 
-      if (chatRoomLayout) {
+      if (fixedViewportShell) {
         root.style.setProperty("--vv-height", heightValue);
         root.style.setProperty("--vv-offset-top", offsetTopValue);
       }
@@ -82,6 +93,10 @@ export function useViewportHeightVar(
       root.dataset.chatRoom = "";
     }
 
+    if (postDetailLayout) {
+      root.dataset.postDetail = "";
+    }
+
     const unbind = bindViewportHeightSync(apply);
 
     return () => {
@@ -91,10 +106,17 @@ export function useViewportHeightVar(
         el.style.removeProperty("--app-height");
       }
 
-      if (chatRoomLayout) {
+      if (fixedViewportShell) {
         root.style.removeProperty("--vv-height");
         root.style.removeProperty("--vv-offset-top");
+      }
+
+      if (chatRoomLayout) {
         delete root.dataset.chatRoom;
+      }
+
+      if (postDetailLayout) {
+        delete root.dataset.postDetail;
       }
 
       if (syncHtml) {
@@ -105,5 +127,11 @@ export function useViewportHeightVar(
         body.style.removeProperty("min-height");
       }
     };
-  }, [targetRef, syncHtml, chatRoomLayout]);
+  }, [
+    targetRef,
+    syncHtml,
+    chatRoomLayout,
+    postDetailLayout,
+    fixedViewportShell,
+  ]);
 }

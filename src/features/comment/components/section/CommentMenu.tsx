@@ -57,7 +57,7 @@ export function CommentMenu({ comment }: CommentMenuProps) {
         }
         onClick={toggle}
       >
-        <EllipsisVerticalIcon className="text-grey-800" />
+        <EllipsisVerticalIcon className="size-full text-grey-800" />
         {isOpen && (
           <ul
             className={`absolute right-0 px-3 py-2 border border-grey-200 bg-background rounded-sm flex flex-col gap-2 z-10 ${

@@ -68,7 +68,9 @@ const ReportCommentModal: React.FC = () => {
                   className="hidden peer"
                 />
                 <span className="w-6 h-6 mr-2 border-2 border-grey-400 rounded-full peer-checked:bg-primary peer-checked:border-primary flex items-center justify-center [&>svg]:opacity-0 peer-checked:[&>svg]:opacity-100">
-                  <CheckIcon className="size-3 text-white stroke-2" />
+                  <span className="size-3 flex items-center justify-center">
+                    <CheckIcon className="size-full text-white stroke-2" />
+                  </span>
                 </span>
                 {value}
               </label>
@@ -77,7 +79,7 @@ const ReportCommentModal: React.FC = () => {
         </ul>
         <button
           type="submit"
-          className="w-full py-4 rounded-md mt-2 disabled:bg-primary-light disabled:cursor-not-allowed  bg-primary-dark text-white peer-checked:enabled:bg-primary"
+          className="w-full py-4 rounded-md mt-2 disabled:bg-primary-light disabled:cursor-not-allowed bg-primary-dark text-white peer-checked:enabled:bg-primary"
           disabled={!selectedReportReason || isPending}
           title="신고하기"
         >

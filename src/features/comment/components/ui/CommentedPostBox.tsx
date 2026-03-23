@@ -38,7 +38,7 @@ function CommentedPostBoxComponent({ comment }: { comment: MyComment }) {
         <div className="flex flex-row items-center justify-between">
           <div className="flex flex-row gap-[12px] items-center">
             <div className="flex flex-row items-center gap-1">
-              <div className="flex justify-center items-center size-[16px]">
+              <div className="flex size-6 items-center justify-center p-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

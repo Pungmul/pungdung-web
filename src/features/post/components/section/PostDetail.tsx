@@ -1,8 +1,17 @@
 "use client";
 
-import { CommentsList } from "@/features/comment";
+import { useRef } from "react";
+
+import {
+  CommentComposer,
+  CommentsList,
+  CommentsThread,
+  useCommentsListComposerState,
+} from "@/features/comment";
 
 import { Header, LinkChipButton, ListEmptyView } from "@/shared/components";
+import { useBodyScrollLock, useViewportHeightVar } from "@/shared/hooks";
+import { cn, useView } from "@/shared/lib";
 
 import { PostContent } from "./PostContent";
 import { PostMenu } from "./PostMenu";
@@ -12,32 +21,104 @@ import { ReportPostModal } from "../overlay/ReportPostModal";
 import { PostContentSkeleton } from "../ui/PostContentSkeleton";
 
 export function PostDetailComponent({ postId }: { postId: number }) {
-  // 상세 본문·보드명·작성자 여부(헤더 메뉴)·문서 제목
+  const view = useView();
+  const useMobileKeyboardShell = view !== "desktop";
+
+  const mainRef = useRef<HTMLDivElement>(null);
+  const composerState = useCommentsListComposerState();
+
+  useViewportHeightVar(mainRef, {
+    syncHtml: useMobileKeyboardShell,
+    postDetailLayout: useMobileKeyboardShell,
+  });
+  useBodyScrollLock(useMobileKeyboardShell);
+
   const { post, isLoading, boardName, isWriter, isDeletedPostError } =
     usePostDetailPageViewModel(postId);
 
+  const postBody = (
+    <>
+      <div className="h-4" />
+      <PostDetailMainContent
+        isLoading={isLoading}
+        isDeletedPostError={isDeletedPostError}
+        post={post}
+      />
+      <div className="h-4" />
+    </>
+  );
+
+  const commentsSection =
+    post && !isDeletedPostError && post.commentList ? (
+      useMobileKeyboardShell ? (
+        <CommentsThread
+          comments={post.commentList}
+          postId={post.postId}
+          {...composerState}
+        />
+      ) : (
+        <CommentsList comments={post.commentList} postId={post.postId} />
+      )
+    ) : null;
+
+  if (useMobileKeyboardShell) {
+    return (
+      <div
+        id="post-detail-main"
+        ref={mainRef}
+        className={cn(
+          "mx-auto flex w-full max-w-[768px] flex-col",
+          "h-[var(--app-height,100dvh)] min-h-0 overflow-hidden"
+        )}
+      >
+        <Header
+          title={boardName || ""}
+          className="z-30 shrink-0"
+          rightBtn={
+            isDeletedPostError ? undefined : <PostMenu isWriter={isWriter} />
+          }
+        />
+
+        <div
+          ref={composerState.commentScrollRootRef}
+          data-comment-scroll-root
+          className="
+            flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain
+            [-webkit-overflow-scrolling:touch]
+          "
+        >
+          <div className="flex flex-col bg-grey-100">
+            {postBody}
+            {commentsSection}
+          </div>
+        </div>
+
+        {post && !isDeletedPostError && post.commentList && (
+          <CommentComposer
+            postId={post.postId}
+            variant="anchored"
+            {...composerState}
+          />
+        )}
+
+        <ReportPostModal />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-full w-full md:max-w-[768px] mx-auto flex flex-col">
+    <div className="mx-auto flex min-h-full w-full max-w-[768px] flex-col">
       <Header
         title={boardName || ""}
-        className="flex-shrink-0 z-30"
+        className="z-30 shrink-0"
         rightBtn={
           isDeletedPostError ? undefined : <PostMenu isWriter={isWriter} />
         }
       />
-      <article className="flex flex-col flex-grow">
-        <div className="flex-grow flex flex-col bg-grey-100">
-          <div className="h-4" />
-          <PostDetailMainContent
-            isLoading={isLoading}
-            isDeletedPostError={isDeletedPostError}
-            post={post}
-          />
-          <div className="h-4" />
-          <PostCommentList
-            post={post}
-            isDeletedPostError={isDeletedPostError}
-          />
+      <article className="flex flex-grow flex-col">
+        <div className="flex flex-grow flex-col bg-grey-100">
+          {postBody}
+          {commentsSection}
         </div>
       </article>
       <ReportPostModal />
@@ -74,17 +155,4 @@ function PostDetailMainContent({
     return null;
   }
   return <PostContent post={post} fitMode="fit" />;
-}
-
-function PostCommentList({
-  post,
-  isDeletedPostError,
-}: {
-  post: PostArticleDetail | null | undefined;
-  isDeletedPostError: boolean;
-}) {
-  if (!post || isDeletedPostError || !post.commentList) {
-    return null;
-  }
-  return <CommentsList comments={post.commentList} postId={post.postId} />;
 }

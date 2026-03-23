@@ -1,11 +1,14 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { Controller } from "react-hook-form";
 
 import { CheckIcon, PaperAirplaneIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import type { Dispatch, RefObject, SetStateAction } from "react";
+
+import { useIOSKeyboardOpacityFix } from "@/shared/hooks";
+import { cn } from "@/shared/lib";
 
 import { useCommentThreadSubmitAction } from "../../../hooks/actions";
 import {
@@ -14,7 +17,10 @@ import {
   useCommentBottomTextareaHeight,
   useCommentComposerForm,
 } from "../../../hooks/form";
-import { useCommentNavigation } from "../../../hooks/view-model";
+import {
+  useCommentNavigation,
+  useReplyTargetScroll,
+} from "../../../hooks/view-model";
 import type { Comment } from "../../../types";
 
 export type CommentComposerProps = {
@@ -25,6 +31,11 @@ export type CommentComposerProps = {
     Record<number, HTMLDivElement | null>
   >;
   composerTextareaRef: RefObject<HTMLTextAreaElement | null>;
+  commentScrollRootRef?: RefObject<HTMLDivElement | null>;
+  composerFormRef?: RefObject<HTMLFormElement | null>;
+  applyComposerFocusRef?: RefObject<(() => boolean) | null>;
+  /** anchored: vv 고정 셸 하단 / sticky: 목록 내부 스크롤용 */
+  variant?: "anchored" | "sticky";
 };
 
 export function CommentComposer({
@@ -33,24 +44,30 @@ export function CommentComposer({
   setReplyTarget,
   commentAnchorElementsRef,
   composerTextareaRef,
+  commentScrollRootRef,
+  composerFormRef,
+  applyComposerFocusRef,
+  variant = "sticky",
 }: CommentComposerProps) {
-  const formRef = useRef<HTMLFormElement>(null);
   const sendIconWrapperRef = useRef<HTMLSpanElement>(null);
+  const {
+    ref: iosOpacityTextareaRef,
+    applyIosKeyboardOpacityFixFocus,
+    onFocus: handleIosOpacityFocus,
+    onBlur: handleTextareaBlur,
+  } = useIOSKeyboardOpacityFix<HTMLTextAreaElement>({ enabled: true });
 
   const { adjustHeight } = useCommentBottomTextareaHeight(composerTextareaRef);
   const { setSendIconActive } =
     useCommentBottomSendIconHighlight(sendIconWrapperRef);
-  // 제출 직후 한 번에: 입력 비움 · 아이콘 기본 톤 · 높이 재계산
   const { resetCommentInput } = useCommentBottomFieldReset(
     composerTextareaRef,
     setSendIconActive,
     adjustHeight
   );
 
-  // RHF: 본문·익명
   const { control, handleSubmit, reset } = useCommentComposerForm();
 
-  // 제출: 댓글/대댓 mutation + 입력·폼 초기화
   const { submitFromComposer, submitReplyFromComposer } =
     useCommentThreadSubmitAction({
       postId,
@@ -60,11 +77,39 @@ export function CommentComposer({
       reset,
     });
 
-  // 답글 대상이 있을 때 원댓의 위치로 스크롤
+  const useAnchoredVvScroll =
+    variant === "anchored" && Boolean(commentScrollRootRef);
+
+  useReplyTargetScroll({
+    replyTarget,
+    commentAnchorElementsRef,
+    commentScrollRootRef: commentScrollRootRef ?? { current: null },
+    composerFormRef: composerFormRef ?? { current: null },
+    enabled: useAnchoredVvScroll,
+  });
+
   const { moveToHash } = useCommentNavigation({
     commentId: replyTarget?.commentId.toString() ?? null,
     commentsRef: commentAnchorElementsRef,
+    ...(useAnchoredVvScroll && commentScrollRootRef && composerFormRef
+      ? {
+        scrollRootRef: commentScrollRootRef,
+        composerFormRef,
+      }
+      : {}),
   });
+
+  useEffect(() => {
+    if (!applyComposerFocusRef) {
+      return;
+    }
+
+    applyComposerFocusRef.current = applyIosKeyboardOpacityFixFocus;
+
+    return () => {
+      applyComposerFocusRef.current = null;
+    };
+  }, [applyComposerFocusRef, applyIosKeyboardOpacityFixFocus]);
 
   const formOnSubmit = replyTarget
     ? handleSubmit(submitReplyFromComposer)
@@ -72,13 +117,18 @@ export function CommentComposer({
 
   return (
     <form
-      ref={formRef}
+      ref={composerFormRef}
       onSubmit={formOnSubmit}
-      className="sticky bottom-0 w-full shadow-up-md"
+      className={cn(
+        "relative z-20 w-full shrink-0 shadow-up-md",
+        variant === "sticky" && "sticky bottom-0",
+        variant === "anchored" &&
+        "max-md:pb-[max(0.75rem,env(safe-area-inset-bottom))] max-md:focus-within:pb-0"
+      )}
     >
       {replyTarget && (
         <div
-          className="pl-6 pr-6 h-8 flex flex-row items-center justify-between bg-black/70"
+          className="absolute bottom-full left-0 right-0 z-10 pl-6 pr-6 h-8 flex flex-row items-center justify-between bg-black/40 backdrop-blur-sm"
           onClick={moveToHash}
         >
           <div className="text-[12px] text-primary">
@@ -99,7 +149,7 @@ export function CommentComposer({
         <div className="flex flex-row h-fit items-end px-4 py-2 rounded-md bg-grey-100">
           <label
             htmlFor="anonymity"
-            className="flex flex-row gap-2 items-center cursor-pointer py-2"
+            className="shrink-0 flex flex-row gap-2 items-center cursor-pointer py-2"
           >
             <Controller
               name="anonymity"
@@ -117,8 +167,8 @@ export function CommentComposer({
                 />
               )}
             />
-            <div className="hidden w-5 h-5 peer-checked:flex rounded-sm items-center justify-center bg-primary">
-              <CheckIcon className="w-[12px] h-[12px] text-white stroke-[4px]" />
+            <div className="hidden size-5 peer-checked:flex items-center justify-center rounded-sm bg-primary p-1">
+              <CheckIcon className="size-[12px] text-white stroke-[4px]" />
             </div>
             <div className="block w-5 h-5 bg-background peer-checked:hidden rounded-sm" />
             <div className="text-grey-400 peer-checked:text-grey-800 text-[12px]">
@@ -134,8 +184,14 @@ export function CommentComposer({
                 ref={(element) => {
                   field.ref(element);
                   composerTextareaRef.current = element;
+                  iosOpacityTextareaRef.current = element;
                 }}
                 placeholder="댓글을 입력하세요..."
+                onTouchStart={applyIosKeyboardOpacityFixFocus}
+                onBlur={() => {
+                  field.onBlur();
+                  handleTextareaBlur();
+                }}
                 onChange={(event) => {
                   field.onChange(event);
                   setSendIconActive(event.target.value.trim().length > 0);
@@ -148,11 +204,12 @@ export function CommentComposer({
                     !event.nativeEvent.isComposing
                   ) {
                     event.preventDefault();
-                    formRef.current?.requestSubmit();
+                    (composerFormRef ?? { current: null }).current?.requestSubmit();
                   }
                 }}
                 className="bg-transparent border-none outline-none px-4 py-2 flex-grow text-[13px] resize-none overflow-y-auto min-h-[20px] max-h-[120px] scrollbar-thin scrollbar-thumb-grey-300 scrollbar-track-transparent hover:scrollbar-thumb-grey-400"
                 rows={1}
+                onFocus={handleIosOpacityFocus}
               />
             )}
           />

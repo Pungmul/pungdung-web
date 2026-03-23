@@ -11,12 +11,14 @@ import type { Comment as CommentType } from "../../types";
 interface UseCommentReplyPromptParams {
   comment: CommentType;
   composerTextareaRef: RefObject<HTMLTextAreaElement | null>;
+  applyComposerFocusRef: RefObject<(() => boolean) | null>;
   setReplyTarget: (comment: CommentType) => void;
 }
 
 export function useCommentReplyPrompt({
   comment,
   composerTextareaRef,
+  applyComposerFocusRef,
   setReplyTarget,
 }: UseCommentReplyPromptParams) {
   return useCallback(
@@ -26,11 +28,15 @@ export function useCommentReplyPrompt({
         title: "대댓글 작성",
         message: "대댓글을 작성하시겠습니까?",
         onConfirm: () => {
-          composerTextareaRef.current?.focus();
           setReplyTarget(comment);
+          queueMicrotask(() => {
+            if (!applyComposerFocusRef.current?.()) {
+              composerTextareaRef.current?.focus({ preventScroll: true });
+            }
+          });
         },
       });
     },
-    [comment, composerTextareaRef, setReplyTarget]
+    [comment, composerTextareaRef, applyComposerFocusRef, setReplyTarget]
   );
 }
