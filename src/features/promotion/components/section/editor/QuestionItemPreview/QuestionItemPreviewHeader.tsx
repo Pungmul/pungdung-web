@@ -28,7 +28,9 @@ export const QuestionItemPreviewHeader = ({
           onFocus();
         }}
       >
-        <PencilIcon className="size-fit rounded text-grey-500" />
+        <span className="size-full flex items-center justify-center">
+          <PencilIcon className="size-full rounded text-grey-500" />
+        </span>
       </div>
     </div>
   );

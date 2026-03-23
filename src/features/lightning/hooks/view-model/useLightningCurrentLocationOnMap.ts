@@ -4,12 +4,13 @@ import { useCallback, useRef, useState } from "react";
 
 import type { RefObject } from "react";
 
+import { MAP_LOCATION_FALLBACK } from "@/features/location";
+
 import { useKakaoMapsEffect } from "@/shared/hooks";
 
 import { createGPSMarker } from "../../lib";
 import type { GeoCoordinates } from "../../types";
 
-import { MAP_LOCATION_FALLBACK } from "@/features/location";
 import { locationStore } from "@/features/location/store";
 
 type UseLightningCurrentLocationOnMapProps = {

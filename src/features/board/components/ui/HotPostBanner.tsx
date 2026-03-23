@@ -13,12 +13,14 @@ interface HotPostBannerProps {
 export function HotPostBanner({ hotPost }: HotPostBannerProps) {
   const content = (
     <div className="bg-red-50 flex flex-row w-full px-[12px] py-[8px] rounded-full items-center gap-2 overflow-hidden">
-      <FireIcon
-        className="w-[24px] h-[24px]"
-        style={{
-          color: hotPost ? "#FF4C4C" : "#C6C8CC",
-        }}
-      />
+      <span className="flex size-6 items-center justify-center">
+        <FireIcon
+          className="size-full"
+          style={{
+            color: hotPost ? "#FF4C4C" : "#C6C8CC",
+          }}
+        />
+      </span>
       <div
         className={
           "text-md font-medium line-clamp-1 text-ellipsis " +

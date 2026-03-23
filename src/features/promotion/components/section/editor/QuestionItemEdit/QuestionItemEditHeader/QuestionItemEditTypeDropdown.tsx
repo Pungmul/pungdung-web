@@ -42,12 +42,14 @@ export const QuestionItemEditTypeDropdown = ({
         title="질문 타입 변경"
       >
         <div className="size-7 p-1">
-          <QuestionTypeIcon type={questionType} className="size-5" />
+          <QuestionTypeIcon type={questionType} className="size-full" />
         </div>
         <div className="px-2 py-1 text-[13px] font-medium text-grey-700">
           {getQuestionTypeLabel(questionType)}
         </div>
-        <ChevronDownIcon className={`size-4 ${isTypeDropdownOpen ? "-scale-y-100" : ""}`} />
+        <span className="size-4 flex items-center justify-center">
+          <ChevronDownIcon className={`size-full ${isTypeDropdownOpen ? "-scale-y-100" : ""}`} />
+        </span>
       </div>
 
       {isTypeDropdownOpen && (
@@ -75,7 +77,7 @@ export const QuestionItemEditTypeDropdown = ({
                   )
                 }
               >
-                <QuestionTypeIcon type={typeOption} className="size-5" />
+                <QuestionTypeIcon type={typeOption} className="size-full" />
               </div>
               <span className="text-[13px] font-medium">
                 {getQuestionTypeLabel(typeOption)}

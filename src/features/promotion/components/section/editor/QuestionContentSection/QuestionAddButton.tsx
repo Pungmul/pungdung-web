@@ -65,10 +65,12 @@ export const QuestionAddButton = ({ onSelectQuestionType }: QuestionAddButtonPro
         <div className="text-[14px] font-normal text-grey-400">
           설문 추가하기
         </div>
-        <PlusCircleIcon
-          className="size-[16px] text-grey-400"
-          strokeWidth={1.5}
-        />
+        <span className="flex size-4 items-center justify-center">
+          <PlusCircleIcon
+            className="size-full text-grey-400"
+            strokeWidth={1.5}
+          />
+        </span>
       </div>
       <div
         className={`absolute w-full px-[12px] left-0`}
@@ -84,8 +86,8 @@ export const QuestionAddButton = ({ onSelectQuestionType }: QuestionAddButtonPro
             className="flex flex-row items-center justify-start w-full px-[16px] py-[8px] cursor-pointer gap-[16px] hover:bg-grey-100"
             onClick={() => handleSelectQuestionType("TEXT")}
           >
-            <span className="flex items-center justify-center">
-              <ShortAnswerOutline className="size-[24px] text-grey-400" />
+            <span className="flex size-4 items-center justify-center">
+              <ShortAnswerOutline className="size-full text-grey-400" />
             </span>
             <span className="text-[14px] font-medium text-grey-400">
               단답형
@@ -95,8 +97,8 @@ export const QuestionAddButton = ({ onSelectQuestionType }: QuestionAddButtonPro
             className="flex flex-row items-center justify-start w-full px-[16px] py-[8px] cursor-pointer gap-[16px] hover:bg-grey-100"
             onClick={() => handleSelectQuestionType("CHOICE")}
           >
-            <span className="flex items-center justify-center">
-              <RadioSelectSolid className="size-[24px] text-grey-400" />
+            <span className="flex size-4 items-center justify-center">
+              <RadioSelectSolid className="size-full text-grey-400" />
             </span>
             <span className="text-[14px] font-medium text-grey-400">
               객관식
@@ -106,8 +108,8 @@ export const QuestionAddButton = ({ onSelectQuestionType }: QuestionAddButtonPro
             className="flex flex-row items-center justify-start w-full px-[16px] py-[8px] cursor-pointer gap-[16px] hover:bg-grey-100"
             onClick={() => handleSelectQuestionType("CHECKBOX")}
           >
-            <span className="flex items-center justify-center">
-              <CheckBoxOutline className="size-[24px] text-grey-400" />
+            <span className="flex size-4 items-center justify-center">
+              <CheckBoxOutline className="size-full text-grey-400" />
             </span>
             <span className="text-[14px] font-medium text-grey-400">
               체크 리스트

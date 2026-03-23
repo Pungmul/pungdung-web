@@ -64,7 +64,9 @@ const FindFriendHistoryItem: React.FC<FindFriendHistoryItemProps> = ({
       }}
       aria-label="기록 삭제"
     >
-      <XMarkIcon className="size-5 text-grey-500" />
+      <span className="flex size-5 items-center justify-center">
+        <XMarkIcon className="size-full text-grey-500" />
+      </span>
     </span>
   </li>
 );

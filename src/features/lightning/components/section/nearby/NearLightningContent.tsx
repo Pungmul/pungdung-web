@@ -111,7 +111,9 @@ export function NearLightningSwiperList() {
                   </h1>
                 </div>
               )}
-              <ThunderIconFilled className="size-[48px] text-grey-800" />
+              <span className="size-12 flex items-center justify-center">
+                <ThunderIconFilled className="size-full text-grey-800" />
+              </span>
               <h1 className="text-center text-grey-400 font-semibold text-sm">
                 {nearLightning && nearLightning.length > 0
                   ? "번개 더 찾아보기"

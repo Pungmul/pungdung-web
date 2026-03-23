@@ -1,6 +1,7 @@
 "use client";
 
 import { InputHTMLAttributes } from "react";
+
 import { CheckIcon } from "@heroicons/react/24/outline";
 
 interface CheckboxProps
@@ -33,8 +34,8 @@ export function Checkbox({
         {...rest}
       />
 
-      <div className="hidden w-[16px] h-[16px] peer-checked:flex rounded-sm items-center justify-center bg-primary">
-        <CheckIcon className="w-[12px] h-[12px] text-white stroke-[4px]" />
+      <div className="hidden size-4 peer-checked:flex items-center justify-center rounded-sm bg-primary">
+        <CheckIcon className="size-[12px] text-white stroke-[4px]" />
       </div>
       <div className="block border border-grey-400 peer-checked:hidden rounded-sm bg-[#FFFFFF] w-[16px] h-[16px]" />
 

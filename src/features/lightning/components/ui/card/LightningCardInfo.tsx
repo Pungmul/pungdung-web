@@ -31,7 +31,9 @@ function LightningCardLocation({ buildingName, locationDetail }: { buildingName?
   if (!buildingName || buildingName?.trim() === "") {
     return (
       <div className="flex flex-row items-end justify-between gap-[4px]">
-        <MapPinIcon className="size-6 text-primary" />
+        <span className="flex size-6 items-center justify-center">
+          <MapPinIcon className="size-full text-primary" />
+        </span>
         <h3 className="text-m1 font-normal text-grey-600 py-1">{locationDetail}</h3>
       </div>
     );
@@ -40,7 +42,9 @@ function LightningCardLocation({ buildingName, locationDetail }: { buildingName?
   if (!locationDetail || locationDetail.trim() === "") {
     return (
       <div className="flex flex-row items-end justify-between gap-[4px]">
-        <MapPinIcon className="size-6 text-primary" />
+        <span className="flex size-6 items-center justify-center">
+          <MapPinIcon className="size-full text-primary" />
+        </span>
         <h3 className="text-m1 font-normal text-grey-600 py-1">{buildingName}</h3>
       </div>
     );
@@ -48,7 +52,9 @@ function LightningCardLocation({ buildingName, locationDetail }: { buildingName?
 
   return (
     <div className="flex flex-row items-end justify-between gap-[4px]">
-      <MapPinIcon className="size-6 text-primary" />
+      <span className="flex size-6 items-center justify-center">
+        <MapPinIcon className="size-full text-primary" />
+      </span>
       <div className="flex flex-col items-start gap-4 py-1">
         <h3 className="text-m1 font-normal text-grey-600">{buildingName}</h3>
         <h3 className="text-m1 font-normal text-grey-600">{locationDetail}</h3>
@@ -60,7 +66,9 @@ function LightningCardLocation({ buildingName, locationDetail }: { buildingName?
 function LightningCardTime({ startTime, endTime }: { startTime: string, endTime: string }) {
   return (
     <div className="flex flex-row items-end justify-between gap-[4px]">
-      <ClockIcon className="size-6 text-primary" />
+      <span className="flex size-6 items-center justify-center">
+        <ClockIcon className="size-full text-primary" />
+      </span>
       <h3 className="text-m1 font-normal text-grey-600">{dayjs(startTime).format("HH:mm")}~{dayjs(endTime).format("HH:mm")}</h3>
     </div>
   );

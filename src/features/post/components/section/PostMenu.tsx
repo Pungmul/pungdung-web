@@ -62,7 +62,9 @@ function PostMenuImpl({ isWriter }: { isWriter: boolean }) {
           setOpen((prev) => !prev);
         }}
       >
-        <EllipsisVerticalIcon className="size-[32px]" />
+        <span className="size-8 flex items-center justify-center">
+          <EllipsisVerticalIcon className="size-full" />
+        </span>
         {isOpen && (
           <ul
             className="absolute right-0 top-full px-3 py-2 border border-grey-300 mt-2 bg-background rounded-sm flex flex-col gap-2"

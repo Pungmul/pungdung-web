@@ -38,7 +38,9 @@ function FriendMenuImpl({ items }: FriendMenuProps) {
           setOpen((prev) => !prev);
         }}
       >
-        <EllipsisHorizontalIcon className="size-5 shrink-0" aria-hidden />
+        <span className="flex size-5 items-center justify-center shrink-0">
+          <EllipsisHorizontalIcon className="size-full" aria-hidden />
+        </span>
       </button>
       {isOpen && (
         <ul

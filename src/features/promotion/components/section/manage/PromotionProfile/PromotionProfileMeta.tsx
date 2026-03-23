@@ -39,7 +39,9 @@ export function PromotionProfileMeta({
           <span className="font-normal text-grey-800 text-[14px] lg:text-[18px]">
             {getAddressDisplayText(address)}
           </span>
-          <ChevronRightIcon className="w-[16px] h-[16px] text-grey-500 flex-shrink-0" />
+          <span className="size-6 flex items-center justify-center flex-shrink-0">
+            <ChevronRightIcon className="size-full text-grey-500" />
+          </span>
         </div>
         <div className="flex flex-row gap-[12px] items-center font-normal max-w-full line-clamp-1">
           <span className="font-normal text-grey-500 text-[14px] lg:text-[18px]">
@@ -73,7 +75,9 @@ export function PromotionProfileMeta({
         <span className="font-normal text-grey-500 text-[14px] lg:text-[18px]">
           {getAddressDisplayText(address)}
         </span>
-        <ChevronRightIcon className="w-[12px] h-[12px] text-grey-500 flex-shrink-0" />
+        <span className="flex size-6 flex-shrink-0 items-center justify-center">
+          <ChevronRightIcon className="size-full text-grey-500" />
+        </span>
       </div>
       <div className="flex flex-row gap-[4px] items-center font-normal max-w-full line-clamp-1">
         <span className="font-normal text-grey-500 text-[14px] lg:text-[18px]">

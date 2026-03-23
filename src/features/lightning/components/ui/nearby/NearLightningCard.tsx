@@ -24,7 +24,10 @@ export const NearLightningCard = memo(function NearLightningCard({
             {lightningMeeting.meetingType === "FREE" ? "일반 모임" : "풍물 모임"}
           </div>
           <span className="text-grey-500 flex flex-row items-center gap-[4px]">
-            <MapPinIcon className="size-[20px] text-primary" /> <span className="text-grey-700 text-[12px]">{parseDistanceToString(distanceInMeters)}</span>
+            <span className="flex size-5 items-center justify-center">
+              <MapPinIcon className="size-full text-primary" />
+            </span>
+            <span className="text-grey-700 text-[12px]">{parseDistanceToString(distanceInMeters)}</span>
           </span>
         </div>
         <h1 className="text-grey-800 text-center font-semibold text-[16px] h-[36px]">

@@ -56,7 +56,9 @@ export function PromotionPostBox({ promotion }: { promotion: Promotion }) {
           </div>
         </div>
         <div className="bg-grey-400 text-[12px] text-white lg:text-[14px] w-fit font-normal px-[4px] py-[2px] rounded-[4px] z-10 flex items-center gap-[4px]">
-          <UsersIcon className="size-4 text-white" />
+          <span className="size-4 flex items-center justify-center">
+            <UsersIcon className="size-full text-white" />
+          </span>
           {promotion.limitNum ? `${promotion.limitNum}` : "제한 없음"}
         </div>
       </Link>

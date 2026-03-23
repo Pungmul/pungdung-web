@@ -139,15 +139,13 @@ export const DateInput = memo(function DateInput(props: DateInputProps) {
         )}
         <div
           ref={targetRef}
-          className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] hover:border-grey-500 ${
-            !!errorMessage
+          className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] hover:border-grey-500 ${!!errorMessage
               ? "border-red-400"
               : "border-grey-300 focus-within:border-grey-500"
-          } ${
-            rest.disabled
+            } ${rest.disabled
               ? "bg-grey-100 text-grey-400 cursor-not-allowed"
               : "cursor-pointer"
-          }`}
+            }`}
         >
           {/* 날짜 입력 필드들 */}
           <DateFields
@@ -171,31 +169,28 @@ export const DateInput = memo(function DateInput(props: DateInputProps) {
             readOnly
             {...rest}
             value={value}
-            className={`flex-grow w-full outline-none placeholder-grey-300 text-grey-500 bg-transparent border-none h-full cursor-pointer ${
-              rest.disabled
+            className={`flex-grow w-full outline-none placeholder-grey-300 text-grey-500 bg-transparent border-none h-full cursor-pointer ${rest.disabled
                 ? "placeholder:bg-grey-100 placeholder-grey-500 cursor-not-allowed"
                 : ""
-            } ${rest.className} `}
+              } ${rest.className} `}
           />
 
           {/* 캘린더 아이콘 */}
           <span
-            className={`size-[32px] p-[4px] flex items-center justify-center text-grey-300 ${
-              rest.disabled
+            className={`size-8 p-1 flex items-center justify-center text-grey-300 ${rest.disabled
                 ? "cursor-not-allowed"
                 : "cursor-pointer hover:text-grey-500"
-            }`}
+              }`}
             onClick={handleIconClick}
           >
-            <CalendarIcon />
+            <CalendarIcon className="size-full text-grey-300" />
           </span>
 
           {/* 드롭다운 달력 */}
           {isOpen && (
             <div
-              className={`absolute left-0 right-0 bg-background w-[320px] border-2 border-grey-300 rounded-lg shadow-lg z-50 ${
-                isBelowHalf ? "bottom-full mb-2" : "top-full mt-2"
-              }`}
+              className={`absolute left-0 right-0 bg-background w-[320px] border-2 border-grey-300 rounded-lg shadow-lg z-50 ${isBelowHalf ? "bottom-full mb-2" : "top-full mt-2"
+                }`}
               onClick={(e) => e.stopPropagation()}
             >
               <DatePicker
@@ -208,7 +203,9 @@ export const DateInput = memo(function DateInput(props: DateInputProps) {
         </div>
         {(!!errorMessage || (!isValidDate && displayDate)) && (
           <div className="flex flex-row items-center gap-[4px]">
-            <WarningCircleIcon className="text-red-400" />
+            <span className="flex size-4 shrink-0 items-center justify-center">
+              <WarningCircleIcon className="size-full text-red-400" />
+            </span>
             <div className="text-red-500 max-w-full text-[12px]">
               {errorMessage || "올바른 날짜를 입력해주세요."}
             </div>

@@ -76,7 +76,7 @@ export function SelectTimeAndPersonnelStep() {
               />
               {fieldErrors[F.MIN_PERSONNEL] ? (
                 <div className="flex flex-row items-center gap-[4px] px-1">
-                  <WarningCircleIcon className="shrink-0 text-red-400" />
+                  <span className="flex size-4 shrink-0 items-center justify-center"><WarningCircleIcon className="size-full text-red-400" /></span>
                   <p className="text-[12px] text-red-500">
                     {fieldErrors[F.MIN_PERSONNEL]}
                   </p>
@@ -109,7 +109,7 @@ export function SelectTimeAndPersonnelStep() {
               />
               {fieldErrors[F.MAX_PERSONNEL] ? (
                 <div className="flex flex-row items-center gap-[4px] px-1">
-                  <WarningCircleIcon className="shrink-0 text-red-400" />
+                  <span className="flex size-4 shrink-0 items-center justify-center"><WarningCircleIcon className="size-full text-red-400" /></span>
                   <p className="text-[12px] text-red-500">
                     {fieldErrors[F.MAX_PERSONNEL]}
                   </p>

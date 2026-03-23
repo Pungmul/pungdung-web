@@ -40,18 +40,18 @@ export function BoardHeaderSearchField({
       />
       {searchValue.trim() !== "" && (
         <>
-          <XCircleIcon
-            className="w-[24px] h-[24px] cursor-pointer peer text-grey-400"
-            width={24}
-            height={24}
+          <span
+            className="flex size-6 items-center justify-center cursor-pointer peer"
             onClick={onClear}
-          />
-          <ArrowRightIcon
-            className="w-[24px] h-[24px] cursor-pointer text-grey-400"
+          >
+            <XCircleIcon className="size-full text-grey-400" />
+          </span>
+          <span
+            className="flex size-6 items-center justify-center cursor-pointer"
             onClick={onSubmitSearch}
-            width={24}
-            height={24}
-          />
+          >
+            <ArrowRightIcon className="size-full text-grey-400" />
+          </span>
         </>
       )}
     </div>

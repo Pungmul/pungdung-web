@@ -2,7 +2,7 @@
 
 import { memo, useMemo, useState } from "react";
 
-import { CommentOutline,EyeIcon } from "@/shared/components/Icons";
+import { CommentOutline, EyeIcon } from "@/shared/components/Icons";
 
 import { PostImageList } from "./PostImageList";
 import { PostLikeButton } from "./PostLikeButton";
@@ -59,11 +59,11 @@ function PostContentImpl({
                   : post.timeSincePostedText}
               </div>
             </div>
-            <div className="flex items-end flex-row">
+            <div className="flex items-center flex-row">
               <div className="flex justify-center items-center size-6 p-1">
-                <EyeIcon className="text-grey-500" />
+                <EyeIcon className="size-full text-grey-500" />
               </div>
-              <div className="text-grey-400 text-[13px]">{post?.viewCount}</div>
+              <div className="text-grey-400 leading-6 text-[13px]">{post?.viewCount}</div>
             </div>
           </div>
         </div>
@@ -99,11 +99,11 @@ function PostContentImpl({
             postId={post.postId}
             likedNum={post.likedNum}
           />
-          <div className="flex items-end flex-row cursor-pointer">
-            <div className="size-7 p-1">
-              <CommentOutline className="size-5 text-grey-400" />
+          <div className="flex items-center flex-row cursor-pointer">
+            <div className="flex size-7 p-1 items-center justify-center">
+              <CommentOutline className="size-full text-grey-400" />
             </div>
-            <div className="text-grey-400">
+            <div className="text-grey-400 leading-6">
               {post?.commentList?.length ?? 0}
             </div>
           </div>

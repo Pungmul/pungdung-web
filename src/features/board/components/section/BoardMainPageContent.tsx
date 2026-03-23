@@ -18,22 +18,30 @@ interface BoardMainPageContentProps {
 
 const boardMainPageContentItemList = [
   {
-    icon: <PencilSquareIcon className="size-[24px] text-grey-400" />,
+    icon: (
+      <PencilSquareIcon className="size-full text-grey-400" />
+    ),
     title: "내가 쓴 글",
     href: "/board/my-post",
   },
   {
-    icon: <CommentOutline className="size-[24px] text-grey-400" />,
+    icon: (
+      <CommentOutline className="size-full text-grey-400" />
+    ),
     title: "내가 쓴 댓글",
     href: "/board/my-comment",
   },
   {
-    icon: <TicketIcon className="size-[24px] text-blue-200" />,
+    icon: (
+      <TicketIcon className="size-full text-blue-200" />
+    ),
     title: "관람 예정인 공연",
     href: "/board/promote/upcoming",
   },
   {
-    icon: <FireIcon className="size-[24px] text-warning" />,
+    icon: (
+      <FireIcon className="size-full text-warning" />
+    ),
     title: "HOT 게시판",
     href: "/board/hot-post",
   },
@@ -79,12 +87,12 @@ const BoardMainPageContentItem = ({
       <WebViewLink
         href={href}
         prefetch
-        className="w-full px-[12px] py-[8px] flex flex-row items-end gap-[12px] cursor-pointer"
+        className="w-full px-[12px] py-[8px] flex flex-row items-center gap-[12px] cursor-pointer"
       >
-        <div className="flex justify-center items-center size-[28px]">
+        <div className="flex size-7 items-center justify-center p-0.5">
           {icon}
         </div>
-        <div className="text-[15px] text-grey-600">
+        <div className="text-[15px] leading-7 text-grey-600">
           {title}
         </div>
       </WebViewLink>

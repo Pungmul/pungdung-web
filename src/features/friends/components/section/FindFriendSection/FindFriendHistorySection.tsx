@@ -18,7 +18,9 @@ const FindFriendHistorySection: React.FC = () => {
   return (
     <div className="flex flex-col gap-2 px-4">
       <h4 className="text-sm text-grey-500 pb-4 px-1">
-        <ClockIcon className="size-5 text-grey-500 inline-block mr-1 align-middle" />
+        <span className="inline-flex size-5 items-center justify-center mr-1 align-middle">
+          <ClockIcon className="size-full text-grey-500" />
+        </span>
         검색 기록
       </h4>
       <FindFriendHistoryList items={searchHistoryForDisplay} />

@@ -240,7 +240,9 @@ export function LocationMapPicker({
       {showSearchBar && (
         <div className="relative w-full flex flex-col gap-2">
           <div className="flex flex-row gap-2 p-2 rounded-lg bg-grey-100 border border-grey-100 focus-within:border-grey-400">
-            <MagnifyingGlassIcon className="size-6 text-grey-400" />
+            <span className="flex size-6 shrink-0 items-center justify-center">
+              <MagnifyingGlassIcon className="size-full text-grey-400" />
+            </span>
             <input
               type="text"
               className="flex-grow bg-transparent outline-none font-light border-none"
@@ -249,10 +251,12 @@ export function LocationMapPicker({
               onChange={(e) => setSearchValue(e.target.value)}
             />
             {searchValue.trim() !== "" && (
-              <XCircleIcon
-                className="size-6 cursor-pointer text-grey-400"
+              <span
+                className="flex size-6 shrink-0 cursor-pointer items-center justify-center"
                 onClick={() => setSearchValue("")}
-              />
+              >
+                <XCircleIcon className="size-full text-grey-400" />
+              </span>
             )}
           </div>
 

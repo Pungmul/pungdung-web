@@ -95,7 +95,9 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 onClick={onClose}
                 title={title ? title + " 닫기" : "닫기"}
               >
-                <XMarkIcon className="w-[24px] h-[24px]" />
+                <span className="flex size-6 items-center justify-center">
+                  <XMarkIcon className="size-full" />
+                </span>
               </div>
             </div>
           )}

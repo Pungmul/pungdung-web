@@ -67,7 +67,9 @@ function BoardPostListEmpty({ boardId }: { boardId: number }) {
           className="inline-flex items-center gap-1"
         >
           이 게시판의 첫 글 쓰기
-          <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />
+          <span className="size-4 flex items-center justify-center flex-shrink-0">
+            <ChevronRightIcon className="size-full" />
+          </span>
         </LinkChipButton>
       }
     />

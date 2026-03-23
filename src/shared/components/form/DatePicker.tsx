@@ -146,17 +146,17 @@ export function DatePicker({
         <div className="flex flex-row gap-2 items-center">
           <button
             onClick={prevAction}
-            className="p-2 hover:bg-grey-100 rounded-md"
+            className="flex size-8 items-center justify-center rounded-md hover:bg-grey-100"
             type="button"
           >
-            <ChevronLeftIcon className="w-5 h-5" />
+            <ChevronLeftIcon className="size-full" />
           </button>
           <button
             onClick={nextAction}
-            className="p-2 hover:bg-grey-100 rounded-md"
+            className="flex size-8 items-center justify-center rounded-md hover:bg-grey-100"
             type="button"
           >
-            <ChevronRightIcon className="w-5 h-5" />
+            <ChevronRightIcon className="size-full" />
           </button>
         </div>
       </div>

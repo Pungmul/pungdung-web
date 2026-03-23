@@ -29,7 +29,7 @@ export function FinalSummary() {
         </div>
         <div className="flex items-center gap-1">
           <SummaryToken
-            icon={<MapPinIcon className="size-4 stroke-[1.5px] stroke-grey-500" />}
+            icon={<span className="flex size-4 items-center justify-center"><MapPinIcon className="size-full stroke-[1.5px] stroke-grey-500" /></span>}
             onClick={() => setBuildStep("SelectLocation")}
             truncate
           >
@@ -40,13 +40,13 @@ export function FinalSummary() {
         <div className="flex items-center gap-1">
           <SummaryToken onClick={() => setBuildStep("SelectType")}>
             {lightningType}{" "}
-            <ChevronDownIcon className="size-4 stroke-[1.5px] stroke-grey-500" />
+            <span className="flex size-4 items-center justify-center"><ChevronDownIcon className="size-full stroke-[1.5px] stroke-grey-500" /></span>
           </SummaryToken>
           <span className="text-secondary font-bold">번개<span className="font-medium text-grey-600">{"를"}</span></span>
         </div>
         <div className="flex items-center gap-1">
           <SummaryToken
-            icon={<UserGroupIcon className="size-4 stroke-[1.5px] fill-grey-500" />}
+            icon={<span className="flex size-4 items-center justify-center"><UserGroupIcon className="size-full stroke-[1.5px] fill-grey-500" /></span>}
             onClick={() => setBuildStep("SelectTimeAndPersonnel")}
             className="tracking-widest"
           >
@@ -56,7 +56,7 @@ export function FinalSummary() {
         </div>
         <div className="flex items-center gap-1">
           <SummaryToken
-            icon={<ClockIcon className="size-4 stroke-[1.5px] stroke-grey-500" />}
+            icon={<span className="flex size-4 items-center justify-center"><ClockIcon className="size-full stroke-[1.5px] stroke-grey-500" /></span>}
             onClick={() => setBuildStep("SelectTimeAndPersonnel")}
             className="tracking-widest"
           >

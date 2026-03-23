@@ -34,7 +34,9 @@ export function MyPromotionPostBox({ form }: { form: PromotionFormListItem }) {
             />
           ) : (
             <div className="flex flex-col items-center justify-center h-full">
-              <PhotoIcon className="size-[64px] text-grey-400" />
+              <span className="size-16 flex items-center justify-center">
+                <PhotoIcon className="size-full text-grey-400" />
+              </span>
             </div>
           )}
         </div>

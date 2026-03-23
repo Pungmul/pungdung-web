@@ -168,9 +168,13 @@ export default function BottomTabs() {
                 prefetch
               >
                 {pathname.startsWith("/home") ? (
-                  <HomeIconFilled className="w-[36px] h-[36px] text-grey-800" />
+                  <span className="flex size-9 items-center justify-center">
+                    <HomeIconFilled className="size-full text-grey-800" />
+                  </span>
                 ) : (
-                  <HomeIconOutline className="w-[36px] h-[36px] text-grey-800" />
+                  <span className="flex size-9 items-center justify-center">
+                    <HomeIconOutline className="size-full text-grey-800" />
+                  </span>
                 )}
                 <span className="hidden 2xl:block w-[100px] text-[16px] self-end pb-[8px] font-semibold text-grey-800">
                   홈
@@ -191,9 +195,13 @@ export default function BottomTabs() {
                 className="h-12 justify-center items-center cursor-pointer flex gap-[24px] flex-row"
               >
                 {pathname.startsWith("/lightning") ? (
-                  <ThunderIconFilled className="w-[36px] h-[36px] text-grey-800" />
+                  <span className="flex size-9 items-center justify-center">
+                    <ThunderIconFilled className="size-full text-grey-800" />
+                  </span>
                 ) : (
-                  <ThunderIconOutline className="w-[36px] h-[36px] text-grey-800" />
+                  <span className="flex size-9 items-center justify-center">
+                    <ThunderIconOutline className="size-full text-grey-800" />
+                  </span>
                 )}
                 <span className="hidden 2xl:block w-[100px] text-[16px] self-end pb-[8px] font-semibold text-grey-800">
                   번개
@@ -208,9 +216,13 @@ export default function BottomTabs() {
                 className="h-12 justify-center items-center cursor-pointer flex gap-[24px] flex-row"
               >
                 {pathname.startsWith("/board") ? (
-                  <BoardIconFilled className="w-[36px] h-[36px] text-grey-800" />
+                  <span className="flex size-9 items-center justify-center">
+                    <BoardIconFilled className="size-full text-grey-800" />
+                  </span>
                 ) : (
-                  <BoardIconOutline className="w-[36px] h-[36px] text-grey-800" />
+                  <span className="flex size-9 items-center justify-center">
+                    <BoardIconOutline className="size-full text-grey-800" />
+                  </span>
                 )}
                 <span className="hidden 2xl:block w-[100px] text-[16px] self-end pb-[8px] font-semibold text-grey-800">
                   게시판
@@ -229,7 +241,9 @@ export default function BottomTabs() {
                 onClick={() => setIsNotificationOpen(true)}
               >
                 {/* notification button */}
-                <NotificationIcon className="w-[36px] h-[36px] text-grey-800 cursor-pointer" />
+                <span className="flex size-9 cursor-pointer items-center justify-center">
+                  <NotificationIcon className="size-full text-grey-800" />
+                </span>
                 <span className="hidden 2xl:block text-left w-[100px] text-[16px] self-end pb-[8px] font-semibold text-grey-800">
                   알림
                 </span>
@@ -242,7 +256,9 @@ export default function BottomTabs() {
                 prefetch
               >
                 {isLoading || !myPageInfo ? (
-                  <UserCircleIcon className="w-[36px] h-[36px] text-grey-800" />
+                  <span className="flex size-9 items-center justify-center">
+                    <UserCircleIcon className="size-full text-grey-800" />
+                  </span>
                 ) : (
                   <ProfileCircle myInfo={myPageInfo} />
                 )}

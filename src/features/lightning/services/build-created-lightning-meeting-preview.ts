@@ -1,8 +1,9 @@
-import type { CreateLightningResponse } from "../api/client/dto.schema";
 import { LIGHTNING_STATUS } from "../constants";
+
+import { buildLightningRequest } from "./build-lightning-request";
+import type { CreateLightningResponse } from "../api/client/dto.schema";
 import type { LightningMeeting } from "../types";
 import type { LightningCreateFormData } from "../types/schemas";
-import { buildLightningRequest } from "./build-lightning-request";
 
 /**
  * 생성 API 응답과 폼 값으로 완료 화면 `LightningCard`용 미리보기 모델을 만든다.

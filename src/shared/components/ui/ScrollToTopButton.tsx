@@ -23,7 +23,7 @@ export function ScrollToTopButton() {
         className="pointer-events-auto size-9 p-2 bg-background rounded-full flex items-center justify-center border border-1 border-grey-300 shadow-md"
         onClick={handleScrollToTop}
       >
-        <ArrowUpIcon className="text-primary" />
+        <ArrowUpIcon className="text-primary size-full" />
       </button>
     </div>
   );

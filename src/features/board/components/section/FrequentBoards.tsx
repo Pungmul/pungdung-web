@@ -29,8 +29,9 @@ export function FrequentBoards() {
                 e.stopPropagation();
                 removeBoard(board);
               }}
+              className="size-4 flex items-center justify-center cursor-pointer"
             >
-              <XMarkIcon className="w-[16px] h-[16px] cursor-pointer" />
+              <XMarkIcon className="size-full" />
             </button>
             <WebViewLink
               href={`/board/${boardHrefSegment(board.id)}`}

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { ArrowUpOnSquareIcon,PlusIcon } from "@heroicons/react/24/outline";
+import { ArrowUpOnSquareIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { AnimatePresence, motion, useMotionValue } from "framer-motion";
 
 import { useView } from "@/shared/lib/view/view-store-provider";
@@ -136,15 +136,17 @@ export default function PWAInstallPrompt() {
               {isIOS ? (
                 <span className="text-grey-100/80 text-xs md:text-sm inline-flex flex-wrap items-center gap-0.5">
                   공유 버튼
-                  <ArrowUpOnSquareIcon
-                    className="size-4 shrink-0 inline-block text-grey-100 text-opacity-80"
-                    aria-hidden={true}
-                  />
+                  <span className="size-4 inline-flex items-center justify-center shrink-0">
+                    <ArrowUpOnSquareIcon
+                      className="size-full inline-block text-grey-100 text-opacity-80"
+                      aria-hidden={true}
+                    />
+                  </span>
                   을 탭한 후{" "}
                   <span className="font-bold">{"홈 화면에 추가"}</span>
-                  <div className="size-4 shrink-0 inline-flex text-grey-100 border border-grey-100 text-opacity-80 rounded-sm items-center justify-center">
+                  <div className="size-4 p-0.5 shrink-0 inline-flex text-grey-100 border border-grey-100 text-opacity-80 rounded-sm items-center justify-center">
                     <PlusIcon
-                      className="size-3 shrink-0 inline-block text-grey-100 text-opacity-80"
+                      className="size-full shrink-0 inline-block text-grey-100 text-opacity-80"
                       aria-hidden={true}
                     />
                   </div>

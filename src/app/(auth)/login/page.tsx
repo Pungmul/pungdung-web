@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { Button, LinkButton,Space } from "@/shared";
+import { Button, LinkButton, Space } from "@/shared";
 import { KakaoLogo } from "@/shared/components/Icons";
 
 import { LoginForm } from "@/features/auth/components";
@@ -73,7 +73,9 @@ export default function LoginPage() {
               window.location.href = `/api/auth/kakao/login`;
             }}
           >
-            <KakaoLogo style={{ width: 20, height: 20 }} />
+            <span className="flex size-5 items-center justify-center">
+              <KakaoLogo className="size-full" />
+            </span>
             <div className="text-[16px] font-semibold text-black ">카카오로 시작하기</div>
           </Button>
         </div>

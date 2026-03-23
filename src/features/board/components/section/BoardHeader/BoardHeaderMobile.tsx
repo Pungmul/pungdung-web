@@ -55,13 +55,15 @@ export function BoardHeaderMobile({
         title={boardInfo?.name || FALLBACK_TITLE}
         bottomGradientOffsetPx={isSearching ? mobileSearchHeightPx : 0}
         rightBtn={
-          <MagnifyingGlassIcon
-            className="w-[24px] h-[24px]"
-            color="#CCC"
-            width={24}
-            height={24}
+          <span
+            className="flex size-6 items-center justify-center cursor-pointer"
             onClick={openMobileSearch}
-          />
+          >
+            <MagnifyingGlassIcon
+              className="size-full"
+              color="#CCC"
+            />
+          </span>
         }
         onLeftClick={goToBoardMain}
         className="z-20"

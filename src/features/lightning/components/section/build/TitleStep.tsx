@@ -38,7 +38,7 @@ export function TitleStep() {
                   onClick={() => updateTitle("")}
                   aria-label="제목 지우기"
                 >
-                  <XCircleIcon className="size-5" />
+                  <span className="flex size-6 items-center justify-center p-0.5"><XCircleIcon className="size-full" /></span>
                 </button>
               ) : null
             }

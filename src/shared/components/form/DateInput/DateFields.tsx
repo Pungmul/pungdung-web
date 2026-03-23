@@ -1,6 +1,8 @@
 import { forwardRef } from "react";
-import { DateField } from "./DateField";
+
 import { FieldType } from "@/shared/types";
+
+import { DateField } from "./DateField";
 
 type DateFieldType = Extract<FieldType, "year" | "month" | "day">;
 

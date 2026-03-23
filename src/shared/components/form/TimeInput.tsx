@@ -214,13 +214,13 @@ export const TimeInput = memo(function TimeInput(props: TimeInputProps) {
 
           {/* 시계 아이콘 */}
           <span
-            className={`size-[32px] p-[4px] flex items-center justify-center text-grey-300 ${rest.disabled
+            className={`size-8 flex items-center justify-center text-grey-300 ${rest.disabled
               ? "cursor-not-allowed"
               : "cursor-pointer hover:text-grey-500"
               }`}
             onClick={handleIconClick}
           >
-            <ClockIcon />
+            <ClockIcon className="size-full text-grey-300" />
           </span>
 
           {/* 드롭다운 시간 선택기 */}
@@ -242,7 +242,9 @@ export const TimeInput = memo(function TimeInput(props: TimeInputProps) {
         </div>
         {(!!errorMessage || (!isValidTime && displayTime)) && (
           <div className="flex flex-row items-center gap-[4px]">
-            <WarningCircleIcon className="text-red-400" />
+            <span className="flex size-4 shrink-0 items-center justify-center">
+              <WarningCircleIcon className="size-full text-red-400" />
+            </span>
             <div className="text-red-500 max-w-full text-[12px]">
               {errorMessage || "올바른 시간을 입력해주세요."}
             </div>

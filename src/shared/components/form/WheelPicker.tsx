@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useEffect } from "react";
+import { useEffect,useMemo, useRef } from "react";
 
 interface WheelPickerProps {
   options: { value: string; label: string }[];

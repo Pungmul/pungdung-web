@@ -22,7 +22,9 @@ const defaultUpcomingEmpty = (
         className="inline-flex items-center gap-1"
       >
         지금 관람객을 모집중인 공연 확인하기
-        <ChevronRightIcon className="w-4 h-4 flex-shrink-0" />
+        <span className="size-4 flex items-center justify-center flex-shrink-0">
+          <ChevronRightIcon className="size-full" />
+        </span>
       </LinkChipButton>
     }
   />

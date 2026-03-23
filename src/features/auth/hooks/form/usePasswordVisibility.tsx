@@ -11,10 +11,14 @@ export function usePasswordVisibility() {
 
   const trailingComponent = (
     <span
-      className="size-[32px] p-[4px] cursor-pointer flex items-center justify-center text-grey-300 hover:text-grey-500"
+      className="size-8 p-1 cursor-pointer flex items-center justify-center text-grey-300 hover:text-grey-500"
       onClick={toggle}
     >
-      {visible ? <EyeIcon /> : <EyeSlashIcon />}
+      {visible ? (
+        <EyeIcon className="size-full" />
+      ) : (
+        <EyeSlashIcon className="size-full" />
+      )}
     </span>
   );
 

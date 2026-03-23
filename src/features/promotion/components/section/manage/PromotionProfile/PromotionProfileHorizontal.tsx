@@ -3,9 +3,10 @@
 import { useRef } from "react";
 
 import { PosterThumbnail } from "./PosterThumbnail";
-import type { PromotionProfileProps } from ".";
 import { PromotionProfileMeta } from "./PromotionProfileMeta";
 import { AddressModal, type AddressModalHandle } from "../../../overlay/AddressModal";
+
+import type { PromotionProfileProps } from ".";
 
 interface PromotionProfileCardProps extends PromotionProfileProps {
   onPosterClick: () => void;

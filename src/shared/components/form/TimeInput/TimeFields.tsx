@@ -1,6 +1,7 @@
-import { NumericField } from "../DateInput/DateField";
-import { AMPMField } from "./AMPMField";
 import { FieldType } from "@/shared/types";
+
+import { AMPMField } from "./AMPMField";
+import { NumericField } from "../DateInput/DateField";
 
 type TimeFieldType = Extract<FieldType, "hour" | "minute" | "second">;
 

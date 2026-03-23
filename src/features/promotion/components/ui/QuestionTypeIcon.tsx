@@ -23,13 +23,13 @@ export const QuestionTypeIcon = React.memo(function QuestionTypeIcon({
 }: QuestionTypeIconProps) {
   const icon = match(type)
     .with("TEXT", () => (
-      <ShortAnswerOutline className={cn("size-3", className)} />
+      <ShortAnswerOutline className={cn("size-full", className)} />
     ))
     .with("CHOICE", () => (
-      <RadioSelectSolid className={cn("size-3", className)} />
+      <RadioSelectSolid className={cn("size-full", className)} />
     ))
     .with("CHECKBOX", () => (
-      <CheckBoxOutline className={cn("size-3", className)} />
+      <CheckBoxOutline className={cn("size-full", className)} />
     ))
     .otherwise(() => null);
 

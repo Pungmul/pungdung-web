@@ -65,11 +65,13 @@ export const ResponseBox = React.memo(
               {dayjs(form.submittedAt).format("YYYY.MM.DD (ddd) A H:mm")}
             </div>
           </div>
-          <div className="flex items-center justify-center flex-shrink-0 px-[4px]">
-            <ChevronDownIcon
-              className={`w-[32px] h-[32px] text-grey-500 flex-shrink-0 transform-gpu transition-transform duration-300 ${isOpen ? "rotate-180" : ""
+          <div className="flex flex-shrink-0 items-center justify-center px-1">
+            <span
+              className={`flex size-8 items-center justify-center transition-transform duration-300 ${isOpen ? "rotate-180" : ""
                 }`}
-            />
+            >
+              <ChevronDownIcon className="size-full text-grey-500" />
+            </span>
           </div>
         </div>
 

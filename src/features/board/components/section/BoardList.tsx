@@ -91,23 +91,27 @@ const BoardListItem = memo(
     toggleBookmark: (board: BoardSummary) => void;
   }) => {
     return (
-      <li className="w-full px-[12px] py-[8px] flex flex-row items-end gap-[8px]">
+      <li className="w-full px-[12px] py-[8px] flex flex-row items-center gap-[8px]">
         <div
-          className="flex justify-center items-center size-[28px] cursor-pointer"
+          className="flex size-7 cursor-pointer items-center justify-center p-0.5"
           onClick={(e) => {
             e.stopPropagation();
             toggleBookmark(board);
           }}
         >
           {isBookmarked ? (
-            <StarIconSolid className="size-[24px]" color="#ffadad" />
+            <span className="flex size-full items-center justify-center">
+              <StarIconSolid className="size-full" color="#ffadad" />
+            </span>
           ) : (
-            <StarIconOutline className="size-[24px]" color="#ffadad" />
+            <span className="flex size-full items-center justify-center">
+              <StarIconOutline className="size-full" color="#ffadad" />
+            </span>
           )}
         </div>
         <WebViewLink
           href={`/board/${boardHrefSegment(board.id)}`}
-          className="flex-grow text-[15px] text-grey-600"
+          className="flex-grow text-[15px] leading-7 text-grey-600"
           prefetch
         >
           {board.name}

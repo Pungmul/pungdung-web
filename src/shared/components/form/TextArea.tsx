@@ -1,9 +1,10 @@
 "use client";
 
 import { InputHTMLAttributes } from "react";
-import { josa } from "es-hangul";
 import Image from "next/image";
+
 import WarningCircleIcon from "@public/icons/Warning-circle-icon.svg";
+import { josa } from "es-hangul";
 
 interface TextAreaProps extends InputHTMLAttributes<HTMLTextAreaElement> {
   placeholder?: string;

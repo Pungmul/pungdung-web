@@ -2,19 +2,20 @@
 
 import { useCallback } from "react";
 
+import { useFormContext } from "react-hook-form";
+
 import type { Editor as EditorType } from "@toast-ui/react-editor";
 import { AnimatePresence } from "framer-motion";
-import { useFormContext } from "react-hook-form";
 
 import { Conditional } from "@/shared/components/Conditional";
 
 import { PromotionDescriptionEditor } from "./PromotionDescriptionEditor";
 import { PromotionTabNav } from "./PromotionTabNav";
-import type { PromotionPostingFormValues } from "../../../../types/promotion-posting-form.types";
 import {
   type PromotionPostingEditorTab,
   usePromotionPostingEditorTabs,
 } from "../../../../hooks/view-model/usePromotionPostingEditorTabs";
+import type { PromotionPostingFormValues } from "../../../../types/promotion-posting-form.types";
 import { QuestionContentSection } from "../QuestionContentSection";
 
 export type PromotionTabsProps = {

@@ -96,7 +96,9 @@ export const CheckboxQuestionForm = ({
                       onClick={() => onRemoveOption(index)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded"
                     >
-                      <TrashIcon className="size-[24px]" strokeWidth={2} />
+                      <span className="flex size-6 items-center justify-center">
+                        <TrashIcon className="size-full" strokeWidth={2} />
+                      </span>
                     </button>
                   ) : undefined
                 }

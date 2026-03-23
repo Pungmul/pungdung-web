@@ -66,7 +66,9 @@ function Input(props: InputProps) {
         </div>
         {!!errorMessage && (
           <div className="flex flex-row items-center gap-[4px]">
-            <WarningCircleIcon className="text-red-400" />
+            <span className="flex size-4 shrink-0 items-center justify-center">
+              <WarningCircleIcon className="size-full text-red-400" />
+            </span>
             <div className="text-red-500 max-w-full text-[12px]">
               {errorMessage}
             </div>

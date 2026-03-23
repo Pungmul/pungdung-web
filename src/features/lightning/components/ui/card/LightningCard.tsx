@@ -4,10 +4,10 @@ import { memo } from "react";
 
 import { cn } from "@/shared";
 
-import { LIGHTNING_MEETING_TYPE } from "../../../constants";
 import { LightningCardButton } from "./LightningCardButton";
 import { LightningCardInfo } from "./LightningCardInfo";
 import { LightningRemainingTime } from "./LightningRemainingTime";
+import { LIGHTNING_MEETING_TYPE } from "../../../constants";
 import { useLightningCardState } from "../../../hooks/state";
 import type { LightningCardRefType, LightningMeeting } from "../../../types";
 

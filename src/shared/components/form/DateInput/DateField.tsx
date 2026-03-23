@@ -1,5 +1,6 @@
-import { FieldType } from "@/shared/types";
 import { useCallback } from "react";
+
+import { FieldType } from "@/shared/types";
 
 interface NumericFieldProps<T extends FieldType> {
   type: T;

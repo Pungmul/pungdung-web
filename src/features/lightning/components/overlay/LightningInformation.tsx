@@ -52,7 +52,9 @@ export function LightningInformation({ userPartinLightning }: LightningInformati
           >
             <div className="flex flex-row items-center justify-center gap-[4px]">
               <div className="flex items-center justify-center">
-                <WarningCircleIcon className="size-[24px] text-warning" />
+                <span className="flex size-6 items-center justify-center">
+                  <WarningCircleIcon className="size-full text-warning" />
+                </span>
               </div>
               <div className="text-[16px] text-grey-400 font-semibold">
                 이미 참여 대기중인 번개가 있습니다

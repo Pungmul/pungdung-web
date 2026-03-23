@@ -31,7 +31,7 @@ export function PostingButton({ boardID }: { boardID: number | "promote" }) {
         <div
           className="flex justify-center items-center size-6 p-1"
         >
-          <PencilIcon className="text-primary" />
+          <PencilIcon className="size-full text-primary" />
         </div>
       </Link>
     </div>

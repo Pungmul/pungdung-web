@@ -39,7 +39,9 @@ export const PromotionPosterForm = () => {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full">
-                <PhotoIcon className="size-[32px]" color="#CCCCCC" />
+                <span className="size-8 flex items-center justify-center">
+                  <PhotoIcon className="size-full" color="#CCCCCC" />
+                </span>
               </div>
             )}
           </div>

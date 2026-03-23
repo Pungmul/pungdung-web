@@ -18,7 +18,7 @@ export function LocationSummary() {
           onClick={() => setBuildStep("SelectType")}
           className="mx-1"
         >
-          {lightningType}{" "}<ChevronDownIcon className="size-4 stroke-[1.5px] stroke-grey-500" />
+          {lightningType}{" "}<span className="flex size-4 items-center justify-center"><ChevronDownIcon className="size-full stroke-[1.5px] stroke-grey-500" /></span>
         </SummaryToken>
         <span className="text-secondary mr-1">번개<span className="text-grey-600">{"를"}</span> </span>만들까요?
       </h2>

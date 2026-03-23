@@ -1,5 +1,6 @@
-import { IconProps } from "../../types/type";
 import { memo } from "react";
+
+import { IconProps } from "../../types/type";
 
 const EyeIcon = memo(function EyeIcon(props: IconProps) {
   return (
@@ -9,7 +10,7 @@ const EyeIcon = memo(function EyeIcon(props: IconProps) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className="size-6"
+      className="size-full"
       {...props}
     >
       <path

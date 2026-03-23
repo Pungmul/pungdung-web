@@ -59,7 +59,9 @@ export const TermsStep: React.FC<TermsStepProps> = ({ onSubmit }) => {
             )}
           />
           <Link href="/terms/서비스 이용약관.html" target="_blank">
-            <ChevronRightIcon className="w-[16px] h-[16px] cursor-pointer" />
+            <span className="size-6 p-1 flex items-center justify-center cursor-pointer">
+              <ChevronRightIcon className="size-full" />
+            </span>
           </Link>
         </div>
 
@@ -79,7 +81,9 @@ export const TermsStep: React.FC<TermsStepProps> = ({ onSubmit }) => {
             )}
           />
           <Link href="/terms/개인정보 처리방침.html" target="_blank">
-            <ChevronRightIcon className="w-[16px] h-[16px] cursor-pointer" />
+            <span className="size-6 p-1 flex items-center justify-center cursor-pointer">
+              <ChevronRightIcon className="size-full" />
+            </span>
           </Link>
         </div>
       </div>

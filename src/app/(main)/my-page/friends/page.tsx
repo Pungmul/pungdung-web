@@ -41,7 +41,9 @@ export default function FriendsPage() {
         >
           <MagnifyingGlassIcon className="absolute left-4 size-[18px] text-grey-500" />
           <span className="text-base text-grey-500">친구 검색</span>
-          <ChevronRightIcon className="ml-auto size-4 text-grey-500" />
+          <span className="ml-auto size-4 flex items-center justify-center">
+            <ChevronRightIcon className="size-full text-grey-500" />
+          </span>
         </Link>
         <Space h={16} />
 

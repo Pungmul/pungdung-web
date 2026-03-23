@@ -30,14 +30,13 @@ export const QuestionItemEditActionButtons = ({
           }
         }}
         disabled={isFirstQuestion}
-        className={`rounded p-1 size-7 ${
-          isFirstQuestion
-            ? "cursor-not-allowed bg-grey-300 text-grey-100"
-            : "text-grey-600 hover:bg-grey-100"
-        }`}
+        className={`rounded p-1 size-7 ${isFirstQuestion
+          ? "cursor-not-allowed bg-grey-300 text-grey-100"
+          : "text-grey-600 hover:bg-grey-100"
+          }`}
         title={isFirstQuestion ? "이동할 수 없습니다" : "위로 이동"}
       >
-        <ArrowUpIcon strokeWidth={2} />
+        <ArrowUpIcon className="size-full" strokeWidth={2} />
       </button>
       <button
         type="button"
@@ -48,14 +47,13 @@ export const QuestionItemEditActionButtons = ({
           }
         }}
         disabled={isLastQuestion}
-        className={`rounded p-1 size-7 ${
-          isLastQuestion
-            ? "cursor-not-allowed bg-grey-300 text-grey-100"
-            : "text-grey-600 hover:bg-grey-100"
-        }`}
+        className={`rounded p-1 size-7 ${isLastQuestion
+          ? "cursor-not-allowed bg-grey-300 text-grey-100"
+          : "text-grey-600 hover:bg-grey-100"
+          }`}
         title={isLastQuestion ? "이동할 수 없습니다" : "아래로 이동"}
       >
-        <ArrowDownIcon strokeWidth={2} />
+        <ArrowDownIcon className="size-full" strokeWidth={2} />
       </button>
       <button
         type="button"
@@ -65,7 +63,7 @@ export const QuestionItemEditActionButtons = ({
             title: "질문 삭제",
             message: "정말 질문을 삭제하시겠습니까?",
             onConfirm: () => onDelete(),
-            onCancel: () => {},
+            onCancel: () => { },
             confirmText: "삭제",
             cancelText: "취소",
             confirmColor: "red",
@@ -74,7 +72,7 @@ export const QuestionItemEditActionButtons = ({
         className="rounded p-1 size-7 hover:bg-red-50"
         title="삭제"
       >
-        <TrashIcon className="text-red-500" />
+        <TrashIcon className="size-full text-red-500" />
       </button>
     </div>
   );

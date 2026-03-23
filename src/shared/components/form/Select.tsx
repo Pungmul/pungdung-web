@@ -236,15 +236,19 @@ export function Select<T extends FieldValues, V extends T[keyof T]>({
               ? displayValue
               : placeholder ?? `${josa(label ?? "", "을/를")} 선택해주세요`}
           </span>
-          <ChevronDownIcon
-            className={`size-5 stroke-[1.5px] text-grey-400 transition-transform duration-200 ${isListOpen ? "rotate-180" : ""
-              }`}
-          />
+          <span
+            className={`flex size-5 shrink-0 items-center justify-center ${isListOpen ? "rotate-180" : ""
+              } transition-transform duration-200`}
+          >
+            <ChevronDownIcon className="size-full stroke-[1.5px] text-grey-400" />
+          </span>
         </button>
 
         {errorMessage && (
           <div className="flex flex-row items-center gap-[4px]">
-            <ExclamationCircleIcon className="size-[16px] text-red-400" />
+            <span className="flex size-4 shrink-0 items-center justify-center">
+              <ExclamationCircleIcon className="size-full text-red-400" />
+            </span>
             <div className="text-red-500 max-w-full text-[12px]">
               {errorMessage}
             </div>
@@ -346,7 +350,7 @@ function SelectList<T extends FieldValues, V extends T[keyof T]>({
 
   return (
     <div
-      className="absolute top-full left-0 w-full overflow-y-auto z-10 mt-[4px] max-h-[200px]  border border-grey-300 rounded bg-background shadow-lg"
+      className="absolute top-full left-0 w-full overflow-y-auto z-10 mt-[4px] max-h-[200px] border border-grey-300 rounded bg-background shadow-lg"
       ref={listRef}
       role="listbox"
       aria-label={`${label} 선택`}

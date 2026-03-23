@@ -22,17 +22,25 @@ export default function ChatMenuButton() {
         clientOnly
         fallback={
           pathname.startsWith("/chats") ? (
-            <ChatIconFilled className="w-[36px] h-[36px] text-grey-800" />
+            <span className="flex size-9 items-center justify-center">
+              <ChatIconFilled className="size-full text-grey-800" />
+            </span>
           ) : (
-            <ChatIconOutline className="w-[36px] h-[36px] text-grey-800" />
+            <span className="flex size-9 items-center justify-center">
+              <ChatIconOutline className="size-full text-grey-800" />
+            </span>
           )
         }
       >
         <ChatTabBadge>
           {pathname.startsWith("/chats") ? (
-            <ChatIconFilled className="w-[36px] h-[36px] text-grey-800" />
+            <span className="flex size-9 items-center justify-center">
+              <ChatIconFilled className="size-full text-grey-800" />
+            </span>
           ) : (
-            <ChatIconOutline className="w-[36px] h-[36px] text-grey-800" />
+            <span className="flex size-9 items-center justify-center">
+              <ChatIconOutline className="size-full text-grey-800" />
+            </span>
           )}
         </ChatTabBadge>
       </Suspense>

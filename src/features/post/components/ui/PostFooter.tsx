@@ -104,9 +104,9 @@ export function PostFooter({
                 : "cursor-pointer"
             )}
           >
-            <div>
-              <CameraIcon className="size-6 text-grey-400" />
-            </div>
+            <span className="flex size-6 items-center justify-center">
+              <CameraIcon className="size-full text-grey-400" />
+            </span>
             <div>사진 첨부</div>
           </div>
         </label>
@@ -134,9 +134,7 @@ export function PostFooter({
           id="anonymity"
           className="hidden peer"
         />
-        <div
-          className="hidden size-[24px] peer-checked:flex rounded-sm items-center justify-center bg-primary"
-        >
+        <div className="hidden size-6 peer-checked:flex items-center justify-center rounded-sm bg-primary">
           <CheckIcon className="size-4 text-white stroke-[4]" />
         </div>
         <div className="size-[24px] bg-background border border-grey-400 peer-checked:hidden rounded-sm" />

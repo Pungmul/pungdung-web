@@ -33,7 +33,9 @@ export function IndividualResponsesTab({
           disabled={isExporting || responses.length === 0}
           className="flex flex-row items-center gap-[8px] px-[16px] py-[8px] bg-primary text-background rounded-[8px] text-[14px] font-medium disabled:bg-grey-300 disabled:cursor-not-allowed hover:bg-primary-light transition-colors"
         >
-          <ArrowDownTrayIcon className="w-[16px] h-[16px]" />
+          <span className="size-6 flex items-center justify-center">
+            <ArrowDownTrayIcon className="size-full" />
+          </span>
           {isExporting ? "내보내는 중..." : "엑셀 다운로드"}
         </button>
       </div>

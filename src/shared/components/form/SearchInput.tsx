@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef,useCallback, useMemo } from "react";
+import React, { forwardRef, useCallback, useMemo } from "react";
 import { InputHTMLAttributes } from "react";
 
 import {
@@ -60,7 +60,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       >
         <div
           className={cn(
-            "flex items-center justify-center",
+            "flex shrink-0 items-center justify-center",
             isMutedBar
               ? "pointer-events-auto absolute left-4 top-1/2 -translate-y-1/2"
               : "size-[24px] rounded-full bg-grey-100"
@@ -76,7 +76,10 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             />
           ) : (
             <MagnifyingGlassIcon
-              className={cn("text-grey-500", isMutedBar ? "size-[18px]" : "size-[20px]")}
+              className={cn(
+                "text-grey-500",
+                isMutedBar ? "size-[18px]" : "size-[20px]"
+              )}
             />
           )}
         </div>
@@ -99,12 +102,15 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         {isSearching && (
           <div
             className={cn(
-              "flex cursor-pointer items-center justify-center",
-              isMutedBar ? "shrink-0 pr-2" : "size-[24px] rounded-full bg-grey-100"
+              "flex shrink-0 cursor-pointer items-center justify-center",
+              isMutedBar ? "pr-2" : "size-[24px] rounded-full bg-grey-100"
             )}
           >
             <XCircleIcon
-              className={cn("fill-grey-500", isMutedBar ? "size-[20px]" : "size-[22px]")}
+              className={cn(
+                "fill-grey-500",
+                isMutedBar ? "size-[20px]" : "size-[22px]"
+              )}
               onClick={handleClear}
             />
           </div>

@@ -41,7 +41,9 @@ function UserProfileKebabMenuImpl() {
       className="relative select-none cursor-pointer"
       onClick={() => setOpen((prev) => !prev)}
     >
-      <EllipsisVerticalIcon className="size-[28px] text-grey-600" />
+      <span className="size-7 flex items-center justify-center">
+        <EllipsisVerticalIcon className="size-full text-grey-600" />
+      </span>
       {isOpen && (
         <ul
           className="absolute right-0 top-full z-[60] mt-2 flex min-w-[5.5rem] flex-col gap-2 rounded-sm border border-grey-300 bg-background px-3 py-2"

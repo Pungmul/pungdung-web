@@ -145,10 +145,12 @@ export function LightningBottomSheet({
     >
       <div className="flex flex-row w-full justify-end items-center px-[16px] py-[8px]">
         <div
-          className="flex flex-col size-[48px] rounded-full  bg-background cursor-pointer justify-center items-center shadow-lg"
+          className="flex size-12 cursor-pointer flex-col items-center justify-center rounded-full bg-background shadow-lg"
           onClick={() => mapPanToCurrentRef.current?.()}
         >
-          <GPSOutline className="size-[32px] text-grey-700 stroke-[2px]" />
+          <span className="flex size-8 items-center justify-center">
+            <GPSOutline className="size-full text-grey-700 stroke-[2px]" />
+          </span>
         </div>
       </div>
       <div className="relative z-10 bottom-0 w-full rounded-tl-[12px] rounded-tr-[12px] shadow-up-md bg-background overflow-hidden flex flex-col lg:h-full lg:w-[640px] lg:py-[32px] lg:gap-[24px]">

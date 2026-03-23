@@ -54,7 +54,9 @@ export function PromotionMainTabs({
           className="inline-flex items-center gap-1 text-grey-500 text-[14px] md:text-[16px] flex-shrink-0 px-1"
         >
           관람 신청한 공연 목록{" "}
-          <ChevronRightIcon className="size-5 text-grey-500 inline-block" />
+          <span className="inline-flex size-5 items-center justify-center">
+            <ChevronRightIcon className="size-full text-grey-500" />
+          </span>
         </Link>
       </nav>
     </AnimatePresence>

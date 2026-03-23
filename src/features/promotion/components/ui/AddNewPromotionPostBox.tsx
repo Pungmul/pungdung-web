@@ -44,7 +44,9 @@ export function AddNewPromotionPostBox() {
           {isCreatePromotionPending ? (
             <Spinner size={64} baseColor="#FFFFFF" highlightColor="#FF816D" />
           ) : (
-            <PlusIcon className="size-[64px] text-grey-400" />
+            <span className="size-16 flex items-center justify-center">
+              <PlusIcon className="size-full text-grey-400" />
+            </span>
           )}
         </div>
         <div className="flex-grow w-full flex justify-between flex-col items-start gap-[8px]">

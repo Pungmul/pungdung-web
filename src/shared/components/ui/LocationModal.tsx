@@ -3,10 +3,10 @@ import { useCallback, useState } from "react";
 
 import type { LocationType } from "@/features/location";
 
-import type { Address } from "../../types";
-import { Button } from "../buttons";
 import { LocationMapPicker } from "./LocationMapPicker";
 import { default as Modal } from "./Modal";
+import type { Address } from "../../types";
+import { Button } from "../buttons";
 
 interface LocationModalProps {
   isLocationModalOpen: boolean;

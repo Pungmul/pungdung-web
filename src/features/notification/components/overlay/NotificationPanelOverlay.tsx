@@ -45,10 +45,10 @@ export default function NotificationPanelOverlay({
               isBackBtn={false}
               rightBtn={
                 <div
-                  className="w-[36px] h-[36px] flex items-center justify-center cursor-pointer"
+                  className="flex size-9 cursor-pointer items-center justify-center"
                   onClick={onClose}
                 >
-                  <XMarkIcon className="w-[24px] h-[24px]" />
+                  <XMarkIcon className="size-full" />
                 </div>
               }
             />

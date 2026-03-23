@@ -51,8 +51,8 @@ export default function NotificationPermissionRequestCTA() {
           >
             <div className="flex flex-col gap-3 text-grey-100">
               <span className="font-medium text-sm inline-flex items-center gap-1">
-                <div className="size-5 p-0.5 inline-block">
-                  <BellIcon className="text-grey-100 text-opacity-80" />
+                <div className="inline-block size-5">
+                  <BellIcon className="size-full text-grey-100 text-opacity-80" />
                 </div>
                 알림 설정
               </span>

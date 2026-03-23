@@ -168,7 +168,7 @@ const ImageModal: React.FC<ImageModalProps> = ({
             onClick={onClose}
             className="size-12 p-2 flex items-center justify-center"
           >
-            <XMarkIcon className="text-white" />
+            <XMarkIcon className="size-full text-white" />
           </button>
         </div>
 
@@ -187,12 +187,12 @@ const ImageModal: React.FC<ImageModalProps> = ({
                 goToPrevious();
               }}
               className={
-                "z-10 w-8 h-8 flex items-center justify-center bg-background bg-opacity-50 text-grey-800 rounded-full hover:bg-opacity-70 transition-all md:w-10 md:h-10 " +
+                "z-10 flex size-8 items-center justify-center rounded-full bg-background bg-opacity-50 text-grey-800 transition-all hover:bg-opacity-70 " +
                 (isIndicatorVisible ? "block" : "hidden")
               }
               title="이전 이미지"
             >
-              <ChevronLeftIcon className="w-8 h-8" />
+              <ChevronLeftIcon className="size-full" />
             </button>
           </section>
         )}
@@ -262,12 +262,12 @@ const ImageModal: React.FC<ImageModalProps> = ({
                 goToNext();
               }}
               className={
-                "z-10 w-8 h-8 flex items-center justify-center bg-background bg-opacity-50 text-grey-800 rounded-full hover:bg-opacity-70 transition-all md:w-10 md:h-10 " +
+                "z-10 flex size-8 items-center justify-center rounded-full bg-background bg-opacity-50 text-grey-800 transition-all hover:bg-opacity-70 " +
                 (isIndicatorVisible ? "block" : "hidden")
               }
               title="다음 이미지"
             >
-              <ChevronRightIcon className="w-8 h-8" />
+              <ChevronRightIcon className="size-full" />
             </button>
           </section>
         )}

@@ -20,7 +20,7 @@ export function TimeAndPersonnelSummary() {
         <div className="flex items-center gap-1">
           <SummaryToken
             truncate
-            icon={<MapPinIcon className="size-4 stroke-[1.5px] stroke-grey-500" />}
+            icon={<span className="flex size-4 items-center justify-center"><MapPinIcon className="size-full stroke-[1.5px] stroke-grey-500" /></span>}
             onClick={() => setBuildStep("SelectLocation")}
           >
             {location}
@@ -32,7 +32,7 @@ export function TimeAndPersonnelSummary() {
             onClick={() => setBuildStep("SelectType")}
           >
             {lightningType}{" "}
-            <ChevronDownIcon className="size-4 stroke-[1.5px] stroke-grey-500" />
+            <span className="flex size-4 items-center justify-center"><ChevronDownIcon className="size-full stroke-[1.5px] stroke-grey-500" /></span>
           </SummaryToken>
           <span className="text-secondary font-bold">번개<span className="font-medium text-grey-600">{"를"}</span></span>위해
           모아볼까요?

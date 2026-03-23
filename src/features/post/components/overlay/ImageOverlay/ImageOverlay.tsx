@@ -118,7 +118,7 @@ export function ImageOverlay({
                 className="absolute flex-col items-center justify-center size-10 md:size-12 p-2 md:pr-4 top-0 right-0 cursor-pointer"
                 aria-label="이미지 닫기"
               >
-                <XMarkIcon className="text-white" />
+                <XMarkIcon className="size-full text-white" />
               </button>
             </header>
 
@@ -188,7 +188,9 @@ export function ImageOverlay({
               className="absolute bottom-4 right-4 z-20 rounded-full p-3 bg-primary text-white"
               aria-label="이미지 다운로드"
             >
-              <ArrowDownTrayIcon className="size-5" />
+              <span className="size-5 flex items-center justify-center">
+                <ArrowDownTrayIcon className="size-full" />
+              </span>
             </button>
           </motion.div>
         </div>

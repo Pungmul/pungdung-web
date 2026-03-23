@@ -88,7 +88,9 @@ export function EditProfileForm() {
           htmlFor="profile-image"
           className="absolute -bottom-1 -right-1 size-8 rounded-full bg-grey-800 flex items-center justify-center z-10 cursor-pointer"
         >
-          <CameraIcon className="size-6 text-background" />
+          <span className="flex size-6 items-center justify-center">
+            <CameraIcon className="size-full text-background" />
+          </span>
           <input
             type="file"
             className="hidden"
