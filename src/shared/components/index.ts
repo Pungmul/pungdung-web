@@ -12,6 +12,7 @@ export { LoadingSpinner } from "./ui/LoadingSpinner";
 export { default as LocationModal } from "./ui/LocationModal";
 export { default as Modal } from "./ui/Modal";
 export { ScrollToTopButton } from "./ui/ScrollToTopButton";
+export { FloatingButton } from "./ui/FloatingButton";
 export { SkeletonView } from "./ui/SkeletonView";
 export { Spinner } from "./ui/Spinner";
 export { default as ToastContainer } from "./ui/Toast";

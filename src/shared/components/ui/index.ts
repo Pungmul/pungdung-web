@@ -8,3 +8,5 @@ export { default as Modal } from "./Modal";
 export { SkeletonView } from "./SkeletonView";
 export { Spinner } from "./Spinner";
 export { default as Toast } from "./Toast";
+export { FloatingButton } from "./FloatingButton";
+export { ScrollToTopButton } from "./ScrollToTopButton";

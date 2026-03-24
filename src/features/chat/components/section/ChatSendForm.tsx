@@ -99,7 +99,7 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
     <form
       ref={formRef}
       className="
- z-20 shrink-0 bg-background
+        z-50 shrink-0 bg-background
         max-md:pb-[max(0.75rem,env(safe-area-inset-bottom))]
         max-md:focus-within:pb-0
       "

@@ -41,9 +41,7 @@ export function useScrollHideComponent({
             window.scrollY || 0,
             document.documentElement.scrollTop || 0,
             document.body.scrollTop || 0
-          )
-        ;
-
+          );
     const handleScroll = () => {
       const currentScrollY = getScrollTop();
       const diff = currentScrollY - lastScrollY.current;
@@ -94,7 +92,12 @@ export function useScrollHideComponent({
         target.removeEventListener("touchstart", handleTouch);
       });
     };
-  }, [scrollTargetElement, scrollContainerSelector, hideThreshold, showThreshold]);
+  }, [
+    scrollTargetElement,
+    scrollContainerSelector,
+    hideThreshold,
+    showThreshold,
+  ]);
 
   return { componentRef, isVisible };
 }

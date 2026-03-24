@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Spinner } from "@/shared/components";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+
+import { FloatingButton, Spinner } from "@/shared/components";
 import ObserveTrigger from "@/shared/components/ObserveTrigger";
 
 import { ChatSendForm } from "./ChatSendForm";
@@ -17,6 +19,7 @@ import {
   useChatRoomMessageList,
   useChatRoomUserMaps,
 } from "../../hooks/view-model";
+import { cn } from "@/shared";
 
 type ChatRoomTimelinePanelProps = {
   roomId: string;
@@ -25,6 +28,8 @@ type ChatRoomTimelinePanelProps = {
   isConnected: boolean;
 };
 
+const SHOW_SCROLL_TO_LATEST_BUTTON_THRESHOLD = 160;
+
 export function ChatRoomTimelinePanel({
   roomId,
   myInfo,
@@ -32,6 +37,8 @@ export function ChatRoomTimelinePanel({
   isConnected,
 }: ChatRoomTimelinePanelProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showScrollToLatestButton, setShowScrollToLatestButton] =
+    useState(false);
 
   const {
     messageContainerRef,
@@ -78,14 +85,42 @@ export function ChatRoomTimelinePanel({
 
   useMaintainScrollOnRoomMessageListChange(messageList, maintainScrollPosition);
 
+  useEffect(() => {
+    const scrollElement = scrollContainerRef.current;
+    if (!scrollElement) return;
+
+    const syncScrollButtonVisibility = () => {
+      setShowScrollToLatestButton(
+        Math.abs(scrollElement.scrollTop) >
+        SHOW_SCROLL_TO_LATEST_BUTTON_THRESHOLD
+      );
+    };
+
+    syncScrollButtonVisibility();
+    scrollElement.addEventListener("scroll", syncScrollButtonVisibility, {
+      passive: true,
+    });
+
+    return () => {
+      scrollElement.removeEventListener(
+        "scroll",
+        syncScrollButtonVisibility
+      );
+    };
+  }, []);
+
+  const handleScrollToLatestMessage = useCallback(() => {
+    scrollContainerRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, []);
+
   const blockMainArea = isInfiniteLoading || !isConnected;
 
   return (
-    <>
+    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
       <div
         ref={scrollContainerRef}
         className="
-          flex min-h-0 flex-col-reverse overflow-y-auto overscroll-contain
+          flex min-h-0 flex-1 flex-col-reverse overflow-y-auto overscroll-contain
           [-webkit-overflow-scrolling:touch]
           [overflow-anchor:none]
         "
@@ -126,10 +161,24 @@ export function ChatRoomTimelinePanel({
           </div>
         )}
       </div>
+      <div
+        className={cn(
+          "pointer-events-none absolute bottom-[4.75rem] right-4 z-30",
+          "transition-transform duration-300 will-change-transform",
+          "max-md:bottom-[calc(env(safe-area-inset-bottom)+4.25rem)]",
+          showScrollToLatestButton ? "translate-y-0" : "translate-y-[140%]"
+        )}
+      >
+        <FloatingButton
+          ariaLabel="최신 메시지로 이동"
+          onClick={handleScrollToLatestMessage}
+          innerElement={<ChevronDownIcon strokeWidth={2} className="size-full text-grey-500" />}
+        />
+      </div>
       <ChatSendForm
         onSendMessage={onSendMessage}
         onSendImage={onSendImage}
       />
-    </>
+    </div>
   );
 }
