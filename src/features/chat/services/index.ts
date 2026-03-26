@@ -1,3 +1,5 @@
+export * from "./apply-chat-room-display-overrides.service";
+export * from "./chat-room-local-override.service";
 export * from "./chat-room-list-updater.service";
 export * from "./create-pending-message.service";
 export * from "./create-user-maps.service";

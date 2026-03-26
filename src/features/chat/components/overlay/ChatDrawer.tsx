@@ -19,12 +19,12 @@ import {
 } from "../ui";
 
 interface ChatDrawerProps {
-  roomId: string;
   drawerOpen: boolean;
   onClose: () => void;
   onExitChat: () => void;
   userList: User[];
   onInviteUser: () => void;
+  onOpenSettings: () => void;
 }
 
 /** 채팅방 `userInfoList`는 오래될 수 있어, 본인 모달에는 최신 `Member`로 덮어쓴다. */
@@ -39,12 +39,12 @@ function mergeMemberIntoUserForSelfModal(roomUser: User, member: Member): User {
 }
 
 export const ChatDrawer = ({
-  roomId,
   drawerOpen,
   onClose,
   onExitChat,
   userList,
   onInviteUser,
+  onOpenSettings,
 }: ChatDrawerProps) => {
   const { data: myInfo } = useSuspenseQuery(myPageQueries.info());
 
@@ -139,7 +139,7 @@ export const ChatDrawer = ({
             />
             <ChatExitButton onClick={onExitChat} />
           </div>
-          <ChatSettingsButton roomId={roomId} />
+          <ChatSettingsButton onClick={onOpenSettings} />
         </motion.div>
       )}
     </AnimatePresence>

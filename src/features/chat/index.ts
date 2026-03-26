@@ -52,6 +52,7 @@ export {
 } from "./hooks/actions";
 export {
   useChatRoomFetchOlderPageTrigger,
+  useChatRoomDisplayOverride,
   useMaintainScrollOnRoomMessageListChange,
   useResetRoomUnreadCount,
   useScrollPosition,
@@ -68,6 +69,11 @@ export {
   useMessageList,
   usePendingMessages,
 } from "./hooks/view-model";
+export {
+  applyChatRoomDisplayOverrideToInfo,
+  applyChatRoomDisplayOverrideToListItem,
+  applyChatRoomDisplayOverridesToList,
+} from "./services";
 export { chatMutationOptions, chatQueries } from "./queries";
 export { useRoomListSocket, useRoomReadSocket } from "./socket";
 export {

@@ -2,10 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-import type { ChatRoom, ChatRoomListItem } from "../../types/domain/chat-room.types";
+import type {
+  ChatRoom,
+  ChatRoomListItem,
+} from "../../types/domain/chat-room.types";
 
 interface UseChatRoomTitleParams {
   chatRoomData: ChatRoom | undefined;
+  roomNameOverride?: string;
   defaultTitle?: string;
 }
 
@@ -28,6 +32,7 @@ interface UseChatRoomTitleReturn {
  */
 export const useChatRoomTitle = ({
   chatRoomData,
+  roomNameOverride,
   defaultTitle = "채팅",
 }: UseChatRoomTitleParams): UseChatRoomTitleReturn => {
   const [title, setTitle] = useState("");
@@ -35,12 +40,9 @@ export const useChatRoomTitle = ({
   // 채팅방 데이터가 로드되면 title 설정
   useEffect(() => {
     if (chatRoomData) {
-      const newTitle = chatRoomData.chatRoomInfo.group
-        ? `${chatRoomData.chatRoomInfo.roomName} (${chatRoomData.userInfoList.length})`
-        : chatRoomData.chatRoomInfo.roomName;
-      setTitle(newTitle);
+      setTitle(roomNameOverride ?? chatRoomData.chatRoomInfo.roomName);
     }
-  }, [chatRoomData]);
+  }, [chatRoomData, roomNameOverride]);
 
   // document.title 업데이트
   useEffect(() => {

@@ -6,18 +6,24 @@ import { useQuery } from "@tanstack/react-query";
 
 import { DEFAULT_STALE_TIME_MS } from "../../constants";
 import {
+  getChatRoomLocalOverridesCache,
   getChatRoomListCache,
   setChatRoomListCache,
+  subscribeChatRoomLocalOverridesCacheUpdated,
   subscribeChatRoomListCacheUpdated,
 } from "../../lib";
+import { applyChatRoomDisplayOverridesToList } from "../../services";
 import { chatQueries } from "../../queries";
 import { mergeChatRoomListWithCache } from "../../services/merge-chat-room-list-with-cache.service";
-import type { ChatRoomListItem } from "../../types";
+import type { ChatRoomListItem, ChatRoomLocalOverride } from "../../types";
 import { CHAT_ROOM_LIST_CACHE_KEY } from "../../types";
 
 export function useChatRoomListIndexedDB() {
   const [cachedRooms, setCachedRooms] = useState<ChatRoomListItem[]>([]);
   const [cacheUpdatedAt, setCacheUpdatedAt] = useState<number | null>(null);
+  const [localOverrides, setLocalOverrides] = useState<
+    Record<string, ChatRoomLocalOverride>
+  >({});
   const [hydrated, setHydrated] = useState(false);
   const [allowQuery, setAllowQuery] = useState(false);
 
@@ -40,6 +46,30 @@ export function useChatRoomListIndexedDB() {
     return () => {
       active = false;
     };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    void getChatRoomLocalOverridesCache()
+      .then((record) => {
+        if (!active) return;
+        setLocalOverrides(record?.overrides ?? {});
+      })
+      .catch(() => {
+        if (!active) return;
+        setLocalOverrides({});
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    return subscribeChatRoomLocalOverridesCacheUpdated((record) => {
+      setLocalOverrides(record.overrides);
+    });
   }, []);
 
   useEffect(() => {
@@ -98,8 +128,9 @@ export function useChatRoomListIndexedDB() {
   const rooms = useMemo(() => {
     const queried = roomListQuery.data ?? [];
     // 캐시 우선 렌더 후 서버 응답으로 방 단위 병합(최신 데이터 우선).
-    return mergeChatRoomListWithCache(cachedRooms, queried);
-  }, [cachedRooms, roomListQuery.data]);
+    const mergedRooms = mergeChatRoomListWithCache(cachedRooms, queried);
+    return applyChatRoomDisplayOverridesToList(mergedRooms, localOverrides);
+  }, [cachedRooms, localOverrides, roomListQuery.data]);
 
   return {
     rooms,

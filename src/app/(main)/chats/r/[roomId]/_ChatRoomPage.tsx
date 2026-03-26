@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { use } from "react";
 import { useParams, useRouter } from "next/navigation";
 
@@ -11,11 +11,8 @@ import { AnimatePresence } from "framer-motion";
 import { useSocketConnection } from "@/core/socket";
 
 import {
-  ChatDrawer,
   chatQueries,
-  ChatRoomHeader,
-  ChatRoomTimelinePanel,
-  InviteUserModal,
+  useChatRoomDisplayOverride,
   useChatRoomForegroundReconciliation,
   useChatRoomTitle,
   useChatRoomUserMaps,
@@ -24,10 +21,14 @@ import {
   useSyncChatRoomFocusOnRoomId,
 } from "@/features/chat";
 import { myPageQueries } from "@/features/my-page";
-import { UserProfileCardModalHost } from "@/features/user";
 
 import { useBodyScrollLock, useViewportHeightVar } from "@/shared/hooks";
 
+import { ChatRoomMainScreen } from "./_ChatRoomMainScreen";
+import { ChatRoomSettingScreen } from "./_ChatRoomSettingScreen";
+import { Conditional } from "@/shared";
+
+type ChatRoomActiveScreen = "main" | "settings";
 
 type ChatRoomPageProps = {
   decodedUsernamePromise: Promise<string | undefined>;
@@ -43,8 +44,8 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
 
   const isConnected = useSocketConnection();
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [inviteUserModalOpen, setInviteUserModalOpen] = useState(false);
+  const [activeScreen, setActiveScreen] =
+    useState<ChatRoomActiveScreen>("main");
 
   const { readSign } = useRoomReadSocket(roomId as string);
   const { exitChatRoom } = useExitChatRoom({ roomId: roomId as string });
@@ -66,13 +67,16 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
     chatQueries.room(roomId as string),
   );
 
-  const { title } = useChatRoomTitle({ chatRoomData });
+  const { override } = useChatRoomDisplayOverride(roomId as string);
+  const { title } = useChatRoomTitle({
+    chatRoomData,
+    ...(override?.roomName ? { roomNameOverride: override.roomName } : {}),
+  });
   const { userList } = useChatRoomUserMaps({ chatRoomData });
 
-  const memberCount = chatRoomData?.userInfoList.length
+  const memberCount = useMemo(() => chatRoomData?.userInfoList.length
     ? chatRoomData?.userInfoList.length - 1
-    : 0;
-
+    : 0, [chatRoomData?.userInfoList.length]);
 
   return (
     <AnimatePresence mode="wait">
@@ -81,41 +85,32 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
         ref={mainRef}
         className="relative h-full min-h-0 overflow-hidden bg-background max-md:h-[var(--app-height,100dvh)]"
       >
-        <div className="h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)_auto]">
-          <ChatRoomHeader
-            title={title}
-            memberCount={memberCount}
-            onBack={() => router.push("/chats/r/inbox")}
-            onOpenDrawer={() => setDrawerOpen(true)}
-          />
-
-          <ChatRoomTimelinePanel
-            roomId={roomId as string}
-            {...(myUsername ? { myInfo: { username: myUsername } } : {})}
-            readSign={readSign}
-            isConnected={isConnected}
-          />
-        </div>
-
-        <UserProfileCardModalHost />
-
-        <ChatDrawer
-          roomId={roomId as string}
-          drawerOpen={drawerOpen}
-          onExitChat={exitChatRoom}
-          userList={userList}
-          onClose={() => setDrawerOpen(false)}
-          onInviteUser={() => setInviteUserModalOpen(true)}
-        />
-        <InviteUserModal
-          roomId={roomId as string}
-          currentUsernames={userList.map((user) => user.username)}
-          isGroupRoom={chatRoomData?.chatRoomInfo.group ?? false}
-          myUsername={myUsername}
-          isOpen={inviteUserModalOpen}
-          onClose={() => {
-            setInviteUserModalOpen(false);
+        <Conditional
+          value={activeScreen}
+          cases={{
+            main: <ChatRoomMainScreen
+              roomId={roomId as string}
+              title={title}
+              memberCount={memberCount}
+              myUsername={myUsername}
+              readSign={readSign}
+              isConnected={isConnected}
+              userList={userList}
+              isGroupRoom={chatRoomData?.chatRoomInfo.group ?? false}
+              onBack={() => router.push("/chats/r/inbox")}
+              onExitChat={exitChatRoom}
+              onOpenSettings={() => setActiveScreen("settings")}
+            />,
+            settings: <ChatRoomSettingScreen
+              roomId={roomId as string}
+              defaultRoomName={chatRoomData?.chatRoomInfo.roomName ?? ""}
+              defaultProfileImageUrl={
+                chatRoomData?.chatRoomInfo.profileImageUrl ?? null
+              }
+              onBack={() => setActiveScreen("main")}
+            />,
           }}
+          fallback={null}
         />
       </main>
     </AnimatePresence>

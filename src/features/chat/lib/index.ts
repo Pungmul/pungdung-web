@@ -1,9 +1,13 @@
 export {
+  getChatRoomLocalOverridesCache,
   getChatRoomListCache,
   getChatRoomMessagesCache,
+  setChatRoomLocalOverridesCache,
   setChatRoomListCache,
   setChatRoomMessagesCache,
+  subscribeChatRoomLocalOverridesCacheUpdated,
   subscribeChatRoomListCacheUpdated,
+  updateChatRoomLocalOverride,
 } from "./chat-indexedDB-cache";
 export {
   mapChatRoomDtoToDomain,

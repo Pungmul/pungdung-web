@@ -2,20 +2,21 @@
 
 import { useState } from "react";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
-
 import { getChoseong } from "es-hangul";
 
 import { SearchInput } from "@/shared/components";
 
 import ChatRoomPanelHeader from "./ChatRoomPanelHeader";
 import ChatRoomPanelList from "./ChatRoomPanelList";
-import { CHAT_ROOM_PANEL_CLASS_NAME } from "./ChatRoomPanelSkeleton";
-import { chatQueries } from "../../../queries";
+import {
+  CHAT_ROOM_PANEL_CLASS_NAME,
+  ChatRoomPanelSkeleton,
+} from "./ChatRoomPanelSkeleton";
+import { useChatRoomListIndexedDB } from "../../../hooks/state/useChatRoomListIndexedDB";
 import { useSelectFriendModal } from "../../../store/select-friend-modal.context";
 
 export default function ChatRoomPanelContent() {
-  const { data: chatRooms } = useSuspenseQuery(chatQueries.roomList());
+  const { rooms: chatRooms, isLoading } = useChatRoomListIndexedDB();
   const { openModalToSelectFriend } = useSelectFriendModal();
 
   const [isSearching, setIsSearching] = useState(false);
@@ -26,6 +27,10 @@ export default function ChatRoomPanelContent() {
       getChoseong(room.roomName).includes(getChoseong(searchKeyword))
     )
     : chatRooms;
+
+  if (isLoading) {
+    return <ChatRoomPanelSkeleton />;
+  }
 
   return (
     <div className={CHAT_ROOM_PANEL_CLASS_NAME}>

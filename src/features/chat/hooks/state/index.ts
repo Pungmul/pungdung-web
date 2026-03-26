@@ -1,4 +1,5 @@
 export { useChatRoomFetchOlderPageTrigger } from "./useChatRoomFetchOlderPageTrigger";
+export { useChatRoomDisplayOverride } from "./useChatRoomDisplayOverride";
 export { useChatRoomListIndexedDB } from "./useChatRoomListIndexedDB";
 export { useChatRoomMessagesIndexedDB } from "./useChatRoomMessagesIndexedDB";
 export { useMaintainScrollOnRoomMessageListChange } from "./useMaintainScrollOnRoomMessageListChange";

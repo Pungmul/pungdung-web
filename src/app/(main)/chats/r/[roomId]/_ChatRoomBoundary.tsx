@@ -10,6 +10,7 @@ import { ErrorBoundary, Suspense } from "@suspensive/react";
 import {
   chatQueries,
   ChatRoomHeader,
+  useChatRoomDisplayOverride,
 } from "@/features/chat";
 
 import { Button, Spinner } from "@/shared";
@@ -28,6 +29,7 @@ function ChatRoomSuspenseFallback() {
     chatQueries.roomList().queryKey
   );
   const roomFromList = chatRooms?.find((r) => r.chatRoomUUID === roomId);
+  const { override } = useChatRoomDisplayOverride(roomId);
 
   if (!roomFromList) {
     return (
@@ -40,7 +42,7 @@ function ChatRoomSuspenseFallback() {
   return (
     <div className="flex flex-col h-full bg-background">
       <ChatRoomHeader
-        title={roomFromList.roomName}
+        title={override?.roomName ?? roomFromList.roomName}
         memberCount={roomFromList.chatRoomMemberIds?.length ?? 1}
         onBack={() => router.push("/chats/r/inbox")}
         onOpenDrawer={() => { }}
