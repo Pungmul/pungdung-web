@@ -4,6 +4,7 @@ export { BoardListNav } from "./section/BoardListNav";
 export { BoardMainPageContent } from "./section/BoardMainPageContent";
 export { FrequentBoards } from "./section/FrequentBoards";
 export { BoardHeaderSearchField } from "./ui/BoardHeaderSearchField";
+export { BoardChildCategoryTabs } from "./ui/BoardChildCategoryTabs";
 export { HotPostBanner } from "./ui/HotPostBanner";
 export { HotPostBannerSkeleton } from "./ui/HotPostBannerSkeleton";
 export { LastUpdateTime } from "./ui/LastUpdateTime";

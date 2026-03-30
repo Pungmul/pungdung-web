@@ -36,6 +36,7 @@ const boardDataStub: BoardOverview = {
   boardInfo: {
     rootCategoryName: "root",
     childCategoryName: null,
+    childCategories: [],
   },
   hotPost: postStub,
   recentPostList: {

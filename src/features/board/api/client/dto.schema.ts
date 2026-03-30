@@ -1,25 +1,31 @@
 import { z } from "zod";
 
 /** 게시글 목록 페이지 (업스트림 페이징 메타 — PageHelper 등 추가 필드 무시) */
-export const postListPageDtoSchema = z
-  .object({
-    total: z.number(),
-    list: z.array(z.unknown()),
-    pageNum: z.number(),
-    pageSize: z.number(),
-    isFirstPage: z.boolean(),
-    isLastPage: z.boolean(),
-    hasPreviousPage: z.boolean(),
-    hasNextPage: z.boolean(),
-  })
-  .passthrough();
+export const postListPageDtoSchema = z.looseObject({
+  total: z.number(),
+  list: z.array(z.unknown()),
+  pageNum: z.number(),
+  pageSize: z.number(),
+  isFirstPage: z.boolean(),
+  isLastPage: z.boolean(),
+  hasPreviousPage: z.boolean(),
+  hasNextPage: z.boolean(),
+});
 
 export type PostListPageDto = z.infer<typeof postListPageDtoSchema>;
+
+export const childBoardCategoryDtoSchema = z.object({
+  id: z.number(),
+  parentId: z.number().nullable(),
+  name: z.string(),
+  description: z.string().nullable(),
+});
 
 export const boardInfoDtoSchema = z.object({
   /** 목록 전용 호출 등에서 null로 올 수 있음 */
   rootCategoryName: z.string().nullable(),
   childCategoryName: z.string().nullable(),
+  childCategories: z.array(childBoardCategoryDtoSchema).default([]),
 });
 
 /** 게시판 상세 + 목록 첫 페이지 (`/api/boards/:id`) */
@@ -67,21 +73,17 @@ export const hotPostListResponseDtoSchema = z.object({
 });
 
 /** `/api/posts/me` envelope.response */
-export const myPostListPageDtoSchema = z
-  .object({
-    total: z.number(),
-    list: z.array(z.unknown()),
-    pageNum: z.number(),
-    pageSize: z.number(),
-  })
-  .passthrough();
+export const myPostListPageDtoSchema = z.looseObject({
+  total: z.number(),
+  list: z.array(z.unknown()),
+  pageNum: z.number(),
+  pageSize: z.number(),
+});
 
 /** `/api/comments/me` envelope.response */
-export const myCommentListPageDtoSchema = z
-  .object({
-    total: z.number(),
-    list: z.array(z.unknown()),
-    pageNum: z.number(),
-    pageSize: z.number(),
-  })
-  .passthrough();
+export const myCommentListPageDtoSchema = z.looseObject({
+  total: z.number(),
+  list: z.array(z.unknown()),
+  pageNum: z.number(),
+  pageSize: z.number(),
+});

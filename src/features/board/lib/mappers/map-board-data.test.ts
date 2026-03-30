@@ -23,6 +23,7 @@ describe("mapBoardDataDtoToBoardOverview", () => {
       boardInfo: {
         rootCategoryName: null,
         childCategoryName: "자식",
+        childCategories: [],
       },
       hotPost: { postId: 1 },
       recentPostList: minimalRecentPostList(),
@@ -46,6 +47,7 @@ describe("mapBoardDataDtoToBoardOverview", () => {
       boardInfo: {
         rootCategoryName: "루트",
         childCategoryName: null,
+        childCategories: [],
       },
       hotPost,
       recentPostList,
@@ -56,5 +58,35 @@ describe("mapBoardDataDtoToBoardOverview", () => {
     expect(overview.hotPost).toEqual(hotPost);
     expect(overview.recentPostList.total).toBe(2);
     expect(overview.recentPostList.list).toEqual([{ postId: 1 }]);
+  });
+
+  it("childCategories를 게시판 클라이언트 모델에 포함한다", () => {
+    const dto: BoardDataDto = {
+      boardInfo: {
+        rootCategoryName: "악기 게시판",
+        childCategoryName: null,
+        childCategories: [
+          {
+            id: 4,
+            parentId: null,
+            name: "쇠",
+            description: null,
+          },
+        ],
+      },
+      hotPost: null,
+      recentPostList: minimalRecentPostList(),
+    };
+
+    const overview = mapBoardDataDtoToBoardOverview(dto);
+
+    expect(overview.boardInfo.childCategories).toEqual([
+      {
+        id: 4,
+        parentId: null,
+        name: "쇠",
+        description: null,
+      },
+    ]);
   });
 });

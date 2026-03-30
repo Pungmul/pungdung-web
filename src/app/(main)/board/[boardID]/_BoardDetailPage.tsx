@@ -1,5 +1,8 @@
 "use client";
 
+import { useCallback } from "react";
+import { useSearchParams } from "next/navigation";
+
 import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
@@ -9,6 +12,7 @@ import { ChevronRightIcon } from "@heroicons/react/24/outline";
 
 import {
   boardQueries,
+  BoardChildCategoryTabs,
   deriveBoardPostList,
   deriveBoardPostListHasNextPage,
   HotPostBanner,
@@ -20,13 +24,25 @@ import { PostList } from "@/features/post";
 import { LinkChipButton, ListEmptyView } from "@/shared/components";
 
 export function BoardDetailPage({ boardId }: { boardId: number }) {
-  
+  const searchParams = useSearchParams();
   const { data: boardData } = useSuspenseQuery(boardQueries.detail(boardId));
-  const postList = useSuspenseInfiniteQuery(boardQueries.postList(boardId));
+  const childCategories = boardData.boardInfo.childCategories;
+  const hasChildCategories = childCategories.length > 0;
+  const selectedCategory =
+    childCategories.find(
+      (category) => String(category.id) === searchParams.get("tab")
+    ) ?? childCategories[0];
+  const postListBoardId = selectedCategory?.id ?? boardId;
+  const postList = useSuspenseInfiniteQuery(
+    boardQueries.postList(postListBoardId)
+  );
 
-  const posts = deriveBoardPostList(boardData, postList.data);
+  const posts = deriveBoardPostList(
+    hasChildCategories ? undefined : boardData,
+    postList.data
+  );
   const hasNextPageForList = deriveBoardPostListHasNextPage(
-    boardData,
+    hasChildCategories ? undefined : boardData,
     postList.data,
     postList.hasNextPage
   );
@@ -38,19 +54,39 @@ export function BoardDetailPage({ boardId }: { boardId: number }) {
 
   useTrackBoardVisit({ boardId, boardData });
 
+  const handleCategoryChange = useCallback(
+    (category: NonNullable<typeof selectedCategory>) => {
+      const params = new URLSearchParams(searchParams);
+      params.set("tab", String(category.id));
+      window.history.pushState(
+        null,
+        "",
+        `/board/${boardId}?${params.toString()}`
+      );
+    },
+    [boardId, searchParams]
+  );
+
   return (
     <section
       key="board-post-list-section"
       className="relative flex w-full flex-col bg-background"
     >
+      {selectedCategory ? (
+        <BoardChildCategoryTabs
+          categories={childCategories}
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
+        />
+      ) : null}
       <HotPostBanner hotPost={boardData.hotPost} />
       <PostList
-        key="board-post-list"
+        key={`board-post-list-${postListBoardId}`}
         posts={posts}
         isLoading={postList.isFetchingNextPage}
         hasNextPage={hasNextPageForList}
         onLoadMore={loadMore}
-        ListEmptyComponent={<BoardPostListEmpty boardId={boardId} />}
+        ListEmptyComponent={<BoardPostListEmpty boardId={postListBoardId} />}
       />
     </section>
   );

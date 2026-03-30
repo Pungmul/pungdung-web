@@ -11,6 +11,7 @@ export function mapBoardDataDtoToBoardOverview(
     boardInfo: {
       rootCategoryName: dto.boardInfo.rootCategoryName ?? "",
       childCategoryName: dto.boardInfo.childCategoryName,
+      childCategories: dto.boardInfo.childCategories,
     },
     hotPost: dto.hotPost as PostSummary,
     recentPostList: mapPostListPageDtoToPostListPage(dto.recentPostList),

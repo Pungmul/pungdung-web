@@ -85,6 +85,47 @@ describe("board dto.schema", () => {
     expect(parsed.success).toBe(true);
   });
 
+  it("boardDataDtoSchema는 childCategories를 게시판 정보 안에서 통과시킨다", () => {
+    const parsed = boardDataDtoSchema.safeParse({
+      boardInfo: {
+        rootCategoryName: "악기 게시판",
+        childCategoryName: null,
+        childCategories: [
+          {
+            id: 4,
+            parentId: null,
+            name: "쇠",
+            description: null,
+          },
+        ],
+      },
+      hotPost: null,
+      recentPostList: {
+        total: 0,
+        list: [],
+        pageNum: 1,
+        pageSize: 10,
+        isFirstPage: true,
+        isLastPage: true,
+        hasPreviousPage: false,
+        hasNextPage: false,
+      },
+    });
+
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) {
+      throw new Error("childCategories should parse");
+    }
+    expect(parsed.data?.boardInfo.childCategories).toEqual([
+      {
+        id: 4,
+        parentId: null,
+        name: "쇠",
+        description: null,
+      },
+    ]);
+  });
+
   it("postWithCategoryNameDtoSchema는 필수 필드가 있으면 통과한다", () => {
     const parsed = postWithCategoryNameDtoSchema.safeParse(
       minimalPostWithCategoryRow()
