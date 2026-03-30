@@ -12,6 +12,13 @@ const PROMOTE_BOARD = {
   description: "공연 모집 정보를 공유하는 게시판입니다",
 };
 
+const CLUB_BOARD = {
+  id: "club",
+  parentId: null,
+  name: "동아리 게시판",
+  description: "소속 동아리의 게시글을 확인하는 게시판입니다",
+};
+
 function okEnvelope(response: unknown) {
   return {
     code: "OK",
@@ -68,15 +75,25 @@ describe("prefetchBoardInfoList", () => {
 
     await prefetchBoardInfoList();
 
-    expect(fetchMock).toHaveBeenCalledWith("https://x.example.com/api/boards");
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://x.example.com/api/boards",
+      expect.objectContaining({
+        next: expect.objectContaining({ revalidate: 900 }),
+      })
+    );
 
     process.env.NEXT_PUBLIC_BASE_URL = "https://y.example.com";
     await prefetchBoardInfoList();
 
-    expect(fetchMock).toHaveBeenCalledWith("https://y.example.com/api/boards");
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://y.example.com/api/boards",
+      expect.objectContaining({
+        next: expect.objectContaining({ revalidate: 900 }),
+      })
+    );
   });
 
-  it("성공 응답이면 매핑된 목록 끝에 PROMOTE_BOARD를 붙인다", async () => {
+  it("성공 응답이면 매핑된 목록 끝에 CLUB_BOARD와 PROMOTE_BOARD를 붙인다", async () => {
     const fetchMock = vi.mocked(globalThis.fetch);
     fetchMock.mockResolvedValueOnce({
       ok: true,
@@ -102,6 +119,7 @@ describe("prefetchBoardInfoList", () => {
         name: "자유",
         description: "desc",
       },
+      CLUB_BOARD,
       PROMOTE_BOARD,
     ]);
   });

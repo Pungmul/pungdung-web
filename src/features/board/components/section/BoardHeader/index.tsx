@@ -13,11 +13,13 @@ import type { BoardHeaderDisplay } from "../../../types";
 interface BoardHeaderProps {
   boardID: string;
   initialBoardInfo?: BoardHeaderDisplay;
+  searchable?: boolean;
 }
 
 export function BoardHeader({
   boardID,
   initialBoardInfo,
+  searchable = true,
 }: BoardHeaderProps) {
   const { boardInfo, categoryDescription, goToBoardMain } = useBoardHeaderMeta(
     boardID,
@@ -35,6 +37,7 @@ export function BoardHeader({
           boardInfo={boardInfo}
           goToBoardMain={goToBoardMain}
           keyword={keyword}
+          searchable={searchable}
         />
       }
       desktop={
@@ -45,6 +48,7 @@ export function BoardHeader({
             ? { categoryDescription }
             : {})}
           keyword={keyword}
+          searchable={searchable}
         />
       }
     />

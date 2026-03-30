@@ -21,6 +21,7 @@ interface BoardHeaderMobileProps {
   boardInfo: BoardSummary | BoardHeaderDisplay | undefined;
   goToBoardMain: () => void;
   keyword: BoardHeaderSearchKeyword;
+  searchable?: boolean;
 }
 
 /** 모바일: 상단 헤더(제목·뒤로) + 검색 아이콘 + 검색 입력 줄 */
@@ -29,6 +30,7 @@ export function BoardHeaderMobile({
   boardInfo,
   goToBoardMain,
   keyword,
+  searchable = true,
 }: BoardHeaderMobileProps) {
   const router = useRouter();
 
@@ -54,21 +56,22 @@ export function BoardHeaderMobile({
       <Header
         title={boardInfo?.name || FALLBACK_TITLE}
         bottomGradientOffsetPx={isSearching ? mobileSearchHeightPx : 0}
-        rightBtn={
-          <span
-            className="flex size-6 items-center justify-center cursor-pointer"
-            onClick={openMobileSearch}
-          >
-            <MagnifyingGlassIcon
-              className="size-full"
-              color="#CCC"
-            />
-          </span>
-        }
+        {...(searchable
+          ? {
+            rightBtn: (
+              <span
+                className="flex size-6 items-center justify-center cursor-pointer"
+                onClick={openMobileSearch}
+              >
+                <MagnifyingGlassIcon className="size-full" color="#CCC" />
+              </span>
+            ),
+          }
+          : {})}
         onLeftClick={goToBoardMain}
         className="z-20"
       />
-      {isSearching ? (
+      {searchable && isSearching ? (
         <div
           ref={mobileSearchRowRef}
           className="flex flex-row gap-[8px] px-[12px] py-[4px] bg-background"

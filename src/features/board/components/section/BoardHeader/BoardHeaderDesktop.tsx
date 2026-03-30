@@ -12,6 +12,7 @@ interface BoardHeaderDesktopProps {
   boardInfo: BoardSummary | BoardHeaderDisplay | undefined;
   categoryDescription?: string;
   keyword: BoardHeaderSearchKeyword;
+  searchable?: boolean;
 }
 
 /** 데스크톱: 게시판 정보 + 검색 필드 한 행 */
@@ -20,6 +21,7 @@ export function BoardHeaderDesktop({
   boardInfo,
   categoryDescription,
   keyword,
+  searchable = true,
 }: BoardHeaderDesktopProps) {
   const router = useRouter();
 
@@ -37,13 +39,15 @@ export function BoardHeaderDesktop({
           ? { categoryDescription }
           : {})}
       />
-      <BoardHeaderSearchField
-        searchValue={keyword.searchValue}
-        onSearchValueChange={keyword.setSearchValue}
-        onSubmitSearch={navigateToSearch}
-        onClear={keyword.resetKeyword}
-        containerClassName="w-[320px] h-fit"
-      />
+      {searchable ? (
+        <BoardHeaderSearchField
+          searchValue={keyword.searchValue}
+          onSearchValueChange={keyword.setSearchValue}
+          onSubmitSearch={navigateToSearch}
+          onClear={keyword.resetKeyword}
+          containerClassName="w-[320px] h-fit"
+        />
+      ) : null}
     </div>
   );
 }
