@@ -22,18 +22,6 @@ const c: BoardSummary = {
   name: "X",
   description: "",
 };
-const club: BoardSummary = {
-  id: "club",
-  parentId: null,
-  name: "동아리 게시판",
-  description: "",
-};
-const promote: BoardSummary = {
-  id: "promote",
-  parentId: null,
-  name: "홍보 게시판",
-  description: "",
-};
 
 describe("sortBoardsWithBookmarks", () => {
   it("북마크된 보드가 앞으로 온다", () => {
@@ -48,12 +36,5 @@ describe("sortBoardsWithBookmarks", () => {
 
   it("문자열 id는 로케일 비교", () => {
     expect(sortBoardsWithBookmarks([c, a], [])).toEqual([a, c]);
-  });
-
-  it("합성 게시판 중 동아리 게시판은 홍보 게시판보다 앞에 온다", () => {
-    expect(sortBoardsWithBookmarks([promote, club], [])).toEqual([
-      club,
-      promote,
-    ]);
   });
 });

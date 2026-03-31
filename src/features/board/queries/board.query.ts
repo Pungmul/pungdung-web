@@ -13,8 +13,6 @@ import {
   fetchBoardDetails,
   fetchBoardInfo,
   fetchBoardInfoList,
-  fetchClubBoardDetails,
-  fetchClubPostList,
   fetchHotPostList,
   fetchMyCommentList,
   fetchMyPostList,
@@ -66,37 +64,11 @@ export const boardQueries = {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
     }),
-  clubDetail: (size = DEFAULT_POST_LIST_SIZE) =>
-    queryOptions({
-      queryKey: [...boardQueries.details(), "club", size] as const,
-      queryFn: () => fetchClubBoardDetails(1, size),
-      staleTime: BOARD_STALE_TIME,
-      gcTime: BOARD_GC_TIME,
-      retry: 2,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    }),
   postLists: () => [...boardQueries.all(), "post-list"] as const,
   postList: (boardId: number, size = DEFAULT_POST_LIST_SIZE) =>
     infiniteQueryOptions({
       queryKey: [...boardQueries.postLists(), boardId, size] as const,
       queryFn: ({ pageParam = 1 }) => fetchPostList(boardId, pageParam, size),
-      getNextPageParam: (lastPage) =>
-        lastPage.hasNextPage ? lastPage.pageNum + 1 : undefined,
-      initialPageParam: 1,
-      retry: 0,
-      refetchOnMount: true,
-      refetchOnReconnect: true,
-      refetchOnWindowFocus: true,
-      staleTime: BOARD_STALE_TIME,
-      gcTime: BOARD_GC_TIME,
-      placeholderData: keepPreviousData,
-    }),
-  clubPostList: (size = DEFAULT_POST_LIST_SIZE) =>
-    infiniteQueryOptions({
-      queryKey: [...boardQueries.postLists(), "club", size] as const,
-      queryFn: ({ pageParam = 1 }) =>
-        fetchClubPostList(pageParam as number, size),
       getNextPageParam: (lastPage) =>
         lastPage.hasNextPage ? lastPage.pageNum + 1 : undefined,
       initialPageParam: 1,

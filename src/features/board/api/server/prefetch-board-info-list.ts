@@ -14,13 +14,6 @@ const PROMOTE_BOARD: BoardSummary = {
   description: "공연 모집 정보를 공유하는 게시판입니다",
 };
 
-const CLUB_BOARD: BoardSummary = {
-  id: "club",
-  parentId: null,
-  name: "동아리 게시판",
-  description: "소속 동아리의 게시글을 확인하는 게시판입니다",
-};
-
 function resolveServerBoardsUrl(): string {
   const base = process.env.NEXT_PUBLIC_BASE_URL;
   if (!base) {
@@ -51,7 +44,6 @@ export const prefetchBoardInfoList = async () =>
     },
     map: (list) => [
       ...list.map(mapBriefBoardInfoDtoToBoardSummary),
-      CLUB_BOARD,
       PROMOTE_BOARD,
     ],
   });

@@ -2,10 +2,6 @@ export { fetchBoardDetails } from "./fetch-board-details";
 export { fetchBoardInfo } from "./fetch-board-info";
 export { fetchBoardInfoList } from "./fetch-board-info-list";
 export {
-  fetchClubBoardDetails,
-  fetchClubPostList,
-} from "./fetch-club-board-details";
-export {
   fetchHotPostList,
   type HotPostListPageDto,
   type HotPostListResponse,

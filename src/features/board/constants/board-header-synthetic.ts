@@ -21,10 +21,6 @@ export const BOARD_HEADER_SYNTHETIC_BY_SEGMENT: Record<
     name: "인기 게시글",
     description: "인기 게시글 목록 입니다.",
   },
-  club: {
-    name: "동아리 게시판",
-    description: "소속 동아리의 게시글을 확인하는 게시판입니다.",
-  },
   promote: {
     name: "홍보 게시판",
     description: "공연을 홍보하는 게시판 입니다.",

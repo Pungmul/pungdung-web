@@ -12,12 +12,6 @@ const sample: BoardSummary[] = [
     description: "",
   },
   {
-    id: "club",
-    parentId: null,
-    name: "동아리",
-    description: "",
-  },
-  {
     id: "promote",
     parentId: null,
     name: "홍보",
@@ -32,11 +26,7 @@ const sample: BoardSummary[] = [
 ];
 
 describe("filterBoardsForMainPage", () => {
-  it("숫자 id와 club, promote 합성 게시판만 남김", () => {
-    expect(filterBoardsForMainPage(sample)).toEqual([
-      sample[0],
-      sample[1],
-      sample[2],
-    ]);
+  it("숫자 id와 promote만 남김", () => {
+    expect(filterBoardsForMainPage(sample)).toEqual([sample[0], sample[1]]);
   });
 });
