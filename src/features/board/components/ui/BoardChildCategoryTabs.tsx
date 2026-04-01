@@ -34,12 +34,12 @@ export function BoardChildCategoryTabs({
                     ? "var(--color-grey-800)"
                     : "var(--color-grey-500)",
                 }}
-                className="relative min-w-[72px] md:min-w-[96px] text-center text-[15px] md:text-[18px] font-semibold py-[12px] cursor-pointer flex-shrink-0"
+                className="relative min-w-[72px] md:min-w-24 text-center text-[15px] md:text-[18px] font-semibold py-3 cursor-pointer flex-shrink-0"
                 onClick={() => onCategoryChange(category)}
               >
                 {category.name}
                 <motion.div
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-grey-800"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-grey-800"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: isSelected ? 1 : 0 }}
                   transition={{ duration: 0.25 }}

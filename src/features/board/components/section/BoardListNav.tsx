@@ -7,10 +7,17 @@ import { useQuery } from "@tanstack/react-query";
 
 import { boardHrefSegment } from "../../lib";
 import { boardQueries } from "../../queries";
+import { cn } from "@/shared";
 
 function boardNavLinkClass(isActive: boolean) {
-  return `cursor-pointer text-[15px] ${isActive ? "text-primary" : "text-grey-500"
-    } hover:text-primary transition-colors`;
+  return cn("cursor-pointer text-[15px]",
+    isActive ? "text-primary" : "text-grey-500",
+    "hover:text-primary transition-colors");
+}
+
+function isBoardPathActive(pathname: string, segment: string): boolean {
+  const basePath = `/board/${segment}`;
+  return pathname === basePath || pathname.startsWith(`${basePath}/`);
 }
 
 export function BoardListNav() {
@@ -22,7 +29,7 @@ export function BoardListNav() {
 
   return (
     <aside>
-      <nav className="hidden lg:flex flex-col gap-[24px] sticky top-[72px] self-start w-[120px] h-fit">
+      <nav className="hidden lg:flex flex-col gap-[24px] sticky top-[72px] self-start w-36 h-fit">
         <h2 className="text-[17px] font-bold px-4">다른 게시판</h2>
         <ul className="flex flex-col items-start list-none gap-[24px] p-4">
           <li>
@@ -30,7 +37,7 @@ export function BoardListNav() {
               href="/board/hot-post"
               prefetch={false}
               className={boardNavLinkClass(
-                pathname.includes("/board/hot-post")
+                isBoardPathActive(pathname, "hot-post")
               )}
               onMouseEnter={() => {
                 void router.prefetch("/board/hot-post");
@@ -50,7 +57,7 @@ export function BoardListNav() {
                   href={`/board/${segment}`}
                   prefetch={false}
                   className={boardNavLinkClass(
-                    pathname.includes(`/board/${segment}`)
+                    isBoardPathActive(pathname, segment)
                   )}
                   onMouseEnter={() => {
                     void router.prefetch(`/board/${segment}`);
