@@ -44,4 +44,10 @@ export const memberMeResponseSchema = z.object({
   profile: profileImageDtoSchema,
 });
 
+export const invitationCodeResponseSchema = z.object({
+  code: z.string(),
+  remainingUses: z.number(),
+});
+
 export type MemberMeDto = z.infer<typeof memberMeResponseSchema>;
+export type InvitationCodeDto = z.infer<typeof invitationCodeResponseSchema>;

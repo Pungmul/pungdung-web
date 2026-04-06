@@ -12,6 +12,7 @@ import {
   MyPageAccountSection,
   MyPageAccountSectionSkeleton,
 } from "../../../features/my-page/components/section/MyPageAccountSection";
+import { MyInvitationCodeMenuItem } from "../../../features/my-page/components/section/MyInvitationCodeMenuItem";
 import { MyPageFriendsSection } from "../../../features/my-page/components/section/MyPageFriendsSection";
 import { ProfileSection, ProfileSectionSkeleton } from "../../../features/my-page/components/section/ProfileSection";
 
@@ -67,6 +68,9 @@ function MyPageClientContent() {
             >
               로그인 설정
             </Link>
+          </li>
+          <li>
+            <MyInvitationCodeMenuItem />
           </li>
         </ul>
       </section>
