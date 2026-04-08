@@ -11,10 +11,10 @@ import {
 
 import {
   HeaderProgressBar,
+  Tabs,
   PWAInstallPrompt,
   ToastContainer,
 } from "@/shared/components";
-import BottomTabs from "@/shared/components/layout/BottomTabs";
 import ReactQueryProviders from "@/shared/lib/useReactQuery";
 
 
@@ -40,7 +40,7 @@ export default function RootLayout({
             id="main-shell"
             className="flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-app"
           >
-            <BottomTabs />
+            <Tabs />
             {children}
           </div>
         </div>

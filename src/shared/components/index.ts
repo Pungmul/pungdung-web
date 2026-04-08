@@ -4,6 +4,7 @@
 export { Header } from "./layout/Header";
 export { default as HeaderProgressBar } from "./layout/HeaderProgressBar";
 export { Space } from "./layout/Space";
+export { default as Tabs } from "./layout/Tabs";
 
 // UI Components
 export { AlertModal } from "./ui/AlertModal";

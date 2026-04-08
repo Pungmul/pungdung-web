@@ -24,7 +24,7 @@ function BoardIconFilled({
     height: "20",
     rx: "4",
     strokeWidth: "2.5",
-    className: "fill-grey-800 stroke-grey-800"
+    className: "fill-current stroke-current"
   }), /*#__PURE__*/React.createElement("rect", {
     x: "6.99997",
     y: "7",
@@ -32,8 +32,6 @@ function BoardIconFilled({
     height: "20",
     rx: "4",
     strokeWidth: "2.5",
-    // fill: "white",
-    // stroke: "white",
     className: "fill-background stroke-background"
   }), /*#__PURE__*/React.createElement("rect", {
     x: "6",
@@ -41,10 +39,8 @@ function BoardIconFilled({
     width: "16",
     height: "20",
     rx: "4",
-    // fill: "currentColor",
-    // stroke: "currentColor",
     strokeWidth: "2.5",
-    className: "fill-grey-800 stroke-grey-800"
+    className: "fill-current stroke-current"
   }), /*#__PURE__*/React.createElement("path", {
     d: "M9 18H17",
     strokeWidth: "2",

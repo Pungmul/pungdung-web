@@ -2,13 +2,21 @@ import Image from "next/image";
 
 import type { Member } from "@/features/user";
 
+import { cn } from "@/shared/lib";
+
 interface ProfileCircleProps {
   myInfo: Member;
+  className?: string;
 }
 
-export function ProfileCircle({ myInfo }: ProfileCircleProps) {
+export function ProfileCircle({ myInfo, className }: ProfileCircleProps) {
   return (
-    <div className="w-[36px] h-[36px] overflow-hidden rounded-full border-2 border-black relative">
+    <div
+      className={cn(
+        "relative size-9 shrink-0 overflow-hidden rounded-full border-2 border-black",
+        className
+      )}
+    >
       {myInfo?.profile.fullFilePath ? (
         <Image
           src={myInfo?.profile.fullFilePath || ""}

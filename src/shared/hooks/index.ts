@@ -5,3 +5,4 @@ export { useKakaoMaps, useKakaoMapsEffect } from "./useKakaoMaps";
 export { useScrollHideComponent } from "./useScrollHideComponent";
 export { useThemePreference } from "./useThemePreference";
 export { useViewportHeightVar } from "./useViewportHeightVar";
+export { useWebViewCookieBridge } from "./useWebViewCookieBridge";

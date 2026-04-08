@@ -20,8 +20,8 @@ export const ChatTabBadge = ({
       {children}
 
       {shouldShowBadge && (
-        <div className="absolute -top-2 -right-2 min-w-[20px] h-[20px] bg-red-500 rounded-full flex items-center justify-center">
-          <span className="text-white text-xs font-medium px-1">
+        <div className="absolute max-md:-top-1 max-md:-right-1 -top-2 -right-2 max-md:size-4 size-5 bg-red-500 rounded-full flex items-center justify-center">
+          <span className="text-white max-md:text-[10px] text-xs font-medium px-1">
             {badgeText}
           </span>
         </div>

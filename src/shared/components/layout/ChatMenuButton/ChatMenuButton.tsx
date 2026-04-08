@@ -7,46 +7,77 @@ import { Suspense } from "@suspensive/react";
 
 import { ChatTabBadge } from "@/features/chat";
 
-import { ChatIconFilled, ChatIconOutline } from "@/shared/components/Icons";
+import { ChatIconFilled } from "@/shared/components/Icons";
 
-export default function ChatMenuButton() {
+type ChatMenuButtonProps = {
+  linkClassName: string;
+  iconWrapClassName: string;
+  labelClassName: (isActive: boolean) => string;
+  iconClassName: (isActive: boolean) => string;
+};
+
+function ChatMenuIcon({
+  isActive,
+  iconWrapClassName,
+  iconClassName,
+}: {
+  isActive: boolean;
+  iconWrapClassName: string;
+  iconClassName: (isActive: boolean) => string;
+}) {
+  return (
+    <ChatTabBadge>
+      <span className={iconWrapClassName}>
+        <ChatIconFilled className={iconClassName(isActive)} />
+      </span>
+    </ChatTabBadge>
+  );
+}
+
+function ChatMenuIconFallback({
+  isActive,
+  iconWrapClassName,
+  iconClassName,
+}: {
+  isActive: boolean;
+  iconWrapClassName: string;
+  iconClassName: (isActive: boolean) => string;
+}) {
+  return (
+    <span className={iconWrapClassName}>
+      <ChatIconFilled className={iconClassName(isActive)} />
+    </span>
+  );
+}
+
+export function ChatMenuButton({
+  linkClassName,
+  iconWrapClassName,
+  labelClassName,
+  iconClassName,
+}: ChatMenuButtonProps) {
   const pathname = usePathname();
+  const isActive = pathname.startsWith("/chats");
 
   return (
-    <Link
-      href={"/chats/r/inbox"}
-      className="h-12 justify-center items-center cursor-pointer flex gap-[24px] flex-row"
-      prefetch
-    >
+    <Link href="/chats/r/inbox" className={linkClassName} prefetch>
       <Suspense
         clientOnly
         fallback={
-          pathname.startsWith("/chats") ? (
-            <span className="flex size-9 items-center justify-center">
-              <ChatIconFilled className="size-full text-grey-800" />
-            </span>
-          ) : (
-            <span className="flex size-9 items-center justify-center">
-              <ChatIconOutline className="size-full text-grey-800" />
-            </span>
-          )
+          <ChatMenuIconFallback
+            isActive={isActive}
+            iconWrapClassName={iconWrapClassName}
+            iconClassName={iconClassName}
+          />
         }
       >
-        <ChatTabBadge>
-          {pathname.startsWith("/chats") ? (
-            <span className="flex size-9 items-center justify-center">
-              <ChatIconFilled className="size-full text-grey-800" />
-            </span>
-          ) : (
-            <span className="flex size-9 items-center justify-center">
-              <ChatIconOutline className="size-full text-grey-800" />
-            </span>
-          )}
-        </ChatTabBadge>
+        <ChatMenuIcon
+          isActive={isActive}
+          iconWrapClassName={iconWrapClassName}
+          iconClassName={iconClassName}
+        />
       </Suspense>
-      <div className="hidden 2xl:block w-[100px] text-[16px] self-end pb-[8px] font-semibold text-grey-800">
-        채팅
-      </div>
+      <span className={labelClassName(isActive)}>채팅</span>
     </Link>
   );
 }
