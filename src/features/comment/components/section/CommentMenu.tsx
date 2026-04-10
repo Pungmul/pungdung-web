@@ -4,14 +4,16 @@ import { useRef } from "react";
 
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
-import { useClickOutside } from "@/shared/hooks";
+import {
+  useAnchorDropdownPlacement,
+  useClickOutside,
+} from "@/shared/hooks";
 
 import {
   useCommentMenuDelete,
   useCommentMenuReportOpen,
 } from "../../hooks/actions";
 import { useCommentMenuOpen } from "../../hooks/state";
-import { useAnchorDropdownPlacement } from "../../hooks/view-model";
 import type { Comment as CommentType, Reply as ReplyType } from "../../types";
 
 /** 위로 펼칠 때 메뉴 패널 높이에 맞춘 앵커 오프셋(px) */
@@ -32,6 +34,7 @@ export function CommentMenu({ comment }: CommentMenuProps) {
     anchorRef: targetRef,
     enabled: isOpen,
     onAnchorOutsideViewport: close,
+    throttleMs: 1000,
   });
 
   // 삭제·신고: 각각 mutation/모달과 연결 (메뉴 닫기는 신고 쪽에서 공유)
@@ -60,9 +63,8 @@ export function CommentMenu({ comment }: CommentMenuProps) {
         <EllipsisVerticalIcon className="size-full text-grey-800" />
         {isOpen && (
           <ul
-            className={`absolute right-0 px-3 py-2 border border-grey-200 bg-background rounded-sm flex flex-col gap-2 z-10 ${
-              openUpward ? "mb-1" : "top-full mt-1"
-            }`}
+            className={`absolute right-0 px-3 py-2 border border-grey-200 bg-background rounded-sm flex flex-col gap-2 z-10 ${openUpward ? "mb-1" : "top-full mt-1"
+              }`}
             style={
               openUpward ? { top: -COMMENT_MENU_PANEL_OFFSET_PX } : undefined
             }

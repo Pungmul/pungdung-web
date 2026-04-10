@@ -1,3 +1,4 @@
+export { useAnchorDropdownPlacement } from "./useAnchorDropdownPlacement";
 export { useBodyScrollLock } from "./useBodyScrollLock";
 export { useClickOutside } from "./useClickOutside";
 export { useIOSKeyboardOpacityFix } from "./useIOSKeyboardOpacityFix";

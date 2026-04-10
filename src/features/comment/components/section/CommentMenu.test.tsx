@@ -42,11 +42,8 @@ vi.mock("../../hooks/actions", async (importOriginal) => {
   };
 });
 
-vi.mock("../../hooks/view-model/useAnchorDropdownPlacement", () => ({
-  useAnchorDropdownPlacement: vi.fn(() => ({ openUpward: false })),
-}));
-
 vi.mock("@/shared/hooks", () => ({
+  useAnchorDropdownPlacement: vi.fn(() => ({ openUpward: false })),
   useClickOutside: vi.fn(),
 }));
 
