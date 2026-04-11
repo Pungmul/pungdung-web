@@ -1,5 +1,5 @@
 "use client";
-import { useImperativeHandle, useRef, useState } from "react";
+import { useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 
 import {
   motion,
@@ -7,75 +7,170 @@ import {
   useAnimate,
   useDragControls,
 } from "framer-motion";
-import type { RefObject } from "react";
-import type { SwiperRef } from "swiper/react";
+import type { ReactNode, RefObject } from "react";
 
 import { GPSOutline } from "@/shared/components/Icons";
 
 import {
   GESTURE_THRESHOLD,
   GESTURE_VELOCITY_THRESHOLD,
-  HIGH_LEVEL,
-  LOW_LEVEL,
-  MEDIUM_LEVEL,
+  HIGH_LEVEL_VISIBLE_HEIGHT,
+  LOW_LEVEL_VISIBLE_HEIGHT,
+  MEDIUM_LEVEL_VISIBLE_HEIGHT,
 } from "../../constants";
-import type {
-  LightningBottomSheetRefType,
-  LightningMeeting,
-  UserParticipationData,
-} from "../../types";
+import { getElementTranslateY } from "../../lib/get-element-translate-y";
+import { resolveNearestBottomSheetLevel } from "../../lib/resolve-nearest-bottom-sheet-level";
+import type { LightningBottomSheetRefType } from "../../types";
 import { LightningCardList } from "../section/card/LightningCardList";
 
 type LightningBottomSheetProps = {
   bottomSheetRef: RefObject<LightningBottomSheetRefType | null>;
-  swiperRef: RefObject<SwiperRef | null>;
-  lightningList: LightningMeeting[];
   target: "전체" | "우리학교";
   targetOptions: readonly ("전체" | "우리학교")[];
-  userPartinLightning: UserParticipationData | undefined;
   mapPanToCurrentRef: RefObject<(() => void) | null>;
   setTarget: (target: "전체" | "우리학교") => void;
+  children: (controls: { expandSheet: () => void }) => ReactNode;
 };
 
-export function setUpLevel(level: number) {
-  if (level === LOW_LEVEL) {
-    return MEDIUM_LEVEL;
-  } else if (level === MEDIUM_LEVEL) {
-    return HIGH_LEVEL;
-  } else {
-    return HIGH_LEVEL;
-  }
+type BottomSheetLevels = {
+  low: number;
+  medium: number;
+  high: number;
+};
+
+function createBottomSheetLevels() {
+  return {
+    low: LOW_LEVEL_VISIBLE_HEIGHT,
+    medium: MEDIUM_LEVEL_VISIBLE_HEIGHT,
+    high: HIGH_LEVEL_VISIBLE_HEIGHT,
+  };
 }
 
-const setDownLevel = (level: number) => {
-  if (level === HIGH_LEVEL) {
-    return MEDIUM_LEVEL;
-  } else if (level === MEDIUM_LEVEL) {
-    return LOW_LEVEL;
-  } else {
-    return LOW_LEVEL;
+export function setUpLevel(level: number, levels = createBottomSheetLevels()) {
+  if (level === levels.low) {
+    return levels.medium;
   }
+
+  if (level === levels.medium) {
+    return levels.high;
+  }
+
+  return levels.high;
+}
+
+const setDownLevel = (level: number, levels: BottomSheetLevels) => {
+  if (level === levels.high) {
+    return levels.medium;
+  }
+
+  if (level === levels.medium) {
+    return levels.low;
+  }
+
+  return levels.low;
 };
 
 export function LightningBottomSheet({
   bottomSheetRef,
   target,
   setTarget,
-  swiperRef,
-  lightningList,
   targetOptions,
-  userPartinLightning,
   mapPanToCurrentRef,
+  children,
 }: LightningBottomSheetProps) {
   const levelChangeListener = useRef<
     ((oldLevel: number, newLevel: number) => void)[]
   >([]);
   const [container, containerAnimate] = useAnimate<HTMLDivElement>();
-  const [level, setLevel] = useState(MEDIUM_LEVEL);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const levelsRef = useRef(createBottomSheetLevels());
+  const sheetHeightRef = useRef(HIGH_LEVEL_VISIBLE_HEIGHT);
+  const [level, setLevel] = useState(() => levelsRef.current.medium);
+  const levelRef = useRef(level);
   const dragControls = useDragControls();
 
+  const getTranslateY = (visibleHeight: number) =>
+    Math.max(sheetHeightRef.current - visibleHeight, 0);
+
+  const snapToLevel = (
+    newLevel: number,
+    options: { notifyMap?: boolean; duration?: number } = {}
+  ) => {
+    const { notifyMap = false, duration = 0.3 } = options;
+    const oldLevel = levelRef.current;
+
+    containerAnimate(
+      container.current,
+      { y: getTranslateY(newLevel) },
+      { duration, ease: "easeOut" }
+    );
+    levelRef.current = newLevel;
+    setLevel(newLevel);
+
+    if (notifyMap && oldLevel !== newLevel) {
+      levelChangeListener.current.forEach((callback) =>
+        callback(oldLevel, newLevel)
+      );
+    }
+  };
+
+  const moveToLevel = (newLevel: number) => {
+    snapToLevel(newLevel, { notifyMap: true });
+  };
+
+  const reconcileLevelFromPosition = () => {
+    const translateY = getElementTranslateY(container.current);
+    const visibleHeight = Math.max(
+      sheetHeightRef.current - translateY,
+      0
+    );
+    const resolvedLevel = resolveNearestBottomSheetLevel(
+      visibleHeight,
+      levelsRef.current
+    );
+
+    if (resolvedLevel !== levelRef.current) {
+      snapToLevel(resolvedLevel, { notifyMap: false, duration: 0 });
+    }
+
+    return levelRef.current;
+  };
+
+  const expandSheet = () => {
+    const levels = createBottomSheetLevels();
+    levelsRef.current = levels;
+    moveToLevel(levels.high);
+  };
+
+  useLayoutEffect(() => {
+    const sheet = sheetRef.current;
+    if (!sheet) return;
+
+    const updateSheetHeight = () => {
+      const nextSheetHeight = sheet.offsetHeight;
+      sheetHeightRef.current = nextSheetHeight;
+      containerAnimate(
+        container.current,
+        { y: Math.max(nextSheetHeight - levelRef.current, 0) },
+        { duration: 0 }
+      );
+    };
+
+    updateSheetHeight();
+
+    const resizeObserver = new ResizeObserver(updateSheetHeight);
+    resizeObserver.observe(sheet);
+    window.addEventListener("resize", updateSheetHeight);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateSheetHeight);
+    };
+  }, [container, containerAnimate]);
+
   useImperativeHandle(bottomSheetRef, () => ({
-    getLevel: () => level,
+    getLevel: () => levelRef.current,
+    reconcileLevelFromPosition,
     onLevelChange: (callback: (oldLevel: number, newLevel: number) => void) => {
       levelChangeListener.current.push(callback);
     },
@@ -89,45 +184,29 @@ export function LightningBottomSheet({
       Math.abs(info.offset.y) > GESTURE_THRESHOLD ||
       Math.abs(info.velocity.y) > GESTURE_VELOCITY_THRESHOLD
     ) {
-      if (Math.abs(info.offset.y) > 300 || Math.abs(info.velocity.y) > 500) {
-        const newLevel = info.offset.y > 0 ? LOW_LEVEL : HIGH_LEVEL;
-        containerAnimate(
-          container.current,
-          { y: newLevel },
-          { duration: 0.3, ease: "easeOut" }
-        );
-        setLevel(newLevel);
+      const levels = createBottomSheetLevels();
+      levelsRef.current = levels;
 
-        // 레벨 변경 이벤트 발생
-        levelChangeListener.current.forEach((callback) =>
-          callback(level, newLevel)
-        );
+      if (Math.abs(info.offset.y) > 300 || Math.abs(info.velocity.y) > 500) {
+        const newLevel = info.offset.y > 0 ? levels.low : levels.high;
+        moveToLevel(newLevel);
       } else {
         const newLevel =
-          info.offset.y > 0 ? setDownLevel(level) : setUpLevel(level);
-        containerAnimate(
-          container.current,
-          { y: newLevel },
-          { duration: 0.3, ease: "easeOut" }
-        );
-        setLevel(newLevel);
-
-        // 레벨 변경 이벤트 발생
-        levelChangeListener.current.forEach((callback) =>
-          callback(level, newLevel)
-        );
+          info.offset.y > 0
+            ? setDownLevel(levelRef.current, levels)
+            : setUpLevel(levelRef.current, levels);
+        moveToLevel(newLevel);
       }
     } else {
       // 원위치로 돌아가기
       containerAnimate(
         container.current,
-        { y: level },
+        { y: getTranslateY(levelRef.current) },
         { duration: 0.3, ease: "easeOut" }
       );
     }
   };
 
-  // 드래그 중 제한 로직
   return (
     <motion.div
       drag="y"
@@ -135,15 +214,18 @@ export function LightningBottomSheet({
       dragControls={dragControls}
       dragDirectionLock
       dragElastic={0}
-      dragConstraints={{ top: 0, bottom: 400 }}
-      initial={{ y: LOW_LEVEL }}
-      animate={{ y: MEDIUM_LEVEL }}
+      dragConstraints={{
+        top: getTranslateY(levelsRef.current.high),
+        bottom: getTranslateY(levelsRef.current.low),
+      }}
+      initial={{ y: getTranslateY(levelsRef.current.low) }}
+      animate={{ y: getTranslateY(level) }}
       onDragEnd={handleDragEnd}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="absolute bottom-0 left-0 w-dvw z-10 h-fit"
+      className="absolute inset-x-0 bottom-0 z-10 w-dvw"
       ref={container}
     >
-      <div className="flex flex-row w-full justify-end items-center px-[16px] py-[8px]">
+      <div className="absolute bottom-full left-0 flex w-full flex-row items-center justify-end px-[16px] py-[8px]">
         <div
           className="flex size-12 cursor-pointer flex-col items-center justify-center rounded-full bg-background shadow-lg"
           onClick={() => mapPanToCurrentRef.current?.()}
@@ -153,7 +235,10 @@ export function LightningBottomSheet({
           </span>
         </div>
       </div>
-      <div className="relative z-10 bottom-0 w-full rounded-tl-[12px] rounded-tr-[12px] shadow-up-md bg-background overflow-hidden flex flex-col lg:h-full lg:w-[640px] lg:py-[32px] lg:gap-[24px]">
+      <div
+        ref={sheetRef}
+        className="relative z-10 bottom-0 w-full rounded-tl-[12px] rounded-tr-[12px] shadow-up-md bg-background overflow-hidden flex flex-col lg:h-full lg:w-[640px] lg:py-[32px] lg:gap-[24px]"
+      >
         <div
           className="flex flex-col w-full cursor-grab active:cursor-grabbing touch-none"
           onPointerDown={(e) => dragControls.start(e)}

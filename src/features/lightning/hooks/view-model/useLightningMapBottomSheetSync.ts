@@ -28,7 +28,7 @@ export const useLightningMapBottomSheetSync = ({
     const map = mapRef.current;
 
     bottomSheetRef.current.onLevelChange((oldLevel, newLevel) => {
-      map.panBy(0, (oldLevel - newLevel) / 2);
+      map.panBy(0, (newLevel - oldLevel) / 2);
     });
 
     syncedMapRef.current = map;
