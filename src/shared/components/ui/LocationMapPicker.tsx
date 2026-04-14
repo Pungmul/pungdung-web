@@ -281,7 +281,7 @@ export function LocationMapPicker({
 
       <div
         ref={mapContainerRef}
-        className="w-full aspect-square max-h-[400px] rounded-lg overflow-hidden border border-grey-200"
+        className="w-full max-w-[calc(400px*4/3)] max-h-[400px] aspect-[4/3] rounded-lg overflow-hidden border border-grey-200"
       />
 
       {currentAddress && (
