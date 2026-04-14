@@ -6,7 +6,7 @@ import { Suspense } from "@suspensive/react";
 import { AnimatePresence } from "framer-motion";
 
 import {
-  LightningInformation,
+  LightningParticipationOverlay,
   LightningListOverlay,
   LightningMapSection,
   useLightningBottomSheetState,
@@ -55,6 +55,9 @@ function LightningPageContent() {
   const { bottomSheetRef, swiperRef } = useLightningBottomSheetState();
 
   const mapPanToCurrentRef = useRef<(() => void) | null>(null);
+  const mapMoveToLightningIndexRef = useRef<
+    ((index: number, speed?: number) => void) | null
+  >(null);
 
   return (
     <AnimatePresence mode="sync" key="main-animate-presence">
@@ -62,13 +65,15 @@ function LightningPageContent() {
         key="main-div"
         className="relative w-full h-full flex-grow flex flex-col justify-end md:flex-row-reverse overflow-hidden"
       >
-        <LightningInformation userPartinLightning={userParticipationData} />
         <LightningMapSection
           lightningList={lightningList}
           bottomSheetRef={bottomSheetRef}
           swiperRef={swiperRef}
           mapPanToCurrentRef={mapPanToCurrentRef}
-        />
+          mapMoveToLightningIndexRef={mapMoveToLightningIndexRef}
+        >
+          <LightningParticipationOverlay />
+        </LightningMapSection>
         <LightningListOverlay
           lightningList={lightningList}
           target={target}
@@ -76,6 +81,7 @@ function LightningPageContent() {
           bottomSheetRef={bottomSheetRef}
           swiperRef={swiperRef}
           mapPanToCurrentRef={mapPanToCurrentRef}
+          mapMoveToLightningIndexRef={mapMoveToLightningIndexRef}
         />
       </main>
     </AnimatePresence>
