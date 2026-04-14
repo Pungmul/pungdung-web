@@ -19,6 +19,7 @@ const baseDto = {
   buildingName: "건물",
   locationDetail: "상세",
   tags: [],
+  participantProfiles: [],
   lightningMeetingParticipantList: [],
   instrumentAssignmentList: [],
   status: "OPEN",
@@ -50,5 +51,70 @@ describe("mapLightningMeeting", () => {
     expect(result.lightningMeetingParticipantList).toBe(
       dto.lightningMeetingParticipantList
     );
+  });
+
+  it("currentPersonNum·participantProfiles를 매핑한다", () => {
+    const dto: LightningMeetingDto = {
+      ...baseDto,
+      currentPersonNum: 3,
+      participantProfiles: [
+        {
+          userId: 10,
+          username: "user@pungdung.com",
+          name: "홍길동",
+          clubName: "풍물패",
+          profileImage: {
+            id: 5,
+            originalFilename: "a.jpg",
+            convertedFileName: "a.jpg",
+            fullFilePath: "https://example.com/a.jpg",
+            fileType: "image/jpeg",
+            fileSize: 100,
+            createdAt: "2026-04-28T10:00:00Z",
+          },
+        },
+      ],
+    };
+    const result = mapLightningMeeting(dto);
+    expect(result.currentPersonNum).toBe(3);
+    expect(result.participantProfiles).toHaveLength(1);
+    expect(result.participantProfiles[0]?.name).toBe("홍길동");
+  });
+
+  it("currentPersonNum이 없으면 participantProfiles 길이로 추정한다", () => {
+    const dto: LightningMeetingDto = {
+      ...baseDto,
+      participantProfiles: [
+        {
+          userId: 1,
+          username: "a",
+          name: "A",
+          profileImage: {
+            id: 1,
+            originalFilename: "a.jpg",
+            convertedFileName: "a.jpg",
+            fullFilePath: "https://example.com/a.jpg",
+            fileType: "image/jpeg",
+            fileSize: 1,
+            createdAt: "2026-04-28T10:00:00Z",
+          },
+        },
+        {
+          userId: 2,
+          username: "b",
+          name: "B",
+          profileImage: {
+            id: 2,
+            originalFilename: "b.jpg",
+            convertedFileName: "b.jpg",
+            fullFilePath: "https://example.com/b.jpg",
+            fileType: "image/jpeg",
+            fileSize: 1,
+            createdAt: "2026-04-28T10:00:00Z",
+          },
+        },
+      ],
+    };
+    expect(mapLightningMeeting(dto).currentPersonNum).toBe(2);
   });
 });

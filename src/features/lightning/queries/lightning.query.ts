@@ -31,8 +31,8 @@ export const lightningQueries = {
     queryOptions({
       queryKey: lightningQueryInternal.status(),
       queryFn: fetchUserParticipationStatus,
-      gcTime: 0,
-      staleTime: 0,
+      gcTime: 30 * 1000,
+      staleTime: 10 * 1000,
       retry: 2,
     }),
 

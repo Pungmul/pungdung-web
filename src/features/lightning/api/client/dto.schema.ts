@@ -6,6 +6,29 @@ import {
   VISIBILITY_SCOPE,
 } from "../../constants";
 
+/** 업스트림 SimpleProfileDto — 번개 feature 전용 wire shape */
+export const lightningProfileImageDtoSchema = z.looseObject({
+  id: z.number(),
+  originalFilename: z.string(),
+  convertedFileName: z.string(),
+  fullFilePath: z.string(),
+  fileType: z.string(),
+  fileSize: z.number(),
+  createdAt: z.string(),
+});
+
+export const lightningParticipantProfileDtoSchema = z.looseObject({
+  userId: z.number(),
+  username: z.string(),
+  name: z.string(),
+  clubName: z.string().nullable().optional(),
+  profileImage: lightningProfileImageDtoSchema.nullable(),
+});
+
+export type LightningParticipantProfileDto = z.infer<
+  typeof lightningParticipantProfileDtoSchema
+>;
+
 export const lightningMeetingSchema = z.object({
   id: z.number(),
   meetingName: z.string(),
@@ -21,6 +44,11 @@ export const lightningMeetingSchema = z.object({
   buildingName: z.string(),
   locationDetail: z.string(),
   tags: z.array(z.string()).nullable(),
+  currentPersonNum: z.number().optional(),
+  participantProfiles: z
+    .array(lightningParticipantProfileDtoSchema)
+    .optional()
+    .default([]),
   lightningMeetingParticipantList: z.array(z.unknown()),
   instrumentAssignmentList: z.array(z.unknown()),
   status: z.enum(Object.values(LIGHTNING_STATUS)),
@@ -45,6 +73,10 @@ export const fetchUserParticipationStatusResponseSchema = z.object({
   isOrganizer: z.boolean().nullable(),
   chatRoomUUID: z.string().nullable(),
   lightningMeeting: lightningMeetingSchema.nullable(),
+  participantProfiles: z
+    .array(lightningParticipantProfileDtoSchema)
+    .nullish()
+    .transform((profiles) => profiles ?? []),
 });
 export type fetchUserParticipationStatusResponse = z.infer<
   typeof fetchUserParticipationStatusResponseSchema

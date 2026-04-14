@@ -4,6 +4,8 @@ import {
   VISIBILITY_SCOPE,
 } from "../constants";
 
+import type { LightningParticipantProfile } from "./participant-profile.types";
+
 export interface LightningMeeting {
   id: number;
   meetingName: string;
@@ -19,6 +21,8 @@ export interface LightningMeeting {
   buildingName: string;
   locationDetail: string;
   tags: string[];
+  currentPersonNum: number;
+  participantProfiles: LightningParticipantProfile[];
   lightningMeetingParticipantList: unknown[];
   instrumentAssignmentList: unknown[];
   status: (typeof LIGHTNING_STATUS)[keyof typeof LIGHTNING_STATUS];

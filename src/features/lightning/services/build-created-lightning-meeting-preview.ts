@@ -31,6 +31,8 @@ export function buildCreatedLightningMeetingPreview(
     buildingName: req.buildingName,
     locationDetail: req.locationDetail,
     tags: req.tags,
+    currentPersonNum: 1,
+    participantProfiles: [],
     lightningMeetingParticipantList: [],
     instrumentAssignmentList: [],
     status: LIGHTNING_STATUS.OPEN,

@@ -32,6 +32,7 @@ const validMeeting = {
   buildingName: "건물",
   locationDetail: "상세",
   tags: ["태그"],
+  participantProfiles: [],
   lightningMeetingParticipantList: [],
   instrumentAssignmentList: [],
   status: "OPEN",
@@ -78,6 +79,22 @@ describe("lightningMeetingSchema", () => {
     expect(parsed.success).toBe(false);
   });
 
+  it("participantProfiles의 profileImage가 null이어도 통과시킨다", () => {
+    const parsed = lightningMeetingSchema.safeParse({
+      ...validMeeting,
+      participantProfiles: [
+        {
+          userId: 1,
+          username: "user@test.com",
+          name: "테스트",
+          clubName: null,
+          profileImage: null,
+        },
+      ],
+    });
+    expect(parsed.success).toBe(true);
+  });
+
   it("visibilityScope가 허용 목록이 아니면 실패한다", () => {
     const parsed = lightningMeetingSchema.safeParse({
       ...validMeeting,
@@ -106,6 +123,20 @@ describe("fetchUserParticipationStatusResponseSchema", () => {
       lightningMeeting: null,
     });
     expect(parsed.success).toBe(true);
+  });
+
+  it("participantProfiles가 null이면 빈 배열로 정규화한다", () => {
+    const parsed = fetchUserParticipationStatusResponseSchema.safeParse({
+      participant: false,
+      isOrganizer: null,
+      chatRoomUUID: null,
+      lightningMeeting: null,
+      participantProfiles: null,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.participantProfiles).toEqual([]);
+    }
   });
 });
 

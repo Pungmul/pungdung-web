@@ -1,3 +1,7 @@
+import { resolveLightningCurrentPersonNum } from "../resolve-lightning-current-person-num";
+
+import { mapLightningParticipantProfile } from "./map-lightning-participant-profile";
+
 import type { LightningMeetingDto } from "../../api/client/dto.schema";
 import type { LightningMeeting } from "../../types";
 
@@ -7,6 +11,10 @@ import type { LightningMeeting } from "../../types";
 export function mapLightningMeeting(
   dto: LightningMeetingDto
 ): LightningMeeting {
+  const participantProfiles = (dto.participantProfiles ?? []).map(
+    mapLightningParticipantProfile
+  );
+
   return {
     id: dto.id,
     meetingName: dto.meetingName,
@@ -22,6 +30,8 @@ export function mapLightningMeeting(
     buildingName: dto.buildingName,
     locationDetail: dto.locationDetail,
     tags: dto.tags ?? [],
+    currentPersonNum: resolveLightningCurrentPersonNum(dto),
+    participantProfiles,
     lightningMeetingParticipantList: dto.lightningMeetingParticipantList,
     instrumentAssignmentList: dto.instrumentAssignmentList,
     status: dto.status,

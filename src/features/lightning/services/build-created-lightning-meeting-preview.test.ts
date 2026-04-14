@@ -48,6 +48,8 @@ describe("buildCreatedLightningMeetingPreview", () => {
     expect(preview.visibilityScope).toBe(req.visibilityScope);
 
     expect(preview.organizerId).toBe(0);
+    expect(preview.currentPersonNum).toBe(1);
+    expect(preview.participantProfiles).toEqual([]);
     expect(preview.lightningMeetingParticipantList).toEqual([]);
     expect(preview.instrumentAssignmentList).toEqual([]);
     expect(preview.status).toBe("OPEN");
