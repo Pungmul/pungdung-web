@@ -2,7 +2,7 @@
 
 import { memo, useCallback } from "react";
 
-import { Button } from "@/shared";
+import { Button, cn } from "@/shared";
 
 interface LightningCardButtonProps {
   isParticipated: boolean;
@@ -20,13 +20,19 @@ export const LightningCardButton = memo(function LightningCardButton({
   }, [onJoinLightning, meetingId]);
 
   return (
-    <div className="px-[12px]">
+    <div className="px-[8px]">
       <Button
-        className="!disabled:bg-grey-200 !disabled:text-grey-500 !disabled:cursor-not-allowed bg-primary text-background"
+        className={
+          cn(
+            (isParticipated
+              ? "disabled:cursor-not-allowed disabled:border disabled:border-grey-400 disabled:bg-background disabled:text-grey-500"
+              : "bg-primary text-background")
+          )
+        }
         onClick={handleClick}
         disabled={isParticipated}
       >
-        {isParticipated ? "(번개 참여중)" : "번개 참여하기"}
+        {isParticipated ? "참여중인 번개" : "참가하기"}
       </Button>
     </div>
   );

@@ -10,7 +10,7 @@ import { deleteLightningMeeting } from "../../api/client";
 import { lightningQueries } from "../../queries";
 
 /**
- * `LightningInformation` 패널: 확인 후 삭제·쿼리 갱신·토스트.
+ * `LightningParticipationOverlay` 패널: 확인 후 삭제·쿼리 갱신·토스트.
  */
 export function useLightningDeleteAction(meetingId: number | undefined) {
   const queryClient = useQueryClient();

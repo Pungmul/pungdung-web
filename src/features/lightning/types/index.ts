@@ -13,6 +13,10 @@ export type {
   Tag,
 } from "./meeting.types";
 export type {
+  LightningParticipantProfile,
+  LightningProfileImage,
+} from "./participant-profile.types";
+export type {
   LightningBottomSheetRefType,
   LightningCardRefType,
 } from "./refs.types";

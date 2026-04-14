@@ -1,4 +1,5 @@
 import { mapLightningMeeting } from "./map-lightning-meeting";
+import { mapLightningParticipantProfile } from "./map-lightning-participant-profile";
 import type { fetchUserParticipationStatusResponse } from "../../api/client/dto.schema";
 import type { UserParticipationData } from "../../types";
 
@@ -12,5 +13,8 @@ export function mapUserParticipationStatus(
     lightningMeeting: dto.lightningMeeting
       ? mapLightningMeeting(dto.lightningMeeting)
       : null,
+    participantProfiles: (dto.participantProfiles ?? []).map(
+      mapLightningParticipantProfile
+    ),
   };
 }

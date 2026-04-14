@@ -10,7 +10,7 @@ import { exitLightningMeeting } from "../../api/client";
 import { lightningQueries } from "../../queries";
 
 /**
- * `LightningInformation` 패널: 확인 후 탈퇴·쿼리 갱신·토스트.
+ * `LightningParticipationOverlay` 패널: 확인 후 탈퇴·쿼리 갱신·토스트.
  */
 export function useLightningExitAction(meetingId: number | undefined) {
   const queryClient = useQueryClient();
@@ -19,8 +19,8 @@ export function useLightningExitAction(meetingId: number | undefined) {
     if (!meetingId) return;
 
     Alert.confirm({
-      title: "참여 취소",
-      message: "정말 참여를 취소하시겠습니까?",
+      title: "번개 나가기",
+      message: "정말 참여중인 번개에서 나가시겠습니까?",
       onConfirm: () => {
         void (async () => {
           try {
