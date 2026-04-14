@@ -1,9 +1,4 @@
-export {
-  LightningBottomSheet,
-  LightningInformation,
-  LightningListOverlay,
-  LightningSidebar,
-} from "./overlay";
+export { LightningParticipationOverlay, LightningListOverlay } from "./overlay";
 export {
   BuildProgressBar,
   LightningBuildCompleteStep,

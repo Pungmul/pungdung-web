@@ -1,9 +1,9 @@
 export {
   GESTURE_THRESHOLD,
   GESTURE_VELOCITY_THRESHOLD,
-  HIGH_LEVEL,
-  LOW_LEVEL,
-  MEDIUM_LEVEL,
+  HIGH_LEVEL_VISIBLE_HEIGHT,
+  LOW_LEVEL_VISIBLE_HEIGHT,
+  MEDIUM_LEVEL_VISIBLE_HEIGHT,
 } from "./bottom-sheet-config";
 export { LIGHTNING_BUILD_MESSAGE } from "./lightning-build-domain-messages";
 export { BUILD_STEPS } from "./lightning-build-steps";

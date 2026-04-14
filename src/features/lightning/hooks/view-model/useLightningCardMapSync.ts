@@ -11,9 +11,14 @@ import {
   getLightningIdAtIndex,
   resolveLightningMapTargetById,
 } from "../../services";
-import type { GeoCoordinates, LightningMeeting } from "../../types";
+import type {
+  GeoCoordinates,
+  LightningBottomSheetRefType,
+  LightningMeeting,
+} from "../../types";
 
 type UseLightningCardMapSyncProps = {
+  bottomSheetRef: RefObject<LightningBottomSheetRefType | null>;
   swiperRef: RefObject<SwiperRef | null>;
   lightningList: LightningMeeting[];
   panToCenter: (location: GeoCoordinates) => void;
@@ -21,6 +26,7 @@ type UseLightningCardMapSyncProps = {
 };
 
 export const useLightningCardMapSync = ({
+  bottomSheetRef,
   swiperRef,
   lightningList,
   panToCenter,
@@ -30,6 +36,14 @@ export const useLightningCardMapSync = ({
   const lightningLookup = useMemo(
     () => createLightningLookup(lightningList),
     [lightningList]
+  );
+
+  const panToLightningForCurrentLevel = useCallback(
+    (location: GeoCoordinates) => {
+      bottomSheetRef.current?.reconcileLevelFromPosition();
+      panToCenter(location);
+    },
+    [bottomSheetRef, panToCenter]
   );
 
   const moveToLightningId = useCallback(
@@ -47,11 +61,12 @@ export const useLightningCardMapSync = ({
 
       if (swiper && swiper.activeIndex !== target.index) {
         swiper.slideTo(target.index, speed);
+        return;
       }
 
-      panToCenter(target.location);
+      panToLightningForCurrentLevel(target.location);
     },
-    [lightningLookup, panToCenter, swiperRef]
+    [lightningLookup, panToLightningForCurrentLevel, swiperRef]
   );
 
   const moveToLightningIndex = useCallback(
@@ -95,14 +110,14 @@ export const useLightningCardMapSync = ({
     const swiper = swiperRef.current?.swiper;
     if (!swiper || lightningList.length === 0) return;
 
-    const handleSlideChange = (swiperInstance: Swiper) => {
+    const handleSlideChangeTransitionEnd = (swiperInstance: Swiper) => {
       moveToLightningIndex(swiperInstance.activeIndex);
     };
 
-    swiper.on("slideChange", handleSlideChange);
+    swiper.on("slideChangeTransitionEnd", handleSlideChangeTransitionEnd);
 
     return () => {
-      swiper.off("slideChange", handleSlideChange);
+      swiper.off("slideChangeTransitionEnd", handleSlideChangeTransitionEnd);
     };
   }, [enabled, lightningList.length, moveToLightningIndex, swiperRef]);
 

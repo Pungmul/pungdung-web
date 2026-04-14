@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 import type { SwiperRef } from "swiper/react";
 
 import { MapContainer, Spinner } from "@/shared";
@@ -15,6 +15,7 @@ import {
   useLightningMapBottomSheetSync,
   useLightningMapCamera,
   useLightningMarkers,
+  useMapMoveToLightningIndexRef,
   useMapPanToCurrentLocationRef,
 } from "../../../hooks/view-model";
 import type { LightningBottomSheetRefType, LightningMeeting } from "../../../types";
@@ -24,14 +25,21 @@ type LightningMapSectionProps = {
   swiperRef: RefObject<SwiperRef | null>;
   lightningList: LightningMeeting[];
   mapPanToCurrentRef: RefObject<(() => void) | null>;
+  mapMoveToLightningIndexRef: RefObject<
+    ((index: number, speed?: number) => void) | null
+  >;
+  children?: ReactNode;
 };
 
 export function LightningMapSection(props: LightningMapSectionProps) {
   const view = useView();
   const [isMapReady, setIsMapReady] = useState(false);
+  const didInitialBottomSheetPanRef = useRef(false);
   const {
     bottomSheetRef,
+    children,
     lightningList,
+    mapMoveToLightningIndexRef,
     mapPanToCurrentRef,
     swiperRef,
   } = props;
@@ -42,7 +50,8 @@ export function LightningMapSection(props: LightningMapSectionProps) {
       isMapReady,
       panToCenter,
     });
-  const { moveToLightningId } = useLightningCardMapSync({
+  const { moveToLightningId, moveToLightningIndex } = useLightningCardMapSync({
+    bottomSheetRef,
     swiperRef,
     lightningList,
     panToCenter,
@@ -54,11 +63,37 @@ export function LightningMapSection(props: LightningMapSectionProps) {
     mapPanToCurrentRef,
     panToCurrentLocation,
   });
+  useMapMoveToLightningIndexRef({
+    mapMoveToLightningIndexRef,
+    moveToLightningIndex,
+  });
   useLightningMarkers({
     mapRef,
     lightningList,
     onMarkerClick: moveToLightningId,
   });
+
+  useEffect(() => {
+    if (didInitialBottomSheetPanRef.current) return;
+    if (!isMapReady || !isLocationLoaded) return;
+    if (view !== "mobile") return;
+    if (!bottomSheetRef.current) return;
+
+    const timer = window.setTimeout(() => {
+      mapPanToCurrentRef.current?.();
+      didInitialBottomSheetPanRef.current = true;
+    }, 340);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [
+    bottomSheetRef,
+    isLocationLoaded,
+    isMapReady,
+    mapPanToCurrentRef,
+    view,
+  ]);
 
   return (
     <section className="flex-grow w-full h-full relative md:-left-[8px]">
@@ -89,6 +124,7 @@ export function LightningMapSection(props: LightningMapSectionProps) {
           </div>
         )}
       </MapContainer>
+      {children}
     </section>
   );
 }

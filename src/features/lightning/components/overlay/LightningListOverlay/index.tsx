@@ -11,11 +11,11 @@ import { Responsive } from "@/shared";
 
 import { LightningBottomSheet } from "./LightningBottomSheet";
 import { LightningSidebar } from "./LightningSidebar";
-import { lightningQueries } from "../../queries";
+import { LightningCardList } from "../../section/card/LightningCardList";
 import type {
   LightningBottomSheetRefType,
   LightningMeeting,
-} from "../../types";
+} from "../../../types";
 
 type LightningListOverlayProps = {
   bottomSheetRef: RefObject<LightningBottomSheetRefType | null>;
@@ -23,6 +23,9 @@ type LightningListOverlayProps = {
   lightningList: LightningMeeting[];
   target: "전체" | "우리학교";
   mapPanToCurrentRef: RefObject<(() => void) | null>;
+  mapMoveToLightningIndexRef: RefObject<
+    ((index: number, speed?: number) => void) | null
+  >;
   setTarget: (target: "전체" | "우리학교") => void;
 };
 
@@ -37,23 +40,21 @@ export function LightningListOverlay({
   target,
   lightningList,
   mapPanToCurrentRef,
+  mapMoveToLightningIndexRef,
   setTarget,
 }: LightningListOverlayProps) {
+  const handleSelectLightningAtIndex = (index: number) => {
+    mapMoveToLightningIndexRef.current?.(index);
+  };
   const { data: myInfo } = useQuery(myPageQueries.info());
-  const { data: userPartinLightning } = useQuery(
-    lightningQueries.participationStatus()
-  );
   const targetOptions =
     myInfo?.groupName !== null
       ? (["전체", "우리학교"] as const)
       : (["전체"] as const);
 
   const listProps = {
-    swiperRef,
     target,
     setTarget,
-    lightningList,
-    userPartinLightning,
     targetOptions,
   };
 
@@ -64,9 +65,26 @@ export function LightningListOverlay({
           {...listProps}
           bottomSheetRef={bottomSheetRef}
           mapPanToCurrentRef={mapPanToCurrentRef}
-        />
+        >
+          {({ expandSheet }) => (
+            <LightningCardList
+              ref={swiperRef}
+              lightningList={lightningList}
+              callSheetUp={expandSheet}
+              onSelectLightningAtIndex={handleSelectLightningAtIndex}
+            />
+          )}
+        </LightningBottomSheet>
       }
-      desktop={<LightningSidebar {...listProps} />}
+      desktop={
+        <LightningSidebar {...listProps}>
+          <LightningCardList
+            ref={swiperRef}
+            lightningList={lightningList}
+            onSelectLightningAtIndex={handleSelectLightningAtIndex}
+          />
+        </LightningSidebar>
+      }
     />
   );
 }

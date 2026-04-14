@@ -1,6 +1,6 @@
 export { fetchNearLightning } from "./api/client";
 export {
-  LightningInformation,
+  LightningParticipationOverlay,
   LightningListOverlay,
   LightningMapSection,
   NearLightningContent,

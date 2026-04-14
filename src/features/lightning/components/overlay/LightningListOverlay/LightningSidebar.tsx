@@ -1,29 +1,21 @@
 "use client";
 
-import type { RefObject } from "react";
-import type { SwiperRef } from "swiper/react";
+import type { ReactNode } from "react";
 
 import { Space } from "@/shared";
 
-import type { LightningMeeting, UserParticipationData } from "../../types";
-import { LightningCardList } from "../section/card/LightningCardList";
-
 type LightningSidebarProps = {
-  swiperRef: RefObject<SwiperRef | null>;
   target: "전체" | "우리학교";
   targetOptions: readonly ("전체" | "우리학교")[];
-  lightningList: LightningMeeting[];
-  userPartinLightning: UserParticipationData | undefined;
   setTarget: (target: "전체" | "우리학교") => void;
+  children: ReactNode;
 };
 
 export function LightningSidebar({
   target,
   setTarget,
-  swiperRef,
-  lightningList,
   targetOptions,
-  userPartinLightning,
+  children,
 }: LightningSidebarProps) {
   return (
     <div className="relative z-10 rounded-tr-xl rounded-br-xl shadow-up-md bg-background overflow-hidden flex flex-col h-full w-[640px]">
@@ -50,11 +42,7 @@ export function LightningSidebar({
       </div>
 
       <Space h={24} />
-      <LightningCardList
-        ref={swiperRef}
-        lightningList={lightningList}
-        userPartinLightning={userPartinLightning}
-      />
+      {children}
     </div>
   );
 }

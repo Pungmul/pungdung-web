@@ -40,7 +40,7 @@ export const LightningRemainingTime = memo(function LightningRemainingTime({
 
   return (
     <div className="text-grey-800 text-[14px] font-semibold">
-      {remainingTime > 60
+      {remainingTime >= 60
         ? Math.floor(remainingTime / 60) + "분 후 마감"
         : remainingTime + "초 후 마감"}
     </div>

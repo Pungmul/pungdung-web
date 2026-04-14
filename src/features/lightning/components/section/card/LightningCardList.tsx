@@ -2,29 +2,32 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { Swiper, SwiperRef, SwiperSlide } from "swiper/react";
 
 import { useLightningJoinAction } from "../../../hooks/actions";
-import {
-  LightningCardRefType,
-  LightningMeeting,
-  UserParticipationData,
-} from "../../../types";
+import { lightningQueries } from "../../../queries";
+import { LightningCardRefType, LightningMeeting } from "../../../types";
 import { AddLightningCard, LightningCard } from "../../ui";
+
+const LIGHTNING_CARD_SLIDE_HEIGHT = 324;
 
 interface LightningCardListProps {
   lightningList: LightningMeeting[];
-  userPartinLightning: UserParticipationData | undefined;
   ref: React.RefObject<SwiperRef | null>;
   callSheetUp?: () => void;
+  onSelectLightningAtIndex?: (index: number) => void;
 }
 
 export function LightningCardList({
   lightningList,
-  userPartinLightning,
   ref,
   callSheetUp,
+  onSelectLightningAtIndex,
 }: LightningCardListProps) {
+  const { data: userPartinLightning } = useQuery(
+    lightningQueries.participationStatus()
+  );
   const { handleJoinLightningMeeting } = useLightningJoinAction();
 
   const cardRefs = useRef<Map<string, LightningCardRefType>>(new Map());
@@ -81,7 +84,7 @@ export function LightningCardList({
           style={{
             width: "calc(100% - 48px)",
             maxWidth: 342,
-            height: 328,
+            height: LIGHTNING_CARD_SLIDE_HEIGHT,
           }}
         >
           <div className="flex h-full w-full items-center justify-center">
@@ -98,7 +101,7 @@ export function LightningCardList({
               style={{
                 width: "calc(100% - 48px)",
                 maxWidth: 342,
-                height: 328,
+                height: LIGHTNING_CARD_SLIDE_HEIGHT,
                 position: "relative",
                 display: "flex",
                 alignItems: "center",
@@ -110,11 +113,9 @@ export function LightningCardList({
 
                 if (swiper.activeIndex === index) {
                   callSheetUp?.();
-                  return;
                 }
 
-                swiper.slideTo(index);
-                focusCard(meetingId);
+                onSelectLightningAtIndex?.(index);
               }}
             >
               <LightningCard
@@ -136,7 +137,7 @@ export function LightningCardList({
           style={{
             width: "calc(100% - 48px)",
             maxWidth: 342,
-            height: 328,
+            height: LIGHTNING_CARD_SLIDE_HEIGHT,
           }}
         >
           <AddLightningCard />

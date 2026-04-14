@@ -1,4 +1,3 @@
-import { LOW_LEVEL } from "../constants";
 import { LightningBottomSheetRefType } from "../types";
 
 export const getAdjustedCenter = (
@@ -7,7 +6,7 @@ export const getAdjustedCenter = (
   bottomSheetRef: LightningBottomSheetRefType
 ): kakao.maps.LatLng => {
   const bottomSheetHeight = bottomSheetRef
-    ? LOW_LEVEL - bottomSheetRef.getLevel()
+    ? Math.max(bottomSheetRef.getLevel(), 0)
     : 0;
   const proj = map.getProjection();
   const point = proj.containerPointFromCoords(center);

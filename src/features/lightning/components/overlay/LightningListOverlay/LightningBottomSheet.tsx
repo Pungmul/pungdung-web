@@ -17,11 +17,10 @@ import {
   HIGH_LEVEL_VISIBLE_HEIGHT,
   LOW_LEVEL_VISIBLE_HEIGHT,
   MEDIUM_LEVEL_VISIBLE_HEIGHT,
-} from "../../constants";
-import { getElementTranslateY } from "../../lib/get-element-translate-y";
-import { resolveNearestBottomSheetLevel } from "../../lib/resolve-nearest-bottom-sheet-level";
-import type { LightningBottomSheetRefType } from "../../types";
-import { LightningCardList } from "../section/card/LightningCardList";
+} from "../../../constants";
+import { getElementTranslateY } from "../../../lib/get-element-translate-y";
+import { resolveNearestBottomSheetLevel } from "../../../lib/resolve-nearest-bottom-sheet-level";
+import type { LightningBottomSheetRefType } from "../../../types";
 
 type LightningBottomSheetProps = {
   bottomSheetRef: RefObject<LightningBottomSheetRefType | null>;
@@ -266,20 +265,7 @@ export function LightningBottomSheet({
             ))}
           </div>
         </div>
-        <div className="py-[8px]">
-          <LightningCardList
-            ref={swiperRef}
-            lightningList={lightningList}
-            userPartinLightning={userPartinLightning}
-            callSheetUp={() => {
-              containerAnimate(
-                container.current,
-                { y: HIGH_LEVEL },
-                { duration: 0.3, ease: "easeOut" }
-              );
-            }}
-          />
-        </div>
+        <div className="py-[8px]">{children({ expandSheet })}</div>
       </div>
     </motion.div>
   );
