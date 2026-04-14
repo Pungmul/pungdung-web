@@ -2,8 +2,6 @@
 
 import { useRef } from "react";
 
-import { useQuery } from "@tanstack/react-query";
-
 import { Suspense } from "@suspensive/react";
 import { AnimatePresence } from "framer-motion";
 
@@ -11,7 +9,6 @@ import {
   LightningInformation,
   LightningListOverlay,
   LightningMapSection,
-  lightningQueries,
   useLightningBottomSheetState,
   useLightningLists,
   useLightningListViewModel,
@@ -41,16 +38,15 @@ export default function LightningPage() {
 }
 
 function LightningPageContent() {
-  const { data: userParticipationData } = useQuery(
-    lightningQueries.participationStatus()
-  );
-
   useSyncUserLocation();
 
-  useWholeLightningSocket({ userParticipationData });
-  useSchoolLightningSocket({ userParticipationData });
+  const normalLightningMeetings = useWholeLightningSocket();
+  const schoolLightningMeetings = useSchoolLightningSocket();
 
-  const { wholeLightningList, schoolLightningList } = useLightningLists();
+  const { wholeLightningList, schoolLightningList } = useLightningLists({
+    normalLightningMeetings,
+    schoolLightningMeetings,
+  });
   const { target, setTarget, lightningList } = useLightningListViewModel({
     wholeLightningList,
     schoolLightningList,
