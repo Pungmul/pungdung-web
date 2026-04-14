@@ -1,27 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 
-import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import { useSocketSubscription } from "@/core/socket";
 
 import { clubQueries, mapClubToSchoolName } from "@/features/club";
 import { myPageQueries } from "@/features/my-page";
 
-import { applyLightningListSocketPayload } from "../services/apply-lightning-list-socket-payload";
-import { isLightningMeetingMessage } from "../services/is-lightning-meeting-message";
-import type { UserParticipationData } from "../types";
+import { useLightningSocketSnapshot } from "./useLightningSocketSnapshot";
+import { useSyncParticipationStatusFromSocketList } from "./useSyncParticipationStatusFromSocketList";
 
-interface UseSchoolLightningSocketProps {
-  userParticipationData: UserParticipationData | undefined;
-}
-
-export const useSchoolLightningSocket = ({
-  userParticipationData,
-}: UseSchoolLightningSocketProps) => {
+export const useSchoolLightningSocket = () => {
   const { data: myInfo } = useQuery(myPageQueries.info());
   const { data: clubList } = useSuspenseQuery(clubQueries.list());
+  const syncParticipationStatus = useSyncParticipationStatusFromSocketList();
+  const { snapshotMeetings, onSnapshotMessage } = useLightningSocketSnapshot({
+    scope: "school",
+    syncParticipationStatus,
+  });
 
   const schoolTopic = useMemo(
     () =>
@@ -34,36 +32,11 @@ export const useSchoolLightningSocket = ({
     [clubList, myInfo?.groupName]
   );
 
-  const queryClient = useQueryClient();
-  const participationRef = useRef<UserParticipationData | undefined>(
-    userParticipationData
-  );
-
-  useEffect(() => {
-    participationRef.current = userParticipationData;
-  }, [userParticipationData]);
-
-  const schoolCallback = useCallback(
-    (content: unknown) => {
-      if (!isLightningMeetingMessage(content)) {
-        console.error("Invalid message content");
-        return;
-      }
-
-      const { content: newSchoolLightningMeetings } = content;
-      applyLightningListSocketPayload(
-        queryClient,
-        newSchoolLightningMeetings,
-        "school",
-        participationRef.current
-      );
-    },
-    [queryClient]
-  );
-
   useSocketSubscription({
     topic: schoolTopic,
-    onMessage: schoolCallback,
+    onMessage: onSnapshotMessage,
     enabled: !!schoolTopic,
   });
+
+  return snapshotMeetings;
 };
