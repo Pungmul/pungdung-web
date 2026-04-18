@@ -1,2 +1,2 @@
-export { notificationStore } from "./notification.store";
+export { dismissNotification, notificationStore } from "./notification.store";
 export { notificationPermissionStore } from "./notification-permission.store";

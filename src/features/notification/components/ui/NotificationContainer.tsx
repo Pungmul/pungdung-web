@@ -1,16 +1,18 @@
 "use client";
 
-import { AnimatePresence } from "framer-motion";
+import { cn } from "@/shared/lib";
+
+import { NOTIFICATION_CONTAINER_ID } from "../../constants/notification-banner";
 
 export default function NotificationContainer() {
   return (
-    <div className="absolute top-0 left-0 w-full h-full z-100">
-      <AnimatePresence mode="sync">
-        <div
-          id="notification-container"
-          className="fixed bottom-[96px] right-4 lg:bottom-4 flex flex-col gap-[4px] z-50"
-        />
-      </AnimatePresence>
-    </div>
+    <div
+      id={NOTIFICATION_CONTAINER_ID}
+      className={cn(
+        "pointer-events-none fixed z-50 flex w-full flex-col gap-2 [&>*]:pointer-events-auto",
+        "inset-x-0 top-0 px-4 pt-[max(0.75rem,env(safe-area-inset-top))]",
+        "md:inset-x-auto md:left-auto md:right-4 md:top-auto md:bottom-4 md:max-w-80 md:items-end md:px-0 md:pt-0"
+      )}
+    />
   );
-} 
+}

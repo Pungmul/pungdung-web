@@ -1,14 +1,18 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { AnimatePresence, motion } from "framer-motion";
 
 import { useView } from "@/shared/lib/view/view-store-provider";
 
-import { notificationStore } from "../../store/notification.store";
-
-const TOAST_AUTO_HIDE_MS = 5000;
+import {
+  NOTIFICATION_AUTO_HIDE_MS,
+  NOTIFICATION_CONTAINER_ID,
+  NOTIFICATION_MOTION,
+} from "../../constants/notification-banner";
+import { notificationStore } from "../../store";
 
 function getNotificationId({
   title,
@@ -24,109 +28,79 @@ function getNotificationId({
 
 export default function NotificationToast() {
   const view = useView();
-  const notifications = notificationStore((s) => s.notifications);
-  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
-  const timerMapRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const activeNotification = notificationStore((s) => s.notifications[0]);
+  const dismissNotification = notificationStore((s) => s.dismissNotification);
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+
+  const activeId = activeNotification
+    ? getNotificationId(activeNotification)
+    : undefined;
 
   useEffect(() => {
-    if (notifications.length === 0) {
-      timerMapRef.current.forEach((timer) => clearTimeout(timer));
-      timerMapRef.current.clear();
-      setDismissedIds(new Set());
-      return;
-    }
-
-    notifications.forEach((notification) => {
-      const id = getNotificationId(notification);
-      if (timerMapRef.current.has(id)) {
-        return;
-      }
-
-      const timer = setTimeout(() => {
-        setDismissedIds((prev) => new Set(prev).add(id));
-        timerMapRef.current.delete(id);
-      }, TOAST_AUTO_HIDE_MS);
-      timerMapRef.current.set(id, timer);
-    });
-  }, [notifications]);
-
-  useEffect(() => {
-    const timerMap = timerMapRef.current;
-    return () => {
-      timerMap.forEach((timer) => clearTimeout(timer));
-      timerMap.clear();
-    };
+    const el = document.getElementById(NOTIFICATION_CONTAINER_ID);
+    setContainer(el);
   }, []);
 
-  const items = useMemo(
-    () =>
-      [...notifications]
-        .reverse()
-        .map((notification) => ({
-          id: getNotificationId(notification),
-          notification,
-        }))
-        .filter(({ id }) => !dismissedIds.has(id)),
-    [dismissedIds, notifications]
-  );
+  useEffect(() => {
+    if (!activeId) return;
 
-  const dismiss = (id: string) => {
-    const timer = timerMapRef.current.get(id);
-    if (timer) {
-      clearTimeout(timer);
-      timerMapRef.current.delete(id);
-    }
-    setDismissedIds((prev) => new Set(prev).add(id));
-  };
+    const timer = setTimeout(() => {
+      dismissNotification();
+    }, NOTIFICATION_AUTO_HIDE_MS);
 
-  const hasNotification = items.length > 0;
+    return () => clearTimeout(timer);
+  }, [activeId, dismissNotification]);
 
-  if (!hasNotification) return null;
+  if (!container) return null;
 
-  const container = document.getElementById("notification-container");
-  if (!container) {
-    return null;
-  }
+  const isDesktop = view === "desktop";
+  const motionInitial = isDesktop
+    ? { opacity: 1, x: NOTIFICATION_MOTION.desktopOffsetX }
+    : { opacity: 1, y: NOTIFICATION_MOTION.mobileOffsetY };
+  const motionAnimate = isDesktop
+    ? { opacity: 1, x: 0, y: 0 }
+    : { opacity: 1, x: 0, y: 0 };
+  const motionExit = isDesktop
+    ? { opacity: 0, x: NOTIFICATION_MOTION.desktopOffsetX }
+    : { opacity: 0, y: NOTIFICATION_MOTION.mobileOffsetY };
 
   return createPortal(
-    <AnimatePresence mode="sync">
-      {items.map(({ id, notification }) => (
+    <AnimatePresence mode="wait">
+      {activeNotification && activeId ? (
         <motion.div
-          key={id}
-          layout
-          initial={
-            view === "desktop" ? { opacity: 0, x: 300 } : { opacity: 0, y: 300 }
-          }
-          animate={
-            view === "desktop" ? { opacity: 1, x: 0 } : { opacity: 1, y: 0 }
-          }
-          exit={
-            view === "desktop" ? { opacity: 0, x: 300 } : { opacity: 0, y: 300 }
-          }
-          transition={{ duration: 0.3 }}
-          style={{
-            maxWidth: "320px",
-            minWidth: "280px",
+          key={activeId}
+          initial={motionInitial}
+          animate={motionAnimate}
+          exit={motionExit}
+          transition={{
+            duration: NOTIFICATION_MOTION.durationSec,
+            opacity: {
+              duration: NOTIFICATION_MOTION.exitOpacityDuration,
+              ease: "easeOut",
+            },
           }}
+          className="w-full"
         >
-          <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
+          <div className="rounded-lg border border-grey-200 bg-background p-4 shadow-lg">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="font-semibold text-gray-900 text-sm">
-                  {notification.title}
+                <div className="text-sm font-semibold text-grey-900">
+                  {activeNotification.title}
                 </div>
-                <div className="text-gray-600 text-sm mt-1 leading-relaxed">
-                  {notification.body}
+                <div className="mt-1 text-sm leading-relaxed text-grey-600">
+                  {activeNotification.body}
                 </div>
-                <div className="text-xs text-gray-400 mt-2">
-                  {notification.receivedAt.toLocaleTimeString()}
+                <div className="mt-2 text-xs text-grey-400">
+                  {activeNotification.receivedAt.toLocaleTimeString()}
                 </div>
               </div>
               <button
-                onClick={() => dismiss(id)}
-                className="ml-3 text-gray-400 hover:text-gray-600 transition-colors"
+                type="button"
+                aria-label="알림 닫기"
+                onClick={dismissNotification}
+                className="ml-3 text-grey-400 transition-colors hover:text-grey-600"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"
                     d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -137,7 +111,7 @@ export default function NotificationToast() {
             </div>
           </div>
         </motion.div>
-      ))}
+      ) : null}
     </AnimatePresence>,
     container
   );
