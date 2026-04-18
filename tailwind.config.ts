@@ -30,6 +30,10 @@ const config: Config = {
         warning: "var(--color-warning)",
         green: "var(--color-green)",
         kakao: "var(--color-kakao)",
+        toast: {
+          DEFAULT: "var(--color-toast-bg)",
+          foreground: "var(--color-toast-text)",
+        },
         grey: {
           100: "var(--color-grey-100)",
           200: "var(--color-grey-200)",

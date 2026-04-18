@@ -5,6 +5,7 @@ export { Header } from "./layout/Header";
 export { default as HeaderProgressBar } from "./layout/HeaderProgressBar";
 export { Space } from "./layout/Space";
 export { default as Tabs } from "./layout/Tabs";
+export { ToastHost } from "./layout/ToastHost";
 
 // UI Components
 export { AlertModal } from "./ui/AlertModal";
@@ -16,7 +17,6 @@ export { ScrollToTopButton } from "./ui/ScrollToTopButton";
 export { FloatingButton } from "./ui/FloatingButton";
 export { SkeletonView } from "./ui/SkeletonView";
 export { Spinner } from "./ui/Spinner";
-export { default as ToastContainer } from "./ui/Toast";
 
 // Form Components
 export {

@@ -1,40 +1,87 @@
 import { create } from "zustand";
 
-import { ToastConfig } from "../types/toast";
+import { ToastConfig, ToastItem } from "../types/toast";
 
-/** 스토어 내부 토스트 상태 — ToastConfig와 동일하되 모든 필드 required */
-type ToastProps = Required<ToastConfig>;
+const DEFAULT_TOAST_DURATION = 5000;
+const MAX_TOAST_COUNT = 5;
+
+const timerMap = new Map<string, ReturnType<typeof setTimeout>>();
+
+let toastIdSeed = 0;
+
+const createToastId = () => {
+  toastIdSeed += 1;
+  return `${Date.now()}-${toastIdSeed}`;
+};
+
+const clearToastTimer = (id: string) => {
+  const timer = timerMap.get(id);
+  if (!timer) return;
+
+  clearTimeout(timer);
+  timerMap.delete(id);
+};
+
+const removeToast = (id: string) => {
+  clearToastTimer(id);
+  toastStore.setState((state) => ({
+    toasts: state.toasts.filter((toast) => toast.id !== id),
+  }));
+};
 
 interface ToastState {
-  visible: boolean;
-  toast: ToastProps;
-  hide: () => void;
+  toasts: ToastItem[];
+  hide: (id?: string) => void;
 }
 
 export const toastStore = create<ToastState>(() => ({
-  visible: false,
-  toast: {
-    message: "기본 토스트 메시지",
-    type: "success",
-    duration: 5000,
-  },
-  hide: () => {
-    toastStore.setState({ visible: false });
+  toasts: [],
+  hide: (id) => {
+    if (id) {
+      removeToast(id);
+      return;
+    }
+
+    timerMap.forEach((timer) => clearTimeout(timer));
+    timerMap.clear();
+    toastStore.setState({ toasts: [] });
   },
 }));
 
 export const Toast = {
-  show: ({ message, type = "success", duration = 5000 }: ToastConfig) => {
-    toastStore.setState({
-      toast: { message, type, duration },
-      visible: true,
+  show: ({
+    message,
+    type = "success",
+    duration = DEFAULT_TOAST_DURATION,
+  }: ToastConfig) => {
+    const toast: ToastItem = {
+      id: createToastId(),
+      message,
+      type,
+      duration,
+    };
+
+    toastStore.setState((state) => {
+      const nextToasts = [...state.toasts, toast].slice(-MAX_TOAST_COUNT);
+      const visibleToastIds = new Set(nextToasts.map(({ id }) => id));
+
+      state.toasts.forEach(({ id }) => {
+        if (!visibleToastIds.has(id)) {
+          clearToastTimer(id);
+        }
+      });
+
+      return { toasts: nextToasts };
     });
 
-    setTimeout(() => {
-      toastStore.setState({ visible: false });
-    }, duration);
+    if (duration > 0) {
+      const timer = setTimeout(() => {
+        removeToast(toast.id);
+      }, duration);
+      timerMap.set(toast.id, timer);
+    }
   },
-  hide: () => {
-    toastStore.setState({ visible: false });
+  hide: (id?: string) => {
+    toastStore.getState().hide(id);
   },
 };

@@ -5,3 +5,7 @@ export interface ToastConfig {
   type?: ToastType;
   duration?: number;
 }
+
+export type ToastItem = Required<ToastConfig> & {
+  id: string;
+};

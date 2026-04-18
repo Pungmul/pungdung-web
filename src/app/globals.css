@@ -145,6 +145,11 @@
 
   /* 실제 사용 가능한 뷰포트 높이 (h-dvh 대신 사용해 overflow 방지) */
   --app-height: 100dvh;
+
+  /* Toast surface (bright: #232424, 92% opacity) */
+  --color-toast-bg-base: #232424;
+  --color-toast-text: #f7f7f8;
+  --color-toast-bg: color-mix(in srgb, var(--color-toast-bg-base) 92%, transparent);
 }
 
 /* 다크모드 자동 감지 및 색상 전환 */
@@ -191,6 +196,9 @@
     --color-lime-600: var(--color-lime-600-dark);
     --color-lime-700: var(--color-lime-700-dark);
     --color-lime-800: var(--color-lime-800-dark);
+
+    --color-toast-bg-base: #43454a;
+    --color-toast-bg: color-mix(in srgb, var(--color-toast-bg-base) 92%, transparent);
   }
 }
 
@@ -236,6 +244,9 @@
   --color-lime-600: var(--color-lime-600-light);
   --color-lime-700: var(--color-lime-700-light);
   --color-lime-800: var(--color-lime-800-light);
+
+  --color-toast-bg-base: #232424;
+  --color-toast-bg: color-mix(in srgb, var(--color-toast-bg-base) 92%, transparent);
 }
 
 :root[data-theme="dark"] {
@@ -279,6 +290,9 @@
   --color-lime-600: var(--color-lime-600-dark);
   --color-lime-700: var(--color-lime-700-dark);
   --color-lime-800: var(--color-lime-800-dark);
+
+  --color-toast-bg-base: #43454a;
+  --color-toast-bg: color-mix(in srgb, var(--color-toast-bg-base) 92%, transparent);
 }
 
 html {

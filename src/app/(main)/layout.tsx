@@ -13,7 +13,7 @@ import {
   HeaderProgressBar,
   Tabs,
   PWAInstallPrompt,
-  ToastContainer,
+  ToastHost,
 } from "@/shared/components";
 import ReactQueryProviders from "@/shared/lib/useReactQuery";
 
@@ -29,18 +29,19 @@ export default function RootLayout({
         <PWAInstallPrompt />
         <div id="main-contents" className="relative flex">
           <FCMClient />
+          {/* FCM push banner (notification-container) vs action feedback (toast-container) */}
           <NotificationContainer />
           <ChatNotificationSocket />
           <NotificationToast />
-          <ToastContainer />
           <Suspense clientOnly fallback={null}>
             <HeaderProgressBar />
           </Suspense>
           <div
             id="main-shell"
-            className="flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-app"
+            className="relative flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-app"
           >
             <Tabs />
+            <ToastHost />
             {children}
           </div>
         </div>
