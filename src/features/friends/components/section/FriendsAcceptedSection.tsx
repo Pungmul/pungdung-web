@@ -27,21 +27,21 @@ export function FriendsAcceptedSection({
   const handleMenuDelete = useCallback(() => {
     Toast.show({
       message: "친구 삭제 기능은 준비 중입니다.",
-      type: "success",
+      type: "warning",
     });
   }, []);
 
   const handleMenuBlock = useCallback(() => {
     Toast.show({
       message: "차단 기능은 준비 중입니다.",
-      type: "success",
+      type: "warning",
     });
   }, []);
 
   const handleMenuReport = useCallback(() => {
     Toast.show({
       message: "신고 기능은 준비 중입니다.",
-      type: "success",
+      type: "warning",
     });
   }, []);
 

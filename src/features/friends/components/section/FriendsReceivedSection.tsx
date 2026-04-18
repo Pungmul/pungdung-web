@@ -30,7 +30,7 @@ export function FriendsReceivedSection({
   const handleMenuReport = useCallback(() => {
     Toast.show({
       message: "신고 기능은 준비 중입니다.",
-      type: "success",
+      type: "warning",
     });
   }, []);
 

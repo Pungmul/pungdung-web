@@ -19,14 +19,14 @@ function UserProfileKebabMenuImpl() {
   const handleReport = () => {
     Toast.show({
       message: "신고 기능은 준비 중입니다.",
-      type: "info",
+      type: "warning",
     });
   };
 
   const handleBlock = () => {
     Toast.show({
       message: "차단 기능은 준비 중입니다.",
-      type: "info",
+      type: "warning",
     });
   };
 
