@@ -18,7 +18,14 @@ export async function unsubscribeSocket(
   return await sharedSocketManager.unsubscribe(subscription);
 }
 
-export function sendMessage(topic: string, message: unknown) {
+export async function publishSocket(
+  topic: string,
+  message: unknown
+): Promise<void> {
+  return await sharedSocketManager.publish(topic, message);
+}
+
+export function sendMessage(topic: string, message: unknown): void {
   return sharedSocketManager.sendMessage(topic, message);
 }
 

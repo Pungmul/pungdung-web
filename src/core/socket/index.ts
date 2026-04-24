@@ -6,3 +6,4 @@ export * as SocketService from "./lib/socketHandler";
 
 export * from "./hooks/useSocketConnection";
 export * from "./hooks/useSocketSubscribe";
+export * from "./types";

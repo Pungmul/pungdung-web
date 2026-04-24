@@ -9,22 +9,21 @@ importScripts(
 );
 
 let stompClient = null;
+let connectionPhase = "idle";
 const connections = new Map();
-const subscriptions = new Map();
-const pendingSubscriptions = new Map(); // 대기 중인 구독들을 저장
+const topicSubscribers = new Map();
+const topicSubscriptions = new Map();
+const topicSubscriptionStates = new Map();
+const pendingTopicSubscribeAcks = new Map();
+const pendingSubscriptions = new Map();
+const pendingPublishes = new Map();
+const pendingConnectCommands = new Map();
 
 // SharedWorker 모드
 self.addEventListener("connect", (event) => {
   const port = event.ports[0];
   const clientId = Date.now() + Math.random();
   connections.set(clientId, port);
-
-  console.log(
-    "[SocketWorker] 클라이언트 연결됨:",
-    clientId,
-    "총 연결 수:",
-    connections.size
-  );
 
   port.addEventListener("message", (event) => {
     handleMessage(event.data, clientId);
@@ -35,13 +34,6 @@ self.addEventListener("connect", (event) => {
 
 function handleMessage(data, clientId) {
   const { type, data: messageData, commandId = null } = data;
-
-  console.log("[SocketWorker] 메시지 수신:", {
-    type,
-    clientId,
-    data: messageData,
-    commandId,
-  });
 
   switch (type) {
     case "CONNECT":
@@ -54,7 +46,7 @@ function handleMessage(data, clientId) {
       unsubscribeFromTopic(messageData, clientId);
       break;
     case "SEND_MESSAGE":
-      sendMessage(messageData, clientId);
+      publishMessage(messageData, clientId, commandId);
       break;
     case "DISCONNECT":
       disconnectClient(clientId);
@@ -63,207 +55,223 @@ function handleMessage(data, clientId) {
 }
 
 function connectWebSocket(config, clientId, commandId) {
-  console.log("[SocketWorker] WebSocket 연결 시도:", {
-    clientId,
-    commandId,
-    url: config.url,
-  });
+  enqueueConnectCommand(clientId, commandId);
 
-  if (stompClient && stompClient.connected) {
-    console.log("[SocketWorker] 이미 연결된 WebSocket 재사용:", clientId);
-    sendToClient(clientId, {
-      type: "CONNECTED",
-      clientId: clientId,
-      commandId: commandId,
-    });
+  if (stompClient && stompClient.connected && connectionPhase === "connected") {
+    sendConnectionStateToClient(clientId, "connected", true);
+    flushConnectAcks(clientId);
     return;
   }
-  const socket = new SockJS(config.url);
 
+  if (connectionPhase === "connecting" || connectionPhase === "reconnecting") {
+    sendConnectionStateToClient(clientId, connectionPhase, false);
+    return;
+  }
+
+  connectionPhase = connectionPhase === "connected" ? "reconnecting" : "connecting";
+  broadcastConnectionState(connectionPhase, false);
+
+  const socket = new SockJS(config.url);
   stompClient = new self.StompJs.Client({
-    webSocketFactory: () => socket, // SockJS 사용
+    webSocketFactory: () => socket,
     reconnectDelay: 5000,
     connectHeaders: {
-      Authorization: config.headers.Authorization,
+      Authorization: config.headers?.Authorization,
     },
     onConnect: () => {
-      console.log("[SocketWorker] WebSocket 연결 성공:", {
-        clientId,
-        commandId,
-      });
-
-      sendToClient(clientId, {
-        type: "CONNECTED",
-        clientId: clientId,
-        commandId: commandId,
-      });
-
-      // 연결 완료 후 대기 중인 구독들을 다시 시도
+      connectionPhase = "connected";
+      broadcastConnectionState("connected", true);
+      flushAllConnectAcks();
       retryPendingSubscriptions();
+      retryPendingPublishes();
+    },
+    onWebSocketClose: () => {
+      if (connectionPhase === "disconnected") {
+        return;
+      }
+      connectionPhase = "reconnecting";
+      broadcastConnectionState("reconnecting", false);
     },
     onStompError: (error) => {
-      console.error("[SocketWorker] WebSocket 연결 에러:", {
-        error,
-        clientId,
-        commandId,
-      });
-      sendToClient(clientId, {
-        type: "ERROR",
-        error: error,
-        commandId: commandId,
-      });
+      connectionPhase = "failed";
+      broadcastConnectionState("failed", false, String(error));
+      rejectPendingConnect(error);
     },
   });
-
-  if (!stompClient) {
-    console.error("[SocketWorker] Stomp 클라이언트 생성 실패:", {
-      clientId,
-      commandId,
-    });
-    sendToClient(clientId, {
-      type: "ERROR",
-      error: "Stomp 클라이언트 생성 실패",
-      commandId: commandId,
-    });
-    return;
-  }
-
-  console.log("[SocketWorker] Stomp 클라이언트 활성화 중...");
   stompClient.activate();
 }
 
 function subscribeToTopic(data, clientId, commandId) {
-  const { topic } = data;
-
-  if (!stompClient || !stompClient.connected) {
-    console.log("[SocketWorker] WebSocket 미연결, 구독 대기:", {
-      topic,
-      clientId,
-      commandId,
-    });
-    // 대기 중인 구독으로 저장
-    if (!pendingSubscriptions.has(clientId)) {
-      pendingSubscriptions.set(clientId, []);
-    }
-    pendingSubscriptions.get(clientId).push({ ...data, commandId });
+  const topic = data?.topic;
+  if (!topic) {
+    sendCommandError(clientId, commandId, "Topic is required for subscribe");
     return;
   }
 
-  // 이미 구독 중인 토픽인지 확인
-  if (subscriptions.has(topic)) {
-    console.log("[SocketWorker] 기존 토픽에 클라이언트 추가:", {
-      topic,
-      clientId,
-    });
-    const existingSubscribers = subscriptions.get(topic);
-    existingSubscribers.add(clientId);
-  } else {
-    console.log("[SocketWorker] 새 토픽 구독:", { topic, clientId });
-    // 새로운 토픽 구독
-    const subscribers = new Set([clientId]);
-    subscriptions.set(topic, subscribers);
-
-    try {
-      stompClient.subscribe(topic, (message) => {
-        const messageData = JSON.parse(message.body);
-        console.log("[SocketWorker] 토픽 메시지 수신:", { topic, messageData });
-
-        // 해당 토픽을 구독하는 모든 클라이언트에게 메시지 전달
-        const topicSubscribers = subscriptions.get(topic);
-        if (topicSubscribers) {
-          console.log("[SocketWorker] 클라이언트들에게 메시지 전달:", {
-            topic,
-            subscriberCount: topicSubscribers.size,
-          });
-          topicSubscribers.forEach((subscriberId) => {
-            sendToClient(subscriberId, {
-              type: "MESSAGE",
-              data: {
-                topic: topic,
-                message: messageData,
-              },
-            });
-          });
-        }
-      });
-
-      // 구독 완료 알림
-      sendToClient(clientId, {
-        type: "SUBSCRIBED",
-        data: {
-          topic: topic,
-        },
-        commandId: commandId,
-      });
-      console.log("[SocketWorker] 구독 완료:", { topic, clientId, commandId });
-    } catch (error) {
-      console.error("[SocketWorker] 구독 에러:", {
-        topic,
-        clientId,
-        commandId,
-        error,
-      });
-      sendToClient(clientId, {
-        type: "ERROR",
-        error: error,
-        commandId: commandId,
-      });
+  if (!stompClient || !stompClient.connected) {
+    if (!pendingSubscriptions.has(clientId)) {
+      pendingSubscriptions.set(clientId, []);
     }
+    pendingSubscriptions.get(clientId).push({ topic, commandId });
+    sendSubscriptionState(clientId, topic, "pending", commandId);
+    sendRetrying(clientId, "SUBSCRIBE", topic, commandId, "socket-not-connected");
+    return;
+  }
+
+  let subscribers = topicSubscribers.get(topic);
+  if (!subscribers) {
+    subscribers = new Set();
+    topicSubscribers.set(topic, subscribers);
+  }
+  subscribers.add(clientId);
+
+  const topicState = topicSubscriptionStates.get(topic);
+  if (topicState?.status === "subscribed") {
+    sendSubscribed(clientId, topic, commandId);
+    return;
+  }
+
+  if (topicState?.status === "pending") {
+    enqueueTopicSubscribeAck(topic, clientId, commandId);
+    sendSubscriptionState(clientId, topic, "pending", commandId);
+    return;
+  }
+
+  topicSubscriptionStates.set(topic, { status: "pending" });
+  enqueueTopicSubscribeAck(topic, clientId, commandId);
+  sendSubscriptionState(clientId, topic, "pending", commandId);
+
+  try {
+    const subscription = stompClient.subscribe(
+      topic,
+      (message) => {
+        const messageData = safeParseMessageBody(message.body);
+        const subscribersForTopic = topicSubscribers.get(topic);
+        if (!subscribersForTopic) {
+          return;
+        }
+        subscribersForTopic.forEach((subscriberId) => {
+          sendToClient(subscriberId, {
+            type: "MESSAGE",
+            data: {
+              topic,
+              message: messageData,
+            },
+          });
+        });
+      },
+      undefined
+    );
+    topicSubscriptions.set(topic, subscription);
+    topicSubscriptionStates.set(topic, { status: "subscribed" });
+    flushTopicSubscribeAcks(topic);
+  } catch (error) {
+    const subscribersForTopic = topicSubscribers.get(topic);
+    if (subscribersForTopic && subscribersForTopic.size === 0) {
+      topicSubscribers.delete(topic);
+    }
+    const message = String(error);
+    topicSubscriptionStates.set(topic, { status: "error", error: message });
+    rejectTopicSubscribeAcks(topic, message);
   }
 }
 
 function unsubscribeFromTopic(data, clientId) {
-  const { topic } = data;
-  console.log("[SocketWorker] 토픽 구독 해제:", { topic, clientId });
-
-  // 클라이언트의 구독 제거
-  if (subscriptions.has(topic)) {
-    const subscribers = subscriptions.get(topic);
-    subscribers.delete(clientId);
-
-    // 해당 토픽을 구독하는 클라이언트가 없으면 구독 해제
-    if (subscribers.size === 0) {
-      console.log("[SocketWorker] 토픽에 구독자가 없어 구독 해제:", topic);
-      subscriptions.delete(topic);
-    }
-  }
-}
-
-function sendMessage(data, clientId) {
-  if (!stompClient || !stompClient.connected) {
-    console.warn("[SocketWorker] WebSocket 미연결, 메시지 전송 실패:", {
-      clientId,
-      data,
-    });
+  const topic = data?.topic;
+  if (!topic) {
     return;
   }
 
-  const { topic, message } = data;
-  console.log("[SocketWorker] 메시지 전송:", { topic, clientId, message });
-  stompClient.publish({ destination: topic, body: JSON.stringify(message) });
+  if (topicSubscribers.has(topic)) {
+    const subscribers = topicSubscribers.get(topic);
+    subscribers.delete(clientId);
+    removeTopicSubscribeAck(topic, clientId);
+
+    if (subscribers.size === 0) {
+      topicSubscribers.delete(topic);
+      const stompSubscription = topicSubscriptions.get(topic);
+      if (stompSubscription && typeof stompSubscription.unsubscribe === "function") {
+        stompSubscription.unsubscribe();
+      }
+      topicSubscriptions.delete(topic);
+      topicSubscriptionStates.delete(topic);
+      pendingTopicSubscribeAcks.delete(topic);
+    }
+  }
+}
+
+function publishMessage(data, clientId, commandId) {
+  const topic = data?.topic;
+  if (!topic) {
+    sendCommandError(clientId, commandId, "Topic is required for publish");
+    return;
+  }
+
+  if (!stompClient || !stompClient.connected) {
+    if (!pendingPublishes.has(clientId)) {
+      pendingPublishes.set(clientId, []);
+    }
+    pendingPublishes.get(clientId).push({
+      topic,
+      message: data?.message,
+      commandId,
+    });
+    sendRetrying(clientId, "SEND_MESSAGE", topic, commandId, "socket-not-connected");
+    return;
+  }
+
+  try {
+    stompClient.publish({
+      destination: topic,
+      body: JSON.stringify(data?.message ?? null),
+      headers: undefined,
+    });
+    sendPublished(clientId, topic, commandId);
+  } catch (error) {
+    sendToClient(clientId, {
+      type: "PUBLISHED",
+      data: {
+        topic,
+        status: "error",
+        error: String(error),
+      },
+      commandId: commandId || undefined,
+    });
+    sendCommandError(clientId, commandId, error);
+  }
 }
 
 function disconnectClient(clientId) {
-  console.log("[SocketWorker] 클라이언트 연결 해제:", { clientId });
-
-  // 클라이언트의 모든 구독 제거
-  subscriptions.forEach((subscribers, topic) => {
+  topicSubscribers.forEach((subscribers, topic) => {
     subscribers.delete(clientId);
+    removeTopicSubscribeAck(topic, clientId);
     if (subscribers.size === 0) {
-      console.log("[SocketWorker] 토픽 구독 해제 (구독자 없음):", topic);
-      subscriptions.delete(topic);
+      topicSubscribers.delete(topic);
+      const subscription = topicSubscriptions.get(topic);
+      if (subscription && typeof subscription.unsubscribe === "function") {
+        subscription.unsubscribe();
+      }
+      topicSubscriptions.delete(topic);
+      topicSubscriptionStates.delete(topic);
+      pendingTopicSubscribeAcks.delete(topic);
     }
   });
 
-  // 연결 제거
+  pendingSubscriptions.delete(clientId);
+  pendingPublishes.delete(clientId);
+  pendingConnectCommands.delete(clientId);
   connections.delete(clientId);
-  console.log("[SocketWorker] 남은 연결 수:", connections.size);
 
-  // 모든 클라이언트가 연결 해제된 경우 웹소켓도 해제
   if (connections.size === 0 && stompClient) {
-    console.log("[SocketWorker] 모든 클라이언트 연결 해제, WebSocket 종료");
-    stompClient.disconnect();
+    connectionPhase = "disconnected";
+    stompClient.deactivate();
     stompClient = null;
+    topicSubscribers.clear();
+    topicSubscriptions.clear();
+    topicSubscriptionStates.clear();
+    pendingTopicSubscribeAcks.clear();
+    pendingSubscriptions.clear();
+    pendingPublishes.clear();
   }
 }
 
@@ -275,28 +283,184 @@ function disconnectClient(clientId) {
 function sendToClient(clientId, message) {
   const port = connections.get(clientId);
   if (port) {
-    console.log("[SocketWorker] 클라이언트에게 메시지 전송:", {
-      clientId,
-      messageType: message.type,
-    });
     port.postMessage(message);
-  } else {
-    console.warn("[SocketWorker] 클라이언트 포트를 찾을 수 없음:", clientId);
   }
 }
 
 function retryPendingSubscriptions() {
-  console.log("[SocketWorker] 대기 중인 구독 재시도:", {
-    pendingCount: pendingSubscriptions.size,
-  });
-  pendingSubscriptions.forEach((subscriptions, clientId) => {
-    subscriptions.forEach((data) => {
-      const { commandId } = data;
-      subscribeToTopic(data, clientId, commandId);
+  pendingSubscriptions.forEach((queuedSubscriptions, clientId) => {
+    queuedSubscriptions.forEach((queuedItem) => {
+      subscribeToTopic({ topic: queuedItem.topic }, clientId, queuedItem.commandId);
     });
   });
-
-  // 재시도 후 대기 목록 클리어
   pendingSubscriptions.clear();
-  console.log("[SocketWorker] 대기 중인 구독 재시도 완료");
+}
+
+function retryPendingPublishes() {
+  pendingPublishes.forEach((queuedPublishes, clientId) => {
+    queuedPublishes.forEach((queuedItem) => {
+      publishMessage(
+        { topic: queuedItem.topic, message: queuedItem.message },
+        clientId,
+        queuedItem.commandId
+      );
+    });
+  });
+  pendingPublishes.clear();
+}
+
+function enqueueConnectCommand(clientId, commandId) {
+  if (!commandId) {
+    return;
+  }
+  if (!pendingConnectCommands.has(clientId)) {
+    pendingConnectCommands.set(clientId, []);
+  }
+  pendingConnectCommands.get(clientId).push(commandId);
+}
+
+function flushConnectAcks(clientId) {
+  const commandIds = pendingConnectCommands.get(clientId) || [];
+  commandIds.forEach((commandId) => {
+    sendToClient(clientId, {
+      type: "CONNECTED",
+      clientId,
+      commandId,
+    });
+  });
+  pendingConnectCommands.delete(clientId);
+}
+
+function flushAllConnectAcks() {
+  pendingConnectCommands.forEach((_, clientId) => {
+    flushConnectAcks(clientId);
+  });
+}
+
+function rejectPendingConnect(error) {
+  pendingConnectCommands.forEach((commandIds, clientId) => {
+    commandIds.forEach((commandId) => {
+      sendCommandError(clientId, commandId, error);
+    });
+  });
+  pendingConnectCommands.clear();
+}
+
+function sendConnectionStateToClient(clientId, phase, isConnected, error) {
+  sendToClient(clientId, {
+    type: "CONNECTION_STATE",
+    data: {
+      phase,
+      isConnected,
+      ...(error ? { error } : {}),
+    },
+  });
+}
+
+function broadcastConnectionState(phase, isConnected, error) {
+  connections.forEach((_port, clientId) => {
+    sendConnectionStateToClient(clientId, phase, isConnected, error);
+  });
+}
+
+function sendSubscriptionState(clientId, topic, status, commandId, error) {
+  sendToClient(clientId, {
+    type: "SUBSCRIPTION_STATE",
+    data: {
+      topic,
+      status,
+      ...(error ? { error } : {}),
+    },
+    commandId: commandId || undefined,
+  });
+}
+
+function sendSubscribed(clientId, topic, commandId) {
+  sendToClient(clientId, {
+    type: "SUBSCRIBED",
+    data: { topic },
+    commandId: commandId || undefined,
+  });
+  sendSubscriptionState(clientId, topic, "subscribed", commandId);
+}
+
+function sendPublished(clientId, topic, commandId) {
+  sendToClient(clientId, {
+    type: "PUBLISHED",
+    data: {
+      topic,
+      status: "published",
+    },
+    commandId: commandId || undefined,
+  });
+}
+
+function sendRetrying(clientId, commandType, topic, commandId, reason) {
+  sendToClient(clientId, {
+    type: "RETRYING",
+    data: {
+      commandType,
+      ...(topic ? { topic } : {}),
+      ...(reason ? { reason } : {}),
+    },
+    commandId: commandId || undefined,
+  });
+}
+
+function sendCommandError(clientId, commandId, error) {
+  sendToClient(clientId, {
+    type: "ERROR",
+    error: error instanceof Error ? error.message : String(error),
+    commandId: commandId || undefined,
+  });
+}
+
+function safeParseMessageBody(body) {
+  try {
+    return JSON.parse(body);
+  } catch {
+    return body;
+  }
+}
+
+function enqueueTopicSubscribeAck(topic, clientId, commandId) {
+  if (!pendingTopicSubscribeAcks.has(topic)) {
+    pendingTopicSubscribeAcks.set(topic, []);
+  }
+  pendingTopicSubscribeAcks.get(topic).push({ clientId, commandId });
+}
+
+function flushTopicSubscribeAcks(topic) {
+  const waiters = pendingTopicSubscribeAcks.get(topic) || [];
+  if (waiters.length === 0) {
+    return;
+  }
+  waiters.forEach((waiter) => {
+    sendSubscribed(waiter.clientId, topic, waiter.commandId);
+  });
+  pendingTopicSubscribeAcks.delete(topic);
+}
+
+function rejectTopicSubscribeAcks(topic, error) {
+  const waiters = pendingTopicSubscribeAcks.get(topic) || [];
+  waiters.forEach((waiter) => {
+    sendSubscriptionState(waiter.clientId, topic, "error", waiter.commandId, error);
+    if (waiter.commandId) {
+      sendCommandError(waiter.clientId, waiter.commandId, error);
+    }
+  });
+  pendingTopicSubscribeAcks.delete(topic);
+}
+
+function removeTopicSubscribeAck(topic, clientId) {
+  const waiters = pendingTopicSubscribeAcks.get(topic);
+  if (!waiters || waiters.length === 0) {
+    return;
+  }
+  const remaining = waiters.filter((waiter) => waiter.clientId !== clientId);
+  if (remaining.length === 0) {
+    pendingTopicSubscribeAcks.delete(topic);
+    return;
+  }
+  pendingTopicSubscribeAcks.set(topic, remaining);
 }

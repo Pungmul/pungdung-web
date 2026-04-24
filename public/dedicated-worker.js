@@ -8,8 +8,11 @@ importScripts(
 );
 
 let stompClient = null;
+let connectionPhase = "idle";
 const subscriptions = new Map();
-const pendingSubscriptions = []; // 대기 중인 구독들을 저장
+const pendingSubscriptions = [];
+const pendingPublishes = [];
+const pendingConnectCommands = [];
 
 // DedicatedWorker 모드
 self.addEventListener("message", (event) => {
@@ -18,12 +21,6 @@ self.addEventListener("message", (event) => {
 
 function handleMessage(data) {
   const { type, data: messageData, commandId = null } = data;
-
-  console.log("[DedicatedWorker] 메시지 수신:", {
-    type,
-    commandId,
-    data: messageData,
-  });
 
   switch (type) {
     case "CONNECT":
@@ -36,7 +33,7 @@ function handleMessage(data) {
       unsubscribeFromTopic(messageData);
       break;
     case "SEND_MESSAGE":
-      sendMessage(messageData);
+      publishMessage(messageData, commandId);
       break;
     case "DISCONNECT":
       disconnectWebSocket();
@@ -45,18 +42,23 @@ function handleMessage(data) {
 }
 
 function connectWebSocket(config, commandId) {
-  console.log("[DedicatedWorker] WebSocket 연결 시도:", {
-    commandId,
-    url: config.url,
-  });
+  if (commandId) {
+    pendingConnectCommands.push(commandId);
+  }
 
   if (stompClient && stompClient.connected) {
-    self.postMessage({
-      type: "CONNECTED",
-      commandId,
-    });
+    flushConnectAcks();
+    emitConnectionState("connected", true);
     return;
   }
+
+  if (connectionPhase === "connecting" || connectionPhase === "reconnecting") {
+    emitConnectionState(connectionPhase, false);
+    return;
+  }
+
+  connectionPhase = connectionPhase === "connected" ? "reconnecting" : "connecting";
+  emitConnectionState(connectionPhase, false);
 
   const socket = new SockJS(config.url);
 
@@ -67,32 +69,28 @@ function connectWebSocket(config, commandId) {
       Authorization: config.headers?.Authorization,
     },
     onConnect: () => {
-      console.log("[DedicatedWorker] WebSocket 연결 성공:", { commandId });
-
-      self.postMessage({
-        type: "CONNECTED",
-        commandId,
-      });
-
+      connectionPhase = "connected";
+      emitConnectionState("connected", true);
+      flushConnectAcks();
       retryPendingSubscriptions();
+      retryPendingPublishes();
     },
     onStompError: (error) => {
-      console.error("[DedicatedWorker] STOMP 에러:", { error, commandId });
-
-      self.postMessage({
-        type: "ERROR",
-        error: String(error),
-        commandId,
-      });
+      connectionPhase = "failed";
+      emitConnectionState("failed", false, String(error));
+      rejectPendingConnect(error);
     },
     onWebSocketError: (error) => {
-      console.error("[DedicatedWorker] WebSocket 에러:", { error, commandId });
-
-      self.postMessage({
-        type: "ERROR",
-        error: String(error),
-        commandId,
-      });
+      connectionPhase = "failed";
+      emitConnectionState("failed", false, String(error));
+      rejectPendingConnect(error);
+    },
+    onWebSocketClose: () => {
+      if (connectionPhase === "disconnected") {
+        return;
+      }
+      connectionPhase = "reconnecting";
+      emitConnectionState("reconnecting", false);
     },
   });
 
@@ -100,102 +98,218 @@ function connectWebSocket(config, commandId) {
 }
 
 function subscribeToTopic(data, commandId) {
-  const { topic } = data;
-
-  if (!stompClient || !stompClient.connected) {
-    console.log("[DedicatedWorker] WebSocket 미연결, 구독 대기:", {
-      topic,
-      commandId,
-    });
-    // 대기 중인 구독으로 저장
-    pendingSubscriptions.push({ ...data, commandId });
+  const topic = data?.topic;
+  if (!topic) {
+    emitCommandError(commandId, "Topic is required for subscribe");
     return;
   }
 
-  // 이미 구독 중인 토픽인지 확인
-  if (subscriptions.has(topic)) {
-    console.log("[DedicatedWorker] 이미 구독 중인 토픽:", { topic, commandId });
+  if (!stompClient || !stompClient.connected) {
+    pendingSubscriptions.push({ topic, commandId });
+    emitSubscriptionState(topic, "pending", commandId);
+    emitRetrying("SUBSCRIBE", topic, commandId, "socket-not-connected");
     return;
-  } else {
-    console.log("[DedicatedWorker] 새 토픽 구독:", { topic, commandId });
-    // 새로운 토픽 구독
-    subscriptions.set(topic, true);
+  }
 
-    stompClient.subscribe(topic, (message) => {
-      const messageData = JSON.parse(message.body);
-      console.log("[DedicatedWorker] 토픽 메시지 수신:", {
-        topic,
-        messageData,
-      });
+  if (subscriptions.has(topic)) {
+    emitSubscribed(topic, commandId);
+    return;
+  }
 
+  try {
+    const subscription = stompClient.subscribe(topic, (message) => {
+      const messageData = safeParseMessageBody(message.body);
       self.postMessage({
         type: "MESSAGE",
         data: {
-          topic: topic,
+          topic,
           message: messageData,
         },
       });
     });
-
-    // 구독 완료 알림
-    self.postMessage({
-      type: "SUBSCRIBED",
-      data: {
-        topic: topic,
-      },
-      commandId: commandId,
-    });
-    console.log("[DedicatedWorker] 구독 완료:", { topic, commandId });
+    subscriptions.set(topic, subscription);
+    emitSubscriptionState(topic, "pending", commandId);
+    emitSubscribed(topic, commandId);
+  } catch (error) {
+    emitSubscriptionState(topic, "error", commandId, String(error));
+    emitCommandError(commandId, error);
   }
 }
 
 function unsubscribeFromTopic(data) {
-  const { topic } = data;
-  console.log("[DedicatedWorker] 토픽 구독 해제:", { topic });
-
-  // 구독 제거
-  if (subscriptions.has(topic)) {
-    subscriptions.delete(topic);
-    console.log("[DedicatedWorker] 구독 해제 완료:", { topic });
-  }
-}
-
-function sendMessage(data) {
-  if (!stompClient || !stompClient.connected) {
-    console.warn("[DedicatedWorker] WebSocket 미연결, 메시지 전송 실패:", {
-      data,
-    });
+  const topic = data?.topic;
+  if (!topic) {
     return;
   }
 
-  const { topic, message } = data;
-  console.log("[DedicatedWorker] 메시지 전송:", { topic, message });
-  stompClient.publish({ destination: topic, body: JSON.stringify(message) });
+  if (subscriptions.has(topic)) {
+    const subscription = subscriptions.get(topic);
+    if (subscription && typeof subscription.unsubscribe === "function") {
+      subscription.unsubscribe();
+    }
+    subscriptions.delete(topic);
+  }
+}
+
+function publishMessage(data, commandId) {
+  const topic = data?.topic;
+  if (!topic) {
+    emitCommandError(commandId, "Topic is required for publish");
+    return;
+  }
+
+  if (!stompClient || !stompClient.connected) {
+    pendingPublishes.push({ topic, message: data?.message, commandId });
+    emitRetrying("SEND_MESSAGE", topic, commandId, "socket-not-connected");
+    return;
+  }
+
+  try {
+    stompClient.publish({
+      destination: topic,
+      body: JSON.stringify(data?.message ?? null),
+      headers: undefined,
+    });
+    emitPublished(topic, commandId);
+  } catch (error) {
+    emitPublishState(topic, "error", commandId, String(error));
+    emitCommandError(commandId, error);
+  }
 }
 
 function disconnectWebSocket() {
-  console.log("[DedicatedWorker] WebSocket 연결 해제:");
+  connectionPhase = "disconnected";
+  emitConnectionState("disconnected", false);
   if (stompClient) {
-    stompClient.disconnect();
+    stompClient.deactivate();
     stompClient = null;
     subscriptions.clear();
     pendingSubscriptions.length = 0;
+    pendingPublishes.length = 0;
   }
 }
 
 function retryPendingSubscriptions() {
-  if (pendingSubscriptions.length > 0) {
-    console.log("[DedicatedWorker] 대기 중인 구독 재시도:", {
-      pendingCount: pendingSubscriptions.length,
-    });
+  if (pendingSubscriptions.length === 0) {
+    return;
+  }
 
-    pendingSubscriptions.forEach((data) => {
-      const { commandId } = data;
-      subscribeToTopic(data, commandId);
-    });
+  const queued = pendingSubscriptions.splice(0, pendingSubscriptions.length);
+  queued.forEach((queuedItem) => {
+    subscribeToTopic({ topic: queuedItem.topic }, queuedItem.commandId);
+  });
+}
 
-    // 재시도 후 대기 목록 클리어
-    pendingSubscriptions.length = 0;
-    console.log("[DedicatedWorker] 대기 중인 구독 재시도 완료");
+function retryPendingPublishes() {
+  if (pendingPublishes.length === 0) {
+    return;
+  }
+
+  const queued = pendingPublishes.splice(0, pendingPublishes.length);
+  queued.forEach((queuedItem) => {
+    publishMessage(
+      { topic: queuedItem.topic, message: queuedItem.message },
+      queuedItem.commandId
+    );
+  });
+}
+
+function flushConnectAcks() {
+  if (pendingConnectCommands.length === 0) {
+    return;
+  }
+  const commands = pendingConnectCommands.splice(0, pendingConnectCommands.length);
+  commands.forEach((commandId) => {
+    self.postMessage({
+      type: "CONNECTED",
+      commandId,
+    });
+  });
+}
+
+function rejectPendingConnect(error) {
+  if (pendingConnectCommands.length === 0) {
+    return;
+  }
+  const commands = pendingConnectCommands.splice(0, pendingConnectCommands.length);
+  commands.forEach((commandId) => {
+    emitCommandError(commandId, error);
+  });
+}
+
+function emitConnectionState(phase, isConnected, error) {
+  self.postMessage({
+    type: "CONNECTION_STATE",
+    data: {
+      phase,
+      isConnected,
+      ...(error ? { error } : {}),
+    },
+  });
+}
+
+function emitSubscriptionState(topic, status, commandId, error) {
+  self.postMessage({
+    type: "SUBSCRIPTION_STATE",
+    data: {
+      topic,
+      status,
+      ...(error ? { error } : {}),
+    },
+    commandId: commandId || undefined,
+  });
+}
+
+function emitPublishState(topic, status, commandId, error) {
+  self.postMessage({
+    type: "PUBLISHED",
+    data: {
+      topic,
+      status,
+      ...(error ? { error } : {}),
+    },
+    commandId: commandId || undefined,
+  });
+}
+
+function emitSubscribed(topic, commandId) {
+  self.postMessage({
+    type: "SUBSCRIBED",
+    data: { topic },
+    commandId: commandId || undefined,
+  });
+  emitSubscriptionState(topic, "subscribed", commandId);
+}
+
+function emitPublished(topic, commandId) {
+  emitPublishState(topic, "published", commandId);
+}
+
+function emitRetrying(commandType, topic, commandId, reason) {
+  self.postMessage({
+    type: "RETRYING",
+    data: {
+      commandType,
+      ...(topic ? { topic } : {}),
+      ...(reason ? { reason } : {}),
+    },
+    commandId: commandId || undefined,
+  });
+}
+
+function emitCommandError(commandId, error) {
+  self.postMessage({
+    type: "ERROR",
+    error: error instanceof Error ? error.message : String(error),
+    commandId: commandId || undefined,
+  });
+}
+
+function safeParseMessageBody(body) {
+  try {
+    return JSON.parse(body);
+  } catch {
+    return body;
   }
 }
+

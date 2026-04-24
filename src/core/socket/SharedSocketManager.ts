@@ -1,7 +1,13 @@
 import {
+  SocketConnectionPhase,
+  SocketConnectionStatus,
   SocketConfig,
+  SocketSubscriptionStatus,
   Subscription,
   WorkerMessage,
+  WorkerPublishedPayload,
+  WorkerResponseType,
+  WorkerSubscriptionStatePayload,
   WorkerResponse,
 } from "./types";
 
@@ -9,6 +15,8 @@ type PendingCommand = {
   resolve: (value?: unknown) => void;
   reject: (reason?: unknown) => void;
   timeout: NodeJS.Timeout;
+  type: WorkerMessage["type"];
+  topic: string | undefined;
 };
 
 export class SharedSocketManager {
@@ -19,14 +27,36 @@ export class SharedSocketManager {
     string,
     Map<string, (data: unknown) => void>
   >();
-  private pendingSubscriptions = new Set<string>(); // 대기 중인 구독들
-  private pendingCommands = new Map<string, PendingCommand>(); // commandId와 Promise 매핑
-  private isConnected = false;
+  private pendingSubscriptions = new Set<string>();
+  private pendingCommands = new Map<string, PendingCommand>();
+  private connectionStatus: SocketConnectionStatus = {
+    phase: "idle",
+    isConnected: false,
+  };
+  private topicReadiness = new Map<
+    string,
+    { status: SocketSubscriptionStatus; error?: string }
+  >();
   private isSharedWorkerSupported: boolean;
   private workerMode: "shared" | "dedicated" = "dedicated";
-  private readonly COMMAND_TIMEOUT = 30000; // 30초 타임아웃
+  private readonly COMMAND_TIMEOUT = 30000;
+  private connectPromise: Promise<void> | null = null;
 
   private stateSubscriptions = new Set<() => void>();
+  private snapshotVersion = 0;
+  private cachedSnapshot:
+    | {
+        version: number;
+        value: {
+          connection: SocketConnectionStatus;
+          isConnected: boolean;
+          topicReadiness: ReadonlyMap<
+            string,
+            { status: SocketSubscriptionStatus; error?: string }
+          >;
+        };
+      }
+    | null = null;
 
   private constructor() {
     this.isSharedWorkerSupported = typeof SharedWorker !== "undefined";
@@ -40,9 +70,19 @@ export class SharedSocketManager {
   }
 
   async connect(config: SocketConfig): Promise<void> {
-    if (this.worker) {
-      console.log("🔍 이미 Worker가 존재함");
+    if (this.worker && this.connectionStatus.isConnected) {
       return;
+    }
+    if (
+      this.worker &&
+      this.port &&
+      (this.connectionStatus.phase === "connecting" ||
+        this.connectionStatus.phase === "reconnecting")
+    ) {
+      return this.connectPromise ?? this.sendCommand("CONNECT", config).then(() => undefined);
+    }
+    if (this.connectPromise) {
+      return this.connectPromise;
     }
 
     const tryConnect = async (useSharedWorker: boolean): Promise<void> => {
@@ -62,70 +102,16 @@ export class SharedSocketManager {
       this.port.addEventListener("message", (event: MessageEvent) => {
         const response = event.data as WorkerResponse;
         const { type, data, error, commandId } = response;
-        console.log("🔍 Worker 메시지 수신:", { type, commandId, data });
-
-        switch (type) {
-          case "CONNECTED":
-            this.isConnected = true;
-            console.log("🔍 Worker: WebSocket 연결 완료", { commandId });
-            if (commandId) {
-              this.resolveCommand(commandId, undefined);
-            }
-            this.notifyStateSubscriptions();
-            this.retryPendingSubscriptions();
-            break;
-          case "SUBSCRIBED":
-            const { topic: subscribedTopic } = data as { topic: string };
-            console.log("🔍 Worker: 구독 완료 - topic:", subscribedTopic, {
-              commandId,
-            });
-            if (!!commandId) {
-              this.resolveCommand(commandId, data);
-            }
-            break;
-          case "MESSAGE":
-            const { topic, message } = data as {
-              topic: string;
-              message: unknown;
-            };
-            console.log(
-              "🔍 Worker: 메시지 수신 - topic:",
-              topic,
-              "message:",
-              message,
-              { commandId }
-            );
-            const callbacks = this.subscriptions.get(topic);
-            console.log("callbacks size", callbacks?.size ?? 0, topic, message);
-            if (callbacks && callbacks.size > 0) {
-              callbacks.forEach((callback) => {
-                try {
-                  callback(message);
-                } catch (err) {
-                  console.error("🔍 구독 콜백 에러:", err, { commandId });
-                }
-              });
-            }
-            break;
-          case "ERROR":
-            console.error("🔍 Worker: 에러 발생", error, { commandId });
-            this.isConnected = false;
-            if (commandId) {
-              this.rejectCommand(
-                commandId,
-                error || new Error("Unknown error")
-              );
-            }
-            this.notifyStateSubscriptions();
-            break;
-        }
+        this.handleWorkerResponse(type, data, error, commandId);
       });
 
       if (useSharedWorker) {
         (this.port as MessagePort).start();
       }
 
+      this.updateConnectionStatus({ phase: "connecting", isConnected: false });
       await this.sendCommand("CONNECT", config);
+      this.flushPendingSubscriptions();
     };
 
     const cleanupWorker = () => {
@@ -134,42 +120,43 @@ export class SharedSocketManager {
       }
       this.worker = null;
       this.port = null;
+      this.updateConnectionStatus({
+        phase: "disconnected",
+        isConnected: false,
+      });
     };
 
-    try {
-      if (this.isSharedWorkerSupported) {
-        try {
-          console.log("🔍 SharedWorker 모드로 연결 시도");
-          await tryConnect(true);
-          console.log("🔍 SharedWorker 연결 성공");
-        } catch (error) {
-          console.warn("🔍 SharedWorker 연결 실패, DedicatedWorker로 폴백:", error);
-          cleanupWorker();
-          console.log("🔍 DedicatedWorker 모드로 연결 시도");
+    const connectTask = (async () => {
+      try {
+        if (this.isSharedWorkerSupported) {
+          try {
+            await tryConnect(true);
+          } catch {
+            cleanupWorker();
+            await tryConnect(false);
+          }
+        } else {
           await tryConnect(false);
-          console.log("🔍 DedicatedWorker 연결 성공");
         }
-      } else {
-        console.log("🔍 DedicatedWorker 모드로 연결");
-        await tryConnect(false);
+      } catch (error) {
+        cleanupWorker();
+        throw error;
       }
-    } catch (error) {
-      console.error("🔍 Worker 연결 실패:", error);
-      cleanupWorker();
-      throw error;
-    }
+    })();
+
+    this.connectPromise = connectTask.finally(() => {
+      this.connectPromise = null;
+    });
+
+    return this.connectPromise;
   }
 
   async subscribe(
     topic: string,
     callback: (data: unknown) => void
   ): Promise<Subscription> {
-    console.log("🔍 구독 시도 - topic:", topic);
-    console.log("callback", callback, topic);
-
     const callbackId = crypto.randomUUID();
 
-    // 기존 Map 가져오기 또는 새로 생성
     let callbacks = this.subscriptions.get(topic);
     const isFirstSubscriber = !callbacks || callbacks.size === 0;
 
@@ -178,24 +165,22 @@ export class SharedSocketManager {
       this.subscriptions.set(topic, callbacks);
     }
 
-    // ✅ 반드시 콜백 추가!
     callbacks.set(callbackId, callback);
 
-    // 첫 구독자일 때만 워커에 SUBSCRIBE 전송 또는 대기열 추가
     if (isFirstSubscriber) {
-      if (this.port && this.isConnected) {
+      this.topicReadiness.set(topic, { status: "pending" });
+      this.notifyStateSubscriptions();
+
+      if (this.port) {
         await this.sendCommand("SUBSCRIBE", { topic });
-        console.log("🔍 구독 요청 완료 - topic:", topic);
       } else {
-        if (!this.isConnected) {
-          console.log("🔍 연결되지 않음, 구독 대기");
-          // 대기 중인 구독으로 저장
-          this.pendingSubscriptions.add(topic);
-          console.log("🔍 대기 중인 구독 추가:", topic);
+        callbacks.delete(callbackId);
+        if (callbacks.size === 0) {
+          this.subscriptions.delete(topic);
+          this.topicReadiness.delete(topic);
+          this.notifyStateSubscriptions();
         }
-        if (!this.port) {
-          console.log("🔍 port 없음");
-        }
+        throw new Error("Socket worker is not initialized");
       }
     }
 
@@ -204,6 +189,7 @@ export class SharedSocketManager {
 
   async unsubscribe(subscription: Subscription): Promise<void> {
     this.pendingSubscriptions.delete(subscription.topic);
+    this.topicReadiness.delete(subscription.topic);
     const callbacks = this.subscriptions.get(subscription.topic);
 
     if (!callbacks) {
@@ -215,61 +201,89 @@ export class SharedSocketManager {
       // 남은 구독자가 없으면 실제로 해제
       if (callbacks.size === 0) {
         this.subscriptions.delete(subscription.topic);
-        if (this.port && this.isConnected) {
+        if (this.port) {
           this.port.postMessage({
             type: "UNSUBSCRIBE",
             data: { topic: subscription.topic },
           } as WorkerMessage);
-          console.log("🔍 구독 해제 요청 완료 - topic:", subscription.topic);
-          console.log("🔍 잔여 구독 콜백 수", callbacks.size);
         }
       }
       return;
     }
 
-    // 콜백 미지정 시 전체 해제
     this.subscriptions.delete(subscription.topic);
-    if (this.port && this.isConnected) {
+    if (this.port) {
       this.port.postMessage({
         type: "UNSUBSCRIBE",
         data: { topic: subscription.topic },
       } as WorkerMessage);
-      console.log("🔍 구독 해제 요청 완료 - topic:", subscription.topic);
     }
+  }
+
+  async publish(topic: string, message: unknown): Promise<void> {
+    if (!this.port) {
+      throw new Error("Socket is not connected");
+    }
+
+    await this.sendCommand("SEND_MESSAGE", { topic, message });
   }
 
   sendMessage(topic: string, message: unknown): void {
-    if (this.port && this.isConnected) {
-      this.port.postMessage({
-        type: "SEND_MESSAGE",
-        data: { topic, message },
-      } as WorkerMessage);
-      console.log("🔍 메시지 전송 요청 완료 - topic:", topic);
-    } else {
+    if (!this.connectionStatus.isConnected) {
       throw new Error("Socket is not connected");
     }
+
+    void this.publish(topic, message).catch((publishError) => {
+      console.error("Socket publish failed", publishError);
+    });
   }
 
   disconnect(): void {
-    this.isConnected = false;
-
     if (this.port) {
       const disconnectCommandId = crypto.randomUUID();
       this.port.postMessage({
         type: "DISCONNECT",
         commandId: disconnectCommandId,
       } as WorkerMessage);
-      console.log("🔍 연결 해제 요청 전송", { commandId: disconnectCommandId });
     }
 
+    this.connectionStatus = { phase: "disconnected", isConnected: false };
     this.subscriptions.clear();
+    this.topicReadiness.clear();
+    this.pendingSubscriptions.clear();
+    this.pendingCommands.forEach((pending) => {
+      clearTimeout(pending.timeout);
+      pending.reject(new Error("Socket disconnected"));
+    });
+    this.pendingCommands.clear();
     this.port = null;
     this.worker = null;
+    this.connectPromise = null;
     this.workerMode = "dedicated";
+    this.notifyStateSubscriptions();
   }
 
   getConnectionStatus(): boolean {
-    return this.isConnected;
+    return this.connectionStatus.isConnected;
+  }
+
+  getConnectionPhase(): SocketConnectionPhase {
+    return this.connectionStatus.phase;
+  }
+
+  getTopicStatus(topic: string): SocketSubscriptionStatus {
+    return this.topicReadiness.get(topic)?.status ?? "idle";
+  }
+
+  getTopicError(topic: string): string | undefined {
+    return this.topicReadiness.get(topic)?.error;
+  }
+
+  areTopicsReady(topics: string[]): boolean {
+    if (topics.length === 0) {
+      return false;
+    }
+    return topics.every((topic) => this.getTopicStatus(topic) === "subscribed");
   }
 
   getWorkerType(): "shared" | "dedicated" {
@@ -282,39 +296,32 @@ export class SharedSocketManager {
     return count;
   }
 
-  private retryPendingSubscriptions(): void {
-    console.log("🔍 대기 중인 구독들 재시도");
-
-    if (this.pendingSubscriptions.size > 0) {
-      console.log("🔍 재시도할 구독 개수:", this.pendingSubscriptions.size);
-
-      this.pendingSubscriptions.forEach(async (topic) => {
-        if (this.port && this.isConnected) {
-          try {
-            await this.sendCommand("SUBSCRIBE", { topic });
-            console.log("🔍 지연 구독 요청 완료 - topic:", topic);
-          } catch (error) {
-            console.error("🔍 지연 구독 실패 - topic:", topic, error);
-          }
-        }
-      });
-
-      // 재시도 후 대기 목록 클리어
-      this.pendingSubscriptions.clear();
-      console.log("🔍 대기 목록 클리어 완료");
-    } else {
-      console.log("🔍 대기 중인 구독 없음");
+  private flushPendingSubscriptions(): void {
+    if (!this.port || this.pendingSubscriptions.size === 0) {
+      return;
     }
+
+    const topics = Array.from(this.pendingSubscriptions);
+    this.pendingSubscriptions.clear();
+    topics.forEach((topic) => {
+      void this.sendCommand("SUBSCRIBE", { topic }).then(
+        () => undefined,
+        (subscriptionError) => {
+          this.topicReadiness.set(topic, {
+            status: "error",
+            error:
+              subscriptionError instanceof Error
+                ? subscriptionError.message
+                : String(subscriptionError),
+          });
+          this.notifyStateSubscriptions();
+        }
+      );
+    });
   }
 
-  /**
-   * commandId를 사용하여 비동기 명령 전송 및 응답 대기
-   */
   private sendCommand(
-    type: Exclude<
-      WorkerMessage["type"],
-      "SEND_MESSAGE" | "UNSUBSCRIBE" | "DISCONNECT"
-    >,
+    type: Exclude<WorkerMessage["type"], "UNSUBSCRIBE" | "DISCONNECT">,
     data?: unknown
   ): Promise<unknown> {
     return new Promise((resolve, reject) => {
@@ -324,18 +331,18 @@ export class SharedSocketManager {
       }
 
       const commandId = crypto.randomUUID();
-      console.log("🔍 명령 전송:", { type, commandId, data });
+      const topic =
+        data && typeof data === "object" && "topic" in data
+          ? String((data as { topic?: unknown }).topic)
+          : undefined;
 
-      // 타임아웃 설정
       const timeout = setTimeout(() => {
         this.pendingCommands.delete(commandId);
         reject(new Error(`Command timeout: ${type} (${commandId})`));
       }, this.COMMAND_TIMEOUT);
 
-      // Promise 저장
-      this.pendingCommands.set(commandId, { resolve, reject, timeout });
+      this.pendingCommands.set(commandId, { resolve, reject, timeout, type, topic });
 
-      // 메시지 전송
       this.port.postMessage({
         type,
         data,
@@ -344,49 +351,188 @@ export class SharedSocketManager {
     });
   }
 
-  /**
-   * commandId로 Promise resolve
-   */
   private resolveCommand(commandId: string, value?: unknown): void {
     const pending = this.pendingCommands.get(commandId);
     if (pending) {
       clearTimeout(pending.timeout);
       this.pendingCommands.delete(commandId);
       pending.resolve(value);
-      console.log("🔍 명령 완료:", { commandId, value });
     }
   }
 
-  /**
-   * commandId로 Promise reject
-   */
   private rejectCommand(commandId: string, error: unknown): void {
     const pending = this.pendingCommands.get(commandId);
     if (pending) {
       clearTimeout(pending.timeout);
       this.pendingCommands.delete(commandId);
       pending.reject(error);
-      console.error("🔍 명령 실패:", { commandId, error });
     }
   }
 
-  /**
-   * 상태 변경 구독
-   */
   storeSubscribe = (listener: () => void) => {
     this.stateSubscriptions.add(listener);
     return () => this.stateSubscriptions.delete(listener);
   };
 
-  /**
-   * 상태 변경 알림
-   */
   private notifyStateSubscriptions(): void {
+    this.snapshotVersion += 1;
+    this.cachedSnapshot = null;
     this.stateSubscriptions.forEach((listener) => listener());
   }
 
-  getSnapshot(): { isConnected: boolean } {
-    return { isConnected: this.isConnected };
+  getSnapshot(): {
+    connection: SocketConnectionStatus;
+    isConnected: boolean;
+    topicReadiness: ReadonlyMap<string, { status: SocketSubscriptionStatus; error?: string }>;
+  } {
+    if (this.cachedSnapshot && this.cachedSnapshot.version === this.snapshotVersion) {
+      return this.cachedSnapshot.value;
+    }
+
+    const snapshot = {
+      connection: { ...this.connectionStatus },
+      isConnected: this.connectionStatus.isConnected,
+      topicReadiness: new Map(this.topicReadiness),
+    };
+
+    this.cachedSnapshot = {
+      version: this.snapshotVersion,
+      value: snapshot,
+    };
+
+    return snapshot;
+  }
+
+  private handleWorkerResponse(
+    type: WorkerResponseType,
+    data: unknown,
+    error: unknown,
+    commandId?: string
+  ) {
+    switch (type) {
+      case "CONNECTED":
+        this.updateConnectionStatus({ phase: "connected", isConnected: true });
+        if (commandId) {
+          this.resolveCommand(commandId, undefined);
+        }
+        this.flushPendingSubscriptions();
+        break;
+      case "CONNECTION_STATE":
+        this.applyConnectionState(data);
+        if (commandId && this.connectionStatus.isConnected) {
+          this.resolveCommand(commandId, data);
+        }
+        break;
+      case "SUBSCRIBED":
+        this.applySubscribedState(data, commandId);
+        break;
+      case "SUBSCRIPTION_STATE":
+        this.applySubscriptionState(data as WorkerSubscriptionStatePayload, commandId);
+        break;
+      case "PUBLISHED":
+        this.applyPublishedState(data as WorkerPublishedPayload, commandId);
+        break;
+      case "RETRYING":
+        break;
+      case "MESSAGE":
+        this.dispatchMessage(data);
+        break;
+      case "ERROR":
+        if (commandId) {
+          this.rejectCommand(commandId, error || new Error("Unknown error"));
+        } else {
+          this.updateConnectionStatus({
+            phase: "failed",
+            isConnected: false,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  private applyConnectionState(data: unknown) {
+    const payload = data as {
+      phase?: SocketConnectionPhase;
+      isConnected?: boolean;
+      error?: string;
+    };
+    this.updateConnectionStatus({
+      phase: payload.phase ?? "failed",
+      isConnected: Boolean(payload.isConnected),
+      ...(payload.error ? { error: payload.error } : {}),
+    });
+    if (payload.phase === "connected") {
+      this.flushPendingSubscriptions();
+    }
+  }
+
+  private applySubscribedState(data: unknown, commandId?: string) {
+    const payload = data as { topic?: string };
+    if (!payload?.topic) {
+      return;
+    }
+    this.topicReadiness.set(payload.topic, { status: "subscribed" });
+    this.notifyStateSubscriptions();
+    if (commandId) {
+      this.resolveCommand(commandId, payload);
+    }
+  }
+
+  private applySubscriptionState(
+    data: WorkerSubscriptionStatePayload,
+    commandId?: string
+  ) {
+    if (!data?.topic) {
+      return;
+    }
+    this.topicReadiness.set(data.topic, {
+      status: data.status,
+      ...(data.error ? { error: data.error } : {}),
+    });
+    this.notifyStateSubscriptions();
+    if (commandId && data.status === "subscribed") {
+      this.resolveCommand(commandId, data);
+    }
+    if (commandId && data.status === "error") {
+      this.rejectCommand(commandId, new Error(data.error || "Subscription failed"));
+    }
+  }
+
+  private applyPublishedState(data: WorkerPublishedPayload, commandId?: string) {
+    if (!commandId) {
+      return;
+    }
+    if (data.status === "published") {
+      this.resolveCommand(commandId, data);
+      return;
+    }
+    this.rejectCommand(commandId, new Error(data.error || "Publish failed"));
+  }
+
+  private dispatchMessage(data: unknown) {
+    const payload = data as {
+      topic: string;
+      message: unknown;
+    };
+    const callbacks = this.subscriptions.get(payload.topic);
+    if (!callbacks || callbacks.size === 0) {
+      return;
+    }
+    callbacks.forEach((callback) => {
+      try {
+        callback(payload.message);
+      } catch (callbackError) {
+        console.error("Socket subscription callback error", callbackError);
+      }
+    });
+  }
+
+  private updateConnectionStatus(next: SocketConnectionStatus): void {
+    this.connectionStatus = next;
+    this.notifyStateSubscriptions();
   }
 }
 
