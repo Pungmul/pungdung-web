@@ -1,41 +1,34 @@
 "use client";
+
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useSocketConnection } from "./useSocketConnection";
+
 import { connectSocket, disconnectSocket } from "../lib/socketHandler";
-import { authQueries } from "@/features/auth/queries";
 
-export function useInitSocketConnect() {
-  const { data: token } = useQuery(authQueries.token());
-  const isConnected = useSocketConnection();
+const DEFAULT_SOCKET_URL =
+  process.env.NEXT_PUBLIC_WEBSOCKET_URL ?? "ws://localhost:8080/ws";
 
+/**
+ * Injects socket connection config from the composition layer (e.g. auth provider).
+ * Does not fetch tokens — pass `accessToken` from the caller.
+ */
+export function useInitSocketConnect(accessToken: string | null | undefined) {
   useEffect(() => {
-    if (isConnected) {
-      return; // 이미 연결되어 있거나 토큰이 없으면 연결하지 않음
-    }
-    if (!token?.accessToken) {
-      // 토큰이 없으면 연결을 끊음
+    if (!accessToken) {
       disconnectSocket();
       return;
     }
-    connectSocket({
-      url: process.env.NEXT_PUBLIC_WEBSOCKET_URL || "ws://localhost:8080/ws",
+
+    void connectSocket({
+      url: DEFAULT_SOCKET_URL,
       headers: {
-        Authorization: `Bearer ${token.accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
-    })
-      .then(() => {
-        console.log("웹 소켓 연결 성공");
-      })
-      .catch((error) => {
-        console.error("웹 소켓 연결 실패:", error);
-      });
+    }).catch((error) => {
+      console.error("웹 소켓 연결 실패:", error);
+    });
 
     return () => {
-      if (isConnected) {
-        console.log("웹 소켓 연결 해제");
-        disconnectSocket();
-      }
+      disconnectSocket();
     };
-  }, [isConnected, token?.accessToken]);
+  }, [accessToken]);
 }

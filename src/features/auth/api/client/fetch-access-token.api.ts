@@ -4,7 +4,7 @@ import { AccessTokenResponse, accessTokenResponseSchema } from "./dto.schema";
 
 /**
  * accessToken 조회 (GET /api/auth/token)
- * 사용처: useQuery(authQueries.token()) → roomReadSocket, useInitSocketConnect
+ * 사용처: useQuery(authQueries.token()) → app (main) SocketProvider, roomReadSocket
  */
 export const fetchAccessToken = async (): Promise<AccessTokenResponse> =>
   clientApiRequest({
