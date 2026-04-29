@@ -1,0 +1,30 @@
+# scripts
+
+패키지 빌드·개발 보조 스크립트입니다.
+
+## 파일
+
+| 파일 | 책임 |
+|------|------|
+| `build-workers.mjs` | `workers/*.ts` → consumer 앱 `public/*.js` esbuild 번들 |
+| `sync-docs.mjs` | 폴더 `README.md` → VitePress `docs/modules/` 마크다운 동기화 |
+
+## `build-workers.mjs`
+
+### 동작
+
+1. `workers/socket-worker.ts` → `public/socket-worker.js`
+2. `workers/dedicated-worker.ts` → `public/dedicated-worker.js`
+3. production 빌드 시 minify·sourcemap 정책 적용
+
+### CLI 옵션
+
+| 옵션 | 설명 |
+|------|------|
+| `--watch` | 파일 변경 시 재번들 |
+| `--outdir <path>` | 출력 디렉터리 (기본: monorepo `public/`) |
+
+### 호출 경로
+
+- 패키지: `yarn build:workers`
+- 루트: `predev` / `prebuild`에서 자동 실행

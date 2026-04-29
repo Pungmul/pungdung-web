@@ -1,14 +1,15 @@
 "use client";
+
 import { useCallback, useEffect, useRef } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
 
 import {
-  SocketService,
   useSocketConnection,
+  useSocketManagerOptional,
   useSocketSubscription,
-} from "@/core/socket";
+} from "@pungdung/worker-socket-bridge/react";
 
 import { chatQueries } from "../queries";
 import {
@@ -35,26 +36,34 @@ import { authQueries } from "@/features/auth/queries";
  * readSign();
  */
 export function useRoomReadSocket(roomId: string) {
+  const socket = useSocketManagerOptional();
   const queryClient = useQueryClient();
   const isConnected = useSocketConnection();
   const { data: token } = useQuery(authQueries.token());
 
   /** 연결·가시성이 맞지 않아 보내지 못한 읽음 신호를 나중에 다시 시도하기 위한 플래그 */
   const pendingReadSignRef = useRef(false);
-  const isPageVisibleRef = useRef(!document.hidden);
+  const isPageVisibleRef = useRef(
+    typeof document !== "undefined" ? !document.hidden : true
+  );
 
   const canSendNow = useCallback(
     () => isConnected && isPageVisibleRef.current,
     [isConnected]
   );
 
-  const sendReadSign = useCallback(() => {
+  const sendReadSign = useCallback(async () => {
     const message = {
       chatRoomUUID: roomId,
     };
 
+    if (!socket) {
+      pendingReadSignRef.current = true;
+      return false;
+    }
+
     try {
-      SocketService.sendMessage(`/pub/chat/read/${roomId}`, message);
+      await socket.publish(`/pub/chat/read/${roomId}`, message);
       pendingReadSignRef.current = false;
       return true;
     } catch (error) {
@@ -66,7 +75,7 @@ export function useRoomReadSocket(roomId: string) {
       );
       return false;
     }
-  }, [roomId]);
+  }, [roomId, socket]);
 
   /** 타인 읽음 브로드캐스트: `mergeChatRoomWithReadSocketMessage`로 캐시만 갱신 */
   const handleReadMessage = useCallback(
@@ -103,19 +112,20 @@ export function useRoomReadSocket(roomId: string) {
       return;
     }
 
-    const didSend = sendReadSign();
-    if (!didSend) {
-      return;
-    }
-
-    // ChatRoomList의 unreadCount 즉시 업데이트 (낙관적 업데이트)
-    queryClient.setQueryData<ChatRoomListItem[]>(
-      chatQueries.roomList().queryKey,
-      (prevData) => {
-        if (!prevData) return prevData;
-        return resetUnreadCount(prevData, roomId);
+    void sendReadSign().then((didSend) => {
+      if (!didSend) {
+        return;
       }
-    );
+
+      // ChatRoomList의 unreadCount 즉시 업데이트 (낙관적 업데이트)
+      queryClient.setQueryData<ChatRoomListItem[]>(
+        chatQueries.roomList().queryKey,
+        (prevData) => {
+          if (!prevData) return prevData;
+          return resetUnreadCount(prevData, roomId);
+        }
+      );
+    });
   }, [token, canSendNow, isConnected, queryClient, roomId, sendReadSign]);
 
   /**

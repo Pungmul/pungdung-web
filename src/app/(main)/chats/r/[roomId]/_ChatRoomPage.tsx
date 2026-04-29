@@ -6,9 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 
 import { useQuery } from "@tanstack/react-query";
 
+import { useSocketConnection } from "@pungdung/worker-socket-bridge/react";
 import { AnimatePresence } from "framer-motion";
-
-import { useSocketConnection } from "@/core/socket";
 
 import {
   chatQueries,
@@ -22,11 +21,11 @@ import {
 } from "@/features/chat";
 import { myPageQueries } from "@/features/my-page";
 
+import { Conditional } from "@/shared";
 import { useBodyScrollLock, useViewportHeightVar } from "@/shared/hooks";
 
 import { ChatRoomMainScreen } from "./_ChatRoomMainScreen";
 import { ChatRoomSettingScreen } from "./_ChatRoomSettingScreen";
-import { Conditional } from "@/shared";
 
 type ChatRoomActiveScreen = "main" | "settings";
 

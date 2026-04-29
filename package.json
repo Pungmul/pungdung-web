@@ -2,20 +2,27 @@
   "name": "pungdung-web",
   "version": "0.0.1",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "predev": "node scripts/generate-firebase-sw.mjs",
+    "predev": "node scripts/generate-firebase-sw.mjs && node packages/worker-socket-bridge/scripts/build-workers.mjs",
     "dev": "next dev",
-    "prebuild": "cross-env NODE_ENV=production node scripts/generate-firebase-sw.mjs",
+    "prebuild": "cross-env NODE_ENV=production node scripts/generate-firebase-sw.mjs && cross-env NODE_ENV=production node packages/worker-socket-bridge/scripts/build-workers.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "dev:mock": "node scripts/generate-firebase-sw.mjs && cross-env NEXT_PUBLIC_USE_MOCK=true next dev",
+    "dev:mock": "node scripts/generate-firebase-sw.mjs && node packages/worker-socket-bridge/scripts/build-workers.mjs && cross-env NEXT_PUBLIC_USE_MOCK=true next dev",
+    "build:workers": "node packages/worker-socket-bridge/scripts/build-workers.mjs",
+    "build:workers:watch": "node packages/worker-socket-bridge/scripts/build-workers.mjs --watch",
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "typecheck:workers": "tsc --project packages/worker-socket-bridge/tsconfig.workers.json --noEmit"
   },
   "dependencies": {
+    "@pungdung/worker-socket-bridge": "0.0.1",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.1.1",
     "@stomp/stompjs": "^7.1.1",
@@ -80,6 +87,7 @@
     "@typescript-eslint/parser": "^8.35.0",
     "@vitejs/plugin-react": "^5.0.4",
     "cross-env": "^7.0.3",
+    "esbuild": "^0.25.0",
     "eslint": "^9.30.0",
     "eslint-config-next": "15.3.4",
     "eslint-plugin-simple-import-sort": "^13.0.0",

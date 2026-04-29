@@ -1,7 +1,5 @@
 import { Suspense } from "@suspensive/react";
 
-import { AuthenticatedSocketProvider } from "./_AuthenticatedSocketProvider";
-
 import { ChatNotificationSocket } from "@/features/chat";
 import {
   FCMClient,
@@ -11,11 +9,13 @@ import {
 
 import {
   HeaderProgressBar,
-  Tabs,
   PWAInstallPrompt,
+  Tabs,
   ToastHost,
 } from "@/shared/components";
 import ReactQueryProviders from "@/shared/lib/useReactQuery";
+
+import { AuthenticatedSocketProvider } from "./_AuthenticatedSocketProvider";
 
 
 export default function RootLayout({
@@ -26,16 +26,16 @@ export default function RootLayout({
   return (
     <ReactQueryProviders>
       <PWAInstallPrompt />
-      <div id="main-contents" className="relative flex">
-        <FCMClient />
-        {/* FCM push banner (notification-container) vs action feedback (toast-container) */}
-        <NotificationContainer />
-        <ChatNotificationSocket />
-        <NotificationToast />
-        <Suspense clientOnly fallback={null}>
-          <HeaderProgressBar />
-        </Suspense>
-        <AuthenticatedSocketProvider>
+      <AuthenticatedSocketProvider>
+        <div id="main-contents" className="relative flex">
+          <FCMClient />
+          {/* FCM push banner (notification-container) vs action feedback (toast-container) */}
+          <NotificationContainer />
+          <ChatNotificationSocket />
+          <NotificationToast />
+          <Suspense clientOnly fallback={null}>
+            <HeaderProgressBar />
+          </Suspense>
           <div
             id="main-shell"
             className="relative flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-app"
@@ -44,8 +44,8 @@ export default function RootLayout({
             <ToastHost />
             {children}
           </div>
-        </AuthenticatedSocketProvider>
-      </div>
+        </div>
+      </AuthenticatedSocketProvider>
     </ReactQueryProviders>
   );
 }

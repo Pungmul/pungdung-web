@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { useSocketConnection } from "@/core/socket";
+import { useSocketConnection } from "@pungdung/worker-socket-bridge/react";
 
 import { parseLightningSocketMeetings } from "../services";
+
 import type { LightningListSocketScope, LightningMeeting } from "../types";
 
 type UseLightningSocketSnapshotParams = {

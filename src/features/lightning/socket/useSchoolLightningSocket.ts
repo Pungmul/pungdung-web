@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
-import { useSocketSubscription } from "@/core/socket";
+import { useSocketSubscription } from "@pungdung/worker-socket-bridge/react";
 
 import { clubQueries, mapClubToSchoolName } from "@/features/club";
 import { myPageQueries } from "@/features/my-page";

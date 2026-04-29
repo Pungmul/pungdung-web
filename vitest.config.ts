@@ -8,7 +8,14 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
-      "@pThunder": path.resolve(__dirname, "src"),
+      "@pungdung/worker-socket-bridge": path.resolve(
+        __dirname,
+        "packages/worker-socket-bridge/src/index.ts"
+      ),
+      "@pungdung/worker-socket-bridge/react": path.resolve(
+        __dirname,
+        "packages/worker-socket-bridge/src/react/index.ts"
+      ),
     },
   },
   test: {

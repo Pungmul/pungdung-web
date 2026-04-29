@@ -1,0 +1,44 @@
+{
+  "name": "@pungdung/worker-socket-bridge",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Worker-backed STOMP socket bridge with RPC and runtime fallback",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./react": "./src/react/index.ts",
+    "./protocol": "./src/protocol/index.ts",
+    "./runtime": "./src/runtime/index.ts"
+  },
+  "scripts": {
+    "build:workers": "node ./scripts/build-workers.mjs",
+    "build:workers:watch": "node ./scripts/build-workers.mjs --watch",
+    "docs:sync": "node ./scripts/sync-docs.mjs",
+    "predocs:dev": "node ./scripts/sync-docs.mjs",
+    "predocs:build": "node ./scripts/sync-docs.mjs",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "dependencies": {
+    "@stomp/stompjs": "^7.1.1",
+    "sockjs-client": "^1.6.1",
+    "use-sync-external-store": "^1.6.0"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/sockjs-client": "^1.5.4",
+    "mermaid": "^11.6.0",
+    "vitepress": "^1.6.3",
+    "vitepress-plugin-mermaid": "^2.0.17"
+  }
+}

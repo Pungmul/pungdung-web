@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { useSocketSubscription } from "@/core/socket/hooks/useSocketSubscribe";
+import { useSocketSubscription } from "@pungdung/worker-socket-bridge/react";
 
 import { myPageQueries } from "@/features/my-page";
 

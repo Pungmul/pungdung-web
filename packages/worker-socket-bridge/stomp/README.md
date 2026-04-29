@@ -1,0 +1,39 @@
+# stomp
+
+Worker(또는 main-thread runtime) **내부**에서 실행되는 STOMP 세션 구현입니다. `@stomp/stompjs` + SockJS transport를 캡슐화하고 protocol envelope로 명령을 처리합니다.
+
+## 역할
+
+- `CommandEnvelope` → STOMP connect / subscribe / publish / disconnect
+- STOMP 이벤트 → `ResponseEnvelope` emit
+- 연결 probe(`PongPayload`)·heartbeat liveness·transport recovery 신호
+
+## 파일
+
+| 파일 | 책임 |
+|------|------|
+| `create-stomp-session.ts` | **핵심** — `StompSession` 팩토리, command 라우팅, 큐잉된 subscribe/publish |
+| `stomp-transport.ts` | SockJS + STOMP client 생성·activate·deactivate |
+| `stomp-response-dispatch.ts` | session / shared hub용 response emitter dispatch 테이블 |
+| `stomp-response-emitters.ts` | `CONNECTED`, `MESSAGE`, `PONG` 등 envelope 빌더 |
+| `connection-probe.ts` | `PongPayload` 스냅샷 조립·`isRuntimeTransportHealthy` |
+| `stomp-liveness.ts` | 서버 heartbeat·MESSAGE 수신 시각 추적, stale·recovery signal |
+| `message-envelope-utils.ts` | body JSON parse, worker error 포맷 |
+| `constants.ts` | `SOCKET_NOT_CONNECTED_REASON`, heartbeat lost 상수 |
+| `*.test.ts` | session·probe·liveness·emitters 단위 테스트 |
+
+## `StompSession` API
+
+```ts
+type StompSession = {
+  handleCommand(envelope: CommandEnvelope): void;
+  getConnectionProbe(): PongPayload;
+  dispose(): void;
+};
+```
+
+Dedicated worker(`workers/dedicated-worker.ts`)는 단일 클라이언트용으로 `createStompSession`을 사용합니다. Shared hub는 동일 stomp 모듈을 재사용하되 멀티 클라이언트 fan-out을 추가합니다.
+
+## Main thread 연동
+
+`client/socket-probe.ts`와 `socket-push-handler.ts`가 `stomp/connection-probe`, `stomp-liveness`, `constants`를 import해 동일한 건강 기준을 유지합니다.

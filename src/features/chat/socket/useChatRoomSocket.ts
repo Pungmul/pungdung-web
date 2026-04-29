@@ -2,12 +2,11 @@
 
 import { useCallback, useState } from "react";
 
-import { useSocketSubscription } from "@/core/socket/hooks/useSocketSubscribe";
+import { useSocketSubscription } from "@pungdung/worker-socket-bridge/react";
 
 import { isImageMessage, isTextMessage, type Message } from "../types";
 
 import {
-  type StompAlarmEnvelope,
   stompAlarmEnvelopeSchema,
   stompTimelineSocketPayloadSchema,
 } from "./socket-message.schema";
@@ -65,23 +64,17 @@ export function useChatRoomSocket({
     [append]
   );
 
-  const onAlarm = useCallback((payload: StompAlarmEnvelope) => {
-    console.log(payload, "alarm message");
+  const handleAlarmPayload = useCallback((raw: unknown) => {
+    stompAlarmEnvelopeSchema.safeParse(raw);
   }, []);
-
-  const handleAlarmPayload = useCallback(
-    (raw: unknown) => {
-      const parsed = stompAlarmEnvelopeSchema.safeParse(raw);
-      if (!parsed.success) return;
-      onAlarm(parsed.data);
-    },
-    [onAlarm]
-  );
 
   const handleMessagePayload = useCallback(
     (raw: unknown) => {
       const parsed = stompTimelineSocketPayloadSchema.safeParse(raw);
-      if (!parsed.success) return;
+      if (!parsed.success) {
+        return;
+      }
+
       onSocketTypedMessage(mapStompTimelineSocketPayloadToMessage(parsed.data));
     },
     [onSocketTypedMessage]

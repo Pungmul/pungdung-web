@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "es6"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es6"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -26,47 +30,58 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@pThunder/*": ["./src/*"],
-      "@asset/*": ["./src/app/assets/*"],
-      "@public/*": ["./public/*"],
-      
-      "@/*": ["./src/*"],
-      "@/features/*": ["./src/features/*"],
-      "@/shared/*": ["./src/shared/*"],
-      "@/core/*": ["./src/core/*"],
-      "@/app/*": ["./src/app/*"],
-      // 기능별 alias
-      "@/auth": ["./src/features/auth"],
-      "@/lightning": ["./src/features/lightning"],
-      "@/chat": ["./src/features/chat"],
-      "@/board": ["./src/features/board"],
-      "@/friends": ["./src/features/friends"],
-      "@/notification": ["./src/features/notification"],
-      // 공통 모듈 alias
-      "@/ui": ["./src/shared/components/ui"],
-      "@/components": ["./src/shared/components"],
-      "@/hooks": ["./src/shared/hooks"],
-      "@/utils": ["./src/shared/utils"],
-      "@/constants": ["./src/shared/constants"],
-      "@/lib": ["./src/shared/lib"],
-      "@/step-flow": ["./step-flow"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@/core": [
+        "./src/core"
+      ],
+      "@/core/*": [
+        "./src/core/*"
+      ],
+      "@/features/*": [
+        "./src/features/*"
+      ],
+      "@/shared": [
+        "./src/shared"
+      ],
+      "@/shared/*": [
+        "./src/shared/*"
+      ],
+      "@asset/*": [
+        "./src/app/assets/*"
+      ],
+      "@public/*": [
+        "./public/*"
+      ],
+      "@pungdung/worker-socket-bridge": [
+        "./packages/worker-socket-bridge/src/index.ts"
+      ],
+      "@pungdung/worker-socket-bridge/react": [
+        "./packages/worker-socket-bridge/src/react/index.ts"
+      ],
+      "@pungdung/worker-socket-bridge/*": [
+        "./packages/worker-socket-bridge/src/*"
+      ]
     },
-    "types": ["kakao.maps.d.ts"]
+    "types": [
+      "kakao.maps.d.ts"
+    ]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
+    ".next/types/**/*.ts",
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/*.spec.ts",
     "**/*.spec.tsx",
-    "**/__tests__/**",
-    "**/__mocks__/**",
-    "**/__mock.ts"
+    "src/shared/components/layout/Tabs/index.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "packages/worker-socket-bridge/workers",
+    "packages/worker-socket-bridge/stomp"
   ]
-} 
+}

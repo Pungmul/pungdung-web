@@ -1,6 +1,6 @@
 "use client";
 
-import { useSocketSubscription } from "@/core/socket";
+import { useSocketSubscription } from "@pungdung/worker-socket-bridge/react";
 
 import { useLightningSocketSnapshot } from "./useLightningSocketSnapshot";
 import { useSyncParticipationStatusFromSocketList } from "./useSyncParticipationStatusFromSocketList";

@@ -1,9 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import {
+  useSocketManager,
+  useSocketTopicsReady,
+} from "@pungdung/worker-socket-bridge/react";
 
+import { cn } from "@/shared";
 import { FloatingButton, Spinner } from "@/shared/components";
 import ObserveTrigger from "@/shared/components/ObserveTrigger";
 
@@ -19,7 +24,6 @@ import {
   useChatRoomMessageList,
   useChatRoomUserMaps,
 } from "../../hooks/view-model";
-import { cn } from "@/shared";
 
 type ChatRoomTimelinePanelProps = {
   roomId: string;
@@ -29,6 +33,7 @@ type ChatRoomTimelinePanelProps = {
 };
 
 const SHOW_SCROLL_TO_LATEST_BUTTON_THRESHOLD = 160;
+const STUCK_SUBSCRIPTION_RESYNC_MS = 3_000;
 
 export function ChatRoomTimelinePanel({
   roomId,
@@ -61,6 +66,27 @@ export function ChatRoomTimelinePanel({
     ...(myInfo !== undefined ? { myInfo } : {}),
     readSign,
   });
+
+  const socket = useSocketManager();
+  const chatMessageTopic = useMemo(
+    () => `/sub/chat/message/${roomId}`,
+    [roomId]
+  );
+  const { isReady: isMessageTopicReady } = useSocketTopicsReady([
+    chatMessageTopic,
+  ]);
+
+  useEffect(() => {
+    if (!isConnected || isMessageTopicReady) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      void socket.resyncTopics([chatMessageTopic]);
+    }, STUCK_SUBSCRIPTION_RESYNC_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [chatMessageTopic, isConnected, isMessageTopicReady, socket]);
 
   const {
     onSendMessage,

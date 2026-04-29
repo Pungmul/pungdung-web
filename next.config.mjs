@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ["@pungdung/worker-socket-bridge"],
   images: {
     remotePatterns: [
       {

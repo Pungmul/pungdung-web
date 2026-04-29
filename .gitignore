@@ -31,6 +31,12 @@ yarn-error.log*
 # FCM 백그라운드 조각(public 템플릿 + ENV, pungdung-sw.js 에서 import)
 /public/pungdung-fcm-background.js
 
+# 소켓 워커 빌드 산출물 (packages/worker-socket-bridge/workers → esbuild)
+/public/socket-worker.js
+/public/dedicated-worker.js
+/public/socket-worker.js.map
+/public/dedicated-worker.js.map
+
 # vercel
 .vercel
 
@@ -38,3 +44,14 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /docs
+
+# VitePress (worker-socket-bridge package docs)
+packages/worker-socket-bridge/docs/.vitepress/cache
+packages/worker-socket-bridge/docs/.vitepress/dist
+
+# .cursor
+.vscode
+.agents
+.coderabbit.yaml
+.github
+.codex

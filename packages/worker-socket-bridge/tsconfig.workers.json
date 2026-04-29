@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["ES2020", "WebWorker"],
+    "types": []
+  },
+  "include": [
+    "workers/**/*.ts",
+    "stomp/**/*.ts",
+    "src/protocol/**/*.ts"
+  ]
+}
