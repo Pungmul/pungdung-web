@@ -9,8 +9,10 @@
   "exports": {
     ".": "./src/index.ts",
     "./react": "./src/react/index.ts",
+    "./react/testing": "./src/react/testing/index.tsx",
     "./protocol": "./src/protocol/index.ts",
-    "./runtime": "./src/runtime/index.ts"
+    "./runtime": "./src/runtime/index.ts",
+    "./testing": "./src/testing/index.ts"
   },
   "scripts": {
     "build:workers": "node ./scripts/build-workers.mjs",
