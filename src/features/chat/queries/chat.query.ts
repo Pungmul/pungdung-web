@@ -50,11 +50,25 @@ export const chatQueries = {
       refetchOnMount: "always",
     }),
 
-  roomInfinite: (roomId: string) =>
+  /**
+   * `initialPageSize`는 queryKey에 넣지 않는다.
+   * 첫 페이지 크기만 바뀌어도 동일 캐시 키로 `setQueryData`·invalidate가 유지되어야 하기 때문이다.
+   * 크기 증가 시 refetch는 `useChatRoomMessageSources`에서 처리한다.
+   */
+  roomInfinite: (
+    roomId: string,
+    options?: { initialPageSize?: number }
+  ) =>
     infiniteQueryOptions({
       queryKey: chatQueryInternal.roomInfinite(roomId),
       queryFn: ({ pageParam }) =>
-        loadChatLogs(roomId, pageParam, CHAT_LOG_PAGE_SIZE),
+        loadChatLogs(
+          roomId,
+          pageParam,
+          pageParam === undefined
+            ? (options?.initialPageSize ?? CHAT_LOG_PAGE_SIZE)
+            : CHAT_LOG_PAGE_SIZE
+        ),
       getNextPageParam: (lastPage) => {
         if (!lastPage.hasMore) return undefined;
         if (lastPage.nextCursor == null) return undefined;

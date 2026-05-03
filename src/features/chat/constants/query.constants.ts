@@ -10,3 +10,6 @@ export const DEFAULT_GC_TIME_MS = 1000 * 60 * 10;
 
 /** 채팅 로그 페이지 크기 */
 export const CHAT_LOG_PAGE_SIZE = 20;
+
+/** reconnect/foreground gap 보완 시 beforeId 역방향 최대 페이지 수 */
+export const CHAT_GAP_RECONCILE_MAX_PAGES = 5;

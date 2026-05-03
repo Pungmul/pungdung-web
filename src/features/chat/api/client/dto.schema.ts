@@ -55,22 +55,26 @@ export const messageDtoSchema = z.discriminatedUnion("chatType", [
 
 export type MessageDto = z.infer<typeof messageDtoSchema>;
 
-/** GET .../message — 커서 페이지(오래된→최신 순) */
-export const chatLogCursorPageDtoSchema = z.object({
+/** 커서 기반 메시지 페이지 공통 shape (messages, hasMore, nextCursor) */
+export const chatMessageCursorPageDtoSchema = z.object({
   messages: z.array(messageDtoSchema),
   hasMore: z.boolean(),
   nextCursor: z.coerce.number().nullable().optional(),
 });
 
-export type ChatLogCursorPageDto = z.infer<typeof chatLogCursorPageDtoSchema>;
+export type ChatMessageCursorPageDto = z.infer<
+  typeof chatMessageCursorPageDtoSchema
+>;
 
-export const messageListDtoSchema = z.object({
-  messages: z.array(messageDtoSchema),
-  hasMore: z.boolean(),
-  nextCursor: z.coerce.number().nullable().optional(),
-});
+/** GET .../message — 커서 페이지(최신→오래된 순). `chatMessageCursorPageDtoSchema`와 동일 참조. */
+export const chatLogCursorPageDtoSchema = chatMessageCursorPageDtoSchema;
 
-export type MessageListDto = z.infer<typeof messageListDtoSchema>;
+export type ChatLogCursorPageDto = ChatMessageCursorPageDto;
+
+/** GET .../chat-room/:roomId — 방 상세 `messageList` 필드. `chatMessageCursorPageDtoSchema`와 동일 참조. */
+export const messageListDtoSchema = chatMessageCursorPageDtoSchema;
+
+export type MessageListDto = ChatMessageCursorPageDto;
 
 export const chatRoomInfoDtoSchema = z.object({
   chatRoomUUID: z.string(),
@@ -148,7 +152,10 @@ export const chatRoomListItemDtoSchema = z
     group: z.boolean(),
   })
   .superRefine((value, ctx) => {
-    if (typeof value.isMuted === "boolean" || typeof value.muted === "boolean") {
+    if (
+      typeof value.isMuted === "boolean" ||
+      typeof value.muted === "boolean"
+    ) {
       return;
     }
     ctx.addIssue({
@@ -187,7 +194,10 @@ export const chatRoomNotificationStateDtoSchema = z
     globalEnabled: z.boolean(),
   })
   .superRefine((value, ctx) => {
-    if (typeof value.isMuted === "boolean" || typeof value.muted === "boolean") {
+    if (
+      typeof value.isMuted === "boolean" ||
+      typeof value.muted === "boolean"
+    ) {
       return;
     }
     ctx.addIssue({

@@ -3,7 +3,7 @@ import { clientApiRequest, withResponseMapper } from "@/core/api/client";
 import { chatRoomListResponseEnvelopeSchema } from "./dto.schema";
 import { sortChatRoomByDate } from "../../lib";
 import { mapChatRoomListItemDtoToDomain } from "../../lib/mappers";
-import type { ChatRoomListItem } from "../../types/domain/chat-room.types";
+import type { ChatRoomListItem } from "../../types/chat-room.types";
 
 export const loadChatRoomList = (): Promise<ChatRoomListItem[]> =>
   withResponseMapper({
