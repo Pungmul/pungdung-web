@@ -1,9 +1,9 @@
 import { mapChatRoomInfoDtoToDomain } from "./chat-room-info.mapper";
 import { mapChatRoomUserDtoToDomain } from "./chat-room-user.mapper";
-import { mapMessageListDtoToDomain } from "./message.mapper";
+import { mapMessageListDtoToDomain } from "./map-message-list-dto-to-domain.mapper";
 import { mapUserLastReadMessageIdDtoToDomain } from "./user-last-read-message-id.mapper";
 import type { ChatRoomDto } from "../../api/client/dto.schema";
-import type { ChatRoom } from "../../types/domain/chat-room.types";
+import type { ChatRoom } from "../../types/chat-room.types";
 
 export function mapChatRoomDtoToDomain(dto: ChatRoomDto): ChatRoom {
   return {

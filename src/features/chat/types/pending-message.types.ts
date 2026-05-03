@@ -1,9 +1,4 @@
-import type { Message } from "./domain/chat-message.types";
-
-/**
- * 전송 대기 중이거나 실패한 메시지의 상태
- */
-export type PendingMessageState = "pending" | "failed";
+import type { Message } from "./chat-message.types";
 
 /**
  * 전송 대기 중인 메시지 타입
@@ -12,15 +7,8 @@ export type PendingMessageState = "pending" | "failed";
  */
 export type PendingMessage = Message & {
   clientId?: string;
-  state: PendingMessageState;
+  state: "pending" | "failed";
 };
-
-/**
- * 유저별 마지막 읽은 메시지 ID 맵
- * key: username
- * value: lastReadMessageId (null이면 읽은 메시지 없음)
- */
-export type UserLastReadMessageIdMap = Record<string, number | null>;
 
 /**
  * 유저별 프로필 이미지 맵
@@ -35,12 +23,3 @@ export type UserImageMap = Record<string, string | null>;
  * value: 표시 이름
  */
 export type UserNameMap = Record<string, string | null>;
-
-/**
- * 채팅방 유저 관련 맵들을 묶은 타입
- */
-export interface ChatRoomUserMaps {
-  userLastReadMessageIdMap: UserLastReadMessageIdMap;
-  userImageMap: UserImageMap;
-  userNameMap: UserNameMap;
-}

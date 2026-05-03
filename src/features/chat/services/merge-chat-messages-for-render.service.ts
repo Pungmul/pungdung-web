@@ -1,6 +1,7 @@
 import type { InfiniteData } from "@tanstack/react-query";
 
 import { removePendingMessagesShadowedByConfirmed } from "./reconcile-pending-messages.service";
+import { sortMessagesOldestFirst } from "../lib/compare-message-order";
 import type {
   ChatLogCursorPage,
   ChatRoom,
@@ -16,6 +17,10 @@ interface MergeChatMessagesForRenderParams {
   pendingMessages?: PendingMessage[];
 }
 
+/**
+ * confirmed 메시지는 canonical oldest-first로 정렬하고,
+ * pending 메시지는 reconcile 이후 기존처럼 배열 끝에 append합니다.
+ */
 export function mergeChatMessagesForRender({
   cachedMessages = [],
   chatRoomData,
@@ -47,8 +52,8 @@ export function mergeChatMessagesForRender({
     messageMap.set(String(msg.id), msg);
   }
 
-  const sortedConfirmed = Array.from(messageMap.values()).sort((a, b) =>
-    a.createdAt.localeCompare(b.createdAt)
+  const sortedConfirmed = sortMessagesOldestFirst(
+    Array.from(messageMap.values())
   );
 
   const visiblePendingMessages = removePendingMessagesShadowedByConfirmed(

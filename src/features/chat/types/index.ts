@@ -3,13 +3,14 @@ export type {
   ChatLogCursorPage,
   Message,
   MessageList,
-} from "./domain/chat-message.types";
+} from "./chat-message.types";
 export type {
   ChatRoom,
   ChatRoomInfo,
   ChatRoomListItem,
   UserLastReadMessageId,
-} from "./domain/chat-room.types";
+} from "./chat-room.types";
 export * from "./guards/message.guards";
 export type { ChatRoomOutgoingMessageHandlers } from "./outgoing-message-handler.types";
 export * from "./pending-message.types";
+export * from "./read-receipt-display.types";

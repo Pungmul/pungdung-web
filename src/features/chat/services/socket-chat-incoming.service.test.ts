@@ -1,13 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { Message } from "../types/domain/chat-message.types";
+import type { Message } from "../types/chat-message.types";
 import type { PendingMessage } from "../types/pending-message.types";
 
-import {
-  normalizeSocketImageMessage,
-  normalizeSocketTextMessage,
-  removePendingMatchedBySocketTextEcho,
-} from "./socket-chat-incoming.service";
+import { normalizeSocketImageMessage } from "./normalize-socket-image-message.service";
+import { normalizeSocketTextMessage } from "./normalize-socket-text-message.service";
+import { removePendingMatchedBySocketTextEcho } from "./remove-pending-matched-by-socket-text-echo.service";
 
 const textMessage = (over: Partial<Message> & Pick<Message, "id">): Message =>
   ({

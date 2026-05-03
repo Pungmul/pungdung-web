@@ -1,11 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import type { ChatRoomInfo, ChatRoomListItem } from "../types";
+import type { ChatRoomListItem } from "../types";
 
-import {
-  applyChatRoomDisplayOverrideToInfo,
-  applyChatRoomDisplayOverridesToList,
-} from "./apply-chat-room-display-overrides.service";
+import { applyChatRoomDisplayOverridesToList } from "./apply-chat-room-display-overrides.service";
 
 const room = (overrides: Partial<ChatRoomListItem> = {}): ChatRoomListItem => ({
   chatRoomUUID: "room-1",
@@ -47,22 +44,5 @@ describe("applyChatRoomDisplayOverrides", () => {
 
     expect(result[0]?.roomName).toBe("서버 방");
     expect(result[0]?.profileImageUrl).toBe("/server.png");
-  });
-
-  it("방 상세 정보도 로컬 override를 query 데이터보다 우선한다", () => {
-    const info: ChatRoomInfo = {
-      chatRoomUUID: "room-1",
-      roomName: "서버 방",
-      profileImageUrl: "/server.png",
-      group: false,
-    };
-
-    const result = applyChatRoomDisplayOverrideToInfo(info, {
-      roomName: "로컬 방",
-      profileImageUrl: null,
-    });
-
-    expect(result.roomName).toBe("로컬 방");
-    expect(result.profileImageUrl).toBeNull();
   });
 });

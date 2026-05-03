@@ -1,4 +1,4 @@
-import type { Message } from "../domain/chat-message.types";
+import type { Message } from "../chat-message.types";
 
 /**
  * 알 수 없는 값이 Message 타입인지 확인하는 타입 가드
@@ -36,22 +36,4 @@ export const isImageMessage = (
   value: unknown
 ): value is Extract<Message, { chatType: "IMAGE" }> => {
   return isMessage(value) && value.chatType === "IMAGE";
-};
-
-/**
- * 알 수 없는 값이 LEAVE 타입 Message인지 확인하는 타입 가드
- */
-export const isLeaveMessage = (
-  value: unknown
-): value is Extract<Message, { chatType: "LEAVE" }> => {
-  return isMessage(value) && value.chatType === "LEAVE";
-};
-
-/**
- * 알 수 없는 값이 JOIN 타입 Message인지 확인하는 타입 가드
- */
-export const isJoinMessage = (
-  value: unknown
-): value is Extract<Message, { chatType: "JOIN" }> => {
-  return isMessage(value) && value.chatType === "JOIN";
 };

@@ -1,5 +1,5 @@
-import type { Message } from "./domain/chat-message.types";
-import type { ChatRoomListItem } from "./domain/chat-room.types";
+import type { Message } from "./chat-message.types";
+import type { ChatRoomListItem } from "./chat-room.types";
 
 export const CHAT_ROOM_LIST_CACHE_KEY = "chat-room-list";
 export const CHAT_ROOM_MESSAGES_CACHE_KEY_PREFIX = "chat-room-messages:";
@@ -34,6 +34,7 @@ export interface ChatRoomMessagesCacheRecord {
   messages: Message[];
   updatedAt: number;
   validatedAt?: number;
+  /** chatRoom.userInitReadList의 읽음 위치(lastReadMessageId). infinite nextCursor와 무관 */
   oldestCursor: number | null;
   newestMessageId: string | null;
 }

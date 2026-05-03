@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { ChatRoomListItem } from "../types/domain/chat-room.types";
+import type { ChatRoomListItem } from "../types";
 
 import { sortChatRoomByDate } from "./sort-chat-room-by-date";
 

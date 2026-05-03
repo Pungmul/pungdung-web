@@ -1,5 +1,5 @@
 import type { ChatRoomInfoDto } from "../../api/client/dto.schema";
-import type { ChatRoomInfo } from "../../types/domain/chat-room.types";
+import type { ChatRoomInfo } from "../../types/chat-room.types";
 
 export function mapChatRoomInfoDtoToDomain(dto: ChatRoomInfoDto): ChatRoomInfo {
   return {

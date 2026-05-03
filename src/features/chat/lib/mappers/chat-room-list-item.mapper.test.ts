@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ChatRoomListItem } from "../../types";
 
-import { mapChatRoomListItemIndexedDBToDomain } from "./chat-room-list-item.mapper";
+import { mapChatRoomListItemIndexedDBToDomain } from "./map-chat-room-list-item-indexed-db-to-domain.mapper";
 
 const roomBase: Omit<ChatRoomListItem, "isMuted"> = {
   chatRoomUUID: "room-1",

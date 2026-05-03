@@ -2,12 +2,12 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { PendingMessage } from "../types/pending-message.types";
 
+import { createPendingTextMessage } from "./create-pending-text-message.service";
 import {
-  createPendingTextMessage,
   markMessageAsFailed,
   removePendingMessage,
   updateMessageToFailed,
-} from "./create-pending-message.service";
+} from "./patch-pending-message-state.service";
 
 vi.mock("uuid", () => ({
   v4: () => "fixed-uuid",
@@ -45,8 +45,28 @@ describe("create-pending-message.service", () => {
 
   it("updateMessageToFailed는 id가 일치하는 항목만 failed로", () => {
     const list: PendingMessage[] = [
-      { id: "a", clientId: "a", senderUsername: "u", content: "1", chatType: "TEXT", imageUrlList: null, chatRoomUUID: "r", createdAt: "t", state: "pending" },
-      { id: "b", clientId: "b", senderUsername: "u", content: "2", chatType: "TEXT", imageUrlList: null, chatRoomUUID: "r", createdAt: "t", state: "pending" },
+      {
+        id: "a",
+        clientId: "a",
+        senderUsername: "u",
+        content: "1",
+        chatType: "TEXT",
+        imageUrlList: null,
+        chatRoomUUID: "r",
+        createdAt: "t",
+        state: "pending",
+      },
+      {
+        id: "b",
+        clientId: "b",
+        senderUsername: "u",
+        content: "2",
+        chatType: "TEXT",
+        imageUrlList: null,
+        chatRoomUUID: "r",
+        createdAt: "t",
+        state: "pending",
+      },
     ];
     const next = updateMessageToFailed(list, "a");
     expect(next.find((x) => x.id === "a")?.state).toBe("failed");
@@ -55,7 +75,17 @@ describe("create-pending-message.service", () => {
 
   it("removePendingMessage는 해당 id를 제거한다", () => {
     const list: PendingMessage[] = [
-      { id: 1, clientId: "1", senderUsername: "u", content: "1", chatType: "TEXT", imageUrlList: null, chatRoomUUID: "r", createdAt: "t", state: "pending" },
+      {
+        id: 1,
+        clientId: "1",
+        senderUsername: "u",
+        content: "1",
+        chatType: "TEXT",
+        imageUrlList: null,
+        chatRoomUUID: "r",
+        createdAt: "t",
+        state: "pending",
+      },
     ];
     expect(removePendingMessage(list, 1)).toEqual([]);
   });

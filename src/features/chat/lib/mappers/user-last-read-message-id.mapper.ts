@@ -1,5 +1,5 @@
 import type { UserLastReadMessageIdDto } from "../../api/client/dto.schema";
-import type { UserLastReadMessageId } from "../../types/domain/chat-room.types";
+import type { UserLastReadMessageId } from "../../types/chat-room.types";
 
 export function mapUserLastReadMessageIdDtoToDomain(
   dto: UserLastReadMessageIdDto

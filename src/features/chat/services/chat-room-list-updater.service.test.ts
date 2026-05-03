@@ -1,14 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { ChatRoomListItem } from "../types/domain/chat-room.types";
+import type { ChatRoomListItem } from "../types/chat-room.types";
 
-import {
-  incrementUnreadCount,
-  mergeRoomListSocketNotification,
-  removeChatRoom,
-  resetUnreadCount,
-  updateLastMessage,
-} from "./chat-room-list-updater.service";
+import { mergeRoomListSocketNotification } from "./merge-room-list-socket-notification.service";
+import { removeChatRoomFromList } from "./remove-chat-room-from-list.service";
+import { resetUnreadCountInRoomList } from "./reset-unread-count-in-room-list.service";
+import { updateLastMessageInRoomList } from "./update-last-message-in-room-list.service";
 
 const baseRoom = (id: string, unread: number | null = 1): ChatRoomListItem => ({
   chatRoomUUID: id,
@@ -31,7 +28,7 @@ describe("chat-room-list-updater.service", () => {
   describe("resetUnreadCount", () => {
     it("해당 방만 unreadCount를 0으로 만든다", () => {
       const rooms = [baseRoom("a", 3), baseRoom("b", 5)];
-      const next = resetUnreadCount(rooms, "a");
+      const next = resetUnreadCountInRoomList(rooms, "a");
       expect(next.find((r) => r.chatRoomUUID === "a")?.unreadCount).toBe(0);
       expect(next.find((r) => r.chatRoomUUID === "b")?.unreadCount).toBe(5);
     });
@@ -40,24 +37,23 @@ describe("chat-room-list-updater.service", () => {
   describe("removeChatRoom", () => {
     it("해당 UUID 방을 제거한다", () => {
       const rooms = [baseRoom("a"), baseRoom("b")];
-      expect(removeChatRoom(rooms, "a").map((r) => r.chatRoomUUID)).toEqual(["b"]);
+      expect(
+        removeChatRoomFromList(rooms, "a").map((r) => r.chatRoomUUID)
+      ).toEqual(["b"]);
     });
   });
 
   describe("updateLastMessage", () => {
     it("해당 방의 마지막 메시지 필드를 갱신한다", () => {
       const rooms = [baseRoom("x")];
-      const next = updateLastMessage(rooms, "x", "new body", "2026-02-01T00:00:00Z");
+      const next = updateLastMessageInRoomList(
+        rooms,
+        "x",
+        "new body",
+        "2026-02-01T00:00:00Z"
+      );
       expect(next[0]?.lastMessageContent).toBe("new body");
       expect(next[0]?.lastMessageTime).toBe("2026-02-01T00:00:00Z");
-    });
-  });
-
-  describe("incrementUnreadCount", () => {
-    it("unreadCount가 null이면 0에서 증가분을 더한다", () => {
-      const rooms = [baseRoom("x", null)];
-      const next = incrementUnreadCount(rooms, "x", 2);
-      expect(next[0]?.unreadCount).toBe(2);
     });
   });
 
@@ -88,8 +84,12 @@ describe("chat-room-list-updater.service", () => {
       );
       expect(res.kind).toBe("data");
       if (res.kind === "data") {
-        expect(res.rooms.find((r) => r.chatRoomUUID === "a")?.unreadCount).toBe(0);
-        expect(res.rooms.find((r) => r.chatRoomUUID === "b")?.unreadCount).toBe(2);
+        expect(res.rooms.find((r) => r.chatRoomUUID === "a")?.unreadCount).toBe(
+          0
+        );
+        expect(res.rooms.find((r) => r.chatRoomUUID === "b")?.unreadCount).toBe(
+          2
+        );
       }
     });
 
@@ -106,10 +106,12 @@ describe("chat-room-list-updater.service", () => {
       );
       expect(res.kind).toBe("data");
       if (res.kind === "data") {
-        expect(res.rooms.find((r) => r.chatRoomUUID === "a")?.unreadCount).toBe(0);
-        expect(res.rooms.find((r) => r.chatRoomUUID === "a")?.lastMessageContent).toBe(
-          "hi"
+        expect(res.rooms.find((r) => r.chatRoomUUID === "a")?.unreadCount).toBe(
+          0
         );
+        expect(
+          res.rooms.find((r) => r.chatRoomUUID === "a")?.lastMessageContent
+        ).toBe("hi");
       }
     });
 
@@ -130,7 +132,9 @@ describe("chat-room-list-updater.service", () => {
       expect(res.kind).toBe("data");
       if (res.kind === "data") {
         expect(res.rooms[0]?.chatRoomUUID).toBe("old");
-        expect(res.rooms.find((r) => r.chatRoomUUID === "old")?.unreadCount).toBe(2);
+        expect(
+          res.rooms.find((r) => r.chatRoomUUID === "old")?.unreadCount
+        ).toBe(2);
       }
     });
   });

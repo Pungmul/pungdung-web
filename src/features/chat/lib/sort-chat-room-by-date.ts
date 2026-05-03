@@ -1,4 +1,4 @@
-import type { ChatRoomListItem } from "../types/domain/chat-room.types";
+import type { ChatRoomListItem } from "../types";
 
 export function sortChatRoomByDate(chatRooms: ChatRoomListItem[]) {
   return [...chatRooms].sort(

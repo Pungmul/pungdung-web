@@ -146,4 +146,18 @@ describe("mergeChatMessagesForRender", () => {
 
     expect(result.map((m) => String(m.id))).toEqual(["11", "pending-keep"]);
   });
+
+  it("숫자 ID가 다르면 createdAt 역전 상황에서도 ID 순서를 우선한다", () => {
+    const socketMessages: Message[] = [
+      textMessage(100, "2026-05-17T10:00:10.000Z"),
+      textMessage(101, "2026-05-17T10:00:01.000Z"),
+    ];
+
+    const result = mergeChatMessagesForRender({
+      socketMessages,
+      pendingMessages: [],
+    });
+
+    expect(result.map((message) => String(message.id))).toEqual(["100", "101"]);
+  });
 });
