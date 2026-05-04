@@ -11,10 +11,8 @@ import {
   stompTimelineSocketPayloadSchema,
 } from "./socket-message.schema";
 import { mapStompTimelineSocketPayloadToMessage } from "../lib/mappers";
-import {
-  normalizeSocketImageMessage,
-  normalizeSocketTextMessage,
-} from "../services/socket-chat-incoming.service";
+import { normalizeSocketImageMessage } from "../services/normalize-socket-image-message.service";
+import { normalizeSocketTextMessage } from "../services/normalize-socket-text-message.service";
 
 /**
  * STOMP 구독 + 방 단위 소켓 버퍼 state를 **훅 내부**에서 관리합니다.

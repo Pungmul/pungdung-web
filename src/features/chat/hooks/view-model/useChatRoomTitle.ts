@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import type {
-  ChatRoom,
-  ChatRoomListItem,
-} from "../../types/domain/chat-room.types";
+import type { ChatRoom } from "../../types/chat-room.types";
 
 interface UseChatRoomTitleParams {
   chatRoomData: ChatRoom | undefined;
@@ -57,33 +54,4 @@ export const useChatRoomTitle = ({
     title,
     setTitle,
   };
-};
-
-/**
- * 채팅방 데이터에서 제목을 생성합니다.
- * 그룹 채팅인 경우 방 이름 뒤에 멤버 수를 표시합니다.
- *
- * @param chatRoomData - 채팅방 데이터
- * @returns 채팅방 제목 문자열
- *
- * @example
- * const title = getChatRoomTitle(chatRoomData);
- * // "개발팀 (5)" or "홍길동"
- */
-export const getChatRoomTitle = (chatRoomData: ChatRoom): string => {
-  return chatRoomData.chatRoomInfo.group
-    ? `${chatRoomData.chatRoomInfo.roomName} (${chatRoomData.userInfoList.length})`
-    : chatRoomData.chatRoomInfo.roomName;
-};
-
-/**
- * 채팅 목록 캐시 아이템에서 헤더 제목 문자열을 만듭니다.
- * {@link getChatRoomTitle}와 동일한 규칙(그룹일 때 이름 뒤 인원)을 따릅니다.
- */
-export const getChatRoomTitleFromListItem = (
-  item: ChatRoomListItem
-): string => {
-  return item.group
-    ? `${item.roomName} (${item.chatRoomMemberIds.length})`
-    : item.roomName;
 };

@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { chatQueries } from "../../queries";
-import { resetUnreadCount } from "../../services";
+import { resetUnreadCountInRoomList } from "../../services";
 import type { ChatRoomListItem } from "../../types";
 
 /**
@@ -26,7 +26,7 @@ export const useResetRoomUnreadCount = () => {
         chatQueries.roomList().queryKey,
         (oldData: ChatRoomListItem[] | undefined) => {
           if (!oldData) return oldData;
-          return resetUnreadCount(oldData, roomId);
+          return resetUnreadCountInRoomList(oldData, roomId);
         },
       );
     },

@@ -2,8 +2,8 @@ import type { PropsWithChildren } from "react";
 import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import type { Message } from "../../types/domain/chat-message.types";
-import type { ChatRoom } from "../../types/domain/chat-room.types";
+import type { Message } from "../../types/chat-message.types";
+import type { ChatRoom } from "../../types/chat-room.types";
 import type { PendingMessage } from "../../types/pending-message.types";
 
 import { useMessageList } from "./useMessageList";

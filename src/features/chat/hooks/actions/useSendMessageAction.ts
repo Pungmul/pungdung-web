@@ -2,21 +2,27 @@
 
 import { useCallback } from "react";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { Toast } from "@/shared";
 
-import { chatMutationOptions, chatQueries } from "../../queries";
+import { chatMutationOptions } from "../../queries";
 import { fileListFromBlobObjectUrls } from "../../services/file-list-from-object-urls.service";
+import type { ReadSignFn } from "../../socket/read-sign.types";
 import type {
   ChatRoomOutgoingMessageHandlers,
   PendingMessage,
 } from "../../types";
 
+const SOCKET_NOT_READY_TOAST_MESSAGE =
+  "채팅 연결 중입니다. 잠시 후 다시 시도해 주세요.";
+
 export type UseSendMessageActionParams = {
   roomId: string;
-  readSign: () => void;
+  readSign: ReadSignFn;
   outgoingMessageHandlers: ChatRoomOutgoingMessageHandlers;
+  /** STOMP 연결 + 방 메시지 구독이 준비된 뒤에만 HTTP 전송 */
+  canSend: boolean;
   onMessageSent?: () => void;
 };
 
@@ -24,13 +30,13 @@ export function useSendMessageAction({
   roomId,
   readSign,
   outgoingMessageHandlers,
+  canSend,
   onMessageSent,
 }: UseSendMessageActionParams) {
-  const queryClient = useQueryClient();
-  const sendTextMessageMutation = useMutation(
+  const { mutateAsync: sendTextMessage } = useMutation(
     chatMutationOptions.sendTextMessage()
   );
-  const sendImageMessageMutation = useMutation(
+  const { mutateAsync: sendImageMessage } = useMutation(
     chatMutationOptions.sendImageMessage()
   );
 
@@ -43,29 +49,27 @@ export function useSendMessageAction({
     beginRetryImageSend,
   } = outgoingMessageHandlers;
 
-  const invalidateRoom = useCallback(() => {
-    void queryClient.invalidateQueries({
-      queryKey: chatQueries.room(roomId).queryKey,
+  const ensureCanSend = useCallback(() => {
+    if (canSend) {
+      return true;
+    }
+
+    Toast.show({
+      message: SOCKET_NOT_READY_TOAST_MESSAGE,
+      type: "info",
     });
-  }, [queryClient, roomId]);
+    return false;
+  }, [canSend]);
 
   const submitTextWithPendingId = useCallback(
-    (pendingId: string, content: string) => {
+    async (pendingId: string, content: string) => {
       try {
-        sendTextMessageMutation.mutate(
-          { roomId, message: { content, clientId: pendingId } },
-          {
-            onSuccess: () => {
-              // pending 제거는 소켓 echo에서만 한다(로컬 state와 한 커밋).
-              // 여기서 remove 하면 API·invalidate·소켓 타이밍 차로 말풍선이 비는 프레임이 난다.
-              invalidateRoom();
-              readSign();
-            },
-            onError: () => {
-              commitTextSendFailure(pendingId);
-            },
-          }
-        );
+        await sendTextMessage({
+          roomId,
+          message: { content, clientId: pendingId },
+        });
+        // pending 제거는 소켓 echo에서만 한다(로컬 state와 한 커밋).
+        readSign();
       } catch {
         Toast.show({
           message: "채팅 전송에 실패했습니다.",
@@ -74,36 +78,38 @@ export function useSendMessageAction({
         commitTextSendFailure(pendingId);
       }
     },
-    [
-      roomId,
-      sendTextMessageMutation,
-      commitTextSendFailure,
-      invalidateRoom,
-      readSign,
-    ]
+    [roomId, sendTextMessage, commitTextSendFailure, readSign]
   );
 
   const onSendMessage = useCallback(
     async (message: string) => {
+      if (!ensureCanSend()) {
+        return;
+      }
+
       const pendingId = beginTextSend(message);
       onMessageSent?.();
-      submitTextWithPendingId(pendingId, message);
+      await submitTextWithPendingId(pendingId, message);
     },
-    [beginTextSend, onMessageSent, submitTextWithPendingId]
+    [beginTextSend, ensureCanSend, onMessageSent, submitTextWithPendingId]
   );
 
   const onRetryTextFailed = useCallback(
-    (failed: PendingMessage) => {
+    async (failed: PendingMessage) => {
+      if (!ensureCanSend()) {
+        return;
+      }
+
       const pendingId = beginRetryTextSend(failed);
       if (!pendingId) return;
       onMessageSent?.();
-      submitTextWithPendingId(pendingId, failed.content ?? "");
+      await submitTextWithPendingId(pendingId, failed.content ?? "");
     },
-    [beginRetryTextSend, onMessageSent, submitTextWithPendingId]
+    [beginRetryTextSend, ensureCanSend, onMessageSent, submitTextWithPendingId]
   );
 
   const submitImageWithPendingId = useCallback(
-    (pendingId: string, files: FileList) => {
+    async (pendingId: string, files: FileList) => {
       try {
         const formData = new FormData();
         if (!files || files.length === 0) throw new Error("파일이 없습니다.");
@@ -112,20 +118,9 @@ export function useSendMessageAction({
         });
         formData.append("clientId", pendingId);
 
-        sendImageMessageMutation.mutate(
-          { roomId, formData },
-          {
-            onSuccess: () => {
-              // pending 제거는 확정 메시지가 query/socket에 반영된 뒤 view-model에서 처리한다.
-              // API success 직후 제거하면 confirmed 반영 전 빈 프레임이 생긴다.
-              invalidateRoom();
-              readSign();
-            },
-            onError: () => {
-              commitImageSendFailure(pendingId);
-            },
-          }
-        );
+        await sendImageMessage({ roomId, formData });
+        // pending 제거는 확정 메시지가 query/socket에 반영된 뒤 view-model에서 처리한다.
+        readSign();
       } catch (error) {
         const errorMessage =
           error instanceof Error
@@ -139,26 +134,28 @@ export function useSendMessageAction({
         commitImageSendFailure(pendingId);
       }
     },
-    [
-      roomId,
-      sendImageMessageMutation,
-      commitImageSendFailure,
-      invalidateRoom,
-      readSign,
-    ]
+    [roomId, sendImageMessage, commitImageSendFailure, readSign]
   );
 
   const onSendImage = useCallback(
     async (files: FileList) => {
+      if (!ensureCanSend()) {
+        return;
+      }
+
       const pendingId = beginImageSend(files);
       onMessageSent?.();
-      submitImageWithPendingId(pendingId, files);
+      await submitImageWithPendingId(pendingId, files);
     },
-    [beginImageSend, onMessageSent, submitImageWithPendingId]
+    [beginImageSend, ensureCanSend, onMessageSent, submitImageWithPendingId]
   );
 
   const onRetryImageFailed = useCallback(
     async (failed: PendingMessage) => {
+      if (!ensureCanSend()) {
+        return;
+      }
+
       const urls = failed.imageUrlList ?? [];
       const files = await fileListFromBlobObjectUrls(urls);
       if (!files || files.length === 0) {
@@ -171,9 +168,14 @@ export function useSendMessageAction({
       const pendingId = beginRetryImageSend(failed, files);
       if (!pendingId) return;
       onMessageSent?.();
-      submitImageWithPendingId(pendingId, files);
+      await submitImageWithPendingId(pendingId, files);
     },
-    [beginRetryImageSend, onMessageSent, submitImageWithPendingId]
+    [
+      beginRetryImageSend,
+      ensureCanSend,
+      onMessageSent,
+      submitImageWithPendingId,
+    ]
   );
 
   return {

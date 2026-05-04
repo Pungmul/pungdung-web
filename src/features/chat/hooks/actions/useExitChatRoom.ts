@@ -8,8 +8,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert } from "@/shared";
 
 import { chatMutationOptions, chatQueries } from "../../queries";
-import { removeChatRoom } from "../../services";
-import type { ChatRoomListItem } from "../../types/domain/chat-room.types";
+import { removeChatRoomFromList } from "../../services";
+import type { ChatRoomListItem } from "../../types/chat-room.types";
 
 interface UseExitChatRoomOptions {
   roomId: string;
@@ -53,7 +53,7 @@ export const useExitChatRoom = ({
           queryClient.setQueryData(
             chatQueries.roomList().queryKey,
             (old: ChatRoomListItem[] | undefined) =>
-              old ? removeChatRoom(old, roomId) : []
+              old ? removeChatRoomFromList(old, roomId) : []
           );
         } catch {
           Alert.alert({

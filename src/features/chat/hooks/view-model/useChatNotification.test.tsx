@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as chatApi from "../../api";
 import { chatQueries } from "../../queries";
-import type { ChatRoomListItem } from "../../types/domain/chat-room.types";
+import type { ChatRoomListItem } from "../../types/chat-room.types";
 
 import { useChatNotification } from "./useChatNotification";
 

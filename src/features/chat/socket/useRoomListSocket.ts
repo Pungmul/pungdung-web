@@ -13,7 +13,7 @@ import { mergeRoomListSocketNotification } from "../services";
 import { useChatRoomStore } from "../store";
 
 import { chatRoomUpdateMessageSchema } from "./socket-message.schema";
-import type { ChatRoomListItem } from "../types/domain/chat-room.types";
+import type { ChatRoomListItem } from "../types/chat-room.types";
 
 
 export function useRoomListSocket() {

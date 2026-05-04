@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { useSyncChatRoomFocusOnRoomId } from "./useSyncChatRoomFocusOnRoomId";
 import { chatQueries } from "../../queries";
-import { useChatRoomStore } from "../../store";
+import { useChatRoomStore } from "../../store/chat-room.store";
 import type { ChatRoomListItem } from "../../types";
 
 const createRoom = (

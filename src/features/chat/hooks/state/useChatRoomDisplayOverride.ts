@@ -5,8 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   getChatRoomLocalOverridesCache,
   subscribeChatRoomLocalOverridesCacheUpdated,
-  updateChatRoomLocalOverride,
 } from "../../lib";
+import { updateChatRoomLocalOverrideCache } from "../../services/update-chat-room-local-override-cache.service";
 import type { ChatRoomLocalOverride } from "../../types";
 
 export function useChatRoomDisplayOverride(roomId: string) {
@@ -43,7 +43,7 @@ export function useChatRoomDisplayOverride(roomId: string) {
   const updateRoomName = useCallback(
     async (roomName: string | undefined) => {
       try {
-        await updateChatRoomLocalOverride(roomId, { roomName });
+        await updateChatRoomLocalOverrideCache(roomId, { roomName });
       } catch {
         // IndexedDB 저장 실패는 서버 query fallback 표시를 깨뜨리지 않는다.
       }
@@ -54,7 +54,7 @@ export function useChatRoomDisplayOverride(roomId: string) {
   const updateProfileImageUrl = useCallback(
     async (profileImageUrl: string | null | undefined) => {
       try {
-        await updateChatRoomLocalOverride(roomId, { profileImageUrl });
+        await updateChatRoomLocalOverrideCache(roomId, { profileImageUrl });
       } catch {
         // IndexedDB 저장 실패는 서버 query fallback 표시를 깨뜨리지 않는다.
       }

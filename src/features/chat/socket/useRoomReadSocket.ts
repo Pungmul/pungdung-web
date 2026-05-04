@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
@@ -11,133 +11,226 @@ import {
   useSocketSubscription,
 } from "@pungdung/worker-socket-bridge/react";
 
-import { chatQueries } from "../queries";
-import {
-  mergeChatRoomWithReadSocketMessage,
-  resetUnreadCount,
-} from "../services";
+import { myPageQueries } from "@/features/my-page";
 
+import { chatQueries } from "../queries";
+import { useReadReceiptStore } from "../store";
+
+import type { ReadSignFn, ReadSignOptions } from "./read-sign.types";
 import { readSocketMessageSchema } from "./socket-message.schema";
-import type { ChatRoom, ChatRoomListItem } from "../types/domain/chat-room.types";
+import { toNumericMessageId } from "../lib/parse-message-id";
+import { buildReadSignPublishPayload } from "../services/build-read-sign-publish-payload.service";
+import { mergeReadTargetMessageId } from "../services/merge-read-target-message-id.service";
+import {
+  MAX_ATTEMPTS,
+  READ_SIGN_CATCH_UP_DELAY_MS,
+} from "../services/read-sign-catch-up.constants";
+import { resetUnreadCountInRoomList } from "../services/reset-unread-count-in-room-list.service";
+import { resolveConfirmedLastReadMessageId } from "../services/resolve-confirmed-last-read-message-id.service";
+import { shouldClearReadSignTarget } from "../services/should-clear-read-sign-target.service";
+import { shouldScheduleReadSignCatchUp } from "../services/should-schedule-read-sign-catch-up.service";
+import type { ChatRoomListItem } from "../types/chat-room.types";
 
 import { authQueries } from "@/features/auth/queries";
 
+type RoomReadSignRuntime = {
+  pending: boolean;
+  pageVisible: boolean;
+  targetMessageId: number | null;
+  catchUpTimer: ReturnType<typeof setTimeout> | null;
+  catchUpAttempts: number;
+  myUserId: number | null;
+  readSign: ReadSignFn;
+};
+
+function createRoomReadSignRuntime(): RoomReadSignRuntime {
+  return {
+    pending: false,
+    pageVisible: typeof document !== "undefined" ? !document.hidden : true,
+    targetMessageId: null,
+    catchUpTimer: null,
+    catchUpAttempts: 0,
+    myUserId: null,
+    readSign: () => {},
+  };
+}
+
+function clearCatchUpTimer(runtime: RoomReadSignRuntime): void {
+  if (runtime.catchUpTimer === null) {
+    return;
+  }
+
+  clearTimeout(runtime.catchUpTimer);
+  runtime.catchUpTimer = null;
+}
+
 /**
- * 채팅방의 읽음 처리를 관리하는 소켓 훅.
- *
- * @description
- * 1. 사용자가 메시지를 읽었음을 서버에 알림 (`readSign` → `/pub/chat/read/:roomId`)
- * 2. 다른 사용자의 읽음 상태를 소켓으로 수신해 `ChatRoom` 쿼리 `userInitReadList` 반영
- * 3. React Query 캐시 갱신으로 UI에 반영
- *
- * @example
- * const { readSign, isConnected } = useRoomReadSocket(roomId);
- * // 새 메시지를 화면에 반영한 뒤
- * readSign();
+ * 채팅방 읽음 publish + `/sub/chat/read` 브로드캐스트 반영.
  */
 export function useRoomReadSocket(roomId: string) {
   const socket = useSocketManagerOptional();
   const queryClient = useQueryClient();
   const isConnected = useSocketConnection();
   const { data: token } = useQuery(authQueries.token());
+  const { data: myInfo } = useQuery(myPageQueries.info());
+  const { data: chatRoomData } = useQuery(chatQueries.room(roomId));
+  const runtimeRef = useRef<RoomReadSignRuntime>(createRoomReadSignRuntime());
+  const applySocketRead = useReadReceiptStore((state) => state.applySocketRead);
 
-  /** 연결·가시성이 맞지 않아 보내지 못한 읽음 신호를 나중에 다시 시도하기 위한 플래그 */
-  const pendingReadSignRef = useRef(false);
-  const isPageVisibleRef = useRef(
-    typeof document !== "undefined" ? !document.hidden : true
-  );
+  const myUserId = useMemo(() => {
+    const username = myInfo?.username;
+    if (!username || !chatRoomData) {
+      return null;
+    }
 
-  const canSendNow = useCallback(
-    () => isConnected && isPageVisibleRef.current,
-    [isConnected]
-  );
+    return (
+      chatRoomData.userInfoList.find((user) => user.username === username)
+        ?.userId ?? null
+    );
+  }, [chatRoomData, myInfo?.username]);
 
-  const sendReadSign = useCallback(async () => {
-    const message = {
-      chatRoomUUID: roomId,
-    };
+  runtimeRef.current.myUserId = myUserId;
+
+  const canSendNow = useCallback(() => {
+    return isConnected && runtimeRef.current.pageVisible;
+  }, [isConnected]);
+
+  const publishReadSign = useCallback(async () => {
+    const runtime = runtimeRef.current;
 
     if (!socket) {
-      pendingReadSignRef.current = true;
+      runtime.pending = true;
       return false;
     }
 
+    const topic = `/pub/chat/read/${roomId}`;
+    const payload = buildReadSignPublishPayload(
+      roomId,
+      runtime.targetMessageId
+    );
+
     try {
-      await socket.publish(`/pub/chat/read/${roomId}`, message);
-      pendingReadSignRef.current = false;
+      await socket.publish(topic, payload);
+      runtime.pending = false;
       return true;
-    } catch (error) {
-      // 소켓 publish 타이밍 이슈로 실패할 수 있어 다음 기회에 재전송한다.
-      pendingReadSignRef.current = true;
-      console.warn(
-        "Failed to send read sign, will retry on next trigger",
-        error
-      );
+    } catch {
+      runtime.pending = true;
       return false;
     }
   }, [roomId, socket]);
 
-  /** 타인 읽음 브로드캐스트: `mergeChatRoomWithReadSocketMessage`로 캐시만 갱신 */
+  const scheduleReadSignCatchUp = useCallback(() => {
+    const runtime = runtimeRef.current;
+    const targetMessageId = runtime.targetMessageId;
+
+    if (targetMessageId === null) {
+      return;
+    }
+
+    if (runtime.catchUpAttempts >= MAX_ATTEMPTS) {
+      return;
+    }
+
+    clearCatchUpTimer(runtime);
+    runtime.catchUpTimer = setTimeout(() => {
+      runtime.catchUpTimer = null;
+      runtime.catchUpAttempts += 1;
+      runtime.readSign({ upToMessageId: targetMessageId });
+    }, READ_SIGN_CATCH_UP_DELAY_MS);
+  }, []);
+
   const handleReadMessage = useCallback(
     (message: unknown) => {
+      const runtime = runtimeRef.current;
       const parsed = readSocketMessageSchema.safeParse(message);
-      if (!parsed.success) return;
-
-      queryClient.setQueryData<ChatRoom>(
-        chatQueries.room(roomId).queryKey,
-        (prev) =>
-          mergeChatRoomWithReadSocketMessage(prev, parsed.data) ?? prev
-      );
-    },
-    [queryClient, roomId]
-  );
-
-  /**
-   * 현재 사용자 읽음을 서버에 전송하고, 방 목록 `unreadCount`는 낙관적으로 0으로 둔다.
-   * 실제 읽음 동기화는 서버 브로드캐스트로 이어진다.
-   */
-  const readSign = useCallback(() => {
-    if (!token?.accessToken) {
-      console.warn("Cannot send read sign: No token (logged out)");
-      return;
-    }
-
-    if (!canSendNow()) {
-      if (!isConnected) {
-        console.warn("Cannot send read sign: WebSocket not connected");
-      } else {
-        console.log("Page not visible, pending read sign");
-      }
-      pendingReadSignRef.current = true;
-      return;
-    }
-
-    void sendReadSign().then((didSend) => {
-      if (!didSend) {
+      if (!parsed.success) {
         return;
       }
 
-      // ChatRoomList의 unreadCount 즉시 업데이트 (낙관적 업데이트)
-      queryClient.setQueryData<ChatRoomListItem[]>(
-        chatQueries.roomList().queryKey,
-        (prevData) => {
-          if (!prevData) return prevData;
-          return resetUnreadCount(prevData, roomId);
+      const { userId, messageIds } = parsed.data.content;
+      const confirmedLastReadMessageId =
+        resolveConfirmedLastReadMessageId(messageIds);
+      const isMyReadBroadcast =
+        runtime.myUserId !== null && userId === runtime.myUserId;
+
+      if (!isMyReadBroadcast) {
+        applySocketRead(roomId, userId, messageIds);
+        return;
+      }
+
+      if (
+        shouldClearReadSignTarget(
+          runtime.targetMessageId,
+          confirmedLastReadMessageId
+        )
+      ) {
+        runtime.targetMessageId = null;
+        runtime.catchUpAttempts = 0;
+        clearCatchUpTimer(runtime);
+        return;
+      }
+
+      if (
+        shouldScheduleReadSignCatchUp({
+          broadcastUserId: userId,
+          myUserId: runtime.myUserId,
+          targetMessageId: runtime.targetMessageId,
+          messageIds,
+          confirmedLastReadMessageId,
+        })
+      ) {
+        scheduleReadSignCatchUp();
+      }
+    },
+    [applySocketRead, roomId, scheduleReadSignCatchUp]
+  );
+
+  const readSign = useCallback<ReadSignFn>(
+    (options?: ReadSignOptions) => {
+      const runtime = runtimeRef.current;
+      const upToMessageId = toNumericMessageId(options?.upToMessageId);
+
+      if (upToMessageId !== null) {
+        runtime.targetMessageId = mergeReadTargetMessageId(
+          runtime.targetMessageId,
+          upToMessageId
+        );
+      }
+
+      if (!token?.accessToken) {
+        return;
+      }
+
+      if (!canSendNow()) {
+        runtime.pending = true;
+        return;
+      }
+
+      void publishReadSign().then((didSend) => {
+        if (!didSend) {
+          return;
         }
-      );
-    });
-  }, [token, canSendNow, isConnected, queryClient, roomId, sendReadSign]);
 
-  /**
-   * 페이지 가시성: 다시 보이면 보류 중인 읽음 신호를 실행하고, 숨기면 전송 중단 상태로 둔다.
-   */
+        queryClient.setQueryData<ChatRoomListItem[]>(
+          chatQueries.roomList().queryKey,
+          (prevData) => {
+            if (!prevData) return prevData;
+            return resetUnreadCountInRoomList(prevData, roomId);
+          }
+        );
+      });
+    },
+    [token, canSendNow, publishReadSign, queryClient, roomId]
+  );
+
+  runtimeRef.current.readSign = readSign;
+
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      const visible = !document.hidden;
-      isPageVisibleRef.current = visible;
+    const runtime = runtimeRef.current;
 
-      // 다시 보이게 되었고 보류 중이며 로그인 상태면 읽음 재시도
-      if (visible && pendingReadSignRef.current && token?.accessToken) {
+    const handleVisibilityChange = () => {
+      runtime.pageVisible = !document.hidden;
+      if (runtime.pageVisible && runtime.pending && token?.accessToken) {
         readSign();
       }
     };
@@ -146,37 +239,23 @@ export function useRoomReadSocket(roomId: string) {
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      clearCatchUpTimer(runtime);
     };
   }, [readSign, token?.accessToken]);
 
-  /**
-   * 연결 및 가시성이 복구되면 보류된 읽음 신호 재전송.
-   * `visibilitychange`가 빠졌거나 연결 타이밍이 어긋난 경우를 보완한다.
-   */
   useEffect(() => {
+    const runtime = runtimeRef.current;
     if (
       !token?.accessToken ||
       !isConnected ||
-      !isPageVisibleRef.current ||
-      !pendingReadSignRef.current
+      !runtime.pageVisible ||
+      !runtime.pending
     ) {
       return;
     }
     readSign();
   }, [token?.accessToken, isConnected, readSign]);
 
-  /**
-   * 연결되면(및 토큰 있으면) 읽음 신호 전송.
-   * 채팅방 진입·재연결 시 목록/타이틀 반영을 맞추기 위함.
-   */
-  useEffect(() => {
-    if (!token?.accessToken || !isConnected) {
-      return;
-    }
-    readSign();
-  }, [token?.accessToken, isConnected, readSign]);
-
-  /** 다른 사용자 읽음 상태 구독 */
   useSocketSubscription({
     topic: `/sub/chat/read/${roomId}`,
     onMessage: handleReadMessage,
