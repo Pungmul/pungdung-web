@@ -6,6 +6,7 @@ import { throttle } from "lodash";
 import getScrollableParent from "@/shared/lib/getScrollableParent";
 
 import { SCROLL_RELEASE_DELAY_MS, SCROLL_THROTTLE_MS } from "../../constants";
+import { CHAT_ROOM_Z_INDEX } from "../../constants/ui.constants";
 
 const DateItem = ({ date, onClick }: { date: string; onClick?: () => void }) => {
   const [isScrolling, setIsScrolling] = useState(false);
@@ -37,7 +38,13 @@ const DateItem = ({ date, onClick }: { date: string; onClick?: () => void }) => 
   }, []);
 
   return (
-    <li className={`h-[24px] ${isScrolling ? "sticky top-0 " : ""}`} ref={itemRef}>
+    <li
+      className={`h-[24px] ${isScrolling ? "sticky top-0 bg-transparent" : ""}`}
+      ref={itemRef}
+      style={
+        isScrolling ? { zIndex: CHAT_ROOM_Z_INDEX.stickyDate } : undefined
+      }
+    >
       <div className="h-full flex flex-row justify-center items-end">
         <button
           type="button"

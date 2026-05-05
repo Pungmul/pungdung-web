@@ -13,6 +13,7 @@ interface ImageMessageProps {
   userImageUrl: string | null;
   senderUsername: string;
   isProfileRevealed: boolean;
+  onProfileClick?: () => void;
 }
 
 const ImageMessageComponent: React.FC<ImageMessageProps> = ({
@@ -22,7 +23,18 @@ const ImageMessageComponent: React.FC<ImageMessageProps> = ({
   userImageUrl,
   senderUsername,
   isProfileRevealed,
+  onProfileClick,
 }: ImageMessageProps) => {
+  const profileAvatar = (
+    <div className="size-[32px] bg-grey-100 rounded-full overflow-hidden relative">
+      {userImageUrl ? (
+        <Image src={userImageUrl} alt="user" fill loading="lazy" />
+      ) : (
+        <div className="size-[32px] bg-grey-200 rounded-full overflow-hidden" />
+      )}
+    </div>
+  );
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [loadStateByUrl, setLoadStateByUrl] = useState<
@@ -61,13 +73,18 @@ const ImageMessageComponent: React.FC<ImageMessageProps> = ({
       >
         {!isUser &&
           (isProfileRevealed ? (
-            <div className="size-[32px] bg-grey-100 rounded-full overflow-hidden relative">
-              {userImageUrl ? (
-                <Image src={userImageUrl} alt="user" fill loading="lazy" />
-              ) : (
-                <div className="size-[32px] bg-grey-200 rounded-full overflow-hidden" />
-              )}
-            </div>
+            onProfileClick ? (
+              <button
+                type="button"
+                className="size-[32px] shrink-0 cursor-pointer rounded-full border-0 bg-transparent p-0"
+                aria-label={`${senderUsername} 프로필 보기`}
+                onClick={onProfileClick}
+              >
+                {profileAvatar}
+              </button>
+            ) : (
+              profileAvatar
+            )
           ) : (
             <div className="size-[32px]" />
           ))}

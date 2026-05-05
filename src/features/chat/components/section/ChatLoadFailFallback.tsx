@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 
-import { Button } from "@/shared";
+import Button from "@/shared/components/buttons/Button";
 
 export function ChatLoadFailFallback() {
   const router = useRouter();

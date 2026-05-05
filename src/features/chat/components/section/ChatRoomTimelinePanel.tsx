@@ -1,93 +1,192 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import {
-  useSocketManager,
-  useSocketTopicsReady,
-} from "@pungdung/worker-socket-bridge/react";
+import type { User } from "@/features/user";
 
-import { cn } from "@/shared";
-import { FloatingButton, Spinner } from "@/shared/components";
-import ObserveTrigger from "@/shared/components/ObserveTrigger";
+import { Spinner } from "@/shared/components";
 
 import { ChatSendForm } from "./ChatSendForm";
 import { MessageList as ChatMessageList } from "./MessageList";
+import { OlderMessagesLoader } from "./OlderMessagesLoader";
+import { ScrollToLatestButton } from "./ScrollToLatestButton";
+import { CHAT_ROOM_Z_INDEX } from "../../constants/ui.constants";
 import { useSendMessageAction } from "../../hooks/actions";
 import {
   useChatRoomFetchOlderPageTrigger,
-  useMaintainScrollOnRoomMessageListChange,
-  useScrollPosition,
+  useChatRoomMessageSources,
+  useChatRoomTimelineScroll,
+  useEntryReadSignRuntime,
+  useEntryReadSnapshot,
+  useGatedReadSign,
+  useHydrateReadReceiptStore,
+  usePostEntryReadSign,
 } from "../../hooks/state";
 import {
-  useChatRoomMessageList,
-  useChatRoomUserMaps,
+  useChatRoomSocketMessages,
+  useEntryNewMessagesDivider,
+  useMessageList,
+  useOutgoingMessageHandlers,
+  usePendingMessages,
+  usePendingSocketEchoRemoval,
+  useResetPendingMessagesOnRoomChange,
 } from "../../hooks/view-model";
+import { useChatRoomMessageSubscription } from "../../socket";
+import type { ReadSignFn } from "../../socket/read-sign.types";
+import type { UserImageMap, UserNameMap } from "../../types";
 
 type ChatRoomTimelinePanelProps = {
   roomId: string;
   myInfo?: { username: string };
-  readSign: () => void;
+  readSign: ReadSignFn;
   isConnected: boolean;
+  userList: User[];
+  userImageMap: UserImageMap;
+  userNameMap: UserNameMap;
 };
-
-const SHOW_SCROLL_TO_LATEST_BUTTON_THRESHOLD = 160;
-const STUCK_SUBSCRIPTION_RESYNC_MS = 3_000;
 
 export function ChatRoomTimelinePanel({
   roomId,
   myInfo,
   readSign,
   isConnected,
+  userList,
+  userImageMap,
+  userNameMap,
 }: ChatRoomTimelinePanelProps) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [showScrollToLatestButton, setShowScrollToLatestButton] =
-    useState(false);
+  // --- entry read-sign runtime ---
+  const { coordRef: entryReadSignCoordRef, gate: entryReadSignGate } =
+    useEntryReadSignRuntime(roomId);
 
-  const {
-    messageContainerRef,
-    saveScrollPosition,
-    maintainScrollPosition,
-    scrollToTop,
-  } = useScrollPosition({ scrollContainerRef });
+  // --- socket subscription: room message topic readiness ---
+  const { canSend } = useChatRoomMessageSubscription({ roomId, isConnected });
 
+  // --- message sources: cache, room query, infinite pagination ---
   const {
-    messageList,
+    cachedMessages,
+    entryUnreadCountHint,
     chatRoomData,
+    infiniteData,
+    isRoomInfoReadyForEntrySnapshot,
     isInfiniteLoading,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    outgoingMessageHandlers,
-    onDeleteMessage,
-  } = useChatRoomMessageList({
+  } = useChatRoomMessageSources({
     roomId,
-    ...(myInfo !== undefined ? { myInfo } : {}),
-    readSign,
+    username: myInfo?.username ?? "",
   });
 
-  const socket = useSocketManager();
-  const chatMessageTopic = useMemo(
-    () => `/sub/chat/message/${roomId}`,
-    [roomId]
+  // --- participants: current user in room ---
+  const currentUser = useMemo(() => {
+    const username = myInfo?.username ?? "";
+    return {
+      username,
+      userId: username
+        ? (userList.find((user) => user.username === username)?.userId ?? null)
+        : null,
+    };
+  }, [myInfo?.username, userList]);
+  useHydrateReadReceiptStore({
+    roomId,
+    chatRoomData,
+    currentUserId: currentUser.userId,
+  });
+
+  // --- pending queue: local send state & socket-echo cleanup ---
+  const pending = usePendingMessages();
+  useResetPendingMessagesOnRoomChange(pending.setPendingMessages, roomId);
+  const removePendingOnSocketEcho = usePendingSocketEchoRemoval({
+    setPendingMessages: pending.setPendingMessages,
+    senderUsername: currentUser.username,
+  });
+
+  // --- send wiring: pending primitives → outgoing command handlers ---
+  const outgoingMessageHandlers = useOutgoingMessageHandlers({
+    roomId,
+    senderUsername: currentUser.username,
+    enqueueText: pending.enqueueText,
+    enqueueImage: pending.enqueueImage,
+    requeueTextFailedAtEnd: pending.requeueTextFailedAtEnd,
+    requeueImageFailedAtEnd: pending.requeueImageFailedAtEnd,
+    removeById: pending.removeById,
+    failById: pending.failById,
+  });
+
+  // --- realtime socket buffer & render merge ---
+  const socketMessages = useChatRoomSocketMessages({
+    roomId,
+    readSign,
+    entryReadSignGate,
+    onSocketEchoMessage: removePendingOnSocketEcho,
+  });
+  const messageList = useMessageList({
+    cachedMessages,
+    socketMessages: socketMessages.socketMessages,
+    pendingMessages: pending.pendingMessages,
+    ...(chatRoomData !== undefined ? { chatRoomData } : {}),
+    ...(infiniteData !== undefined ? { infiniteData } : {}),
+  });
+
+  // --- entry unread: snapshot, post-entry readSign, gated send readSign ---
+  const {
+    entryLastReadMessageId,
+    hadUnreadOnEntry,
+    isEntrySnapshotCaptured,
+  } = useEntryReadSnapshot(
+    roomId,
+    chatRoomData,
+    currentUser.username || undefined,
+    messageList,
+    isRoomInfoReadyForEntrySnapshot,
+    entryReadSignCoordRef,
+    entryUnreadCountHint
   );
-  const { isReady: isMessageTopicReady } = useSocketTopicsReady([
-    chatMessageTopic,
-  ]);
+  usePostEntryReadSign({
+    isEntrySnapshotCaptured,
+    messageList,
+    readSign,
+    coordRef: entryReadSignCoordRef,
+  });
+  const gatedReadSign = useGatedReadSign({
+    roomId,
+    readSign,
+    coordRef: entryReadSignCoordRef,
+    gate: entryReadSignGate,
+  });
+  const newMessagesDividerIndex = useEntryNewMessagesDivider({
+    messages: messageList,
+    entryLastReadMessageId,
+    hadUnreadOnEntry,
+  });
 
-  useEffect(() => {
-    if (!isConnected || isMessageTopicReady) {
-      return;
-    }
+  const blockMainArea =
+    messageList.length === 0 && (isInfiniteLoading || !isConnected);
 
-    const timer = window.setTimeout(() => {
-      void socket.resyncTopics([chatMessageTopic]);
-    }, STUCK_SUBSCRIPTION_RESYNC_MS);
+  const canAttemptEntryUnreadScroll =
+    messageList.length > 0 &&
+    !blockMainArea &&
+    !isInfiniteLoading &&
+    isEntrySnapshotCaptured;
 
-    return () => window.clearTimeout(timer);
-  }, [chatMessageTopic, isConnected, isMessageTopicReady, socket]);
+  const {
+    scrollContainerRef,
+    sendFormContainerRef,
+    messageContainerRef,
+    saveScrollPosition,
+    scrollToLatest,
+    showScrollToLatestButton,
+    sendFormBottomOffsetPx,
+  } = useChatRoomTimelineScroll({
+    roomId,
+    messageList,
+    hadUnreadOnEntry,
+    hasNewMessagesDivider: newMessagesDividerIndex !== null,
+    isEntrySnapshotCaptured,
+    canAttemptEntryUnreadScroll,
+  });
 
+  // --- user actions: send, retry, load older messages ---
   const {
     onSendMessage,
     onSendImage,
@@ -95,13 +194,11 @@ export function ChatRoomTimelinePanel({
     onRetryImageFailed,
   } = useSendMessageAction({
     roomId,
-    readSign,
+    readSign: gatedReadSign,
     outgoingMessageHandlers,
-    onMessageSent: scrollToTop,
+    canSend,
+    onMessageSent: () => scrollToLatest("afterLayout"),
   });
-
-  const { userLastReadMessageIdMap, userImageMap, userNameMap } =
-    useChatRoomUserMaps({ chatRoomData });
 
   const { onTrigger } = useChatRoomFetchOlderPageTrigger({
     fetchNextPage,
@@ -109,40 +206,9 @@ export function ChatRoomTimelinePanel({
     saveScrollPosition,
   });
 
-  useMaintainScrollOnRoomMessageListChange(messageList, maintainScrollPosition);
-
-  useEffect(() => {
-    const scrollElement = scrollContainerRef.current;
-    if (!scrollElement) return;
-
-    const syncScrollButtonVisibility = () => {
-      setShowScrollToLatestButton(
-        Math.abs(scrollElement.scrollTop) >
-        SHOW_SCROLL_TO_LATEST_BUTTON_THRESHOLD
-      );
-    };
-
-    syncScrollButtonVisibility();
-    scrollElement.addEventListener("scroll", syncScrollButtonVisibility, {
-      passive: true,
-    });
-
-    return () => {
-      scrollElement.removeEventListener(
-        "scroll",
-        syncScrollButtonVisibility
-      );
-    };
-  }, []);
-
-  const handleScrollToLatestMessage = useCallback(() => {
-    scrollContainerRef.current?.scrollTo({ top: 0, behavior: "auto" });
-  }, []);
-
-  const blockMainArea = isInfiniteLoading || !isConnected;
-
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+      {/* timeline scroll area */}
       <div
         ref={scrollContainerRef}
         className="
@@ -160,51 +226,46 @@ export function ChatRoomTimelinePanel({
             ref={messageContainerRef}
             className="w-full flex flex-col shrink-0 grow-1 bg-background px-[16px] py-[24px]"
           >
-            {Boolean(hasNextPage) && (
-              <>
-                <ObserveTrigger
-                  trigger={onTrigger}
-                  unmountCondition={!hasNextPage}
-                  triggerCondition={{ rootMargin: "100px" }}
-                />
-                {isFetchingNextPage && (
-                  <div className="flex flex-col items-center justify-center py-4">
-                    <Spinner size={36} />
-                  </div>
-                )}
-              </>
-            )}
+            <OlderMessagesLoader
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+              onTrigger={onTrigger}
+            />
             <ChatMessageList
+              roomId={roomId}
               messages={messageList}
-              currentUserId={myInfo?.username ?? ""}
-              userLastReadMessageIdMap={userLastReadMessageIdMap}
+              currentUsername={currentUser.username}
+              currentUserId={currentUser.userId}
+              userList={userList}
+              isGroup={chatRoomData?.chatRoomInfo.group ?? true}
+              newMessagesDividerIndex={newMessagesDividerIndex}
               userImageMap={userImageMap}
               userNameMap={userNameMap}
               onRetryFailedText={onRetryTextFailed}
               onRetryFailedImage={onRetryImageFailed}
-              onDeletePending={onDeleteMessage}
+              onDeletePending={pending.dismiss}
             />
           </div>
         )}
       </div>
+
+      {/* scroll-to-latest & send form */}
+      <ScrollToLatestButton
+        isVisible={showScrollToLatestButton}
+        bottomPx={sendFormBottomOffsetPx}
+        onClick={() => scrollToLatest("immediate")}
+      />
       <div
-        className={cn(
-          "pointer-events-none absolute bottom-[4.75rem] right-4 z-30",
-          "transition-transform duration-300 will-change-transform",
-          "max-md:bottom-[calc(env(safe-area-inset-bottom)+4.25rem)]",
-          showScrollToLatestButton ? "translate-y-0" : "translate-y-[140%]"
-        )}
+        ref={sendFormContainerRef}
+        className="relative shrink-0"
+        style={{ zIndex: CHAT_ROOM_Z_INDEX.sendForm }}
       >
-        <FloatingButton
-          ariaLabel="최신 메시지로 이동"
-          onClick={handleScrollToLatestMessage}
-          innerElement={<ChevronDownIcon strokeWidth={2} className="size-full text-grey-500" />}
+        <ChatSendForm
+          canSend={canSend}
+          onSendMessage={onSendMessage}
+          onSendImage={onSendImage}
         />
       </div>
-      <ChatSendForm
-        onSendMessage={onSendMessage}
-        onSendImage={onSendImage}
-      />
     </div>
   );
 }

@@ -516,6 +516,20 @@ input {
   }
 }
 
+@keyframes read-receipt-scale-in {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.animate-read-receipt-scale-in {
+  animation: read-receipt-scale-in 500ms ease-out forwards;
+}
+
 .ligtning-card-sign {
   overflow: hidden;
   background: radial-gradient(

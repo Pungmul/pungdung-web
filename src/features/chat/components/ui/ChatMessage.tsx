@@ -8,6 +8,7 @@ interface ChatMessageProps {
   senderUsername: string;
   isUser: boolean;
   isProfileRevealed?: boolean;
+  onProfileClick?: () => void;
 }
 
 const ChatMessageComponent: React.FC<ChatMessageProps> = ({
@@ -17,7 +18,18 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({
   senderUsername,
   isProfileRevealed = false,
   isUser,
+  onProfileClick,
 }) => {
+  const profileAvatar = (
+    <div className="size-[32px] bg-grey-100 rounded-full overflow-hidden relative">
+      {userImageUrl ? (
+        <Image src={userImageUrl} alt="user" fill loading="lazy" />
+      ) : (
+        <div className="size-[32px] bg-grey-200 rounded-full overflow-hidden" />
+      )}
+    </div>
+  );
+
   return (
     <div className="px-[12px] flex flex-col gap-[4px] flex-grow">
       {!isUser && isProfileRevealed && (
@@ -33,13 +45,18 @@ const ChatMessageComponent: React.FC<ChatMessageProps> = ({
       >
         {!isUser &&
           (isProfileRevealed ? (
-            <div className="size-[32px] bg-grey-100 rounded-full overflow-hidden relative">
-              {userImageUrl ? (
-                <Image src={userImageUrl} alt="user" fill loading="lazy" />
-              ) : (
-                <div className="size-[32px] bg-grey-200 rounded-full overflow-hidden" />
-              )}
-            </div>
+            onProfileClick ? (
+              <button
+                type="button"
+                className="size-[32px] shrink-0 cursor-pointer rounded-full border-0 bg-transparent p-0"
+                aria-label={`${senderUsername} 프로필 보기`}
+                onClick={onProfileClick}
+              >
+                {profileAvatar}
+              </button>
+            ) : (
+              profileAvatar
+            )
           ) : (
             <div className="size-[32px]" />
           ))}

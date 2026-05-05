@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -6,18 +8,26 @@ import { BellSlashIcon } from "@heroicons/react/24/solid";
 
 import { formatRelativeDate } from "@/shared/lib/parseDateString";
 
-import type { ChatRoomListItem } from "../../types/domain/chat-room.types";
+import { usePrefetchChatRoomOnNavigate } from "../../hooks/actions/usePrefetchChatRoomOnNavigate";
+import {
+  IMAGE_LAST_MESSAGE_PREVIEW,
+  isImageLastMessagePreview,
+} from "../../lib/image-last-message-preview";
+import type { ChatRoomListItem } from "../../types/chat-room.types";
 
 const ChatRoomBox = ({ room }: { room: ChatRoomListItem }) => {
+  const prefetchChatRoom = usePrefetchChatRoomOnNavigate();
+
   return (
     <Link
       className="flex w-full min-w-0 flex-row items-center cursor-pointer bg-background hover:bg-grey-100 px-[28px] py-[12px] gap-[12px]"
       href={`/chats/r/${room.chatRoomUUID}`}
+      onPointerDown={() => prefetchChatRoom(room.chatRoomUUID)}
+      onFocus={() => prefetchChatRoom(room.chatRoomUUID)}
     >
       <div
         className="relative flex-shrink-0 w-[64px] aspect-square lg:w-[48px] lg:h-[48px] lg:min-w-[48px] rounded-[4px] bg-grey-200 overflow-hidden"
       >
-        {/* 여기 이미지 삽입 */}
         {room.profileImageUrl && (
           <Image
             src={room.profileImageUrl}
@@ -51,12 +61,12 @@ const ChatRoomBox = ({ room }: { room: ChatRoomListItem }) => {
         </div>
         <div className="flex-grow flex flex-row items-start justify-center">
           <div className="flex-grow text-ellipsis overflow-hidden text-grey-600 text-[13px] leading-[125%] whitespace-pre-line line-clamp-2">
-            {room.lastMessageContent?.includes("이미지") ? (
+            {isImageLastMessagePreview(room.lastMessageContent) ? (
               <span className="flex flex-row items-center gap-[4px]">
                 <span className="size-6 p-1 flex items-center justify-center">
                   <PhotoIcon className="size-full text-grey-600" />
                 </span>
-                {"이미지를 보냈습니다."}
+                {IMAGE_LAST_MESSAGE_PREVIEW}
               </span>
             ) : (
               room.lastMessageContent ?? "새로운 채팅방에 초대 되었습니다."
@@ -72,4 +82,5 @@ const ChatRoomBox = ({ room }: { room: ChatRoomListItem }) => {
     </Link>
   );
 };
+
 export { ChatRoomBox };

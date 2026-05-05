@@ -8,6 +8,7 @@ import { useIOSKeyboardOpacityFix } from "@/shared/hooks";
 import { useView } from "@/shared/lib";
 
 interface ChatSendFormProps {
+  canSend?: boolean;
   onSendMessage: (message: string) => Promise<void>;
   onSendImage: (files: FileList) => Promise<void>;
 }
@@ -17,6 +18,7 @@ const MAX_TEXTAREA_ROWS = 4;
 const TEXTAREA_LINE_HEIGHT_FALLBACK = 20;
 
 export const ChatSendForm: React.FC<ChatSendFormProps> = ({
+  canSend = true,
   onSendMessage,
   onSendImage,
 }) => {
@@ -62,7 +64,7 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
     const textarea = messageRef.current;
     const message = textarea?.value ?? "";
 
-    if (!message.trim()) return;
+    if (!message.trim() || !canSend) return;
 
     if (textarea) {
       textarea.value = "";
@@ -75,6 +77,11 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
   };
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!canSend) {
+      e.target.value = "";
+      return;
+    }
+
     const files = e.target.files;
 
     if (files) {
@@ -87,19 +94,24 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (view !== "desktop") return;
 
-      if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+      if (
+        canSend &&
+        e.key === "Enter" &&
+        !e.shiftKey &&
+        !e.nativeEvent.isComposing
+      ) {
         e.preventDefault();
         formRef.current?.requestSubmit();
       }
     },
-    [view]
+    [canSend, view]
   );
 
   return (
     <form
       ref={formRef}
       className="
-        z-50 shrink-0 bg-background
+        shrink-0 bg-background
         max-md:pb-[max(0.75rem,env(safe-area-inset-bottom))]
         max-md:focus-within:pb-0
       "
@@ -109,7 +121,10 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
         <div className="flex flex-row items-end rounded-full bg-grey-100 px-0.5 py-0.5">
           <label
             htmlFor="image-upload"
-            className="flex h-9 flex-col justify-center rounded-full bg-primary px-4 text-background"
+            aria-disabled={!canSend}
+            className={`flex h-9 flex-col justify-center rounded-full bg-primary px-4 text-background ${
+              canSend ? "" : "pointer-events-none opacity-50"
+            }`}
           >
             <input
               type="file"
@@ -117,6 +132,7 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
               className="hidden"
               id="image-upload"
               multiple
+              disabled={!canSend}
               onChange={onImageChange}
             />
             <span className="flex size-4 items-center justify-center">
@@ -128,11 +144,12 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
             <textarea
               ref={messageRef}
               name="comment"
+              disabled={!canSend}
               onTouchStart={applyIosKeyboardOpacityFixFocus}
               onBlur={handleTextareaBlur}
               onChange={adjustHeight}
               onKeyDown={handleKeyDown}
-              placeholder="메시지 입력"
+              placeholder={canSend ? "메시지 입력" : "채팅 연결 중..."}
               className="
  block box-border min-h-[20px] w-full resize-none overflow-y-hidden
                 border-none bg-transparent p-0 text-[12px] leading-[20px]
@@ -145,8 +162,9 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
 
           <button
             type="submit"
+            disabled={!canSend}
             onPointerDown={(e) => e.preventDefault()}
-            className="size-9 p-2.5 rounded-full bg-primary flex items-center justify-center"
+            className="size-9 p-2.5 rounded-full bg-primary flex items-center justify-center disabled:opacity-50"
           >
             <ArrowUpIcon className="size-full text-white" />
           </button>

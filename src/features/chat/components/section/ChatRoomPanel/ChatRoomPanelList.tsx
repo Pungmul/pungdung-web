@@ -3,7 +3,7 @@ import { Suspense } from "@suspensive/react";
 import { Responsive } from "@/shared/components";
 import { ChatIconOutline } from "@/shared/components/Icons";
 
-import type { ChatRoomListItem } from "../../../types/domain/chat-room.types";
+import type { ChatRoomListItem } from "../../../types";
 import AddChatRoomButton from "../../ui/AddChatRoomButton";
 import { ChatRoomBox } from "../ChatRoomBox";
 
