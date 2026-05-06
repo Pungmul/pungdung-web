@@ -10,12 +10,11 @@ import { ErrorBoundary, Suspense } from "@suspensive/react";
 import {
   chatQueries,
   ChatRoomHeader,
+  type ChatRoomListItem,
   useChatRoomDisplayOverride,
 } from "@/features/chat";
 
 import { Button, Spinner } from "@/shared";
-
-import type { ChatRoomListItem } from "@/features/chat/types";
 
 function ChatRoomSuspenseFallback() {
   const params = useParams();

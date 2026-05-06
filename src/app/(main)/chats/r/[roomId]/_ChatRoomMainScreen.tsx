@@ -18,6 +18,8 @@ type ChatRoomMainScreenProps = {
   readSign: () => void;
   isConnected: boolean;
   userList: User[];
+  userImageMap: Record<string, string | null>;
+  userNameMap: Record<string, string | null>;
   isGroupRoom: boolean;
   onBack: () => void;
   onExitChat: () => void;
@@ -32,6 +34,8 @@ export function ChatRoomMainScreen({
   readSign,
   isConnected,
   userList,
+  userImageMap,
+  userNameMap,
   isGroupRoom,
   onBack,
   onExitChat,
@@ -55,6 +59,9 @@ export function ChatRoomMainScreen({
           {...(myUsername ? { myInfo: { username: myUsername } } : {})}
           readSign={readSign}
           isConnected={isConnected}
+          userList={userList}
+          userImageMap={userImageMap}
+          userNameMap={userNameMap}
         />
       </div>
 

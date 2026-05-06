@@ -52,6 +52,7 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
   useChatRoomForegroundReconciliation({
     roomId: roomId as string,
     readSign,
+    isConnected,
   });
   useSyncChatRoomFocusOnRoomId(roomId as string);
   useBodyScrollLock(true);
@@ -71,7 +72,9 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
     chatRoomData,
     ...(override?.roomName ? { roomNameOverride: override.roomName } : {}),
   });
-  const { userList } = useChatRoomUserMaps({ chatRoomData });
+  const { userList, userImageMap, userNameMap } = useChatRoomUserMaps({
+    chatRoomData,
+  });
 
   const memberCount = useMemo(() => chatRoomData?.userInfoList.length
     ? chatRoomData?.userInfoList.length - 1
@@ -95,6 +98,8 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
               readSign={readSign}
               isConnected={isConnected}
               userList={userList}
+              userImageMap={userImageMap}
+              userNameMap={userNameMap}
               isGroupRoom={chatRoomData?.chatRoomInfo.group ?? false}
               onBack={() => router.push("/chats/r/inbox")}
               onExitChat={exitChatRoom}

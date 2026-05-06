@@ -8,12 +8,11 @@ import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { ErrorBoundary, Suspense } from "@suspensive/react";
 
 import {
+  ChatRoomPanelSkeleton,
   SelectFriendModalProvider,
 } from "@/features/chat";
 
 import { Responsive } from "@/shared/components/Responsive";
-
-import { ChatRoomPanelSkeleton } from "@/features/chat/components/section/ChatRoomPanel";
 
 
 export const SelectFriendModal = dynamic(
