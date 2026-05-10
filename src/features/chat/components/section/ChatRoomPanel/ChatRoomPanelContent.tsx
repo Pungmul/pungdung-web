@@ -12,7 +12,7 @@ import {
   CHAT_ROOM_PANEL_CLASS_NAME,
   ChatRoomPanelSkeleton,
 } from "./ChatRoomPanelSkeleton";
-import { useChatRoomListIndexedDB } from "../../../hooks/state/useChatRoomListIndexedDB";
+import { useChatRoomListIndexedDB } from "../../../hooks/state";
 import { useSelectFriendModal } from "../../../store/select-friend-modal.context";
 
 export default function ChatRoomPanelContent() {

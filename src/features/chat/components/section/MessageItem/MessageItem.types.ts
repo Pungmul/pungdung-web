@@ -1,4 +1,4 @@
-import type { MessageItemLayoutContext } from "../../../lib/message-item-layout.types";
+import type { MessageItemLayoutContext } from "../../../lib/message/message-item-layout.types";
 import type { Message, PendingMessage } from "../../../types";
 import type { ReadReceiptAvatar } from "../../../types/read-receipt.types";
 

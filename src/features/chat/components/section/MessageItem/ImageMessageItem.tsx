@@ -5,7 +5,7 @@ import React from "react";
 import type { MessageItemLayoutContext } from "./MessageItem.types";
 import { MessageItemFrame } from "./MessageItemFrame";
 import { MessageItemPendingSide } from "./MessageItemPendingSide";
-import { isPendingMessage } from "../../../lib/message-item.guards";
+import { isPendingMessage } from "../../../lib/message/message-item.guards";
 import type { Message, PendingMessage } from "../../../types";
 import { ImageMessage } from "../../ui/ImageMessage";
 

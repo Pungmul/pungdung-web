@@ -4,6 +4,8 @@ import { useCallback, useState } from "react";
 
 import { useSocketSubscription } from "@pungdung/worker-socket-bridge/react";
 
+import { normalizeSocketImageMessage } from "../services";
+import { normalizeSocketTextMessage } from "../services";
 import { isImageMessage, isTextMessage, type Message } from "../types";
 
 import {
@@ -11,8 +13,6 @@ import {
   stompTimelineSocketPayloadSchema,
 } from "./socket-message.schema";
 import { mapStompTimelineSocketPayloadToMessage } from "../lib/mappers";
-import { normalizeSocketImageMessage } from "../services/normalize-socket-image-message.service";
-import { normalizeSocketTextMessage } from "../services/normalize-socket-text-message.service";
 
 /**
  * STOMP 구독 + 방 단위 소켓 버퍼 state를 **훅 내부**에서 관리합니다.

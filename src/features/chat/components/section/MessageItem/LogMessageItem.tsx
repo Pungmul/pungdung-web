@@ -1,7 +1,7 @@
 "use client";
 
 import { MessageItemFrame } from "./MessageItemFrame";
-import { formatJoinLogMessage } from "../../../lib/format-join-log-message";
+import { formatJoinLogMessage } from "../../../lib/message/format-join-log-message";
 import type { Message } from "../../../types";
 import { ChatLogMessage } from "../../ui/ChatLogMessage";
 

@@ -3,8 +3,9 @@ import { create } from "zustand";
 import {
   mergeOtherParticipantReadFromSocket,
   type OtherParticipantReadSnapshot,
-} from "../services/merge-other-participant-read-from-socket.service";
-import { mergeOtherParticipantsReadSeed } from "../services/merge-other-participants-read-seed.service";
+} from "../services";
+import { mergeOtherParticipantsReadSeed } from "../services";
+
 import type { UserLastReadMessageId } from "../types";
 
 export const EMPTY_OTHER_PARTICIPANT_READ_SNAPSHOT: OtherParticipantReadSnapshot =

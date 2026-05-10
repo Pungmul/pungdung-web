@@ -5,7 +5,7 @@ import React, { useCallback, useMemo } from "react";
 import type { User } from "@/features/user";
 
 import { MessageItem } from "./MessageItem";
-import { getMessageDateKey, isSameMessageDate } from "../../lib/message-date";
+import { getMessageDateKey, isSameMessageDate } from "../../lib/message/message-date";
 import type { ReadReceiptDisplayContext } from "../../services";
 import {
   getReadReceiptAvatarsForMessage,

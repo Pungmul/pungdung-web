@@ -8,11 +8,11 @@ import { BellSlashIcon } from "@heroicons/react/24/solid";
 
 import { formatRelativeDate } from "@/shared/lib/parseDateString";
 
-import { usePrefetchChatRoomOnNavigate } from "../../hooks/actions/usePrefetchChatRoomOnNavigate";
+import { usePrefetchChatRoomOnNavigate } from "../../hooks/actions";
 import {
   IMAGE_LAST_MESSAGE_PREVIEW,
   isImageLastMessagePreview,
-} from "../../lib/image-last-message-preview";
+} from "../../lib/message/image-last-message-preview";
 import type { ChatRoomListItem } from "../../types/chat-room.types";
 
 const ChatRoomBox = ({ room }: { room: ChatRoomListItem }) => {

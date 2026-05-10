@@ -4,10 +4,10 @@ import { cookies } from "next/headers";
 
 import { resolveClientApiBody } from "@/core/api/client";
 
+import { sortChatRoomByDate } from "../../lib/chat-room/sort-chat-room-by-date";
 import {
   mapChatRoomListItemDtoToDomain,
 } from "../../lib/mappers";
-import { sortChatRoomByDate } from "../../lib/sort-chat-room-by-date";
 import type { ChatRoomListItem } from "../../types/chat-room.types";
 import { chatRoomListResponseEnvelopeSchema } from "../client/dto.schema";
 

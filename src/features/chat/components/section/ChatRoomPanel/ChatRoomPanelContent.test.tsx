@@ -9,7 +9,7 @@ const chatRoomListIndexedDBMock = vi.hoisted(() => ({
   useChatRoomListIndexedDB: vi.fn(),
 }));
 
-vi.mock("../../../hooks/state/useChatRoomListIndexedDB", () => ({
+vi.mock("../../../hooks/state", () => ({
   useChatRoomListIndexedDB: chatRoomListIndexedDBMock.useChatRoomListIndexedDB,
 }));
 
