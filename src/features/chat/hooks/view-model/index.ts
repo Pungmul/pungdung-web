@@ -3,7 +3,6 @@ export { useChatRoomTitle } from "./chat-room/useChatRoomTitle";
 export { useChatRoomUserMaps } from "./chat-room/useChatRoomUserMaps";
 export { useChatNotification } from "./chat-room-list/useChatNotification";
 export { useEntryNewMessagesDivider } from "./message/useEntryNewMessagesDivider";
-export { useMessageItemViewModel } from "./message/useMessageItemViewModel";
 export { useMessageList } from "./message/useMessageList";
 export { useOutgoingMessageHandlers } from "./message/useOutgoingMessageHandlers";
 export { usePendingMessages } from "./message/usePendingMessages";

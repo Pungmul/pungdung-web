@@ -23,14 +23,14 @@ export const SelectFriendModal = dynamic(
 );
 
 const ChatRoomPanelAsync = dynamic(
-  () => import("@/features/chat/components/section/ChatRoomPanel").then((module) => ({
+  () => import("@/features/chat/components/section/chat-room-list/ChatRoomPanel").then((module) => ({
     default: module.default,
   })),
   { ssr: false, loading: () => <ChatRoomPanelSkeleton /> }
 );
 
 const ChatRoomPanelErrorFallbackAsync = dynamic(
-  () => import("@/features/chat/components/section/ChatRoomPanel").then((module) => ({
+  () => import("@/features/chat/components/section/chat-room-list/ChatRoomPanel").then((module) => ({
     default: module.ChatRoomPanelErrorFallback,
   })),
   { ssr: false }

@@ -15,7 +15,7 @@ import {
   type SelectFriendModalState,
   type SelectFriendModalStore,
 } from "./select-friend-modal.store";
-import SelectFriendsModal from "../components/overlay/SelectFriendsModal";
+import SelectFriendsModal from "../components/overlay/chat-room/SelectFriendsModal";
 import { useCreateChatRoomFromFriendEmails } from "../hooks/actions";
 
 const SelectFriendModalStoreContext =
