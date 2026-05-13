@@ -71,6 +71,32 @@ describe("buildReadReceiptAvatarsByMessageId", () => {
 });
 
 describe("buildReadReceiptDisplayContext / getReadReceiptAvatarsForMessage", () => {
+  it("1:1 채팅에서 currentUserId가 없으면 읽음 라벨을 표시하지 않는다", () => {
+    const context = buildReadReceiptDisplayContext({
+      userInitReadList: [
+        { userId: 1, lastReadMessageId: 3 },
+        { userId: 2, lastReadMessageId: 2 },
+      ],
+      userList: [user(1, "me"), user(2, "u2")],
+      currentUserId: null,
+      isGroup: false,
+    });
+
+    expect(context.mode).toBe("direct");
+    if (context.mode !== "direct") {
+      throw new Error("expected direct read receipt context");
+    }
+    expect(context.opponentLastReadMessageId).toBeNull();
+    expect(
+      shouldShowDirectReadLabel({
+        context,
+        messageId: 2,
+        isMyMessage: true,
+        isLatestMessageFromOpponent: false,
+      })
+    ).toBe(false);
+  });
+
   it("1:1 채팅에서는 상대 lastReadMessageId와 일치하는 내 메시지에만 읽음 라벨을 붙인다", () => {
     const context = buildReadReceiptDisplayContext({
       userInitReadList: [

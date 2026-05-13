@@ -9,6 +9,14 @@ export function buildReadReceiptDisplayContext(
   params: BuildReadReceiptAvatarsByMessageIdParams
 ): ReadReceiptDisplayContext {
   if (!params.isGroup) {
+    if (params.currentUserId === null) {
+      return {
+        mode: "direct",
+        opponent: null,
+        opponentLastReadMessageId: null,
+      };
+    }
+
     const opponentUser = params.userList.find(
       (user) => user.userId !== params.currentUserId
     );
