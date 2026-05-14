@@ -1,15 +1,24 @@
 import { create } from "zustand";
 
+import { logReadSignDebug } from "../lib/read-receipt/read-sign-debug-log";
 import {
   mergeOtherParticipantReadFromSocket,
   type OtherParticipantReadSnapshot,
 } from "../services";
 import { mergeOtherParticipantsReadSeed } from "../services";
+import { resolveLastReadMessageIdFromReadBroadcast } from "../services";
+import type { ReadAtResolutionMessage } from "../services";
 
 import type { UserLastReadMessageId } from "../types";
 
 export const EMPTY_OTHER_PARTICIPANT_READ_SNAPSHOT: OtherParticipantReadSnapshot =
   Object.freeze({});
+
+export type ApplySocketReadParams = {
+  messageIds: readonly number[];
+  readAt: string;
+  timelineMessages?: readonly ReadAtResolutionMessage[] | undefined;
+};
 
 type ReadReceiptState = {
   byRoomId: Record<string, OtherParticipantReadSnapshot>;
@@ -17,7 +26,7 @@ type ReadReceiptState = {
   applySocketRead: (
     roomId: string,
     userId: number,
-    messageIds: readonly number[]
+    params: ApplySocketReadParams
   ) => void;
   mergeSeed: (
     roomId: string,
@@ -44,21 +53,57 @@ export const useReadReceiptStore = create<ReadReceiptState>()((set) => ({
       };
     });
   },
-  applySocketRead: (roomId, userId, messageIds) => {
+  applySocketRead: (roomId, userId, params) => {
+    const { messageIds, readAt, timelineMessages } = params;
+
     set((state) => {
       const prevRoomSnapshot =
         state.byRoomId[roomId] ?? EMPTY_OTHER_PARTICIPANT_READ_SNAPSHOT;
+      const prevLastReadMessageId = prevRoomSnapshot[userId] ?? null;
+      const resolvedLastReadMessageId = resolveLastReadMessageIdFromReadBroadcast(
+        {
+          messageIds,
+          readAt,
+          timelineMessages,
+        }
+      );
       const nextRoomSnapshot = mergeOtherParticipantReadFromSocket(
         prevRoomSnapshot,
         {
           userId,
           messageIds,
+          readAt,
+          timelineMessages,
+          resolvedLastReadMessageId,
         }
       );
+      const nextLastReadMessageId = nextRoomSnapshot[userId] ?? null;
 
       if (nextRoomSnapshot === prevRoomSnapshot) {
+        logReadSignDebug("store.applySocketRead.skipped", {
+          roomId,
+          userId,
+          messageIds,
+          readAt,
+          resolvedLastReadMessageId,
+          prevLastReadMessageId,
+          reason:
+            resolvedLastReadMessageId === null
+              ? "no_resolved_last_read"
+              : "no_snapshot_change",
+        });
         return state;
       }
+
+      logReadSignDebug("store.applySocketRead.applied", {
+        roomId,
+        userId,
+        messageIds,
+        readAt,
+        resolvedLastReadMessageId,
+        prevLastReadMessageId,
+        nextLastReadMessageId,
+      });
 
       return {
         ...state,

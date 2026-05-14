@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, type RefObject } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
@@ -15,23 +15,40 @@ import { myPageQueries } from "@/features/my-page";
 
 import { chatQueries } from "../queries";
 import { buildReadSignPublishPayload } from "../services";
-import { mergeReadTargetMessageId } from "../services";
+import { createReadSignPublishScheduler } from "../services";
+import { ensureReadSignTargetMessageId } from "../services";
+import type { ReadSignPublishScheduler } from "../services";
 import {
   MAX_ATTEMPTS,
   READ_SIGN_CATCH_UP_DELAY_MS,
 } from "../services";
 import { resetUnreadCountInRoomList } from "../services";
-import { resolveConfirmedLastReadMessageId } from "../services";
-import { shouldClearReadSignTarget } from "../services";
-import { shouldScheduleReadSignCatchUp } from "../services";
+import {
+  resolveMyReadBroadcastAction,
+  resolveReadBroadcastLastReadMessageId,
+} from "../services";
 import { useReadReceiptStore } from "../store";
 
 import type { ReadSignFn, ReadSignOptions } from "./read-sign.types";
 import { readSocketMessageSchema } from "./socket-message.schema";
+import { logReadSignDebug } from "../lib/read-receipt/read-sign-debug-log";
 import { toNumericMessageId } from "../lib/message/parse-message-id";
 import type { ChatRoomListItem } from "../types/chat-room.types";
 
 import { authQueries } from "@/features/auth/queries";
+
+export type ReadSignTimelineMessage = {
+  id: number | string;
+  createdAt: string;
+};
+
+export type ReadSignTimelineMessagesRef = RefObject<
+  readonly ReadSignTimelineMessage[]
+>;
+
+type UseRoomReadSocketOptions = {
+  timelineMessagesRef?: ReadSignTimelineMessagesRef;
+};
 
 type RoomReadSignRuntime = {
   pending: boolean;
@@ -41,6 +58,7 @@ type RoomReadSignRuntime = {
   catchUpAttempts: number;
   myUserId: number | null;
   readSign: ReadSignFn;
+  publishScheduler: ReadSignPublishScheduler | null;
 };
 
 function createRoomReadSignRuntime(): RoomReadSignRuntime {
@@ -52,6 +70,7 @@ function createRoomReadSignRuntime(): RoomReadSignRuntime {
     catchUpAttempts: 0,
     myUserId: null,
     readSign: () => {},
+    publishScheduler: null,
   };
 }
 
@@ -67,7 +86,11 @@ function clearCatchUpTimer(runtime: RoomReadSignRuntime): void {
 /**
  * 채팅방 읽음 publish + `/sub/chat/read` 브로드캐스트 반영.
  */
-export function useRoomReadSocket(roomId: string) {
+export function useRoomReadSocket(
+  roomId: string,
+  options?: UseRoomReadSocketOptions
+) {
+  const timelineMessagesRef = options?.timelineMessagesRef;
   const socket = useSocketManagerOptional();
   const queryClient = useQueryClient();
   const isConnected = useSocketConnection();
@@ -95,7 +118,16 @@ export function useRoomReadSocket(roomId: string) {
     return isConnected && runtimeRef.current.pageVisible;
   }, [isConnected]);
 
-  const publishReadSign = useCallback(async () => {
+  const resolvePublishTargetMessageId = useCallback(() => {
+    const runtime = runtimeRef.current;
+    runtime.targetMessageId = ensureReadSignTargetMessageId({
+      currentTargetMessageId: runtime.targetMessageId,
+      timelineMessages: timelineMessagesRef?.current,
+    });
+    return runtime.targetMessageId;
+  }, [timelineMessagesRef]);
+
+  const publishReadSignNow = useCallback(async () => {
     const runtime = runtimeRef.current;
 
     if (!socket) {
@@ -103,110 +135,60 @@ export function useRoomReadSocket(roomId: string) {
       return false;
     }
 
+    const targetMessageId = resolvePublishTargetMessageId();
+    if (targetMessageId === null) {
+      logReadSignDebug("publish.skipped", {
+        roomId,
+        reason: "missing_target_message_id",
+      });
+      return false;
+    }
+
     const topic = `/pub/chat/read/${roomId}`;
-    const payload = buildReadSignPublishPayload(
+    const payload = buildReadSignPublishPayload(roomId, targetMessageId);
+
+    logReadSignDebug("publish.attempt", {
       roomId,
-      runtime.targetMessageId
-    );
+      topic,
+      targetMessageId,
+      payload,
+    });
 
     try {
       await socket.publish(topic, payload);
       runtime.pending = false;
+      logReadSignDebug("publish.success", {
+        roomId,
+        targetMessageId,
+      });
+      runtime.catchUpAttempts = 0;
       return true;
-    } catch {
+    } catch (error) {
       runtime.pending = true;
+      logReadSignDebug("publish.fail", {
+        roomId,
+        targetMessageId,
+        error: error instanceof Error ? error.message : String(error),
+      });
       return false;
     }
-  }, [roomId, socket]);
+  }, [resolvePublishTargetMessageId, roomId, socket]);
 
-  const scheduleReadSignCatchUp = useCallback(() => {
+  const scheduleReadSignPublish = useCallback(() => {
     const runtime = runtimeRef.current;
-    const targetMessageId = runtime.targetMessageId;
 
-    if (targetMessageId === null) {
-      return;
-    }
+    if (!runtime.publishScheduler) {
+      runtime.publishScheduler = createReadSignPublishScheduler(async () => {
+        if (!token?.accessToken) {
+          return;
+        }
 
-    if (runtime.catchUpAttempts >= MAX_ATTEMPTS) {
-      return;
-    }
+        if (!canSendNow()) {
+          runtime.pending = true;
+          return;
+        }
 
-    clearCatchUpTimer(runtime);
-    runtime.catchUpTimer = setTimeout(() => {
-      runtime.catchUpTimer = null;
-      runtime.catchUpAttempts += 1;
-      runtime.readSign({ upToMessageId: targetMessageId });
-    }, READ_SIGN_CATCH_UP_DELAY_MS);
-  }, []);
-
-  const handleReadMessage = useCallback(
-    (message: unknown) => {
-      const runtime = runtimeRef.current;
-      const parsed = readSocketMessageSchema.safeParse(message);
-      if (!parsed.success) {
-        return;
-      }
-
-      const { userId, messageIds } = parsed.data.content;
-      const confirmedLastReadMessageId =
-        resolveConfirmedLastReadMessageId(messageIds);
-      const isMyReadBroadcast =
-        runtime.myUserId !== null && userId === runtime.myUserId;
-
-      if (!isMyReadBroadcast) {
-        applySocketRead(roomId, userId, messageIds);
-        return;
-      }
-
-      if (
-        shouldClearReadSignTarget(
-          runtime.targetMessageId,
-          confirmedLastReadMessageId
-        )
-      ) {
-        runtime.targetMessageId = null;
-        runtime.catchUpAttempts = 0;
-        clearCatchUpTimer(runtime);
-        return;
-      }
-
-      if (
-        shouldScheduleReadSignCatchUp({
-          broadcastUserId: userId,
-          myUserId: runtime.myUserId,
-          targetMessageId: runtime.targetMessageId,
-          messageIds,
-          confirmedLastReadMessageId,
-        })
-      ) {
-        scheduleReadSignCatchUp();
-      }
-    },
-    [applySocketRead, roomId, scheduleReadSignCatchUp]
-  );
-
-  const readSign = useCallback<ReadSignFn>(
-    (options?: ReadSignOptions) => {
-      const runtime = runtimeRef.current;
-      const upToMessageId = toNumericMessageId(options?.upToMessageId);
-
-      if (upToMessageId !== null) {
-        runtime.targetMessageId = mergeReadTargetMessageId(
-          runtime.targetMessageId,
-          upToMessageId
-        );
-      }
-
-      if (!token?.accessToken) {
-        return;
-      }
-
-      if (!canSendNow()) {
-        runtime.pending = true;
-        return;
-      }
-
-      void publishReadSign().then((didSend) => {
+        const didSend = await publishReadSignNow();
         if (!didSend) {
           return;
         }
@@ -219,8 +201,197 @@ export function useRoomReadSocket(roomId: string) {
           }
         );
       });
+    }
+
+    runtime.publishScheduler.schedule();
+  }, [
+    canSendNow,
+    publishReadSignNow,
+    queryClient,
+    roomId,
+    token?.accessToken,
+  ]);
+
+  const scheduleReadSignCatchUp = useCallback(() => {
+    const runtime = runtimeRef.current;
+    const targetMessageId = runtime.targetMessageId;
+
+    if (targetMessageId === null) {
+      return;
+    }
+
+    if (runtime.catchUpAttempts >= MAX_ATTEMPTS) {
+      logReadSignDebug("catch_up.exhausted", {
+        roomId,
+        targetMessageId,
+        catchUpAttempts: runtime.catchUpAttempts,
+      });
+      return;
+    }
+
+    clearCatchUpTimer(runtime);
+    runtime.catchUpTimer = setTimeout(() => {
+      runtime.catchUpTimer = null;
+      runtime.catchUpAttempts += 1;
+      runtime.readSign({
+        upToMessageId: targetMessageId,
+        source: "catch-up",
+      });
+    }, READ_SIGN_CATCH_UP_DELAY_MS);
+  }, []);
+
+  const handleReadMessage = useCallback(
+    (message: unknown) => {
+      const runtime = runtimeRef.current;
+      const parsed = readSocketMessageSchema.safeParse(message);
+      if (!parsed.success) {
+        logReadSignDebug("receive.parse_failed", {
+          roomId,
+          issues: parsed.error.issues.map((issue) => issue.message),
+          raw: message,
+        });
+        return;
+      }
+
+      const { messageLogId } = parsed.data;
+      const { userId, messageIds, readAt } = parsed.data.content;
+      const timelineMessages = timelineMessagesRef?.current;
+      const isMyReadBroadcast =
+        runtime.myUserId !== null && userId === runtime.myUserId;
+      const resolvedLastReadMessageId = resolveReadBroadcastLastReadMessageId({
+        messageIds,
+        readAt,
+        timelineMessages,
+        runtime,
+        isMyReadBroadcast,
+      });
+
+      logReadSignDebug("receive", {
+        roomId,
+        messageLogId,
+        userId,
+        messageIds,
+        readAt,
+        resolvedLastReadMessageId,
+        myUserId: runtime.myUserId,
+        isMyReadBroadcast,
+        targetMessageId: runtime.targetMessageId,
+        catchUpAttempts: runtime.catchUpAttempts,
+      });
+
+      if (!isMyReadBroadcast) {
+        applySocketRead(roomId, userId, {
+          messageIds,
+          readAt,
+          timelineMessages,
+        });
+        return;
+      }
+
+      const myBroadcastAction = resolveMyReadBroadcastAction({
+        runtime,
+        broadcastUserId: userId,
+        messageIds,
+        resolvedLastReadMessageId,
+      });
+
+      if (myBroadcastAction.type === "clear_target") {
+        logReadSignDebug("receive.my_broadcast.clear_target", {
+          roomId,
+          resolvedLastReadMessageId,
+          messageLogId,
+          previousTargetMessageId: runtime.targetMessageId,
+        });
+        runtime.targetMessageId = null;
+        runtime.catchUpAttempts = 0;
+        clearCatchUpTimer(runtime);
+        return;
+      }
+
+      if (myBroadcastAction.type === "schedule_catch_up") {
+        logReadSignDebug("receive.my_broadcast.schedule_catch_up", {
+          roomId,
+          resolvedLastReadMessageId,
+          messageLogId,
+          targetMessageId: runtime.targetMessageId,
+          catchUpAttempts: runtime.catchUpAttempts,
+        });
+        scheduleReadSignCatchUp();
+        return;
+      }
+
+      logReadSignDebug("receive.my_broadcast.noop", {
+        roomId,
+        resolvedLastReadMessageId,
+        messageLogId,
+        targetMessageId: runtime.targetMessageId,
+      });
     },
-    [token, canSendNow, publishReadSign, queryClient, roomId]
+    [applySocketRead, roomId, scheduleReadSignCatchUp, timelineMessagesRef]
+  );
+
+  const readSign = useCallback<ReadSignFn>(
+    (options?: ReadSignOptions) => {
+      const runtime = runtimeRef.current;
+      const previousTargetMessageId = runtime.targetMessageId;
+      runtime.targetMessageId = ensureReadSignTargetMessageId({
+        currentTargetMessageId: runtime.targetMessageId,
+        upToMessageId: options?.upToMessageId,
+        timelineMessages: timelineMessagesRef?.current,
+      });
+      const upToMessageId = toNumericMessageId(options?.upToMessageId);
+
+      logReadSignDebug("invoke", {
+        roomId,
+        source: options?.source ?? "unknown",
+        upToMessageId,
+        previousTargetMessageId,
+        nextTargetMessageId: runtime.targetMessageId,
+        pageVisible: runtime.pageVisible,
+        pending: runtime.pending,
+      });
+
+      if (runtime.targetMessageId === null) {
+        logReadSignDebug("invoke.skipped", {
+          roomId,
+          source: options?.source ?? "unknown",
+          reason: "missing_target_message_id",
+        });
+        return;
+      }
+
+      if (!token?.accessToken) {
+        logReadSignDebug("invoke.skipped", {
+          roomId,
+          source: options?.source ?? "unknown",
+          reason: "missing_token",
+        });
+        return;
+      }
+
+      if (!canSendNow()) {
+        runtime.pending = true;
+        logReadSignDebug("invoke.deferred", {
+          roomId,
+          source: options?.source ?? "unknown",
+          reason: "cannot_send_now",
+          isConnected,
+          pageVisible: runtime.pageVisible,
+          targetMessageId: runtime.targetMessageId,
+        });
+        return;
+      }
+
+      scheduleReadSignPublish();
+    },
+    [
+      canSendNow,
+      isConnected,
+      roomId,
+      scheduleReadSignPublish,
+      timelineMessagesRef,
+      token,
+    ]
   );
 
   runtimeRef.current.readSign = readSign;
@@ -231,7 +402,7 @@ export function useRoomReadSocket(roomId: string) {
     const handleVisibilityChange = () => {
       runtime.pageVisible = !document.hidden;
       if (runtime.pageVisible && runtime.pending && token?.accessToken) {
-        readSign();
+        readSign({ source: "visibility-pending" });
       }
     };
 
@@ -253,7 +424,7 @@ export function useRoomReadSocket(roomId: string) {
     ) {
       return;
     }
-    readSign();
+    readSign({ source: "reconnect-pending" });
   }, [token?.accessToken, isConnected, readSign]);
 
   useSocketSubscription({
