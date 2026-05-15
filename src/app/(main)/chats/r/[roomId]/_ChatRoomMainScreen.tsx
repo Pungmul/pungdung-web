@@ -8,6 +8,8 @@ import {
   ChatRoomTimelinePanel,
   InviteUserModal,
 } from "@/features/chat";
+import type { ReadSignFn } from "@/features/chat/socket/read-sign.types";
+import type { ReadSignTimelineMessagesRef } from "@/features/chat/socket/useRoomReadSocket";
 import { User, UserProfileCardModalHost } from "@/features/user";
 
 type ChatRoomMainScreenProps = {
@@ -15,7 +17,7 @@ type ChatRoomMainScreenProps = {
   title: string;
   memberCount: number;
   myUsername: string;
-  readSign: () => void;
+  readSign: ReadSignFn;
   isConnected: boolean;
   userList: User[];
   userImageMap: Record<string, string | null>;
@@ -24,6 +26,7 @@ type ChatRoomMainScreenProps = {
   onBack: () => void;
   onExitChat: () => void;
   onOpenSettings: () => void;
+  timelineMessagesRef?: ReadSignTimelineMessagesRef;
 };
 
 export function ChatRoomMainScreen({
@@ -40,6 +43,7 @@ export function ChatRoomMainScreen({
   onBack,
   onExitChat,
   onOpenSettings,
+  timelineMessagesRef,
 }: ChatRoomMainScreenProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [inviteUserModalOpen, setInviteUserModalOpen] = useState(false);
@@ -57,6 +61,7 @@ export function ChatRoomMainScreen({
         <ChatRoomTimelinePanel
           roomId={roomId}
           {...(myUsername ? { myInfo: { username: myUsername } } : {})}
+          {...(timelineMessagesRef ? { timelineMessagesRef } : {})}
           readSign={readSign}
           isConnected={isConnected}
           userList={userList}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo } from "react";
 
 import type { User } from "@/features/user";
 
@@ -28,6 +28,7 @@ import {
 } from "../../../hooks/view-model";
 import { useChatRoomMessageSubscription } from "../../../socket";
 import type { ReadSignFn } from "../../../socket/read-sign.types";
+import type { ReadSignTimelineMessagesRef } from "../../../socket/useRoomReadSocket";
 import type { UserImageMap, UserNameMap } from "../../../types";
 import { ChatSendForm } from "../message/ChatSendForm";
 import { MessageList as ChatMessageList } from "../message/MessageList";
@@ -42,6 +43,7 @@ type ChatRoomTimelinePanelProps = {
   userList: User[];
   userImageMap: UserImageMap;
   userNameMap: UserNameMap;
+  timelineMessagesRef?: ReadSignTimelineMessagesRef;
 };
 
 export function ChatRoomTimelinePanel({
@@ -52,6 +54,7 @@ export function ChatRoomTimelinePanel({
   userList,
   userImageMap,
   userNameMap,
+  timelineMessagesRef,
 }: ChatRoomTimelinePanelProps) {
   // --- entry read-sign runtime ---
   const { coordRef: entryReadSignCoordRef, gate: entryReadSignGate } =
@@ -126,6 +129,12 @@ export function ChatRoomTimelinePanel({
     ...(chatRoomData !== undefined ? { chatRoomData } : {}),
     ...(infiniteData !== undefined ? { infiniteData } : {}),
   });
+
+  useLayoutEffect(() => {
+    if (timelineMessagesRef) {
+      timelineMessagesRef.current = messageList;
+    }
+  }, [messageList, timelineMessagesRef]);
 
   // --- entry unread: snapshot, post-entry readSign, gated send readSign ---
   const {

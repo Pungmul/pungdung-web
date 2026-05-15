@@ -19,6 +19,7 @@ import {
   useRoomReadSocket,
   useSyncChatRoomFocusOnRoomId,
 } from "@/features/chat";
+import type { ReadSignTimelineMessagesRef } from "@/features/chat/socket/useRoomReadSocket";
 import { myPageQueries } from "@/features/my-page";
 
 import { Conditional } from "@/shared";
@@ -46,13 +47,17 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
   const [activeScreen, setActiveScreen] =
     useState<ChatRoomActiveScreen>("main");
 
-  const { readSign } = useRoomReadSocket(roomId as string);
+  const timelineMessagesRef = useRef<ReadSignTimelineMessagesRef["current"]>([]);
+  const { readSign } = useRoomReadSocket(roomId as string, {
+    timelineMessagesRef,
+  });
   const { exitChatRoom } = useExitChatRoom({ roomId: roomId as string });
 
   useChatRoomForegroundReconciliation({
     roomId: roomId as string,
     readSign,
     isConnected,
+    timelineMessagesRef,
   });
   useSyncChatRoomFocusOnRoomId(roomId as string);
   useBodyScrollLock(true);
@@ -104,6 +109,7 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
               onBack={() => router.push("/chats/r/inbox")}
               onExitChat={exitChatRoom}
               onOpenSettings={() => setActiveScreen("settings")}
+              timelineMessagesRef={timelineMessagesRef}
             />,
             settings: <ChatRoomSettingScreen
               roomId={roomId as string}

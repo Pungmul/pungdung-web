@@ -29,6 +29,7 @@ describe("usePostEntryReadSign", () => {
   });
 
   it("스냅샷 확정 후 최신 메시지 id로 readSign을 1회 호출한다", () => {
+    vi.useFakeTimers();
     const readSign = vi.fn();
     const coordRef = { current: createEntryReadSignCoord("room-a") };
 
@@ -41,11 +42,19 @@ describe("usePostEntryReadSign", () => {
       })
     );
 
+    vi.advanceTimersByTime(100);
+
     expect(readSign).toHaveBeenCalledTimes(1);
-    expect(readSign).toHaveBeenCalledWith({ upToMessageId: 12 });
+    expect(readSign).toHaveBeenCalledWith({
+      upToMessageId: 12,
+      source: "post-entry",
+    });
+
+    vi.useRealTimers();
   });
 
-  it("같은 room에서는 readSign을 다시 호출하지 않는다", () => {
+  it("messageList가 안정된 뒤 최신 id로 readSign을 1회만 호출한다", () => {
+    vi.useFakeTimers();
     const readSign = vi.fn();
     const coordRef = { current: createEntryReadSignCoord("room-a") };
 
@@ -68,11 +77,19 @@ describe("usePostEntryReadSign", () => {
       coordRef,
     });
 
+    vi.advanceTimersByTime(100);
+
     expect(readSign).toHaveBeenCalledTimes(1);
-    expect(readSign).toHaveBeenCalledWith({ upToMessageId: 5 });
+    expect(readSign).toHaveBeenCalledWith({
+      upToMessageId: 9,
+      source: "post-entry",
+    });
+
+    vi.useRealTimers();
   });
 
   it("roomId가 바뀌면 다시 readSign을 호출한다", () => {
+    vi.useFakeTimers();
     const readSign = vi.fn();
     const coordRef = { current: createEntryReadSignCoord("room-a") };
 
@@ -88,6 +105,8 @@ describe("usePostEntryReadSign", () => {
       }
     );
 
+    vi.advanceTimersByTime(100);
+
     coordRef.current = createEntryReadSignCoord("room-b");
     rerender({
       isEntrySnapshotCaptured: true,
@@ -96,9 +115,19 @@ describe("usePostEntryReadSign", () => {
       coordRef,
     });
 
+    vi.advanceTimersByTime(100);
+
     expect(readSign).toHaveBeenCalledTimes(2);
-    expect(readSign).toHaveBeenNthCalledWith(1, { upToMessageId: 3 });
-    expect(readSign).toHaveBeenNthCalledWith(2, { upToMessageId: 7 });
+    expect(readSign).toHaveBeenNthCalledWith(1, {
+      upToMessageId: 3,
+      source: "post-entry",
+    });
+    expect(readSign).toHaveBeenNthCalledWith(2, {
+      upToMessageId: 7,
+      source: "post-entry",
+    });
+
+    vi.useRealTimers();
   });
 
   it("이미 readSign 처리됨 플래그가 있으면 post-entry를 건너뛴다", () => {
@@ -118,7 +147,8 @@ describe("usePostEntryReadSign", () => {
     expect(readSign).not.toHaveBeenCalled();
   });
 
-  it("메시지가 비었거나 숫자 id가 없으면 bare readSign()을 호출한다", () => {
+  it("숫자 id가 나중에 생기면 post-entry readSign을 호출한다", () => {
+    vi.useFakeTimers();
     const readSign = vi.fn();
     const coordRef = { current: createEntryReadSignCoord("room-a") };
 
@@ -127,23 +157,29 @@ describe("usePostEntryReadSign", () => {
       {
         initialProps: {
           isEntrySnapshotCaptured: true,
-          messageList: [] as Message[],
+          messageList: [message("temp-id")] as Message[],
           readSign,
           coordRef,
         },
       }
     );
 
-    coordRef.current = createEntryReadSignCoord("room-b");
+    vi.advanceTimersByTime(100);
+    expect(readSign).not.toHaveBeenCalled();
+
     rerender({
       isEntrySnapshotCaptured: true,
-      messageList: [message("temp-id")],
+      messageList: [message("temp-id"), message(42)],
       readSign,
       coordRef,
     });
 
-    expect(readSign).toHaveBeenCalledTimes(2);
-    expect(readSign).toHaveBeenNthCalledWith(1);
-    expect(readSign).toHaveBeenNthCalledWith(2);
+    vi.advanceTimersByTime(100);
+    expect(readSign).toHaveBeenCalledWith({
+      upToMessageId: 42,
+      source: "post-entry",
+    });
+
+    vi.useRealTimers();
   });
 });

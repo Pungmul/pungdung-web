@@ -9,7 +9,9 @@ import {
   markEntryReadSignHandled,
   markPostEntryReadSignPublished,
 } from "./entry-read-sign-coord";
+import { logReadSignDebug } from "../../../lib/read-receipt/read-sign-debug-log";
 import { resolveLatestNumericMessageIdFromList } from "../../../services";
+import { POST_ENTRY_READ_SIGN_STABILIZE_MS } from "../../../services";
 import type { ReadSignFn } from "../../../socket/read-sign.types";
 import type { Message, PendingMessage } from "../../../types";
 
@@ -44,15 +46,44 @@ export function usePostEntryReadSign({
       return;
     }
 
-    markPostEntryReadSignPublished(coordRef);
+    const timeoutId = setTimeout(() => {
+      if (hasPostEntryReadSignPublished(coordRef)) {
+        return;
+      }
 
-    const latestMessageId = resolveLatestNumericMessageIdFromList(messageList);
-    markEntryReadSignHandled(coordRef);
-    if (latestMessageId !== null) {
-      readSign({ upToMessageId: latestMessageId });
-      return;
-    }
+      if (hasEntryReadSignHandled(coordRef)) {
+        logReadSignDebug("post_entry.skipped", {
+          roomId: coordRef.current.roomId,
+          reason: "read_sign_already_handled",
+        });
+        markPostEntryReadSignPublished(coordRef);
+        return;
+      }
 
-    readSign();
+      const latestMessageId =
+        resolveLatestNumericMessageIdFromList(messageList);
+
+      if (latestMessageId === null) {
+        logReadSignDebug("post_entry.skipped", {
+          roomId: coordRef.current.roomId,
+          reason: "missing_target_message_id",
+          messageCount: messageList.length,
+        });
+        return;
+      }
+
+      markPostEntryReadSignPublished(coordRef);
+      markEntryReadSignHandled(coordRef);
+      logReadSignDebug("post_entry.publish", {
+        roomId: coordRef.current.roomId,
+        latestMessageId,
+        messageCount: messageList.length,
+      });
+      readSign({ upToMessageId: latestMessageId, source: "post-entry" });
+    }, POST_ENTRY_READ_SIGN_STABILIZE_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [isEntrySnapshotCaptured, messageList, readSign, coordRef]);
 }

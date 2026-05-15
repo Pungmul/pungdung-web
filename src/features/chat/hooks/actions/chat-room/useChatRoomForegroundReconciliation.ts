@@ -6,20 +6,24 @@ import type { InfiniteData } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { chatQueries } from "../../../queries";
+import { logReadSignDebug } from "../../../lib/read-receipt/read-sign-debug-log";
 import {
   applyChatRoomGapMessagesToChatRoom,
   applyChatRoomGapMessagesToRoomInfinite,
   applyChatRoomGapMessagesToRoomList,
   fetchChatRoomMessageGap,
+  FOREGROUND_RECONCILE_THROTTLE_MS,
+  resolveLatestNumericMessageIdFromList,
 } from "../../../services";
+import type { ReadSignFn } from "../../../socket/read-sign.types";
+import type { ReadSignTimelineMessagesRef } from "../../../socket/useRoomReadSocket";
 import type { ChatLogCursorPage, ChatRoom } from "../../../types";
-
-const FOREGROUND_RECONCILE_THROTTLE_MS = 1_000;
 
 type UseChatRoomForegroundReconciliationParams = {
   roomId: string;
-  readSign: () => void;
+  readSign: ReadSignFn;
   isConnected: boolean;
+  timelineMessagesRef?: ReadSignTimelineMessagesRef;
 };
 
 /**
@@ -29,6 +33,7 @@ export function useChatRoomForegroundReconciliation({
   roomId,
   readSign,
   isConnected,
+  timelineMessagesRef,
 }: UseChatRoomForegroundReconciliationParams) {
   const queryClient = useQueryClient();
   const enteredBackgroundRef = useRef(false);
@@ -70,12 +75,30 @@ export function useChatRoomForegroundReconciliation({
           );
         }
 
-        readSign();
+        const latestGapMessageId =
+          resolveLatestNumericMessageIdFromList(gapMessages);
+        const latestTimelineMessageId = resolveLatestNumericMessageIdFromList(
+          timelineMessagesRef?.current ?? []
+        );
+        const upToMessageId = latestGapMessageId ?? latestTimelineMessageId;
+        logReadSignDebug("foreground_gap.readSign", {
+          roomId,
+          gapMessageCount: gapMessages.length,
+          latestGapMessageId,
+          latestTimelineMessageId,
+          upToMessageId,
+        });
+        if (upToMessageId !== null) {
+          readSign({
+            upToMessageId,
+            source: "foreground-gap",
+          });
+        }
       } finally {
         reconcileInFlightRef.current = false;
       }
     })();
-  }, [queryClient, readSign, roomId]);
+  }, [queryClient, readSign, roomId, timelineMessagesRef]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {

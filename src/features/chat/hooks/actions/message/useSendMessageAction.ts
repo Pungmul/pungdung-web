@@ -8,7 +8,6 @@ import { Toast } from "@/shared";
 
 import { chatMutationOptions } from "../../../queries";
 import { fileListFromBlobObjectUrls } from "../../../services";
-import type { ReadSignFn } from "../../../socket/read-sign.types";
 import type {
   ChatRoomOutgoingMessageHandlers,
   PendingMessage,
@@ -19,7 +18,6 @@ const SOCKET_NOT_READY_TOAST_MESSAGE =
 
 export type UseSendMessageActionParams = {
   roomId: string;
-  readSign: ReadSignFn;
   outgoingMessageHandlers: ChatRoomOutgoingMessageHandlers;
   /** STOMP 연결 + 방 메시지 구독이 준비된 뒤에만 HTTP 전송 */
   canSend: boolean;
@@ -28,7 +26,6 @@ export type UseSendMessageActionParams = {
 
 export function useSendMessageAction({
   roomId,
-  readSign,
   outgoingMessageHandlers,
   canSend,
   onMessageSent,
@@ -68,8 +65,7 @@ export function useSendMessageAction({
           roomId,
           message: { content, clientId: pendingId },
         });
-        // pending 제거는 소켓 echo에서만 한다(로컬 state와 한 커밋).
-        readSign();
+        // pending 제거·readSign은 소켓 echo에서만 한다(확정 messageId와 한 커밋).
       } catch {
         Toast.show({
           message: "채팅 전송에 실패했습니다.",
@@ -78,7 +74,7 @@ export function useSendMessageAction({
         commitTextSendFailure(pendingId);
       }
     },
-    [roomId, sendTextMessage, commitTextSendFailure, readSign]
+    [roomId, sendTextMessage, commitTextSendFailure]
   );
 
   const onSendMessage = useCallback(
@@ -119,8 +115,7 @@ export function useSendMessageAction({
         formData.append("clientId", pendingId);
 
         await sendImageMessage({ roomId, formData });
-        // pending 제거는 확정 메시지가 query/socket에 반영된 뒤 view-model에서 처리한다.
-        readSign();
+        // pending 제거·readSign은 소켓 echo에서만 한다(확정 messageId와 한 커밋).
       } catch (error) {
         const errorMessage =
           error instanceof Error
@@ -134,7 +129,7 @@ export function useSendMessageAction({
         commitImageSendFailure(pendingId);
       }
     },
-    [roomId, sendImageMessage, commitImageSendFailure, readSign]
+    [roomId, sendImageMessage, commitImageSendFailure]
   );
 
   const onSendImage = useCallback(

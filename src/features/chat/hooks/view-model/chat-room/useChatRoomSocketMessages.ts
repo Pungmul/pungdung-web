@@ -2,6 +2,7 @@
 
 import { useCallback, useLayoutEffect, useRef } from "react";
 
+import { logReadSignDebug } from "../../../lib/read-receipt/read-sign-debug-log";
 import { toNumericMessageId } from "../../../lib/message/parse-message-id";
 import type { ReadSignFn } from "../../../socket/read-sign.types";
 import { useChatRoomSocket } from "../../../socket/useChatRoomSocket";
@@ -30,13 +31,28 @@ export function useChatRoomSocketMessages({
     (socketMessage: Message) => {
       onSocketEchoMessageRef.current(socketMessage);
 
+      const upToMessageId = toNumericMessageId(socketMessage.id);
+
       if (!entryReadSignGate?.canPublishReadSign(roomId)) {
+        logReadSignDebug("socket_message.readSign.blocked", {
+          roomId,
+          messageId: socketMessage.id,
+          upToMessageId,
+          senderUsername: socketMessage.senderUsername,
+        });
         return;
       }
 
       entryReadSignGate.markReadSignHandled();
+      logReadSignDebug("socket_message.readSign", {
+        roomId,
+        messageId: socketMessage.id,
+        upToMessageId,
+        senderUsername: socketMessage.senderUsername,
+      });
       readSignRef.current({
-        upToMessageId: toNumericMessageId(socketMessage.id),
+        upToMessageId,
+        source: "socket-message-appended",
       });
     },
     [entryReadSignGate, roomId]

@@ -29,7 +29,7 @@ export function useHydrateReadReceiptStore({
       prevRoomIdRef.current = roomId;
     }
 
-    if (chatRoomData?.userInitReadList) {
+    if (currentUserId !== null && chatRoomData?.userInitReadList) {
       mergeSeed(roomId, chatRoomData.userInitReadList, currentUserId);
     }
   }, [

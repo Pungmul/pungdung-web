@@ -64,7 +64,111 @@ describe("useChatRoomForegroundReconciliation", () => {
     });
 
     expect(fetchGapService.fetchChatRoomMessageGap).toHaveBeenCalledWith("room-1");
-    expect(readSign).toHaveBeenCalledTimes(1);
+    expect(readSign).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
+  });
+
+  it("gap이 비어 있어도 타임라인에 메시지가 있으면 readSign을 호출한다", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-20T00:00:00.000Z"));
+
+    const queryClient = new QueryClient();
+    const readSign = vi.fn();
+    const timelineMessagesRef = {
+      current: [
+        { id: 88, createdAt: "2026-05-20T00:00:00.000Z" },
+        { id: 92, createdAt: "2026-05-20T00:00:01.000Z" },
+      ],
+    };
+
+    renderHook(
+      () =>
+        useChatRoomForegroundReconciliation({
+          roomId: "room-1",
+          readSign,
+          isConnected: true,
+          timelineMessagesRef,
+        }),
+      { wrapper: createWrapper(queryClient) }
+    );
+
+    act(() => {
+      setDocumentHidden(true);
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    vi.setSystemTime(new Date("2026-05-20T00:00:01.000Z"));
+
+    await act(async () => {
+      setDocumentHidden(false);
+      document.dispatchEvent(new Event("visibilitychange"));
+      await Promise.resolve();
+    });
+
+    expect(readSign).toHaveBeenCalledWith({
+      upToMessageId: 92,
+      source: "foreground-gap",
+    });
+
+    vi.useRealTimers();
+  });
+
+  it("gap 메시지가 있으면 최신 messageId로 readSign을 호출한다", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-20T00:00:00.000Z"));
+
+    vi.spyOn(fetchGapService, "fetchChatRoomMessageGap").mockResolvedValue([
+      {
+        id: 101,
+        senderUsername: "u2",
+        content: "gap",
+        chatType: "TEXT",
+        imageUrlList: null,
+        chatRoomUUID: "room-1",
+        createdAt: "2026-05-20T00:00:00.000Z",
+      },
+      {
+        id: 105,
+        senderUsername: "u2",
+        content: "latest gap",
+        chatType: "TEXT",
+        imageUrlList: null,
+        chatRoomUUID: "room-1",
+        createdAt: "2026-05-20T00:00:01.000Z",
+      },
+    ]);
+
+    const queryClient = new QueryClient();
+    const readSign = vi.fn();
+
+    renderHook(
+      () =>
+        useChatRoomForegroundReconciliation({
+          roomId: "room-1",
+          readSign,
+          isConnected: true,
+        }),
+      { wrapper: createWrapper(queryClient) }
+    );
+
+    act(() => {
+      setDocumentHidden(true);
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    vi.setSystemTime(new Date("2026-05-20T00:00:01.000Z"));
+
+    await act(async () => {
+      setDocumentHidden(false);
+      document.dispatchEvent(new Event("visibilitychange"));
+      await Promise.resolve();
+    });
+
+    expect(readSign).toHaveBeenCalledWith({
+      upToMessageId: 105,
+      source: "foreground-gap",
+    });
 
     vi.useRealTimers();
   });
@@ -99,7 +203,7 @@ describe("useChatRoomForegroundReconciliation", () => {
     });
 
     expect(fetchGapService.fetchChatRoomMessageGap).toHaveBeenCalledWith("room-1");
-    expect(readSign).toHaveBeenCalledTimes(1);
+    expect(readSign).not.toHaveBeenCalled();
 
     vi.useRealTimers();
   });
@@ -137,7 +241,7 @@ describe("useChatRoomForegroundReconciliation", () => {
     });
 
     expect(fetchGapService.fetchChatRoomMessageGap).toHaveBeenCalledTimes(1);
-    expect(readSign).toHaveBeenCalledTimes(1);
+    expect(readSign).not.toHaveBeenCalled();
 
     vi.useRealTimers();
   });
