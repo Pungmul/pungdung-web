@@ -80,7 +80,7 @@ export function ImageMessageItem({
       isSameDate={layout.isSameDate}
       onDateClick={onDateClick}
       dateRef={dateRef}
-      className="relative flex flex-col gap-1"
+      className="flex flex-col gap-[0.2rem]"
     >
       <ImageMessage
         imageList={message.imageUrlList || []}

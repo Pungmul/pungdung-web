@@ -21,7 +21,7 @@ export function MessageGroupReadReceiptSlot({
   readReceiptAvatars,
   onReadReceiptSlotClick,
 }: MessageGroupReadReceiptSlotProps) {
-  if (!isGroupChat) {
+  if (!isGroupChat || !layout.hasGroupReadReceipts) {
     return null;
   }
 
@@ -29,24 +29,19 @@ export function MessageGroupReadReceiptSlot({
     <button
       type="button"
       className={cn(
-        "absolute -bottom-4 z-10 border-0 bg-transparent p-0",
-        layout.readReceiptAlign === "right" ? "right-4" : "left-14",
-        layout.hasGroupReadReceipts
-          ? "cursor-pointer opacity-100"
-          : "pointer-events-none cursor-default opacity-0"
+        "shrink-0 border-0 bg-transparent p-0",
+        layout.readReceiptAlign === "right"
+          ? "self-end mr-4 cursor-pointer"
+          : "self-start ml-14 cursor-pointer"
       )}
-      aria-hidden={!layout.hasGroupReadReceipts}
-      aria-label={
-        layout.hasGroupReadReceipts
-          ? `읽음 ${readReceiptAvatars.length}명 보기`
-          : undefined
-      }
-      onClick={layout.hasGroupReadReceipts ? onReadReceiptSlotClick : undefined}
+      aria-label={`읽음 ${readReceiptAvatars.length}명 보기`}
+      onClick={onReadReceiptSlotClick}
     >
       <ReadReceiptAvatars
         participants={readReceiptAvatars}
         align={layout.readReceiptAlign}
-        isVisible={layout.hasGroupReadReceipts}
+        isVisible
+        exposeAccessibleName={false}
       />
     </button>
   );

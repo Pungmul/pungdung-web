@@ -80,7 +80,7 @@ export function TextMessageItem({
       isSameDate={layout.isSameDate}
       onDateClick={onDateClick}
       dateRef={dateRef}
-      className="relative flex flex-col gap-1"
+      className="flex flex-col gap-[0.2rem]"
     >
       <ChatMessage
         message={message.content as string}

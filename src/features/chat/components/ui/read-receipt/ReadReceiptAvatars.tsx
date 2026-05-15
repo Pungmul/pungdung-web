@@ -19,6 +19,8 @@ type ReadReceiptAvatarsProps = {
   participants: readonly ReadReceiptAvatar[];
   align: ReadReceiptAvatarAlign;
   isVisible: boolean;
+  /** false면 부모 interactive 요소가 accessible name을 제공한다 */
+  exposeAccessibleName?: boolean;
 };
 
 function buildParticipantUserIdsKey(
@@ -31,6 +33,7 @@ export function ReadReceiptAvatars({
   participants,
   align,
   isVisible,
+  exposeAccessibleName = true,
 }: ReadReceiptAvatarsProps) {
   const displayOrderRef = useRef<number[]>([]);
   const isFirstMountRef = useRef(true);
@@ -107,8 +110,9 @@ export function ReadReceiptAvatars({
     <div
       className="relative"
       style={{ width: stackWidth, height: AVATAR_SIZE_PX }}
+      aria-hidden={!exposeAccessibleName || undefined}
       aria-label={
-        isVisible && displayOrder.length > 0
+        exposeAccessibleName && isVisible && displayOrder.length > 0
           ? `읽음 ${displayOrder.length}명`
           : undefined
       }
