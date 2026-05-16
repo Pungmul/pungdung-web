@@ -149,7 +149,11 @@
   /* Toast surface (bright: #232424, 92% opacity) */
   --color-toast-bg-base: #232424;
   --color-toast-text: #f7f7f8;
-  --color-toast-bg: color-mix(in srgb, var(--color-toast-bg-base) 92%, transparent);
+  --color-toast-bg: color-mix(
+    in srgb,
+    var(--color-toast-bg-base) 92%,
+    transparent
+  );
 }
 
 /* 다크모드 자동 감지 및 색상 전환 */
@@ -198,7 +202,11 @@
     --color-lime-800: var(--color-lime-800-dark);
 
     --color-toast-bg-base: #43454a;
-    --color-toast-bg: color-mix(in srgb, var(--color-toast-bg-base) 92%, transparent);
+    --color-toast-bg: color-mix(
+      in srgb,
+      var(--color-toast-bg-base) 92%,
+      transparent
+    );
   }
 }
 
@@ -246,7 +254,11 @@
   --color-lime-800: var(--color-lime-800-light);
 
   --color-toast-bg-base: #232424;
-  --color-toast-bg: color-mix(in srgb, var(--color-toast-bg-base) 92%, transparent);
+  --color-toast-bg: color-mix(
+    in srgb,
+    var(--color-toast-bg-base) 92%,
+    transparent
+  );
 }
 
 :root[data-theme="dark"] {
@@ -292,7 +304,11 @@
   --color-lime-800: var(--color-lime-800-dark);
 
   --color-toast-bg-base: #43454a;
-  --color-toast-bg: color-mix(in srgb, var(--color-toast-bg-base) 92%, transparent);
+  --color-toast-bg: color-mix(
+    in srgb,
+    var(--color-toast-bg-base) 92%,
+    transparent
+  );
 }
 
 html {
@@ -425,6 +441,10 @@ body {
 
 #nprogress .bar {
   @apply bg-primary h-[2px] !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px var(--color-primary), 0 0 5px var(--color-primary) !important;
 }
 
 .swiper-pagination-bullet-active {
