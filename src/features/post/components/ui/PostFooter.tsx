@@ -98,7 +98,7 @@ export function PostFooter({
         <label htmlFor="images">
           <div
             className={cn(
-              "rounded-full border-[#DDDDDD] border-[1px] px-[8px] py-[4px] flex flex-row gap-2 items-center justify-center",
+              "rounded-full border-grey-400 border-[1px] px-[8px] py-[4px] flex flex-row gap-2 items-center justify-center",
               interactionsDisabled
                 ? "opacity-45 pointer-events-none"
                 : "cursor-pointer"
