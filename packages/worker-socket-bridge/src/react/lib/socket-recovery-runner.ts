@@ -13,7 +13,6 @@ export function createSocketRecoveryRunner(
   ensureWorkerAlive: () => Promise<void>,
   forceReconnect: (config: SocketConfig) => Promise<void>,
   resolveConfig: () => Promise<SocketConfig | null>,
-  backgroundForceReconnectMs: number,
   recoveryActionCooldownMs: number,
   getLastRecoveryActionAt: () => number,
   setLastRecoveryActionAt: (timestamp: number) => void
@@ -23,7 +22,6 @@ export function createSocketRecoveryRunner(
     state: SocketConnectionStateCheck
   ) => {
     const trigger = checkOptions.trigger ?? "manual";
-    const backgroundDurationMs = checkOptions.backgroundDurationMs ?? 0;
 
     if (
       !shouldBypassRecoveryCooldown(trigger) &&
@@ -38,8 +36,6 @@ export function createSocketRecoveryRunner(
     const shouldRecreateRuntimeNow = shouldRecreateRuntime({
       reconnectOnly: checkOptions.reconnectOnly,
       forceRecreate: checkOptions.forceRecreate,
-      backgroundDurationMs,
-      backgroundForceReconnectMs,
       workerAlive: state.workerAlive,
     });
     const config = await resolveConfig();

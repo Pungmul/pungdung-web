@@ -6,7 +6,6 @@ import type { SocketConfig } from "../../protocol";
 import { createForegroundVisibilityTracker } from "../lib/foreground-visibility-tracker";
 import { createSocketConnectionWatch } from "../lib/socket-connection-watch";
 import {
-  DEFAULT_BACKGROUND_FORCE_RECONNECT_MS,
   DEFAULT_CONNECTION_WATCH_INTERVAL_MS,
   DEFAULT_FOREGROUND_DEBOUNCE_MS,
   DEFAULT_MESSAGE_INACTIVITY_PROBE_MS,
@@ -24,7 +23,6 @@ type UseSocketForegroundReconnectOptions = {
   stateCheckThrottleMs?: number;
   recoveryActionCooldownMs?: number;
   connectionWatchIntervalMs?: number;
-  backgroundForceReconnectMs?: number;
   messageInactivityProbeMs?: number;
   resolveConnectConfig?: () => Promise<SocketConfig>;
 };
@@ -41,8 +39,6 @@ export function useSocketForegroundReconnect(
     options.recoveryActionCooldownMs ?? DEFAULT_RECOVERY_ACTION_COOLDOWN_MS;
   const connectionWatchIntervalMs =
     options.connectionWatchIntervalMs ?? DEFAULT_CONNECTION_WATCH_INTERVAL_MS;
-  const backgroundForceReconnectMs =
-    options.backgroundForceReconnectMs ?? DEFAULT_BACKGROUND_FORCE_RECONNECT_MS;
   const messageInactivityProbeMs =
     options.messageInactivityProbeMs ?? DEFAULT_MESSAGE_INACTIVITY_PROBE_MS;
   const resolveConnectConfig = options.resolveConnectConfig;
@@ -68,7 +64,6 @@ export function useSocketForegroundReconnect(
       (config) => socket.forceReconnect(config),
       () => socket.checkConnectionState(),
       resolveConfig,
-      backgroundForceReconnectMs,
       recoveryActionCooldownMs,
       stateCheckThrottleMs
     );
@@ -80,13 +75,12 @@ export function useSocketForegroundReconnect(
 
     const visibilityTracker = createForegroundVisibilityTracker(
       DEFAULT_FOREGROUND_DEBOUNCE_MS,
-      (trigger, backgroundDurationMs) => {
+      (trigger) => {
         if (trigger === "visibilitychange" && document.hidden) {
           return;
         }
         session.runStateCheck({
           trigger: "foreground",
-          backgroundDurationMs,
           force: true,
         });
       }
@@ -118,7 +112,6 @@ export function useSocketForegroundReconnect(
     };
   }, [
     accessToken,
-    backgroundForceReconnectMs,
     connectionWatchIntervalMs,
     messageInactivityProbeMs,
     recoveryActionCooldownMs,

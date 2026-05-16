@@ -1,17 +1,13 @@
-import { resolveHeartbeatStaleThresholdMs } from "../../../stomp/stomp-liveness";
 import type { SocketConnectionStateCheck } from "../../client/socket-manager";
-import type { SocketConfig } from "../../protocol";
 
 import {
   isStateCheckThrottled,
-  shouldForceRecreateAfterBackground,
+  shouldBypassStateCheckInFlight,
   type StateCheckOptions,
 } from "./socket-recovery-policy";
 
 export function createSocketStateCheckRunner(
   checkConnectionState: () => Promise<SocketConnectionStateCheck>,
-  resolveConfig: () => Promise<SocketConfig | null>,
-  backgroundForceReconnectMs: number,
   stateCheckThrottleMs: number,
   getLastStateCheckAt: () => number,
   setLastStateCheckAt: (timestamp: number) => void,
@@ -20,14 +16,16 @@ export function createSocketStateCheckRunner(
   runRecovery: (
     checkOptions: StateCheckOptions,
     state: SocketConnectionStateCheck
-  ) => Promise<void>,
-  foregroundFastRecreateState: SocketConnectionStateCheck
+  ) => Promise<void>
 ) {
   return (checkOptions: StateCheckOptions = {}) => {
     if (typeof document !== "undefined" && document.hidden) {
       return;
     }
-    if (isStateCheckInFlight()) {
+    if (
+      isStateCheckInFlight() &&
+      !shouldBypassStateCheckInFlight(checkOptions.trigger, checkOptions.force)
+    ) {
       return;
     }
 
@@ -47,28 +45,6 @@ export function createSocketStateCheckRunner(
 
     void (async () => {
       try {
-        const backgroundDurationMs = checkOptions.backgroundDurationMs ?? 0;
-        const config = await resolveConfig();
-        const backgroundRecreateThresholdMs = config
-          ? resolveHeartbeatStaleThresholdMs(config.stomp)
-          : backgroundForceReconnectMs;
-        const shouldRecreateAfterBackground = shouldForceRecreateAfterBackground(
-          backgroundDurationMs,
-          backgroundRecreateThresholdMs,
-          checkOptions.trigger
-        );
-
-        if (shouldRecreateAfterBackground) {
-          await runRecovery(
-            {
-              ...checkOptions,
-              forceRecreate: true,
-            },
-            foregroundFastRecreateState
-          );
-          return;
-        }
-
         const state = await checkConnectionState();
 
         if (state.healthy) {
@@ -80,6 +56,7 @@ export function createSocketStateCheckRunner(
             ...checkOptions,
             forceRecreate:
               checkOptions.forceRecreate === true ||
+              !state.workerAlive ||
               state.serverActivityStale === true,
           },
           state

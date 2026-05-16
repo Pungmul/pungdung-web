@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   shouldBypassRecoveryCooldown,
-  shouldForceRecreateAfterBackground,
+  shouldBypassStateCheckInFlight,
   shouldRecreateRuntime,
 } from "./socket-recovery-policy";
 
@@ -13,24 +13,17 @@ describe("socket-recovery-policy", () => {
     expect(shouldBypassRecoveryCooldown("watch-probe")).toBe(false);
   });
 
-  it("should force recreate after long foreground background", () => {
-    expect(
-      shouldForceRecreateAfterBackground(20_000, 20_000, "foreground")
-    ).toBe(true);
-    expect(
-      shouldForceRecreateAfterBackground(5_000, 20_000, "foreground")
-    ).toBe(false);
-    expect(
-      shouldForceRecreateAfterBackground(60_000, 20_000, "watch-probe")
-    ).toBe(false);
+  it("should bypass in-flight guard for urgent foreground checks", () => {
+    expect(shouldBypassStateCheckInFlight("foreground", true)).toBe(true);
+    expect(shouldBypassStateCheckInFlight("online", true)).toBe(true);
+    expect(shouldBypassStateCheckInFlight("foreground", false)).toBe(false);
+    expect(shouldBypassStateCheckInFlight("watch-probe", true)).toBe(false);
   });
 
   it("should recreate runtime when forceRecreate is set", () => {
     expect(
       shouldRecreateRuntime({
         forceRecreate: true,
-        backgroundDurationMs: 0,
-        backgroundForceReconnectMs: 30_000,
         workerAlive: true,
       })
     ).toBe(true);
@@ -41,9 +34,21 @@ describe("socket-recovery-policy", () => {
       shouldRecreateRuntime({
         reconnectOnly: true,
         forceRecreate: true,
-        backgroundDurationMs: 60_000,
-        backgroundForceReconnectMs: 30_000,
         workerAlive: false,
+      })
+    ).toBe(false);
+  });
+
+  it("should recreate runtime only when worker is not alive", () => {
+    expect(
+      shouldRecreateRuntime({
+        workerAlive: false,
+      })
+    ).toBe(true);
+
+    expect(
+      shouldRecreateRuntime({
+        workerAlive: true,
       })
     ).toBe(false);
   });

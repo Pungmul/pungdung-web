@@ -12,8 +12,6 @@ export type StateCheckTrigger =
 
 export type StateCheckOptions = {
   trigger?: StateCheckTrigger;
-  /** 백그라운드 체류 시간(ms). 임계치 이상이면 runtime instance 교체 */
-  backgroundDurationMs?: number;
   /** stateCheck throttle만 우회한다 */
   force?: boolean;
   /** true면 STOMP만 재연결, false/미설정이면 상황에 따라 runtime 교체 */
@@ -25,22 +23,8 @@ export type StateCheckOptions = {
 type ShouldRecreateRuntimeOptions = {
   reconnectOnly?: boolean | undefined;
   forceRecreate?: boolean | undefined;
-  backgroundDurationMs: number;
-  backgroundForceReconnectMs: number;
   workerAlive: boolean;
 };
-
-export function shouldForceRecreateAfterBackground(
-  backgroundDurationMs: number,
-  thresholdMs: number,
-  trigger?: StateCheckTrigger
-): boolean {
-  return (
-    trigger === "foreground" &&
-    thresholdMs > 0 &&
-    backgroundDurationMs >= thresholdMs
-  );
-}
 
 export function shouldRecreateRuntime(
   options: ShouldRecreateRuntimeOptions
@@ -53,10 +37,7 @@ export function shouldRecreateRuntime(
     return true;
   }
 
-  return (
-    options.backgroundDurationMs >= options.backgroundForceReconnectMs ||
-    !options.workerAlive
-  );
+  return !options.workerAlive;
 }
 
 export function shouldBypassRecoveryCooldown(
@@ -67,6 +48,17 @@ export function shouldBypassRecoveryCooldown(
     trigger === "online" ||
     trigger === "heartbeat-lost" ||
     trigger === "transport-failure"
+  );
+}
+
+/** foreground/online + force 시 진행 중인 state check를 기다리지 않는다 */
+export function shouldBypassStateCheckInFlight(
+  trigger: StateCheckTrigger | undefined,
+  force?: boolean
+): boolean {
+  return (
+    force === true &&
+    (trigger === "foreground" || trigger === "online")
   );
 }
 

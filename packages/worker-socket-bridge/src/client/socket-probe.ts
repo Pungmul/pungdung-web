@@ -15,7 +15,7 @@ export type SocketConnectionStateCheck = {
   clientConnected: boolean;
 };
 
-const DEFAULT_WORKER_PING_TIMEOUT_MS = 3_000;
+const DEFAULT_WORKER_PING_TIMEOUT_MS = 1_000;
 const DEFAULT_MESSAGE_INACTIVITY_PROBE_MS = 3 * 60_000;
 const DEFAULT_TRANSPORT_PROBE_CACHE_MS = 15_000;
 const SOCKET_TRANSPORT_PROBE_FAILED = "Socket transport probe failed";
