@@ -29,7 +29,8 @@ export function useSocketManagerOptional(): SocketManager | undefined {
 }
 
 export function useSocketManager(manager?: SocketManager): SocketManager {
-  return manager ?? useContext(SocketContext) ?? sharedNoopManager;
+  const contextManager = useContext(SocketContext);
+  return manager ?? contextManager ?? sharedNoopManager;
 }
 
 export function useClientSocketManager(
@@ -51,7 +52,7 @@ export function ClientSocketManagerProvider({
 export function useInitSocketConnect(
   _accessToken?: string | null,
   _createConnectConfig?: CreateSocketConnectConfig
-) {}
+) { }
 
 export function useSocketConnection() {
   return false;
@@ -72,7 +73,7 @@ export function useSocketTopicsReady(_topics: readonly string[] = []) {
   };
 }
 
-export function useSocketForegroundReconnect() {}
+export function useSocketForegroundReconnect() { }
 
 export function useSocketSubscription<T = unknown>(_params: {
   topic: string | undefined;

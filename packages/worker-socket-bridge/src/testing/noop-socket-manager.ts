@@ -1,12 +1,12 @@
 import type { CreateSocketManagerOptions } from "../client/socket-manager";
+import type { SocketConnectionStateCheck } from "../client/socket-probe";
+import type { TopicReadinessEntry } from "../client/socket-snapshot";
 import type {
   SocketConfig,
   SocketConnectionStatus,
   SocketListener,
   SubscriptionStatus,
 } from "../protocol";
-import type { SocketConnectionStateCheck } from "../client/socket-probe";
-import type { TopicReadinessEntry } from "../client/socket-snapshot";
 import type { SocketRuntime } from "../runtime";
 
 const DISCONNECTED_CONNECTION: SocketConnectionStatus = {

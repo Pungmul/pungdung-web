@@ -1,4 +1,5 @@
 import type { SocketManager as RealSocketManager } from "../client/socket-manager";
+
 import { NoopSocketManager } from "./noop-socket-manager";
 
 export type { CreateSocketManagerOptions } from "../client/socket-manager";
