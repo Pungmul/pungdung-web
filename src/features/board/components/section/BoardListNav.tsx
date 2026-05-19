@@ -5,9 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { useQuery } from "@tanstack/react-query";
 
+import { cn } from "@/shared";
+
 import { boardHrefSegment } from "../../lib";
 import { boardQueries } from "../../queries";
-import { cn } from "@/shared";
 
 function boardNavLinkClass(isActive: boolean) {
   return cn("cursor-pointer text-[15px]",

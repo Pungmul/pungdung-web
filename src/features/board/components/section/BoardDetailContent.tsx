@@ -4,6 +4,7 @@ import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
+
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 
 import { PostBoxSkeleton, PostList } from "@/features/post";

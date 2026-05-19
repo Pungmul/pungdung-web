@@ -28,9 +28,9 @@ export {
   mapUserLastReadMessageIdDtoToDomain,
 } from "./mappers";
 export { deriveMessageItemLayout } from "./message/derive-message-item-layout";
-export { readReceiptAvatarUserIdsKey } from "./message/read-receipt-avatar-key";
 export { formatJoinLogMessage } from "./message/format-join-log-message";
 export { formatMessageTime } from "./message/format-message-time";
 export { mergeChatMessagesNewestFirst } from "./message/merge-chat-messages-newest-first";
 export { isPendingMessage } from "./message/message-item.guards";
 export type { MessageItemLayoutContext } from "./message/message-item-layout.types";
+export { readReceiptAvatarUserIdsKey } from "./message/read-receipt-avatar-key";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, type RefObject } from "react";
+import { type RefObject,useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +17,6 @@ import { chatQueries } from "../queries";
 import { buildReadSignPublishPayload } from "../services";
 import { createReadSignPublishScheduler } from "../services";
 import { ensureReadSignTargetMessageId } from "../services";
-import type { ReadSignPublishScheduler } from "../services";
 import {
   MAX_ATTEMPTS,
   READ_SIGN_CATCH_UP_DELAY_MS,
@@ -31,8 +30,9 @@ import { useReadReceiptStore } from "../store";
 
 import type { ReadSignFn, ReadSignOptions } from "./read-sign.types";
 import { readSocketMessageSchema } from "./socket-message.schema";
-import { logReadSignDebug } from "../lib/read-receipt/read-sign-debug-log";
 import { toNumericMessageId } from "../lib/message/parse-message-id";
+import { logReadSignDebug } from "../lib/read-receipt/read-sign-debug-log";
+import type { ReadSignPublishScheduler } from "../services";
 import type { ChatRoomListItem } from "../types/chat-room.types";
 
 import { authQueries } from "@/features/auth/queries";

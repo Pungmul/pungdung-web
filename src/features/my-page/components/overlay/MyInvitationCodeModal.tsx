@@ -2,10 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { Modal, SkeletonView } from "@/shared";
+
 import { InvitationCodeCopyBox } from "../ui/InvitationCodeCopyBox";
 
 import { myPageQueries } from "@/features/my-page/queries";
-import { Modal, SkeletonView } from "@/shared";
 
 type MyInvitationCodeModalProps = {
   isOpen: boolean;

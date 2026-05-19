@@ -6,8 +6,8 @@ export {
   type BoardHeaderSearchKeyword,
   useBoardHeaderSearchKeyword,
 } from "./useBoardHeaderSearchKeyword";
-export { useDebouncedFetchNextPage } from "./useDebouncedFetchNextPage";
 export {
   useBoardTabNavigation,
   type UseBoardTabNavigationParams,
 } from "./useBoardTabNavigation";
+export { useDebouncedFetchNextPage } from "./useDebouncedFetchNextPage";

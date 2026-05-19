@@ -1,6 +1,6 @@
+import { mergeReadTargetMessageId } from "./merge-read-target-message-id.service";
 import { toNumericMessageId } from "../../lib/message/parse-message-id";
 import { resolveLatestNumericMessageIdFromList } from "../message/resolve-latest-numeric-message-id-from-list.service";
-import { mergeReadTargetMessageId } from "./merge-read-target-message-id.service";
 
 type EnsureReadSignTargetMessageIdParams = {
   currentTargetMessageId: number | null;

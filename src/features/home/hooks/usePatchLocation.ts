@@ -1,5 +1,6 @@
 "use client";
 import { useEffect } from "react";
+
 import { useLocation } from "@/features/location/store";
 
 export function usePatchLocation() {

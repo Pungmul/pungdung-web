@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { boardQueries } from "@/features/board";

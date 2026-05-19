@@ -1,7 +1,7 @@
-import { resolveLatestNumericMessageIdFromList } from "../message/resolve-latest-numeric-message-id-from-list.service";
 import type { ReadAtResolutionMessage } from "./resolve-last-read-message-id-from-read-at.service";
 import { resolveLastReadMessageIdFromReadBroadcast } from "./resolve-last-read-message-id-from-read-broadcast.service";
 import { sanitizePrevLastReadMessageIdForMerge } from "./sanitize-prev-last-read-message-id-for-merge.service";
+import { resolveLatestNumericMessageIdFromList } from "../message/resolve-latest-numeric-message-id-from-list.service";
 
 export type OtherParticipantReadSnapshot = Record<number, number | null>;
 

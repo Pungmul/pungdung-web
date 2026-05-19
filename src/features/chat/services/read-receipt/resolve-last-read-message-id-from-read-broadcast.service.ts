@@ -1,6 +1,6 @@
+import { resolveConfirmedLastReadMessageId } from "./resolve-confirmed-last-read-message-id.service";
 import type { ReadAtResolutionMessage } from "./resolve-last-read-message-id-from-read-at.service";
 import { resolveLastReadMessageIdFromReadAt } from "./resolve-last-read-message-id-from-read-at.service";
-import { resolveConfirmedLastReadMessageId } from "./resolve-confirmed-last-read-message-id.service";
 
 export function resolveLastReadMessageIdFromReadBroadcast(params: {
   messageIds: readonly number[];

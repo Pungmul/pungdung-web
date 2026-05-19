@@ -2,8 +2,8 @@
 
 import { useCallback, useLayoutEffect, useRef } from "react";
 
-import { logReadSignDebug } from "../../../lib/read-receipt/read-sign-debug-log";
 import { toNumericMessageId } from "../../../lib/message/parse-message-id";
+import { logReadSignDebug } from "../../../lib/read-receipt/read-sign-debug-log";
 import type { ReadSignFn } from "../../../socket/read-sign.types";
 import { useChatRoomSocket } from "../../../socket/useChatRoomSocket";
 import type { Message } from "../../../types";
