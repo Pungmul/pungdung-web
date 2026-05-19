@@ -1,7 +1,8 @@
 import dayjs from "dayjs";
-import 'dayjs/locale/ko';
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+
+import 'dayjs/locale/ko';
 
 dayjs.locale('ko');
 dayjs.extend(utc);

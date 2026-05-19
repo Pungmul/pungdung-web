@@ -1,5 +1,6 @@
-import { create } from "zustand";
 import { CSSProperties } from "react";
+
+import { create } from "zustand";
 
 interface AlertData {
   title: string;

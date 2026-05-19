@@ -9,12 +9,12 @@ export { ToastHost } from "./layout/ToastHost";
 
 // UI Components
 export { AlertModal } from "./ui/AlertModal";
+export { FloatingButton } from "./ui/FloatingButton";
 export { ListEmptyView } from "./ui/ListEmptyView";
 export { LoadingSpinner } from "./ui/LoadingSpinner";
 export { default as LocationModal } from "./ui/LocationModal";
 export { default as Modal } from "./ui/Modal";
 export { ScrollToTopButton } from "./ui/ScrollToTopButton";
-export { FloatingButton } from "./ui/FloatingButton";
 export { SkeletonView } from "./ui/SkeletonView";
 export { Spinner } from "./ui/Spinner";
 

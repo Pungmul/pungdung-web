@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+
 import type { ReactNode } from "react";
 
-import { ProfileCircle, type MyPageInfo } from "@/features/my-page";
+import { type MyPageInfo,ProfileCircle } from "@/features/my-page";
 import { NotificationPanelOverlay } from "@/features/notification";
+
 import {
   BoardIconFilled,
   HomeIconFilled,

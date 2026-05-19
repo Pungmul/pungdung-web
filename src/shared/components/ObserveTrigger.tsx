@@ -1,5 +1,6 @@
-import type { RefObject } from "react";
 import { useEffect, useRef } from "react";
+
+import type { RefObject } from "react";
 
 interface ObserveTriggerProps {
   trigger: () => void;

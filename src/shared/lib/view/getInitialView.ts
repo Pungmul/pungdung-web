@@ -1,4 +1,5 @@
 import { ViewType } from "@/shared/types";
+
 import { isWebViewUserAgent } from "./isWebViewUserAgent";
 import { resolveCookieView } from "./viewCookie";
 

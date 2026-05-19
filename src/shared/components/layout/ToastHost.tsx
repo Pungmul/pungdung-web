@@ -1,7 +1,6 @@
 "use client";
 
 import { TOAST_CONTAINER_ID } from "@/shared/constants/toast.constant";
-
 import { cn } from "@/shared/lib";
 
 import Toast from "../ui/Toast";

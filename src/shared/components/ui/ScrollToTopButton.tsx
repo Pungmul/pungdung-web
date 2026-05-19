@@ -2,8 +2,8 @@
 
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
 
-import { useScrollHideComponent } from "../../hooks";
 import { FloatingButton } from "./FloatingButton";
+import { useScrollHideComponent } from "../../hooks";
 
 export function ScrollToTopButton() {
   const { componentRef, isVisible } = useScrollHideComponent();

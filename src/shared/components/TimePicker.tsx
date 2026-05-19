@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Modal } from "./ui";
+
 import dayjs from "dayjs";
+
 import { TimeInput } from "./form";
 import { formatIntervalValue } from "./form/TimeInput/formatIntervalValue";
+import { Modal } from "./ui";
 
 interface TimePickerProps {
   trigger: React.ReactNode;

@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
+
 import { ViewType } from "../types";
+
 import { VIEW_TYPE_COOKIE_NAME } from "./view/constants";
 import { isViewType } from "./view/isViewType";
 

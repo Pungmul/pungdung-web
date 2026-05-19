@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
 import { myPageQueries } from "@/features/my-page";
+
 import { Responsive } from "@/shared/components/Responsive";
 import { useView } from "@/shared/lib/view/view-store-provider";
 
