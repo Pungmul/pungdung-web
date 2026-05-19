@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 import type { MiddlewareHandler } from "../types";
 
 /** 카카오 가입 완료 토큰 유무를 검사해 접근을 제어합니다. */

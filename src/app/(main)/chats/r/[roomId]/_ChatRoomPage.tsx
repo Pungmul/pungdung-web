@@ -19,7 +19,6 @@ import {
   useRoomReadSocket,
   useSyncChatRoomFocusOnRoomId,
 } from "@/features/chat";
-import type { ReadSignTimelineMessagesRef } from "@/features/chat/socket/useRoomReadSocket";
 import { myPageQueries } from "@/features/my-page";
 
 import { Conditional } from "@/shared";
@@ -27,6 +26,8 @@ import { useBodyScrollLock, useViewportHeightVar } from "@/shared/hooks";
 
 import { ChatRoomMainScreen } from "./_ChatRoomMainScreen";
 import { ChatRoomSettingScreen } from "./_ChatRoomSettingScreen";
+
+import type { ReadSignTimelineMessagesRef } from "@/features/chat/socket/useRoomReadSocket";
 
 type ChatRoomActiveScreen = "main" | "settings";
 

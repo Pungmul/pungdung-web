@@ -8,9 +8,10 @@ import {
   ChatRoomTimelinePanel,
   InviteUserModal,
 } from "@/features/chat";
+import { User, UserProfileCardModalHost } from "@/features/user";
+
 import type { ReadSignFn } from "@/features/chat/socket/read-sign.types";
 import type { ReadSignTimelineMessagesRef } from "@/features/chat/socket/useRoomReadSocket";
-import { User, UserProfileCardModalHost } from "@/features/user";
 
 type ChatRoomMainScreenProps = {
   roomId: string;

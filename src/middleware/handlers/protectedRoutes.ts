@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+
 import { PUBLIC_PAGE_PREFIXES } from "../constants";
+
 import { matchesPrefix } from "../path";
 import { clearAuthCookies, tryReissueToken } from "../token";
 import type { MiddlewareHandler } from "../types";

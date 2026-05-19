@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+
 import { BYPASS_PATH_PREFIXES } from "../constants";
+
 import { matchesPrefix } from "../path";
 import type { MiddlewareHandler } from "../types";
 

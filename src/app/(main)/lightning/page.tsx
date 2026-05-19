@@ -6,9 +6,9 @@ import { Suspense } from "@suspensive/react";
 import { AnimatePresence } from "framer-motion";
 
 import {
-  LightningParticipationOverlay,
   LightningListOverlay,
   LightningMapSection,
+  LightningParticipationOverlay,
   useLightningBottomSheetState,
   useLightningLists,
   useLightningListViewModel,

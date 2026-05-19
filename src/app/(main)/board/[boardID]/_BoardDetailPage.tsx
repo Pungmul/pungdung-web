@@ -1,19 +1,19 @@
 "use client";
 
-import { Suspense } from "@suspensive/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
+
+import { Suspense } from "@suspensive/react";
+
+import { SkeletonView } from "@/shared";
 
 import {
   BoardChildCategoryTabs,
   BoardDetailContent,
   BoardDetailContentLoading,
 } from "@/features/board/components";
-
-import { boardQueries } from "@/features/board/queries";
-
-import { useBoardTabNavigation } from "@/features/board/hooks/view-model";
 import { useTrackBoardVisit } from "@/features/board/hooks/actions";
-import { SkeletonView } from "@/shared";
+import { useBoardTabNavigation } from "@/features/board/hooks/view-model";
+import { boardQueries } from "@/features/board/queries";
 
 
 /** 게시판 상세: 자식 탭·게시글 목록·핫글 배너를 조합하는 클라이언트 페이지 */

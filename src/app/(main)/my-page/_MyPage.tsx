@@ -8,11 +8,11 @@ import { Suspense } from "@suspensive/react";
 
 import { Space } from "@/shared";
 
+import { MyInvitationCodeMenuItem } from "../../../features/my-page/components/section/MyInvitationCodeMenuItem";
 import {
   MyPageAccountSection,
   MyPageAccountSectionSkeleton,
 } from "../../../features/my-page/components/section/MyPageAccountSection";
-import { MyInvitationCodeMenuItem } from "../../../features/my-page/components/section/MyInvitationCodeMenuItem";
 import { MyPageFriendsSection } from "../../../features/my-page/components/section/MyPageFriendsSection";
 import { ProfileSection, ProfileSectionSkeleton } from "../../../features/my-page/components/section/ProfileSection";
 

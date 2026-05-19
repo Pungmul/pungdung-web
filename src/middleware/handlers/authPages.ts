@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+
 import { AUTH_PAGE_PREFIXES } from "../constants";
+
 import { matchesPrefix } from "../path";
 import { tryReissueToken } from "../token";
 import type { MiddlewareHandler } from "../types";

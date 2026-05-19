@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 import { clearAuthCookies } from "../token";
 import type { MiddlewareHandler } from "../types";
 
