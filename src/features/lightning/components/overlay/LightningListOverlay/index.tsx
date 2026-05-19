@@ -11,11 +11,11 @@ import { Responsive } from "@/shared";
 
 import { LightningBottomSheet } from "./LightningBottomSheet";
 import { LightningSidebar } from "./LightningSidebar";
-import { LightningCardList } from "../../section/card/LightningCardList";
 import type {
   LightningBottomSheetRefType,
   LightningMeeting,
 } from "../../../types";
+import { LightningCardList } from "../../section/card/LightningCardList";
 
 type LightningListOverlayProps = {
   bottomSheetRef: RefObject<LightningBottomSheetRefType | null>;

@@ -1,9 +1,7 @@
-import { resolveLightningCurrentPersonNum } from "../resolve-lightning-current-person-num";
-
 import { mapLightningParticipantProfile } from "./map-lightning-participant-profile";
-
 import type { LightningMeetingDto } from "../../api/client/dto.schema";
 import type { LightningMeeting } from "../../types";
+import { resolveLightningCurrentPersonNum } from "../resolve-lightning-current-person-num";
 
 /**
  * 스키마로 검증된 모임 DTO → 앱에서 쓰는 `LightningMeeting` (null·필드 정규화).

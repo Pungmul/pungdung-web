@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 
 import { lightningQueries } from "../../queries";
 import { deriveDisplayLightningLists } from "../../services";
-
 import type { LightningMeeting } from "../../types";
 
 type UseLightningListsParams = {

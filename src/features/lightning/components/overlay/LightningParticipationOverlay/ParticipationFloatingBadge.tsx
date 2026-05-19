@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 
 import { Button } from "@/shared";
 
+import { ParticipationStatusTag } from "./ParticipationStatusTag";
 import type { LightningParticipationBadgeStatus } from "../../../lib/get-lightning-participation-time-display";
 import type { LightningMeeting } from "../../../types";
-import { ParticipationStatusTag } from "./ParticipationStatusTag";
 
 type ParticipationFloatingBadgeProps = {
   meeting: LightningMeeting;

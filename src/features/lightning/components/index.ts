@@ -1,4 +1,4 @@
-export { LightningParticipationOverlay, LightningListOverlay } from "./overlay";
+export { LightningListOverlay,LightningParticipationOverlay } from "./overlay";
 export {
   BuildProgressBar,
   LightningBuildCompleteStep,

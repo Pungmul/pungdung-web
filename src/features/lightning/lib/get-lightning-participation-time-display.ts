@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 
 import { LIGHTNING_STATUS } from "../constants";
+
 import type { LightningMeeting } from "../types";
 
 export type LightningParticipationBadgeStatus = "모집중" | "준비완료" | "진행중";

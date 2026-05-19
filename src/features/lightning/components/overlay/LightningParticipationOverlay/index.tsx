@@ -6,10 +6,10 @@ import { useQuery } from "@tanstack/react-query";
 
 import { AnimatePresence } from "framer-motion";
 
-import { useLightningParticipationTimeDisplay } from "../../../hooks/view-model/useLightningParticipationTimeDisplay";
-import { lightningQueries } from "../../../queries";
 import { ParticipationDetailOverlay } from "./ParticipationDetailOverlay";
 import { ParticipationFloatingBadge } from "./ParticipationFloatingBadge";
+import { useLightningParticipationTimeDisplay } from "../../../hooks/view-model/useLightningParticipationTimeDisplay";
+import { lightningQueries } from "../../../queries";
 
 export function LightningParticipationOverlay() {
   const { data: userPartinLightning } = useQuery(

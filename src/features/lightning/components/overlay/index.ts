@@ -1,2 +1,2 @@
-export { LightningParticipationOverlay } from "./LightningParticipationOverlay";
 export { LightningListOverlay } from "./LightningListOverlay";
+export { LightningParticipationOverlay } from "./LightningParticipationOverlay";

@@ -1,8 +1,8 @@
 export { fetchNearLightning } from "./api/client";
 export {
-  LightningParticipationOverlay,
   LightningListOverlay,
   LightningMapSection,
+  LightningParticipationOverlay,
   NearLightningContent,
 } from "./components";
 export { useSyncUserLocation } from "./hooks/actions";

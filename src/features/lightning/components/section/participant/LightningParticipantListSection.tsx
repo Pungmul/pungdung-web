@@ -10,10 +10,10 @@ import {
 import { SearchInput } from "@/shared";
 import { Toast } from "@/shared/store";
 
+import type { LightningParticipantProfile } from "../../../types";
 import { LightningParticipantBox } from "../../ui/participant/LightningParticipantBox";
 import { LightningParticipantMenu } from "../../ui/participant/LightningParticipantMenu";
 import { LightningParticipantMessageButton } from "../../ui/participant/LightningParticipantMessageButton";
-import type { LightningParticipantProfile } from "../../../types";
 
 interface LightningParticipantListSectionProps {
   meetingId: number;

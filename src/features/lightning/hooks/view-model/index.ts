@@ -5,7 +5,7 @@ export { useLightningListViewModel } from "./useLightningListViewModel";
 export { useLightningMapBottomSheetSync } from "./useLightningMapBottomSheetSync";
 export { useLightningMapCamera } from "./useLightningMapCamera";
 export { useLightningMarkers } from "./useLightningMarkers";
+export { useLightningParticipationTimeDisplay } from "./useLightningParticipationTimeDisplay";
 export { useMapMoveToLightningIndexRef } from "./useMapMoveToLightningIndexRef";
 export { useMapPanToCurrentLocationRef } from "./useMapPanToCurrentLocationRef";
-export { useLightningParticipationTimeDisplay } from "./useLightningParticipationTimeDisplay";
 export { useTimeGapPannelCountdown } from "./useTimeGapPannelCountdown";
