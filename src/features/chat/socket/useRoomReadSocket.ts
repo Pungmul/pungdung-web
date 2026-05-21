@@ -21,7 +21,6 @@ import {
   MAX_ATTEMPTS,
   READ_SIGN_CATCH_UP_DELAY_MS,
 } from "../services";
-import { resetUnreadCountInRoomList } from "../services";
 import {
   resolveMyReadBroadcastAction,
   resolveReadBroadcastLastReadMessageId,
@@ -30,10 +29,10 @@ import { useReadReceiptStore } from "../store";
 
 import type { ReadSignFn, ReadSignOptions } from "./read-sign.types";
 import { readSocketMessageSchema } from "./socket-message.schema";
+import { applyResetRoomUnreadCount } from "../hooks/actions/chat-room-list/apply-reset-room-unread-count";
 import { toNumericMessageId } from "../lib/message/parse-message-id";
 import { logReadSignDebug } from "../lib/read-receipt/read-sign-debug-log";
 import type { ReadSignPublishScheduler } from "../services";
-import type { ChatRoomListItem } from "../types/chat-room.types";
 
 import { authQueries } from "@/features/auth/queries";
 
@@ -193,13 +192,7 @@ export function useRoomReadSocket(
           return;
         }
 
-        queryClient.setQueryData<ChatRoomListItem[]>(
-          chatQueries.roomList().queryKey,
-          (prevData) => {
-            if (!prevData) return prevData;
-            return resetUnreadCountInRoomList(prevData, roomId);
-          }
-        );
+        await applyResetRoomUnreadCount(queryClient, roomId);
       });
     }
 
@@ -305,6 +298,7 @@ export function useRoomReadSocket(
         runtime.targetMessageId = null;
         runtime.catchUpAttempts = 0;
         clearCatchUpTimer(runtime);
+        void applyResetRoomUnreadCount(queryClient, roomId);
         return;
       }
 
@@ -327,7 +321,13 @@ export function useRoomReadSocket(
         targetMessageId: runtime.targetMessageId,
       });
     },
-    [applySocketRead, roomId, scheduleReadSignCatchUp, timelineMessagesRef]
+    [
+      applySocketRead,
+      queryClient,
+      roomId,
+      scheduleReadSignCatchUp,
+      timelineMessagesRef,
+    ]
   );
 
   const readSign = useCallback<ReadSignFn>(

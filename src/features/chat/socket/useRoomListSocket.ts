@@ -13,6 +13,7 @@ import { mergeRoomListSocketNotification } from "../services";
 import { useChatRoomStore } from "../store";
 
 import { chatRoomUpdateMessageSchema } from "./socket-message.schema";
+import { applyResetRoomUnreadCount } from "../hooks/actions/chat-room-list/apply-reset-room-unread-count";
 import type { ChatRoomListItem } from "../types/chat-room.types";
 
 
@@ -31,6 +32,14 @@ export function useRoomListSocket() {
     (raw: unknown) => {
       const parsed = chatRoomUpdateMessageSchema.safeParse(raw);
       if (!parsed.success) return;
+
+      if (parsed.data.type === "READ") {
+        void applyResetRoomUnreadCount(
+          queryClient,
+          parsed.data.chatRoomUUID
+        );
+        return;
+      }
 
       const listKey = chatQueries.roomList().queryKey;
       const oldData = queryClient.getQueryData<ChatRoomListItem[]>(listKey);

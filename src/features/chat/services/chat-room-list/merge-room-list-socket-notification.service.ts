@@ -1,5 +1,4 @@
 import { removeChatRoomFromList } from "./remove-chat-room-from-list.service";
-import { resetUnreadCountInRoomList } from "./reset-unread-count-in-room-list.service";
 import { updateLastMessageInRoomList } from "./update-last-message-in-room-list.service";
 import { sortChatRoomByDate } from "../../lib";
 import type { ChatRoomUpdateMessage } from "../../socket/socket-message.schema";
@@ -19,13 +18,6 @@ export function mergeRoomListSocketNotification(
 
   const room = oldList.find((r) => r.chatRoomUUID === message.chatRoomUUID);
   if (!room) return { kind: "invalidate" };
-
-  if (message.type === "READ") {
-    return {
-      kind: "data",
-      rooms: resetUnreadCountInRoomList(oldList, message.chatRoomUUID),
-    };
-  }
 
   if (message.type === "EXIT") {
     return {
