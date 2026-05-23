@@ -2,7 +2,7 @@
 
 import { type RefObject, useCallback, useEffect, useMemo, useRef } from "react";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import {
   useSocketConnection,
@@ -27,7 +27,7 @@ import { useReadReceiptStore } from "../store";
 
 import type { ReadSignFn, ReadSignOptions } from "./read-sign.types";
 import { readSocketMessageSchema } from "./socket-message.schema";
-import { applyResetRoomUnreadCount } from "../hooks/actions/chat-room-list/apply-reset-room-unread-count";
+import { useApplyResetRoomUnreadCount } from "../hooks/actions/chat-room-list/useApplyResetRoomUnreadCount";
 import { toNumericMessageId } from "../lib/message/parse-message-id";
 import { logReadSignDebug } from "../lib/read-receipt/read-sign-debug-log";
 import type { ReadSignPublishScheduler } from "../services";
@@ -77,8 +77,8 @@ export function useRoomReadSocket(
 ) {
   const timelineMessagesRef = options?.timelineMessagesRef;
   const socket = useSocketManagerOptional();
-  const queryClient = useQueryClient();
   const isConnected = useSocketConnection();
+  const { applyResetRoomUnreadCount } = useApplyResetRoomUnreadCount();
   const { data: token } = useQuery(authQueries.token());
   const { data: myInfo } = useQuery(myPageQueries.info());
   const { data: chatRoomData } = useQuery(chatQueries.room(roomId));
@@ -177,12 +177,12 @@ export function useRoomReadSocket(
         return;
       }
 
-      await applyResetRoomUnreadCount(queryClient, roomId);
+      await applyResetRoomUnreadCount(roomId);
     });
   }, [
+    applyResetRoomUnreadCount,
     canSendNow,
     publishReadSignNow,
-    queryClient,
     roomId,
     token?.accessToken,
   ]);
@@ -322,7 +322,7 @@ export function useRoomReadSocket(
         runtime.targetMessageId = null;
         runtime.catchUpAttempts = 0;
         clearReadSignCatchUpTimer(runtime);
-        void applyResetRoomUnreadCount(queryClient, roomId);
+        void applyResetRoomUnreadCount(roomId);
         return;
       }
 
@@ -346,8 +346,8 @@ export function useRoomReadSocket(
       });
     },
     [
+      applyResetRoomUnreadCount,
       applySocketRead,
-      queryClient,
       roomId,
       scheduleReadSignCatchUp,
       timelineMessagesRef,

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from "react";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { FOREGROUND_RECONCILE_THROTTLE_MS } from "../../../constants";
 import { logReadSignDebug } from "../../../lib/read-receipt/read-sign-debug-log";
 import { chatQueries } from "../../../queries";
 import {
@@ -12,7 +13,6 @@ import {
   applyChatRoomGapMessagesToRoomInfinite,
   applyChatRoomGapMessagesToRoomList,
   fetchChatRoomMessageGap,
-  FOREGROUND_RECONCILE_THROTTLE_MS,
   resolveLatestNumericMessageIdFromList,
 } from "../../../services";
 import type { ReadSignFn } from "../../../socket/read-sign.types";

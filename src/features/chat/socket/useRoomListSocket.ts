@@ -13,13 +13,14 @@ import { mergeRoomListSocketNotification } from "../services";
 import { useChatRoomStore } from "../store";
 
 import { chatRoomUpdateMessageSchema } from "./socket-message.schema";
-import { applyResetRoomUnreadCount } from "../hooks/actions/chat-room-list/apply-reset-room-unread-count";
+import { useApplyResetRoomUnreadCount } from "../hooks/actions/chat-room-list/useApplyResetRoomUnreadCount";
 import type { ChatRoomListItem } from "../types/chat-room.types";
 
 
 export function useRoomListSocket() {
   const { data: userData } = useQuery(myPageQueries.info());
   const queryClient = useQueryClient();
+  const { applyResetRoomUnreadCount } = useApplyResetRoomUnreadCount();
 
   const currentChatRoomId = useChatRoomStore((state) => state.focusingRoomId);
   const idRef = useRef<string>(currentChatRoomId);
@@ -34,10 +35,7 @@ export function useRoomListSocket() {
       if (!parsed.success) return;
 
       if (parsed.data.type === "READ") {
-        void applyResetRoomUnreadCount(
-          queryClient,
-          parsed.data.chatRoomUUID
-        );
+        void applyResetRoomUnreadCount(parsed.data.chatRoomUUID);
         return;
       }
 
@@ -56,7 +54,7 @@ export function useRoomListSocket() {
       }
       queryClient.setQueryData(listKey, result.rooms);
     },
-    [queryClient]
+    [applyResetRoomUnreadCount, queryClient]
   );
 
   useSocketSubscription({

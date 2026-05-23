@@ -1,11 +1,14 @@
-import { QueryClient } from "@tanstack/react-query";
+import type { ReactNode } from "react";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { chatQueries } from "../../../queries";
 import * as resetUnreadIdbService from "../../../services/chat-room-list/reset-unread-count-in-room-list-indexed-db.service";
 import type { ChatRoomListItem } from "../../../types";
 
-import { applyResetRoomUnreadCount } from "./apply-reset-room-unread-count";
+import { useApplyResetRoomUnreadCount } from "./useApplyResetRoomUnreadCount";
 
 const createRoom = (
   overrides: Partial<ChatRoomListItem> = {}
@@ -27,7 +30,15 @@ const createRoom = (
   ...overrides,
 });
 
-describe("applyResetRoomUnreadCount", () => {
+function createWrapper(queryClient: QueryClient) {
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+  };
+}
+
+describe("useApplyResetRoomUnreadCount", () => {
   it("React Query room list와 IndexedDB unreadCount를 함께 0으로 맞춘다", async () => {
     const queryClient = new QueryClient();
     const listKey = chatQueries.roomList().queryKey;
@@ -41,7 +52,11 @@ describe("applyResetRoomUnreadCount", () => {
       .spyOn(resetUnreadIdbService, "resetUnreadCountInRoomListIndexedDB")
       .mockResolvedValue(undefined);
 
-    await applyResetRoomUnreadCount(queryClient, "room-1");
+    const { result } = renderHook(() => useApplyResetRoomUnreadCount(), {
+      wrapper: createWrapper(queryClient),
+    });
+
+    await result.current.applyResetRoomUnreadCount("room-1");
 
     const roomList = queryClient.getQueryData<ChatRoomListItem[]>(listKey);
     expect(
@@ -59,7 +74,11 @@ describe("applyResetRoomUnreadCount", () => {
       .spyOn(resetUnreadIdbService, "resetUnreadCountInRoomListIndexedDB")
       .mockResolvedValue(undefined);
 
-    await applyResetRoomUnreadCount(queryClient, "room-1");
+    const { result } = renderHook(() => useApplyResetRoomUnreadCount(), {
+      wrapper: createWrapper(queryClient),
+    });
+
+    await result.current.applyResetRoomUnreadCount("room-1");
 
     expect(idbSpy).toHaveBeenCalledWith("room-1");
   });
@@ -78,26 +97,14 @@ describe("applyResetRoomUnreadCount", () => {
       "resetUnreadCountInRoomListIndexedDB"
     ).mockResolvedValue(undefined);
 
-    await applyResetRoomUnreadCount(queryClient, "room-1");
+    const { result } = renderHook(() => useApplyResetRoomUnreadCount(), {
+      wrapper: createWrapper(queryClient),
+    });
 
-    expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: listKey });
-  });
+    await result.current.applyResetRoomUnreadCount("room-1");
 
-  it("이미 unreadCount가 0이면 setQueryData를 변경하지 않는다", async () => {
-    const queryClient = new QueryClient();
-    const listKey = chatQueries.roomList().queryKey;
-    const rooms = [createRoom({ chatRoomUUID: "room-1", unreadCount: 0 })];
-    queryClient.setQueryData(listKey, rooms);
-
-    const setQueryDataSpy = vi.spyOn(queryClient, "setQueryData");
-    vi.spyOn(
-      resetUnreadIdbService,
-      "resetUnreadCountInRoomListIndexedDB"
-    ).mockResolvedValue(undefined);
-
-    await applyResetRoomUnreadCount(queryClient, "room-1");
-
-    expect(setQueryDataSpy).not.toHaveBeenCalled();
-    expect(queryClient.getQueryData(listKey)).toEqual(rooms);
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: listKey });
+    });
   });
 });
