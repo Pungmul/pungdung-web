@@ -1,19 +1,29 @@
+import { READ_SIGN_PUBLISH_STABILIZE_MS } from "../../constants/read-sign.constants";
+
 export type ReadSignPublishScheduler = {
   schedule: () => void;
+  flushNow: () => void;
+  cancel: () => void;
 };
 
-/**
- * readSign publish를 직렬화한다.
- * 그룹 채팅처럼 연속 수신·post-entry가 겹칠 때 낮은 messageId publish가
- * 높은 id보다 늦게 서버에 도착하는 레이스를 막는다.
- */
 export function createReadSignPublishScheduler(
-  flush: () => Promise<void>
+  flush: () => Promise<void>,
+  stabilizeMs = READ_SIGN_PUBLISH_STABILIZE_MS
 ): ReadSignPublishScheduler {
   let publishing = false;
   let needsAnotherPublish = false;
+  let stabilizeTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const run = async (): Promise<void> => {
+  const clearStabilizeTimer = (): void => {
+    if (stabilizeTimer === null) {
+      return;
+    }
+
+    clearTimeout(stabilizeTimer);
+    stabilizeTimer = null;
+  };
+
+  const runFlush = async (): Promise<void> => {
     if (publishing) {
       needsAnotherPublish = true;
       return;
@@ -26,7 +36,7 @@ export function createReadSignPublishScheduler(
         try {
           await flush();
         } catch {
-          // publish 실패는 flush 쪽에서 pending 등으로 처리한다.
+          // caller(flush)가 pending 등으로 처리
         }
       } while (needsAnotherPublish);
     } finally {
@@ -34,9 +44,29 @@ export function createReadSignPublishScheduler(
     }
   };
 
+  const triggerFlush = (immediate: boolean): void => {
+    clearStabilizeTimer();
+
+    if (immediate || stabilizeMs <= 0) {
+      void runFlush();
+      return;
+    }
+
+    stabilizeTimer = setTimeout(() => {
+      stabilizeTimer = null;
+      void runFlush();
+    }, stabilizeMs);
+  };
+
   return {
     schedule: () => {
-      void run();
+      triggerFlush(false);
+    },
+    flushNow: () => {
+      triggerFlush(true);
+    },
+    cancel: () => {
+      clearStabilizeTimer();
     },
   };
 }

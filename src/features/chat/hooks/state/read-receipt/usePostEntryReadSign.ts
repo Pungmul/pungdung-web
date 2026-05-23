@@ -9,9 +9,9 @@ import {
   markEntryReadSignHandled,
   markPostEntryReadSignPublished,
 } from "./entry-read-sign-coord";
+import { POST_ENTRY_READ_SIGN_STABILIZE_MS } from "../../../constants";
 import { logReadSignDebug } from "../../../lib/read-receipt/read-sign-debug-log";
 import { resolveLatestNumericMessageIdFromList } from "../../../services";
-import { POST_ENTRY_READ_SIGN_STABILIZE_MS } from "../../../services";
 import type { ReadSignFn } from "../../../socket/read-sign.types";
 import type { Message, PendingMessage } from "../../../types";
 
@@ -23,8 +23,8 @@ type UsePostEntryReadSignParams = {
 };
 
 /**
- * 진입 스냅샷 확정 후 room 진입당 1회 readSign한다.
- * 스냅샷 전 readSign이 room query 읽음 위치를 오염시키는 타이밍 버그를 방지한다.
+ * 진입 스냅샷 확정 후 room 진입당 1회 readSign.
+ * 스냅샷 전 readSign은 room query 읽음 위치를 오염시킨다.
  */
 export function usePostEntryReadSign({
   isEntrySnapshotCaptured,

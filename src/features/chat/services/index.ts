@@ -50,7 +50,7 @@ export * from "./read-receipt/get-read-receipt-avatars-for-message.service";
 export * from "./read-receipt/merge-other-participant-read-from-socket.service";
 export * from "./read-receipt/merge-other-participants-read-seed.service";
 export * from "./read-receipt/merge-read-target-message-id.service";
-export * from "./read-receipt/read-sign-catch-up.constants";
+export * from "./read-receipt/reset-read-sign-runtime.service";
 export * from "./read-receipt/resolve-confirmed-last-read-message-id.service";
 export * from "./read-receipt/resolve-last-read-message-id-from-read-at.service";
 export * from "./read-receipt/resolve-last-read-message-id-from-read-broadcast.service";

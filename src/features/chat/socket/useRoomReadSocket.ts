@@ -1,9 +1,8 @@
 "use client";
 
-import { type RefObject,useCallback, useEffect, useMemo, useRef } from "react";
+import { type RefObject, useCallback, useEffect, useMemo, useRef } from "react";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   useSocketConnection,
@@ -13,15 +12,14 @@ import {
 
 import { myPageQueries } from "@/features/my-page";
 
+import { MAX_ATTEMPTS, READ_SIGN_CATCH_UP_DELAY_MS } from "../constants";
 import { chatQueries } from "../queries";
-import { buildReadSignPublishPayload } from "../services";
-import { createReadSignPublishScheduler } from "../services";
-import { ensureReadSignTargetMessageId } from "../services";
 import {
-  MAX_ATTEMPTS,
-  READ_SIGN_CATCH_UP_DELAY_MS,
-} from "../services";
-import {
+  buildReadSignPublishPayload,
+  clearReadSignCatchUpTimer,
+  createReadSignPublishScheduler,
+  ensureReadSignTargetMessageId,
+  resetReadSignRuntimeState,
   resolveMyReadBroadcastAction,
   resolveReadBroadcastLastReadMessageId,
 } from "../services";
@@ -73,18 +71,6 @@ function createRoomReadSignRuntime(): RoomReadSignRuntime {
   };
 }
 
-function clearCatchUpTimer(runtime: RoomReadSignRuntime): void {
-  if (runtime.catchUpTimer === null) {
-    return;
-  }
-
-  clearTimeout(runtime.catchUpTimer);
-  runtime.catchUpTimer = null;
-}
-
-/**
- * 채팅방 읽음 publish + `/sub/chat/read` 브로드캐스트 반영.
- */
 export function useRoomReadSocket(
   roomId: string,
   options?: UseRoomReadSocketOptions
@@ -173,30 +159,26 @@ export function useRoomReadSocket(
     }
   }, [resolvePublishTargetMessageId, roomId, socket]);
 
-  const scheduleReadSignPublish = useCallback(() => {
-    const runtime = runtimeRef.current;
+  const createPublishScheduler = useCallback(() => {
+    return createReadSignPublishScheduler(async () => {
+      const runtime = runtimeRef.current;
 
-    if (!runtime.publishScheduler) {
-      runtime.publishScheduler = createReadSignPublishScheduler(async () => {
-        if (!token?.accessToken) {
-          return;
-        }
+      if (!token?.accessToken) {
+        return;
+      }
 
-        if (!canSendNow()) {
-          runtime.pending = true;
-          return;
-        }
+      if (!canSendNow()) {
+        runtime.pending = true;
+        return;
+      }
 
-        const didSend = await publishReadSignNow();
-        if (!didSend) {
-          return;
-        }
+      const didSend = await publishReadSignNow();
+      if (!didSend) {
+        return;
+      }
 
-        await applyResetRoomUnreadCount(queryClient, roomId);
-      });
-    }
-
-    runtime.publishScheduler.schedule();
+      await applyResetRoomUnreadCount(queryClient, roomId);
+    });
   }, [
     canSendNow,
     publishReadSignNow,
@@ -204,6 +186,48 @@ export function useRoomReadSocket(
     roomId,
     token?.accessToken,
   ]);
+
+  useEffect(() => {
+    const runtime = runtimeRef.current;
+    runtime.publishScheduler?.cancel();
+    runtime.publishScheduler = null;
+  }, [createPublishScheduler]);
+
+  const scheduleReadSignPublish = useCallback(() => {
+    const runtime = runtimeRef.current;
+
+    if (!runtime.publishScheduler) {
+      runtime.publishScheduler = createPublishScheduler();
+    }
+
+    runtime.publishScheduler.schedule();
+  }, [createPublishScheduler]);
+
+  const flushReadSignOnRoomLeave = useCallback(() => {
+    const runtime = runtimeRef.current;
+    resolvePublishTargetMessageId();
+
+    if (runtime.targetMessageId === null) {
+      logReadSignDebug("lifecycle.flush_on_leave.skipped", {
+        roomId,
+        reason: "missing_target_message_id",
+      });
+      runtime.publishScheduler?.cancel();
+    } else {
+      logReadSignDebug("lifecycle.flush_on_leave", {
+        roomId,
+        targetMessageId: runtime.targetMessageId,
+      });
+
+      if (!runtime.publishScheduler) {
+        runtime.publishScheduler = createPublishScheduler();
+      }
+
+      runtime.publishScheduler.flushNow();
+    }
+
+    resetReadSignRuntimeState(runtime);
+  }, [createPublishScheduler, resolvePublishTargetMessageId, roomId]);
 
   const scheduleReadSignCatchUp = useCallback(() => {
     const runtime = runtimeRef.current;
@@ -222,7 +246,7 @@ export function useRoomReadSocket(
       return;
     }
 
-    clearCatchUpTimer(runtime);
+    clearReadSignCatchUpTimer(runtime);
     runtime.catchUpTimer = setTimeout(() => {
       runtime.catchUpTimer = null;
       runtime.catchUpAttempts += 1;
@@ -231,7 +255,7 @@ export function useRoomReadSocket(
         source: "catch-up",
       });
     }, READ_SIGN_CATCH_UP_DELAY_MS);
-  }, []);
+  }, [roomId]);
 
   const handleReadMessage = useCallback(
     (message: unknown) => {
@@ -297,7 +321,7 @@ export function useRoomReadSocket(
         });
         runtime.targetMessageId = null;
         runtime.catchUpAttempts = 0;
-        clearCatchUpTimer(runtime);
+        clearReadSignCatchUpTimer(runtime);
         void applyResetRoomUnreadCount(queryClient, roomId);
         return;
       }
@@ -410,9 +434,15 @@ export function useRoomReadSocket(
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      clearCatchUpTimer(runtime);
+      clearReadSignCatchUpTimer(runtime);
     };
   }, [readSign, token?.accessToken]);
+
+  useEffect(() => {
+    return () => {
+      flushReadSignOnRoomLeave();
+    };
+  }, [flushReadSignOnRoomLeave, roomId]);
 
   useEffect(() => {
     const runtime = runtimeRef.current;
