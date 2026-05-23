@@ -3,7 +3,7 @@
 import React from "react";
 
 import { MessageItemFrame } from "./MessageItemFrame";
-import { isPendingMessage } from "../../../lib/message/message-item.guards";
+import { isPendingMessage } from "../../../types/guards/message-item.guards";
 import type { MessageItemLayoutContext } from "../../../lib/message/message-item-layout.types";
 import type { Message, PendingMessage } from "../../../types";
 import { ChatMessage } from "../../ui/message/ChatMessage";

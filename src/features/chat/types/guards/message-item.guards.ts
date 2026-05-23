@@ -1,4 +1,5 @@
-import type { Message, PendingMessage } from "../../types";
+import type { Message } from "../chat-message.types";
+import type { PendingMessage } from "../pending-message.types";
 
 export function isPendingMessage(
   message: Message | PendingMessage
