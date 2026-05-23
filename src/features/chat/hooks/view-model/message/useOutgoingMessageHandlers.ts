@@ -2,7 +2,10 @@
 
 import { useCallback } from "react";
 
-import type { ChatRoomOutgoingMessageHandlers, PendingMessage } from "../../../types";
+import type {
+  ChatRoomOutgoingMessageHandlers,
+  PendingMessage,
+} from "../../../types";
 
 type UseOutgoingMessageHandlersParams = {
   roomId: string;
@@ -42,7 +45,11 @@ export function useOutgoingMessageHandlers({
 }: UseOutgoingMessageHandlersParams): ChatRoomOutgoingMessageHandlers {
   const beginTextSend = useCallback(
     (content: string) => {
-      const pendingMsg = enqueueText({ senderUsername, content, chatRoomUUID: roomId });
+      const pendingMsg = enqueueText({
+        senderUsername,
+        content,
+        chatRoomUUID: roomId,
+      });
       return String(pendingMsg.id);
     },
     [roomId, senderUsername, enqueueText]
@@ -60,7 +67,11 @@ export function useOutgoingMessageHandlers({
 
   const beginImageSend = useCallback(
     (files: FileList) => {
-      const pendingMsg = enqueueImage({ senderUsername, files, chatRoomUUID: roomId });
+      const pendingMsg = enqueueImage({
+        senderUsername,
+        files,
+        chatRoomUUID: roomId,
+      });
       return String(pendingMsg.id);
     },
     [roomId, senderUsername, enqueueImage]
