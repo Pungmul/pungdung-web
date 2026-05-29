@@ -7,7 +7,7 @@ import { useSyncParticipationStatusFromSocketList } from "./useSyncParticipation
 
 export const useWholeLightningSocket = () => {
   const syncParticipationStatus = useSyncParticipationStatusFromSocketList();
-  const { snapshotMeetings, onSnapshotMessage } = useLightningSocketSnapshot({
+  const { onSnapshotMessage } = useLightningSocketSnapshot({
     scope: "whole",
     syncParticipationStatus,
   });
@@ -16,6 +16,4 @@ export const useWholeLightningSocket = () => {
     topic: "/sub/lightning-meeting/search",
     onMessage: onSnapshotMessage,
   });
-
-  return snapshotMeetings;
 };

@@ -3,6 +3,19 @@ import { describe, expect, it } from "vitest";
 import { mapLightningParticipantProfile } from "./map-lightning-participant-profile";
 
 describe("mapLightningParticipantProfile", () => {
+  it("groupName이 있으면 도메인에 포함한다", () => {
+    const result = mapLightningParticipantProfile({
+      userId: 1,
+      username: "user@test.com",
+      name: "홍길동",
+      clubName: "풍덩패",
+      groupName: "서울대 풍물패",
+      profileImage: null,
+    });
+    expect(result.clubName).toBe("풍덩패");
+    expect(result.groupName).toBe("서울대 풍물패");
+  });
+
   it("clubName이 있으면 도메인에 포함한다", () => {
     const result = mapLightningParticipantProfile({
       userId: 1,

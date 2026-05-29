@@ -16,6 +16,7 @@ import {
   useSyncUserLocation,
   useWholeLightningSocket,
 } from "@/features/lightning";
+import { UserProfileCardModalHost } from "@/features/user";
 
 import { Spinner } from "@/shared";
 
@@ -40,13 +41,10 @@ export default function LightningPage() {
 function LightningPageContent() {
   useSyncUserLocation();
 
-  const normalLightningMeetings = useWholeLightningSocket();
-  const schoolLightningMeetings = useSchoolLightningSocket();
+  useWholeLightningSocket();
+  useSchoolLightningSocket();
 
-  const { wholeLightningList, schoolLightningList } = useLightningLists({
-    normalLightningMeetings,
-    schoolLightningMeetings,
-  });
+  const { wholeLightningList, schoolLightningList } = useLightningLists();
   const { target, setTarget, lightningList } = useLightningListViewModel({
     wholeLightningList,
     schoolLightningList,
@@ -84,6 +82,7 @@ function LightningPageContent() {
           mapMoveToLightningIndexRef={mapMoveToLightningIndexRef}
         />
       </main>
+      <UserProfileCardModalHost />
     </AnimatePresence>
   );
 }

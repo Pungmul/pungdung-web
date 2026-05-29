@@ -4,14 +4,12 @@ import type { LightningParticipantProfile } from "../../types";
 export function mapLightningParticipantProfile(
   dto: LightningParticipantProfileDto
 ): LightningParticipantProfile {
-  const profile: LightningParticipantProfile = {
+  return {
     userId: dto.userId,
     username: dto.username,
     name: dto.name,
     profileImage: dto.profileImage,
+    ...(dto.clubName !== undefined ? { clubName: dto.clubName } : {}),
+    ...(dto.groupName !== undefined ? { groupName: dto.groupName } : {}),
   };
-  if (dto.clubName !== undefined) {
-    return { ...profile, clubName: dto.clubName };
-  }
-  return profile;
 }

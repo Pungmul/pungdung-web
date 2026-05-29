@@ -16,7 +16,7 @@ export const useSchoolLightningSocket = () => {
   const { data: myInfo } = useQuery(myPageQueries.info());
   const { data: clubList } = useSuspenseQuery(clubQueries.list());
   const syncParticipationStatus = useSyncParticipationStatusFromSocketList();
-  const { snapshotMeetings, onSnapshotMessage } = useLightningSocketSnapshot({
+  const { onSnapshotMessage } = useLightningSocketSnapshot({
     scope: "school",
     syncParticipationStatus,
   });
@@ -37,6 +37,4 @@ export const useSchoolLightningSocket = () => {
     onMessage: onSnapshotMessage,
     enabled: !!schoolTopic,
   });
-
-  return snapshotMeetings;
 };

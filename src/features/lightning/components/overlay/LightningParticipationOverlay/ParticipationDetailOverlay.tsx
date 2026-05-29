@@ -37,8 +37,13 @@ export function ParticipationDetailOverlay({
   const router = useRouter();
   const dragControls = useDragControls();
   const meeting = participationData.lightningMeeting;
-  const { currentPersonNum, organizerId } = meeting;
+  const { organizerId } = meeting;
   const participantProfiles = participationData.participantProfiles;
+  const participationMeetingForCard = {
+    ...meeting,
+    participantProfiles,
+    currentPersonNum: participantProfiles.length,
+  };
   const meetingId = meeting.id;
   const isOrganizer = participationData.isOrganizer === true;
   const hasChatRoom = Boolean(participationData.chatRoomUUID);
@@ -99,8 +104,7 @@ export function ParticipationDetailOverlay({
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6">
           <div className="py-6">
             <LightningCard
-              {...meeting}
-              participantProfiles={participantProfiles}
+              {...participationMeetingForCard}
               hideJoinButton
               isParticipated
             />
@@ -109,7 +113,7 @@ export function ParticipationDetailOverlay({
             meetingId={meeting.id}
             organizerId={organizerId}
             participantProfiles={participantProfiles}
-            currentPersonNum={currentPersonNum}
+            currentPersonNum={participationMeetingForCard.currentPersonNum}
             hasChatRoom={hasChatRoom}
             onMoveToChat={handleMoveToChat}
           />

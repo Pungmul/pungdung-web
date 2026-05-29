@@ -1,9 +1,5 @@
 import type { LightningMeeting } from "../types";
 
-/**
- * TEMP: `/api/lightning/status` 응답의 참여자 프로필이 비어 있을 때,
- * `/api/lightning/search` 목록의 동일 id 모임 데이터로 보완한다.
- */
 export function mergeParticipationMeetingParticipantsFromSearch(
   participationMeeting: LightningMeeting | null | undefined,
   searchMeetings: LightningMeeting[]

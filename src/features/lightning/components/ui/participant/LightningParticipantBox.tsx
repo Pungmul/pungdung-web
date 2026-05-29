@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 
-import type { ReactNode } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
 
 import { cn } from "@/shared";
 
+import { formatLightningParticipantSubtitle } from "../../../lib/format-lightning-participant-subtitle";
 import type { LightningParticipantProfile } from "../../../types";
 
 interface LightningParticipantBoxProps {
@@ -28,10 +29,18 @@ export function LightningParticipantBox({
   const imageUrl = profile.profileImage?.fullFilePath;
   const showImage = Boolean(imageUrl) && !hasImageError;
   const hasButtons = Boolean(buttons);
-  const subtitle = profile.clubName?.trim() || "동아리 정보 없음";
+  const canOpenProfile = Boolean(onOpen);
+  const subtitle = formatLightningParticipantSubtitle(profile);
 
   const handleActivate = () => {
     onOpen?.();
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleActivate();
+    }
   };
 
   return (
@@ -40,30 +49,18 @@ export function LightningParticipantBox({
         "flex flex-row items-center p-2",
         hasButtons && "w-full gap-3",
         !hasButtons && "h-16 gap-4",
-        !hasButtons && onOpen && "cursor-pointer",
         className
       )}
-      onClick={hasButtons ? undefined : handleActivate}
     >
       <div
-        role={hasButtons ? "button" : undefined}
-        tabIndex={hasButtons ? 0 : undefined}
+        role={canOpenProfile ? "button" : undefined}
+        tabIndex={canOpenProfile ? 0 : undefined}
         className={cn(
-          "flex min-w-0 flex-1 flex-row items-center gap-4",
-          hasButtons && "outline-none",
-          hasButtons && onOpen && "cursor-pointer"
+          "flex min-w-0 flex-1 flex-row items-center gap-4 outline-none",
+          canOpenProfile && "cursor-pointer"
         )}
-        onClick={hasButtons ? handleActivate : undefined}
-        onKeyDown={
-          hasButtons
-            ? (e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  handleActivate();
-                }
-              }
-            : undefined
-        }
+        onClick={canOpenProfile ? handleActivate : undefined}
+        onKeyDown={canOpenProfile ? handleKeyDown : undefined}
       >
         <div className="relative size-12 shrink-0 overflow-hidden rounded-[8px] bg-grey-200">
           {showImage && imageUrl ? (
@@ -88,9 +85,6 @@ export function LightningParticipantBox({
             )}
           </div>
           <div className="truncate text-[11px] text-grey-400">{subtitle}</div>
-          <div className="truncate text-[11px] text-grey-400">
-            {profile.username}
-          </div>
         </div>
       </div>
       {hasButtons && (

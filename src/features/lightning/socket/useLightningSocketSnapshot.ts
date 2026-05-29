@@ -1,35 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
-import { useSocketConnection } from "@pungdung/worker-socket-bridge/react";
+import { useQueryClient } from "@tanstack/react-query";
 
+import { lightningQueries } from "../queries";
 import { parseLightningSocketMeetings } from "../services";
 
-import type { LightningListSocketScope, LightningMeeting } from "../types";
+import type { LightningListSocketScope } from "../types";
 
 type UseLightningSocketSnapshotParams = {
   scope: LightningListSocketScope;
-  syncParticipationStatus: (
-    scope: LightningListSocketScope,
-    meetings: LightningMeeting[]
-  ) => void;
+  syncParticipationStatus: (scope: LightningListSocketScope) => void;
 };
 
 export const useLightningSocketSnapshot = ({
   scope,
   syncParticipationStatus,
 }: UseLightningSocketSnapshotParams) => {
-  const isConnected = useSocketConnection();
-  const [snapshotMeetings, setSnapshotMeetings] = useState<
-    LightningMeeting[] | null
-  >(null);
-
-  useEffect(() => {
-    if (!isConnected) {
-      setSnapshotMeetings(null);
-    }
-  }, [isConnected]);
+  const queryClient = useQueryClient();
+  const lightningDataQueryKey = lightningQueries.lightningData().queryKey;
 
   const onSnapshotMessage = useCallback(
     (content: unknown) => {
@@ -39,11 +29,14 @@ export const useLightningSocketSnapshot = ({
         return;
       }
 
-      setSnapshotMeetings(meetings);
-      syncParticipationStatus(scope, meetings);
+      void queryClient.invalidateQueries({
+        queryKey: lightningDataQueryKey,
+        refetchType: "all",
+      });
+      syncParticipationStatus(scope);
     },
-    [scope, syncParticipationStatus]
+    [lightningDataQueryKey, queryClient, scope, syncParticipationStatus]
   );
 
-  return { snapshotMeetings, onSnapshotMessage };
+  return { onSnapshotMessage };
 };

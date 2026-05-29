@@ -33,6 +33,7 @@ export const lightningQueries = {
       queryFn: fetchUserParticipationStatus,
       gcTime: 30 * 1000,
       staleTime: 10 * 1000,
+      refetchOnMount: true,
       retry: 2,
     }),
 

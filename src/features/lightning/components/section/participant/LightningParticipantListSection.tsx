@@ -10,6 +10,7 @@ import {
 import { SearchInput } from "@/shared";
 import { Toast } from "@/shared/store";
 
+import { useLightningParticipantProfileClick } from "../../../hooks/actions/useLightningParticipantProfileClick";
 import type { LightningParticipantProfile } from "../../../types";
 import { LightningParticipantBox } from "../../ui/participant/LightningParticipantBox";
 import { LightningParticipantMenu } from "../../ui/participant/LightningParticipantMenu";
@@ -32,6 +33,7 @@ export function LightningParticipantListSection({
   hasChatRoom,
   onMoveToChat,
 }: LightningParticipantListSectionProps) {
+  const { openParticipantProfile } = useLightningParticipantProfileClick();
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -42,11 +44,13 @@ export function LightningParticipantListSection({
     }
 
     return participantProfiles.filter((profile) => {
-      const clubName = profile.clubName?.toLowerCase() ?? "";
+      const nickname = profile.clubName?.toLowerCase() ?? "";
+      const groupName = profile.groupName?.toLowerCase() ?? "";
       return (
         profile.name.toLowerCase().includes(query) ||
         profile.username.toLowerCase().includes(query) ||
-        clubName.includes(query)
+        nickname.includes(query) ||
+        groupName.includes(query)
       );
     });
   }, [participantProfiles, searchQuery]);
@@ -113,6 +117,9 @@ export function LightningParticipantListSection({
               className="hover:bg-grey-100 max-md:px-1"
               profile={profile}
               isOrganizer={profile.userId === organizerId}
+              onOpen={() => {
+                void openParticipantProfile(profile);
+              }}
               buttons={
                 <>
                   {hasChatRoom && (

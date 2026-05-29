@@ -25,28 +25,15 @@ const isParticipationInSocketScope = (
   !!participationMeeting &&
   participationMeeting.visibilityScope === socketScopeVisibility[scope];
 
-const findParticipationMeetingInSnapshot = (
-  meetings: LightningMeeting[],
-  participationMeeting: LightningMeeting
-) =>
-  meetings.find((meeting) => meeting.id === participationMeeting.id);
-
-const hasSameParticipationSnapshot = (
-  nextMeeting: LightningMeeting,
-  currentMeeting: LightningMeeting
-) =>
-  nextMeeting.updatedAt === currentMeeting.updatedAt &&
-  nextMeeting.currentPersonNum === currentMeeting.currentPersonNum &&
-  nextMeeting.status === currentMeeting.status;
-
 export const useSyncParticipationStatusFromSocketList = () => {
   const queryClient = useQueryClient();
+  const participationStatusQueryKey = lightningQueries.participationStatus().queryKey;
 
   return useCallback(
-    (scope: LightningListSocketScope, meetings: LightningMeeting[]) => {
+    (scope: LightningListSocketScope) => {
       const participationStatus =
         queryClient.getQueryData<UserParticipationData>(
-          lightningQueries.participationStatus().queryKey
+          participationStatusQueryKey
         );
 
       if (!participationStatus?.participant) {
@@ -61,39 +48,11 @@ export const useSyncParticipationStatusFromSocketList = () => {
         return;
       }
 
-      const nextParticipationMeeting = findParticipationMeetingInSnapshot(
-        meetings,
-        currentParticipationMeeting
-      );
-
-      if (!nextParticipationMeeting) {
-        void queryClient.refetchQueries({
-          ...lightningQueries.participationStatus(),
-          type: "active",
-        });
-        return;
-      }
-
-      if (
-        hasSameParticipationSnapshot(
-          nextParticipationMeeting,
-          currentParticipationMeeting
-        )
-      ) {
-        return;
-      }
-
-      queryClient.setQueryData<UserParticipationData>(
-        lightningQueries.participationStatus().queryKey,
-        (prev) =>
-          prev?.participant
-            ? {
-                ...prev,
-                lightningMeeting: nextParticipationMeeting,
-              }
-            : prev
-      );
+      void queryClient.invalidateQueries({
+        queryKey: participationStatusQueryKey,
+        refetchType: "all",
+      });
     },
-    [queryClient]
+    [participationStatusQueryKey, queryClient]
   );
 };

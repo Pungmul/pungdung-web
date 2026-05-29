@@ -22,6 +22,7 @@ export const lightningParticipantProfileDtoSchema = z.looseObject({
   username: z.string(),
   name: z.string(),
   clubName: z.string().nullable().optional(),
+  groupName: z.string().nullable().optional(),
   profileImage: lightningProfileImageDtoSchema.nullable(),
 });
 
