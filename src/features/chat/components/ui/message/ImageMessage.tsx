@@ -121,7 +121,9 @@ const ImageMessageComponent: React.FC<ImageMessageProps> = ({
             </div>
           ))}
         </div>
-        {sideContent && <>{sideContent}</>}
+        <div className="shrink-0 self-end">
+          {sideContent}
+        </div>
       </div>
       <ImageViewer
         isOpen={isModalOpen}
