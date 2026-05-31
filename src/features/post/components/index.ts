@@ -1,5 +1,4 @@
 /** overlay */
-export { ImageOverlay } from "./overlay/ImageOverlay";
 export { ReportPostModal } from "./overlay/ReportPostModal";
 
 /** section */

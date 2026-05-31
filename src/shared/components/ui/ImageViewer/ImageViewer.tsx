@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import Image from "next/image";
 
@@ -19,47 +19,54 @@ import { downloadRemoteImage } from "@/shared/lib/download-remote-image";
 
 import "swiper/css";
 
-interface OverlayImage {
+export interface ImageViewerItem {
   url: string;
   name?: string;
 }
 
-interface ImageOverlayProps {
+export type ImageViewerImages = ImageViewerItem[] | string[];
+
+export interface ImageViewerProps {
   isOpen: boolean;
-  images: OverlayImage[];
+  images: ImageViewerImages;
   initialIndex?: number;
   onClose: () => void;
+  enableDownload?: boolean;
 }
 
-export function ImageOverlay({
+function normalizeImages(images: ImageViewerImages): ImageViewerItem[] {
+  return images.map((image, index) =>
+    typeof image === "string"
+      ? { url: image, name: `image-${index + 1}` }
+      : image,
+  );
+}
+
+export function ImageViewer({
   isOpen,
   images,
   initialIndex = 0,
   onClose,
-}: ImageOverlayProps) {
-
-  // 현재 이미지 인덱스
+  enableDownload = true,
+}: ImageViewerProps) {
+  const normalizedImages = useMemo(() => normalizeImages(images), [images]);
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  // Swiper 인스턴스
   const swiperRef = useRef<SwiperType | null>(null);
 
-  // 전체 화면 오버레이 중 배경 스크롤 잠금
   useBodyScrollLock(isOpen);
 
-  // 열릴 때마다 시작 슬라이드 초기화
   useEffect(() => {
     if (!isOpen) return;
+
     setCurrentIndex(initialIndex);
+    swiperRef.current?.slideTo(initialIndex, 0);
   }, [isOpen, initialIndex]);
 
-  const currentImage = useMemo(
-    () => images[currentIndex],
-    [images, currentIndex]
-  );
+  const currentImage = normalizedImages[currentIndex];
 
   const handleOverlayDragEnd = (
     _: MouseEvent | TouchEvent | PointerEvent,
-    info: PanInfo
+    info: PanInfo,
   ) => {
     if (info.offset.y > 150 || info.velocity.y > 500) {
       onClose();
@@ -79,21 +86,47 @@ export function ImageOverlay({
     }
   };
 
-  const goToPrevious = () => {
+  const goToPrevious = useCallback(() => {
     swiperRef.current?.slidePrev();
-  };
+  }, []);
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     swiperRef.current?.slideNext();
-  };
+  }, []);
 
-  if (images.length === 0) return null;
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!isOpen) return;
+
+      switch (event.key) {
+        case "Escape":
+          onClose();
+          break;
+        case "ArrowLeft":
+          goToPrevious();
+          break;
+        case "ArrowRight":
+          goToNext();
+          break;
+      }
+    },
+    [isOpen, onClose, goToPrevious, goToNext],
+  );
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, handleKeyDown]);
+
+  if (normalizedImages.length === 0) return null;
 
   return ReactDOM.createPortal(
     <AnimatePresence>
       {isOpen && (
         <div
-          key="image-overlay"
+          key="image-viewer"
           className="fixed inset-0 z-50 flex items-end"
           onClick={onClose}
         >
@@ -111,9 +144,9 @@ export function ImageOverlay({
             onClick={(e) => e.stopPropagation()}
           >
             <header className="w-full flex bg-black/60 flex-col justify-center items-center px-4 py-3 h-12 z-30">
-              {images.length > 1 && (
+              {normalizedImages.length > 1 && (
                 <div className="text-white text-sm font-medium">
-                  {`${currentIndex + 1}` + "/" + images.length}
+                  {`${currentIndex + 1}/${normalizedImages.length}`}
                 </div>
               )}
               <button
@@ -137,7 +170,7 @@ export function ImageOverlay({
                 }}
                 onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
               >
-                {images.map((image, index) => (
+                {normalizedImages.map((image, index) => (
                   <SwiperSlide key={`${image.url}-${index}`}>
                     <div className="relative w-full h-full flex items-center justify-center">
                       <div className="relative md:max-w-3xl md:max-h-3xl w-full h-full">
@@ -156,9 +189,10 @@ export function ImageOverlay({
               </Swiper>
             </div>
 
-            {images.length > 1 && currentIndex > 0 && (
+            {normalizedImages.length > 1 && currentIndex > 0 && (
               <section className="hidden lg:flex absolute top-0 left-4 z-20 h-full items-center justify-center">
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     goToPrevious();
@@ -171,35 +205,39 @@ export function ImageOverlay({
               </section>
             )}
 
-            {images.length > 1 && currentIndex < images.length - 1 && (
-              <section className="hidden lg:flex absolute top-0 right-4 z-20 h-full items-center justify-center">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goToNext();
-                  }}
-                  className="size-8 p-1 flex items-center justify-center bg-white bg-opacity-50 rounded-full hover:bg-opacity-70 transition-all"
-                  title="다음 이미지"
-                >
-                  <ChevronRightIcon className="size-full text-black" />
-                </button>
-              </section>
-            )}
+            {normalizedImages.length > 1 &&
+              currentIndex < normalizedImages.length - 1 && (
+                <section className="hidden lg:flex absolute top-0 right-4 z-20 h-full items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      goToNext();
+                    }}
+                    className="size-8 p-1 flex items-center justify-center bg-white bg-opacity-50 rounded-full hover:bg-opacity-70 transition-all"
+                    title="다음 이미지"
+                  >
+                    <ChevronRightIcon className="size-full text-black" />
+                  </button>
+                </section>
+              )}
 
-            <button
-              type="button"
-              onClick={handleDownload}
-              className="absolute bottom-4 right-4 z-20 rounded-full p-3 bg-primary text-white"
-              aria-label="이미지 다운로드"
-            >
-              <span className="size-5 flex items-center justify-center">
-                <ArrowDownTrayIcon className="size-full" />
-              </span>
-            </button>
+            {enableDownload && (
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="absolute bottom-4 right-4 z-20 rounded-full p-3 bg-primary text-white"
+                aria-label="이미지 다운로드"
+              >
+                <span className="size-5 flex items-center justify-center">
+                  <ArrowDownTrayIcon className="size-full" />
+                </span>
+              </button>
+            )}
           </motion.div>
         </div>
       )}
     </AnimatePresence>,
-    document.body
+    document.body,
   );
 }

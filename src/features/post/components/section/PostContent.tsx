@@ -3,11 +3,11 @@
 import { memo, useMemo, useState } from "react";
 
 import { CommentOutline, EyeIcon } from "@/shared/components/Icons";
+import { ImageViewer } from "@/shared/components/ui";
 
 import { PostImageList } from "./PostImageList";
 import { PostLikeButton } from "./PostLikeButton";
 import type { PostArticleDetail } from "../../types";
-import { ImageOverlay } from "../overlay/ImageOverlay";
 
 function PostContentImpl({
   post,
@@ -16,11 +16,11 @@ function PostContentImpl({
   post: PostArticleDetail;
   fitMode?: "fit" | "full";
 }) {
-  // 이미지 확대 오버레이: 열림 + 선택 슬라이드
+  // ImageViewer: 열림 상태 + 선택 슬라이드
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  // 오버레이 스와이퍼용(쿼리스트립 제거한 원본 URL)
+  // ImageViewer용 이미지 목록(쿼리스트립 제거한 원본 URL)
   const overlayImages = useMemo(
     () =>
       (post?.imageList || []).map((image) => ({
@@ -85,7 +85,7 @@ function PostContentImpl({
         />
       )}
 
-      <ImageOverlay
+      <ImageViewer
         isOpen={isOverlayOpen}
         images={overlayImages}
         initialIndex={selectedImageIndex}

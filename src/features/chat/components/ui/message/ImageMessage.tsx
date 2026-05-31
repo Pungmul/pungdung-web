@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
-import { ImageModal } from "@/shared/components/ui";
+import { ImageViewer } from "@/shared/components/ui";
 
 interface ImageMessageProps {
   imageList: string[];
@@ -123,7 +123,7 @@ const ImageMessageComponent: React.FC<ImageMessageProps> = ({
         </div>
         {sideContent && <>{sideContent}</>}
       </div>
-      <ImageModal
+      <ImageViewer
         isOpen={isModalOpen}
         images={imageList}
         initialIndex={selectedImageIndex}

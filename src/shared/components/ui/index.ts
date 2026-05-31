@@ -1,6 +1,7 @@
 // UI Components Barrel Exports
 export { FloatingButton } from "./FloatingButton";
-export { default as ImageModal } from "./ImageModal";
+export type { ImageViewerImages, ImageViewerItem, ImageViewerProps } from "./ImageViewer";
+export { ImageViewer } from "./ImageViewer";
 export { ListEmptyView } from "./ListEmptyView";
 export { LoadingSpinner } from "./LoadingSpinner";
 export { LocationMapPicker } from "./LocationMapPicker";

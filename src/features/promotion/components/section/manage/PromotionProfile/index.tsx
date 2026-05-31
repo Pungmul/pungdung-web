@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { Responsive } from "@/shared";
-import { ImageModal } from "@/shared/components/ui";
+import { ImageViewer } from "@/shared/components/ui";
 import type { Address } from "@/shared/types";
 
 import { PromotionProfileHorizontal } from "./PromotionProfileHorizontal";
@@ -17,15 +17,15 @@ export interface PromotionProfileProps {
 }
 
 export const PromotionProfile = (profileProps: PromotionProfileProps) => {
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   const imageList = profileProps.posterUrl ? [profileProps.posterUrl] : [];
 
   return (
     <>
-      <ImageModal
-        isOpen={isImageModalOpen}
+      <ImageViewer
+        isOpen={isImageViewerOpen}
         images={imageList}
-        onClose={() => setIsImageModalOpen(false)}
+        onClose={() => setIsImageViewerOpen(false)}
       />
       <Responsive
         mobile={
@@ -33,7 +33,7 @@ export const PromotionProfile = (profileProps: PromotionProfileProps) => {
             {...profileProps}
             onPosterClick={() => {
               if (!profileProps.posterUrl) return;
-              setIsImageModalOpen(true);
+              setIsImageViewerOpen(true);
             }}
           />
         }
@@ -42,7 +42,7 @@ export const PromotionProfile = (profileProps: PromotionProfileProps) => {
             {...profileProps}
             onPosterClick={() => {
               if (!profileProps.posterUrl) return;
-              setIsImageModalOpen(true);
+              setIsImageViewerOpen(true);
             }}
           />
         }
