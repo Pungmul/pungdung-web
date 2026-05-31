@@ -15,6 +15,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper/types";
 
 import { useBodyScrollLock } from "@/shared/hooks";
+import { downloadRemoteImage } from "@/shared/lib/download-remote-image";
 
 import "swiper/css";
 
@@ -65,14 +66,17 @@ export function ImageOverlay({
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!currentImage?.url) return;
-    const link = document.createElement("a");
-    link.href = currentImage.url;
-    link.download = currentImage.name || `image-${currentIndex + 1}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+
+    try {
+      await downloadRemoteImage({
+        url: currentImage.url,
+        filename: currentImage.name || `image-${currentIndex + 1}`,
+      });
+    } catch (error) {
+      console.error("이미지 다운로드 실패", error);
+    }
   };
 
   const goToPrevious = () => {

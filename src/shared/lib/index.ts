@@ -1,6 +1,7 @@
 // Shared Library Barrel Exports
 export * from './cn'
 export * from './dayjs'
+export * from './download-remote-image'
 export * from './getScrollableParent'
 export * from './parseDateString'
 export * from './splitHangeul'
