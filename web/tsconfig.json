@@ -1,0 +1,57 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@/core": [
+        "./src/core"
+      ],
+      "@/core/*": [
+        "./src/core/*"
+      ],
+      "@/features/*": [
+        "./src/features/*"
+      ],
+      "@/shared": [
+        "./src/shared"
+      ],
+      "@/shared/*": [
+        "./src/shared/*"
+      ],
+      "@asset/*": [
+        "./src/app/assets/*"
+      ],
+      "@public/*": [
+        "./public/*"
+      ]
+    },
+    "types": [
+      "kakao.maps.d.ts"
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "src/test/**",
+    "vitest.config.ts",
+    "../packages/worker-socket-bridge/workers",
+    "../packages/worker-socket-bridge/stomp"
+  ]
+}

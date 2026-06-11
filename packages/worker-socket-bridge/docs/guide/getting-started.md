@@ -7,7 +7,7 @@
 ```json
 {
   "dependencies": {
-    "@pungdung/worker-socket-bridge": "0.0.1"
+    "@pungdung/worker-socket-bridge": "1.0.0"
   }
 }
 ```

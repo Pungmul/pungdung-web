@@ -9,5 +9,8 @@
     "workers/**/*.ts",
     "stomp/**/*.ts",
     "src/protocol/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.test.ts"
   ]
 }

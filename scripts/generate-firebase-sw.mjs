@@ -11,11 +11,9 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const require = createRequire(import.meta.url);
-const { loadEnvConfig } = require("@next/env");
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, "..");
+const DEFAULT_APP_PATH = "web";
 
 const ENV_KEYS = [
   "NEXT_PUBLIC_FIREBASE_API_KEY",
@@ -34,8 +32,24 @@ function shouldUseDevelopmentEnvFiles() {
   return true;
 }
 
+function parseAppRoot(argv) {
+  const appIndex = argv.indexOf("--app");
+  if (appIndex !== -1) {
+    const appPath = argv[appIndex + 1];
+    if (!appPath) {
+      throw new Error("--app requires a path");
+    }
+    return path.resolve(PROJECT_ROOT, appPath);
+  }
+
+  return path.resolve(PROJECT_ROOT, DEFAULT_APP_PATH);
+}
+
 async function main() {
-  loadEnvConfig(PROJECT_ROOT, shouldUseDevelopmentEnvFiles());
+  const appRoot = parseAppRoot(process.argv);
+  const requireFromApp = createRequire(path.join(appRoot, "package.json"));
+  const { loadEnvConfig } = requireFromApp("@next/env");
+  loadEnvConfig(appRoot, shouldUseDevelopmentEnvFiles());
 
   const missing = ENV_KEYS.filter((key) => {
     const v = process.env[key];
@@ -50,12 +64,12 @@ async function main() {
   }
 
   const templatePath = path.join(
-    PROJECT_ROOT,
+    appRoot,
     "public",
     "pungdung-fcm-background.template.js"
   );
   const outPath = path.join(
-    PROJECT_ROOT,
+    appRoot,
     "public",
     "pungdung-fcm-background.js"
   );

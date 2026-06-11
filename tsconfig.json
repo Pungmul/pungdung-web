@@ -22,66 +22,9 @@
     "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/core": [
-        "./src/core"
-      ],
-      "@/core/*": [
-        "./src/core/*"
-      ],
-      "@/features/*": [
-        "./src/features/*"
-      ],
-      "@/shared": [
-        "./src/shared"
-      ],
-      "@/shared/*": [
-        "./src/shared/*"
-      ],
-      "@asset/*": [
-        "./src/app/assets/*"
-      ],
-      "@public/*": [
-        "./public/*"
-      ],
-      "@pungdung/worker-socket-bridge": [
-        "./packages/worker-socket-bridge/src/index.ts"
-      ],
-      "@pungdung/worker-socket-bridge/react": [
-        "./packages/worker-socket-bridge/src/react/index.ts"
-      ],
-      "@pungdung/worker-socket-bridge/*": [
-        "./packages/worker-socket-bridge/src/*"
-      ]
-    },
-    "types": [
-      "kakao.maps.d.ts"
-    ]
+    "noUncheckedIndexedAccess": true
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "src/shared/components/layout/Tabs/index.tsx"
-  ],
   "exclude": [
-    "node_modules",
-    "packages/worker-socket-bridge/workers",
-    "packages/worker-socket-bridge/stomp"
+    "node_modules"
   ]
 }

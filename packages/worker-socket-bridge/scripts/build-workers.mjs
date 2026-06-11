@@ -14,7 +14,7 @@ const PROJECT_ROOT = path.resolve(PACKAGE_ROOT, "..", "..");
 function parseOutDir(argv) {
   const outDirIndex = argv.indexOf("--outdir");
   if (outDirIndex === -1) {
-    return path.join(PROJECT_ROOT, "public");
+    return path.join(PROJECT_ROOT, "web", "public");
   }
   const outDir = argv[outDirIndex + 1];
   if (!outDir) {
