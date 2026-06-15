@@ -63,7 +63,7 @@ const participationStatus = (
 });
 
 describe("useSyncParticipationStatusFromSocketList", () => {
-  it("참여 중이고 스코프가 맞으면 소켓 이벤트마다 participationStatus를 invalidate한다", () => {
+  it("참여 중 번개가 소켓 delta에 포함되면 participationStatus를 invalidate한다", () => {
     const queryClient = new QueryClient();
     const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
     queryClient.setQueryData(
@@ -81,7 +81,7 @@ describe("useSyncParticipationStatusFromSocketList", () => {
     );
 
     act(() => {
-      result.current("whole");
+      result.current("whole", [meeting({ id: 1 })]);
     });
 
     expect(invalidateSpy).toHaveBeenCalledTimes(1);
@@ -89,6 +89,30 @@ describe("useSyncParticipationStatusFromSocketList", () => {
       queryKey: lightningQueries.participationStatus().queryKey,
       refetchType: "all",
     });
+  });
+
+  it("소켓 delta에 참여 중 번개가 없으면 participationStatus를 건드리지 않는다", () => {
+    const queryClient = new QueryClient();
+    const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+    queryClient.setQueryData(
+      lightningQueries.participationStatus().queryKey,
+      participationStatus()
+    );
+
+    const wrapper = ({ children }: PropsWithChildren) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+
+    const { result } = renderHook(
+      () => useSyncParticipationStatusFromSocketList(),
+      { wrapper }
+    );
+
+    act(() => {
+      result.current("whole", [meeting({ id: 99 })]);
+    });
+
+    expect(invalidateSpy).not.toHaveBeenCalled();
   });
 
   it("참여 중이 아니면 participationStatus를 건드리지 않는다", () => {
@@ -109,7 +133,7 @@ describe("useSyncParticipationStatusFromSocketList", () => {
     );
 
     act(() => {
-      result.current("whole");
+      result.current("whole", [meeting({ id: 1 })]);
     });
 
     expect(invalidateSpy).not.toHaveBeenCalled();
@@ -135,7 +159,7 @@ describe("useSyncParticipationStatusFromSocketList", () => {
     );
 
     act(() => {
-      result.current("whole");
+      result.current("whole", [meeting({ id: 1, visibilityScope: "SCHOOL_ONLY" })]);
     });
 
     expect(invalidateSpy).not.toHaveBeenCalled();

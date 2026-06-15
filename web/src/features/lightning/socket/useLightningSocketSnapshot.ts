@@ -5,13 +5,22 @@ import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { lightningQueries } from "../queries";
-import { parseLightningSocketMeetings } from "../services";
+import {
+  mergeLightningListSocketSnapshotMeetings,
+  parseLightningSocketSnapshotEntries,
+  patchLightningListDataMeetings,
+  selectLightningMeetingsForListSocketScope,
+} from "../services";
 
-import type { LightningListSocketScope } from "../types";
+import type { LightningListData } from "../types";
+import type { LightningListSocketScope, LightningMeeting } from "../types";
 
 type UseLightningSocketSnapshotParams = {
   scope: LightningListSocketScope;
-  syncParticipationStatus: (scope: LightningListSocketScope) => void;
+  syncParticipationStatus: (
+    scope: LightningListSocketScope,
+    changedMeetings: LightningMeeting[]
+  ) => void;
 };
 
 export const useLightningSocketSnapshot = ({
@@ -23,17 +32,30 @@ export const useLightningSocketSnapshot = ({
 
   const onSnapshotMessage = useCallback(
     (content: unknown) => {
-      const meetings = parseLightningSocketMeetings(content);
-      if (!meetings) {
-        console.error("Invalid lightning socket message content");
+      const entries = parseLightningSocketSnapshotEntries(content);
+      if (!entries) {
         return;
       }
 
-      void queryClient.invalidateQueries({
-        queryKey: lightningDataQueryKey,
-        refetchType: "all",
-      });
-      syncParticipationStatus(scope);
+      let patchedMeetings: LightningMeeting[] = [];
+
+      queryClient.setQueryData<LightningListData>(
+        lightningDataQueryKey,
+        (current) => {
+          const cachedMeetings = selectLightningMeetingsForListSocketScope(
+            current,
+            scope
+          );
+          patchedMeetings = mergeLightningListSocketSnapshotMeetings({
+            entries,
+            cachedMeetings,
+          });
+
+          return patchLightningListDataMeetings(current, patchedMeetings);
+        }
+      );
+
+      syncParticipationStatus(scope, patchedMeetings);
     },
     [lightningDataQueryKey, queryClient, scope, syncParticipationStatus]
   );

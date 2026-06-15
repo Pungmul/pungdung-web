@@ -4,47 +4,30 @@ import { useCallback } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 
-import { VISIBILITY_SCOPE } from "../constants";
 import { lightningQueries } from "../queries";
 
-import type {
-  LightningListSocketScope,
-  LightningMeeting,
-  UserParticipationData,
-} from "../types";
-
-const socketScopeVisibility = {
-  whole: VISIBILITY_SCOPE.ALL,
-  school: VISIBILITY_SCOPE.SCHOOL_ONLY,
-} as const satisfies Record<LightningListSocketScope, string>;
-
-const isParticipationInSocketScope = (
-  participationMeeting: LightningMeeting | null | undefined,
-  scope: LightningListSocketScope
-) =>
-  !!participationMeeting &&
-  participationMeeting.visibilityScope === socketScopeVisibility[scope];
+import { shouldRefetchParticipationStatusFromSocket } from "../services/should-refetch-participation-status-from-socket";
+import type { LightningListSocketScope, LightningMeeting } from "../types";
+import type { UserParticipationData } from "../types/user-participation.types";
 
 export const useSyncParticipationStatusFromSocketList = () => {
   const queryClient = useQueryClient();
   const participationStatusQueryKey = lightningQueries.participationStatus().queryKey;
 
   return useCallback(
-    (scope: LightningListSocketScope) => {
+    (scope: LightningListSocketScope, changedMeetings: LightningMeeting[]) => {
       const participationStatus =
         queryClient.getQueryData<UserParticipationData>(
           participationStatusQueryKey
         );
 
-      if (!participationStatus?.participant) {
-        return;
-      }
+      const decision = shouldRefetchParticipationStatusFromSocket({
+        participationStatus,
+        scope,
+        changedMeetings,
+      });
 
-      const currentParticipationMeeting = participationStatus.lightningMeeting;
-      if (
-        !currentParticipationMeeting ||
-        !isParticipationInSocketScope(currentParticipationMeeting, scope)
-      ) {
+      if (!decision.shouldRefetch) {
         return;
       }
 
