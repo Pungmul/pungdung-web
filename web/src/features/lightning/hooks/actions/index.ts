@@ -3,5 +3,6 @@ export { useLightningDeleteAction } from "./useLightningDeleteAction";
 export { useLightningExitAction } from "./useLightningExitAction";
 export { useLightningJoinAction } from "./useLightningJoinAction";
 export { useLightningParticipantProfileClick } from "./useLightningParticipantProfileClick";
+export { useLightningSocketReconnectRecovery } from "./useLightningSocketReconnectRecovery";
 export { useSyncUserLocation } from "./useSyncUserLocation";
 export { useUpdateUserLocation } from "./useUpdateUserLocation";

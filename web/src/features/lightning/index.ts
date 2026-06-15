@@ -3,9 +3,13 @@ export {
   LightningListOverlay,
   LightningMapSection,
   LightningParticipationOverlay,
+  LightningSocketReconnectIndicator,
   NearLightningContent,
 } from "./components";
-export { useSyncUserLocation } from "./hooks/actions";
+export {
+  useLightningSocketReconnectRecovery,
+  useSyncUserLocation,
+} from "./hooks/actions";
 export { useLightningBottomSheetState } from "./hooks/state";
 export {
   useLightningLists,

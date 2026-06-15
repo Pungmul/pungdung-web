@@ -9,9 +9,11 @@ import {
   LightningListOverlay,
   LightningMapSection,
   LightningParticipationOverlay,
+  LightningSocketReconnectIndicator,
   useLightningBottomSheetState,
   useLightningLists,
   useLightningListViewModel,
+  useLightningSocketReconnectRecovery,
   useSchoolLightningSocket,
   useSyncUserLocation,
   useWholeLightningSocket,
@@ -40,6 +42,7 @@ export default function LightningPage() {
 
 function LightningPageContent() {
   useSyncUserLocation();
+  useLightningSocketReconnectRecovery();
 
   useWholeLightningSocket();
   useSchoolLightningSocket();
@@ -63,6 +66,7 @@ function LightningPageContent() {
         key="main-div"
         className="relative w-full h-full flex-grow flex flex-col justify-end md:flex-row-reverse overflow-hidden"
       >
+        <LightningSocketReconnectIndicator />
         <LightningMapSection
           lightningList={lightningList}
           bottomSheetRef={bottomSheetRef}
