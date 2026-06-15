@@ -12,6 +12,12 @@ export type LightningListData = {
 /** 전체/학교 구간 STOMP로 목록 캐시를 갱신할 때 쓰는 범위 */
 export type LightningListSocketScope = "whole" | "school";
 
+/** STOMP 검색 delta 파싱 결과 엔트리 */
+export type LightningListSocketSnapshotEntry = {
+  meeting: LightningMeeting;
+  hasParticipantPayload: boolean;
+};
+
 /** `deriveDisplayLightningLists`로 `LightningData`에서 화면에 맞게 파생 */
 export interface DisplayLightningLists {
   wholeLightningList: LightningMeeting[];

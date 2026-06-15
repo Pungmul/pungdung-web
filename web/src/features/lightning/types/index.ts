@@ -4,6 +4,7 @@ export type {
   DisplayLightningLists,
   LightningListData,
   LightningListSocketScope,
+  LightningListSocketSnapshotEntry,
   NearLightningType,
 } from "./lightning-lists.types";
 export type { LightningLookup, LightningMapTarget } from "./map-target.types";
