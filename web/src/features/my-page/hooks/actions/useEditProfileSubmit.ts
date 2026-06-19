@@ -12,50 +12,49 @@ import { Toast } from "@/shared";
 
 import { transformEditProfileData } from "../../lib";
 import { myPageQueries } from "../../queries";
-import type {
-  EditProfileFormValues,
-  EditProfilePasswordFormValues,
-} from "../../types";
+import type { EditProfileFormValues } from "../../types";
 
 import { authMutationOptions } from "@/features/auth/queries";
 
 interface UseEditProfileSubmitParams {
   form: UseFormReturn<EditProfileFormValues>;
-  passwordForm: UseFormReturn<EditProfilePasswordFormValues>;
   changedProfileImageFile: File | null;
   serverClubAgeFallback: number;
+  lockedClubNameFallback: string;
+  lockedClubIdFallback: number | null;
+  isClubNameLocked: boolean;
+  isClubLocked: boolean;
 }
 
 export const useEditProfileSubmit = ({
   form,
-  passwordForm,
   changedProfileImageFile,
   serverClubAgeFallback,
+  lockedClubNameFallback,
+  lockedClubIdFallback,
+  isClubNameLocked,
+  isClubLocked,
 }: UseEditProfileSubmitParams) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const { mutate: updateProfile, isPending } = useMutation(
-    authMutationOptions.updateProfile()
+    authMutationOptions.updateProfile(),
   );
 
   const handleSubmitEditProfile = form.handleSubmit((data) => {
     const formData = new FormData();
     const modifiedProfileData = transformEditProfileData(data, {
       serverClubAgeFallback,
+      lockedClubNameFallback,
+      lockedClubIdFallback,
+      isClubNameLocked,
+      isClubLocked,
     });
 
-    const accountData = new Blob(
-      [
-        JSON.stringify({
-          ...modifiedProfileData,
-          oldPassword: passwordForm.getValues("oldPassword"),
-        }),
-      ],
-      {
-        type: "application/json",
-      }
-    );
+    const accountData = new Blob([JSON.stringify(modifiedProfileData)], {
+      type: "application/json",
+    });
 
     const profileImage = changedProfileImageFile
       ? new Blob([changedProfileImageFile], {

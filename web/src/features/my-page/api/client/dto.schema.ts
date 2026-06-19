@@ -49,5 +49,12 @@ export const invitationCodeResponseSchema = z.object({
   remainingUses: z.number(),
 });
 
+export const memberChangeInfoResponseSchema = z.object({
+  updatedAt: z.string(),
+  clubNameChangedAt: z.string().nullable(),
+  clubIdChangedAt: z.string().nullable(),
+});
+
 export type MemberMeDto = z.infer<typeof memberMeResponseSchema>;
 export type InvitationCodeDto = z.infer<typeof invitationCodeResponseSchema>;
+export type MemberChangeInfoDto = z.infer<typeof memberChangeInfoResponseSchema>;

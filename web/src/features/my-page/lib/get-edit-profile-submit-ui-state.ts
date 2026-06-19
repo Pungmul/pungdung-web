@@ -3,8 +3,9 @@
  */
 type GetEditProfileSubmitUiStateInput = {
   isPending: boolean;
-  passwordIsDirty: boolean;
-  passwordIsValid: boolean;
+  isFormDirty: boolean;
+  isFormValid: boolean;
+  hasProfileImageChange: boolean;
 };
 
 type EditProfileSubmitUiState = {
@@ -15,17 +16,19 @@ type EditProfileSubmitUiState = {
 
 export function getEditProfileSubmitUiState({
   isPending,
-  passwordIsDirty,
-  passwordIsValid,
+  isFormDirty,
+  isFormValid,
+  hasProfileImageChange,
 }: GetEditProfileSubmitUiStateInput): EditProfileSubmitUiState {
-  const disabled = isPending || !passwordIsDirty || !passwordIsValid;
+  const hasChanges = isFormDirty || hasProfileImageChange;
+  const disabled = isPending || !hasChanges || !isFormValid;
 
   if (isPending) {
     return { disabled, showSpinner: true, label: "프로필 수정" };
   }
 
-  if (!passwordIsValid) {
-    return { disabled, showSpinner: false, label: "비밀번호를 입력해주세요" };
+  if (!isFormValid) {
+    return { disabled, showSpinner: false, label: "입력값을 확인해주세요" };
   }
 
   return { disabled, showSpinner: false, label: "프로필 수정" };

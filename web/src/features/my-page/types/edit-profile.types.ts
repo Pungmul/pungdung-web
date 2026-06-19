@@ -1,8 +1,7 @@
 export interface EditPageRequestForm {
-  clubName?: string;
+  clubName?: string | null;
   clubId?: number | null;
   clubAge: number;
   phoneNumber: string;
 }
-
 

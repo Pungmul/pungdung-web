@@ -3,12 +3,15 @@
 import Image from "next/image";
 
 import { useSuspenseQueries } from "@tanstack/react-query";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
 
 import { CameraIcon } from "@heroicons/react/24/outline";
 
-import { clubQueries, useClubOptions } from "@/features/club";
+import {
+  clubQueries,
+  mapGroupNameToClubId,
+  useClubOptions,
+} from "@/features/club";
 
 import {
   BottomFixedButton,
@@ -17,44 +20,76 @@ import {
   Space,
   Spinner,
 } from "@/shared";
+import { WarningCircleIcon } from "@/shared/components/Icons";
 
 import { formatPhoneNumber } from "@/features/auth/lib";
 import { useEditProfileSubmit } from "@/features/my-page/hooks/actions";
 import { useEditProfileMainForm } from "@/features/my-page/hooks/form";
 import { useEditProfileImage } from "@/features/my-page/hooks/state";
 import { getEditProfileSubmitUiState } from "@/features/my-page/lib/get-edit-profile-submit-ui-state";
+import {
+  formatProfileChangeLockedAt,
+  resolveProfileChangeLocks,
+} from "@/features/my-page/lib/profile-change-lock";
 import { myPageQueries } from "@/features/my-page/queries";
-import type { EditProfilePasswordFormValues } from "@/features/my-page/types";
-import { editProfilePasswordSchema } from "@/features/my-page/types";
+
+function ChangeLockNotice({
+  fieldLabel,
+  changedAt,
+}: {
+  fieldLabel: string;
+  changedAt: string | null;
+}) {
+  const formattedDate = formatProfileChangeLockedAt(changedAt);
+
+  if (!formattedDate) {
+    return null;
+  }
+
+  return (
+    <div className="mt-[4px] flex items-start gap-[4px]">
+      <span className="flex size-4 p-[1px] shrink-0 items-center justify-center">
+        <WarningCircleIcon className="size-full text-grey-400" />
+      </span>
+      <p className="text-[12px] text-grey-400 max-[430px]:whitespace-pre-line">
+        {`${fieldLabel}는 6개월에 한 번 변경 가능 합니다. \n(마지막 수정 ${formattedDate})`}
+      </p>
+    </div>
+  );
+}
 
 export function EditProfileForm() {
-  const [{ data: userData }, { data: clubList }] = useSuspenseQueries({
-    queries: [myPageQueries.info(), clubQueries.list()],
-  });
+  const [{ data: userData }, { data: clubList }, { data: changeInfo }] =
+    useSuspenseQueries({
+      queries: [
+        myPageQueries.info(),
+        clubQueries.list(),
+        myPageQueries.changeInfo(),
+      ],
+    });
   const clubOptions = useClubOptions(clubList);
+  const currentClubId = mapGroupNameToClubId(userData.groupName, clubList) ?? null;
+  const { isClubLocked, isClubNameLocked } =
+    resolveProfileChangeLocks(changeInfo);
 
   const form = useEditProfileMainForm(userData, clubList);
-  const passwordForm = useForm<EditProfilePasswordFormValues>({
-    resolver: zodResolver(editProfilePasswordSchema),
-    mode: "onChange",
-    defaultValues: {
-      oldPassword: "",
-    },
-  });
   const { changedProfileImageFile, handleProfileImageChange } =
     useEditProfileImage(form);
 
   const { handleSubmitEditProfile, isPending } = useEditProfileSubmit({
     form,
-    passwordForm,
     changedProfileImageFile,
     serverClubAgeFallback: userData.clubAge ?? 0,
+    lockedClubNameFallback: userData.clubName ?? "",
+    lockedClubIdFallback: currentClubId,
+    isClubNameLocked,
+    isClubLocked,
   });
 
   const {
     register,
     control,
-    formState: { errors: formErrors },
+    formState: { errors: formErrors, isDirty, isValid },
   } = form;
 
   const profileImageSrc = useWatch({
@@ -62,25 +97,16 @@ export function EditProfileForm() {
     name: "profileImage",
   });
 
-  const {
-    register: registerPassword,
-    formState: {
-      errors: passwordErrors,
-      isDirty: passwordIsDirty,
-      isValid: passwordIsValid,
-    },
-  } = passwordForm;
-
-  // 버튼 정책을 순수 함수로 분리해 렌더링 책임만 남긴다.
   const submitUiState = getEditProfileSubmitUiState({
     isPending,
-    passwordIsDirty,
-    passwordIsValid,
+    isFormDirty: isDirty,
+    isFormValid: isValid,
+    hasProfileImageChange: changedProfileImageFile !== null,
   });
 
   return (
     <form
-      className="flex flex-col px-[32px] flex-grow"
+      className="flex flex-col flex-grow md:px-[24px]"
       onSubmit={handleSubmitEditProfile}
     >
       <div className="mx-auto relative">
@@ -114,35 +140,53 @@ export function EditProfileForm() {
         </div>
       </div>
       <Space h={32} />
-      <div className="flex flex-col gap-[24px] md:px-[32px] flex-grow">
+      <div className="flex flex-col gap-[24px] flex-grow px-[24px]">
         <Input label="이름" {...register("name")} disabled={true} />
-        <Input
-          label="패명"
-          {...register("nickname")}
-          errorMessage={formErrors.nickname?.message || ""}
-        />
-        <Controller
-          control={control}
-          name="club"
-          render={({ field }) => (
-            <Select
-              hasSearch={true}
-              label="동아리"
-              name="club"
-              value={field.value}
-              onChange={(value) => {
-                field.onChange(value);
-              }}
-              errorMessage={formErrors.club?.message || ""}
-            >
-              {clubOptions.map((option) => (
-                <Select.Option key={option.label} value={option.value}>
-                  {option.label}
-                </Select.Option>
-              ))}
-            </Select>
+        <div>
+          <Input
+            label="패명"
+            {...register("nickname")}
+            disabled={isClubNameLocked}
+            errorMessage={formErrors.nickname?.message || ""}
+          />
+          {isClubNameLocked && (
+            <ChangeLockNotice
+              fieldLabel="패명"
+              changedAt={changeInfo.clubNameChangedAt}
+            />
           )}
-        />
+        </div>
+        <div>
+          <Controller
+            control={control}
+            name="club"
+            render={({ field }) => (
+              <Select
+                hasSearch={true}
+                label="동아리"
+                name="club"
+                value={field.value}
+                disabled={isClubLocked}
+                onChange={(value) => {
+                  field.onChange(value);
+                }}
+                errorMessage={formErrors.club?.message || ""}
+              >
+                {clubOptions.map((option) => (
+                  <Select.Option key={option.label} value={option.value}>
+                    {option.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            )}
+          />
+          {isClubLocked && (
+            <ChangeLockNotice
+              fieldLabel="동아리"
+              changedAt={changeInfo.clubIdChangedAt}
+            />
+          )}
+        </div>
         <Input
           label="학번"
           {...register("clubAge")}
@@ -166,14 +210,6 @@ export function EditProfileForm() {
               }}
             />
           )}
-        />
-        <Input
-          label="현재 비밀번호"
-          type="password"
-          {...registerPassword("oldPassword")}
-          errorMessage={passwordErrors.oldPassword?.message || ""}
-          placeholder="현재 비밀번호를 입력해주세요."
-          required
         />
       </div>
       <BottomFixedButton
