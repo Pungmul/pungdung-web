@@ -2,9 +2,12 @@ export { MyInvitationCodeModal } from "./overlay/MyInvitationCodeModal";
 export { DarkModePreferenceSection } from "./section/DarkModePreferenceSection";
 export { EditProfileForm } from "./section/EditProfileForm";
 export { MyInvitationCodeMenuItem } from "./section/MyInvitationCodeMenuItem";
-export { MyPageAccountSection } from "./section/MyPageAccountSection";
+export {
+  MyPageAccountSection,
+  MyPageAccountSectionSkeleton,
+} from "./section/MyPageAccountSection";
 export { MyPageFriendsSection } from "./section/MyPageFriendsSection";
-export { ProfileSection } from "./section/ProfileSection";
+export { ProfileSection, ProfileSectionSkeleton } from "./section/ProfileSection";
 export { InvitationCodeCopyBox } from "./ui/InvitationCodeCopyBox";
 export { LoginToggle } from "./ui/LoginToggle";
 export { ProfileCircle } from "./ui/ProfileCircle";

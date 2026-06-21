@@ -70,4 +70,18 @@ export type PasswordResetEmailRequest = z.infer<
   typeof passwordResetEmailRequestSchema
 >;
 
+export const changePasswordRequestSchema = z.object({
+  currentPassword: z.string(),
+  newPassword: z.string(),
+});
+export type ChangePasswordRequest = z.infer<typeof changePasswordRequestSchema>;
+
+export const passwordChangeInfoResponseSchema = z.object({
+  kakaoSignup: z.boolean(),
+  firstPasswordChange: z.boolean(),
+});
+export type PasswordChangeInfoDto = z.infer<
+  typeof passwordChangeInfoResponseSchema
+>;
+
 export const voidResponseSchema = z.unknown().transform(() => undefined);

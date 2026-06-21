@@ -1,7 +1,11 @@
 import { queryOptions } from "@tanstack/react-query";
 
 import { authQueryInternal } from "./auth-query-internal";
-import { fetchAccessToken, fetchEmailExists } from "../api/client";
+import {
+  fetchAccessToken,
+  fetchEmailExists,
+  fetchPasswordChangeInfo,
+} from "../api/client";
 
 /**
  * Auth queryOptions.
@@ -10,6 +14,15 @@ import { fetchAccessToken, fetchEmailExists } from "../api/client";
 export const authQueries = {
   /** invalidateQueries, removeQueries 할 때 넣을 값. auth 하위 쿼리 전부 대상 */
   all: () => ({ queryKey: authQueryInternal.all() } as const),
+
+  passwordInfo: () =>
+    queryOptions({
+      queryKey: authQueryInternal.passwordInfo(),
+      queryFn: fetchPasswordChangeInfo,
+      // 카카오 연동/최초 비밀번호 설정 상태가 바뀔 수 있어 항상 최신값을 본다.
+      staleTime: 0,
+      refetchOnMount: "always",
+    }),
 
   token: () =>
     queryOptions({

@@ -4,6 +4,7 @@
  */
 export * from "./fetch-access-token.api";
 export * from "./fetch-email-exists.api";
+export * from "./fetch-password-change-info.api";
 export * from "./request-kakao-sign-up.api";
 export * from "./request-login.api";
 export * from "./request-password-reset-email.api";

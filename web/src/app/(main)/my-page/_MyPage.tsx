@@ -2,34 +2,75 @@
 
 import Link from "next/link";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { QueryErrorResetBoundary } from "@tanstack/react-query";
+import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
 
-import { Suspense } from "@suspensive/react";
+import { ErrorBoundary, Suspense } from "@suspensive/react";
 
-import { Space } from "@/shared";
-
-import { MyInvitationCodeMenuItem } from "../../../features/my-page/components/section/MyInvitationCodeMenuItem";
+import { authQueries, canChangePassword } from "@/features/auth";
+import type { MyPageInfo } from "@/features/my-page";
 import {
+  MyInvitationCodeMenuItem,
   MyPageAccountSection,
   MyPageAccountSectionSkeleton,
-} from "../../../features/my-page/components/section/MyPageAccountSection";
-import { MyPageFriendsSection } from "../../../features/my-page/components/section/MyPageFriendsSection";
-import { ProfileSection, ProfileSectionSkeleton } from "../../../features/my-page/components/section/ProfileSection";
+  MyPageFriendsSection,
+  ProfileSection,
+  ProfileSectionSkeleton,
+} from "@/features/my-page";
+
+import { SkeletonView, Space } from "@/shared";
 
 import { myPageQueries } from "@/features/my-page/queries";
 
 export function MyPageClient() {
   return (
     <Suspense clientOnly fallback={<MyPageClientSkeleton />}>
-      <MyPageClientContent />
+      <QueryErrorResetBoundary>
+        {({ reset: resetQueries }) => (
+          <ErrorBoundary
+            onReset={resetQueries}
+            fallback={() => (
+              <Suspense clientOnly fallback={<MyPageClientSkeleton />}>
+                <MyPageClientWithoutPasswordMenu />
+              </Suspense>
+            )}
+          >
+            <MyPageClientContent />
+          </ErrorBoundary>
+        )}
+      </QueryErrorResetBoundary>
     </Suspense>
   );
 }
 
 function MyPageClientContent() {
-  // 프로필/계정 섹션에서 공통으로 쓰는 회원 정보를 상위에서 1회 조회한다.
+  const [{ data: userInfo }, { data: passwordInfo }] = useSuspenseQueries({
+    queries: [myPageQueries.info(), authQueries.passwordInfo()],
+  });
+
+  return (
+    <MyPageLayout
+      userInfo={userInfo}
+      showChangePasswordMenu={canChangePassword(passwordInfo)}
+    />
+  );
+}
+
+function MyPageClientWithoutPasswordMenu() {
   const { data: userInfo } = useSuspenseQuery(myPageQueries.info());
 
+  return <MyPageLayout userInfo={userInfo} showChangePasswordMenu={false} />;
+}
+
+type MyPageLayoutProps = {
+  userInfo: MyPageInfo;
+  showChangePasswordMenu: boolean;
+};
+
+function MyPageLayout({
+  userInfo,
+  showChangePasswordMenu,
+}: MyPageLayoutProps) {
   return (
     <div className="px-8 py-6 flex-grow flex flex-col w-full bg-background">
       <ProfileSection
@@ -53,14 +94,16 @@ function MyPageClientContent() {
           <li>
             <MyPageAccountSection email={userInfo?.email} />
           </li>
-          <li>
-            <Link
-              href="/my-page/change-password"
-              className="block text-[16px] text-grey-600 font-semibold p-[8px] hover:text-grey-800"
-            >
-              비밀번호 변경
-            </Link>
-          </li>
+          {showChangePasswordMenu ? (
+            <li>
+              <Link
+                href="/my-page/change-password"
+                className="block text-[16px] text-grey-600 font-semibold p-[8px] hover:text-grey-800"
+              >
+                비밀번호 변경
+              </Link>
+            </li>
+          ) : null}
           <li>
             <Link
               href="/my-page/login-setting"
@@ -119,6 +162,9 @@ function MyPageClientSkeleton() {
           </li>
           <li>
             <MyPageAccountSectionSkeleton />
+          </li>
+          <li aria-hidden className="p-[8px]">
+            <SkeletonView className="h-[16px] w-[88px] rounded" />
           </li>
         </ul>
       </section>

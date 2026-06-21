@@ -58,6 +58,12 @@ export const AUTH_UI_MESSAGE = {
     },
   },
   CHANGE_PASSWORD: {
+    PAGE: {
+      INTRO_CHANGE: "로그인에 사용할 비밀번호를 변경해요.",
+      INTRO_FIRST: "로그인에 사용할 비밀번호를 설정해요.",
+      DESCRIPTION_CHANGE: "현재 비밀번호와 새로운 비밀번호를 입력해주세요.",
+      DESCRIPTION_FIRST: "새로운 비밀번호를 입력해주세요.",
+    },
     FORM: {
       CURRENT_LABEL: "현재 비밀번호",
       NEW_LABEL: "신규 비밀번호",

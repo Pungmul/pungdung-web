@@ -10,6 +10,7 @@ import {
   updatePassword,
   updateProfile,
 } from "../api/client";
+import type { ChangePasswordRequest } from "../api/client/dto.schema";
 
 const root = authQueryInternal.all();
 
@@ -46,14 +47,9 @@ export const authMutationOptions = {
     }),
 
   changePassword: () =>
-    mutationOptions<
-      void,
-      Error,
-      { currentPassword: string; newPassword: string }
-    >({
+    mutationOptions<void, Error, ChangePasswordRequest>({
       mutationKey: [...root, "changePassword"],
-      mutationFn: ({ currentPassword, newPassword }) =>
-        updatePassword(currentPassword, newPassword),
+      mutationFn: updatePassword,
     }),
 
   updateProfile: () =>

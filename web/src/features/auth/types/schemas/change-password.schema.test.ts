@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from "vitest";
 
-import { changePasswordSchema } from "./change-password.schema";
+import { changePasswordSchema, createChangePasswordSchema } from "./change-password.schema";
 
 describe("changePasswordSchema", () => {
   /** 통과 기준이 되는 세 필드 조합(현재·새·확인이 동일한 패턴으로 맞춤). */
@@ -46,5 +46,16 @@ describe("changePasswordSchema", () => {
       );
       expect(confirmIssues.some((i) => i.message.includes("일치"))).toBe(true);
     }
+  });
+
+  it("현재 비밀번호가 필요 없으면 currentPassword 없이도 통과한다", () => {
+    const schema = createChangePasswordSchema(false);
+    expect(
+      schema.safeParse({
+        currentPassword: "",
+        newPassword: "new12345",
+        confirmPassword: "new12345",
+      }).success
+    ).toBe(true);
   });
 });

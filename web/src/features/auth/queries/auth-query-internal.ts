@@ -6,5 +6,6 @@ const AUTH_QUERY_ROOT = ["auth"] as const;
 
 export const authQueryInternal = {
   all: () => [...AUTH_QUERY_ROOT],
+  passwordInfo: () => [...AUTH_QUERY_ROOT, "password-info"] as const,
   token: () => [...AUTH_QUERY_ROOT, "token"] as const,
 };
