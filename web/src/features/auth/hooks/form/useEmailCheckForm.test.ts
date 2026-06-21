@@ -57,8 +57,8 @@ describe("useEmailCheckForm", () => {
     }));
   });
 
-  it("이메일 중복 확인에서 가입된 이메일이면 입력 에러를 설정한다", async () => {
-    refetchMock.mockResolvedValue({ data: { isRegistered: true } });
+  it("이메일 중복 확인에서 가입되지 않은 이메일이면 입력 에러를 설정한다", async () => {
+    refetchMock.mockResolvedValue({ data: { isRegistered: false } });
     const { result } = renderHook(() =>
       useEmailCheckForm({ onSuccess: vi.fn() })
     );
@@ -69,6 +69,17 @@ describe("useEmailCheckForm", () => {
       type: "validate",
       message: AUTH_VALIDATION.EMAIL_CHECK.NOT_REGISTERED,
     });
+  });
+
+  it("이메일 중복 확인에서 가입된 이메일이면 입력 에러를 설정하지 않는다", async () => {
+    refetchMock.mockResolvedValue({ data: { isRegistered: true } });
+    const { result } = renderHook(() =>
+      useEmailCheckForm({ onSuccess: vi.fn() })
+    );
+
+    await result.current.emailRegisterOptions.onBlur?.({} as never);
+
+    expect(setErrorMock).not.toHaveBeenCalled();
   });
 
   it("이메일 중복 확인 요청 실패 시 공통 에러 메시지를 설정한다", async () => {

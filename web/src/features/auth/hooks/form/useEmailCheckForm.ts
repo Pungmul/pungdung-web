@@ -33,7 +33,7 @@ export function useEmailCheckForm(options: { onSuccess: () => void }) {
     onBlur: async () => {
       try {
         const { data } = await refetchEmailExists();
-        if (data?.isRegistered) {
+        if (!data?.isRegistered) {
           setInputError("email", {
             type: "validate",
             message: AUTH_VALIDATION.EMAIL_CHECK.NOT_REGISTERED,
