@@ -44,7 +44,6 @@ export function Editor({ boardID }: { boardID: number }) {
     postTitle: detailTitle,
     postContent: detailContent,
     postImageList: detailImageList,
-    postAuthor: detailAuthor,
   } = usePostFormDetailViewModel(null);
 
   // RHF 폼 인스턴스 + 상세 쿼리가 바뀔 때 폼 필드 동기화
@@ -57,7 +56,6 @@ export function Editor({ boardID }: { boardID: number }) {
     postTitle: detailTitle,
     postContent: detailContent,
     postImageList: detailImageList,
-    postAuthor: detailAuthor,
   });
 
   // 제출 성공 후 폼·Draft 본문 초기화

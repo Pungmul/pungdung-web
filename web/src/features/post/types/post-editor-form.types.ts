@@ -5,7 +5,6 @@ export type PostEditorFormDetailSnapshot = {
   postTitle: string;
   postContent: string;
   postImageList: ImageObject[];
-  postAuthor: string;
 };
 
 /** multipart 업로드에 실리는 이미지 한 줄. */

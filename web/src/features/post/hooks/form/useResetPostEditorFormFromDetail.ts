@@ -15,17 +15,18 @@ export function useResetPostEditorFormFromDetail(
   form: UseFormReturn<PostEditorFormValues>,
   snapshot: ResetPostEditorFormFromDetailInput
 ) {
-  const { reset } = form;
-  const { postTitle, postContent, postImageList, postAuthor } = snapshot;
+  const { reset, getValues } = form;
+  const { postTitle, postContent, postImageList } = snapshot;
 
   useEffect(() => {
-    reset(
-      buildPostEditorDefaultValues({
+    reset({
+      ...buildPostEditorDefaultValues({
         postTitle,
         postContent,
         postImageList,
-        postAuthor,
-      })
-    );
-  }, [postAuthor, postContent, postImageList, postTitle, reset]);
+      }),
+      // 상세 refetch로 리셋될 때 사용자가 토글한 익명 체크를 덮지 않는다.
+      anonymity: getValues("anonymity"),
+    });
+  }, [getValues, postContent, postImageList, postTitle, reset]);
 }

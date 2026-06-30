@@ -13,7 +13,6 @@ export function usePostFormDetailViewModel(postId: number | null) {
 
   const postTitle = postDetail?.title ?? "";
   const postContent = postDetail?.content ?? "";
-  const postAuthor = postDetail?.author ?? "Anonymous";
 
   const postImageList = useMemo(
     () => postDetail?.imageList ?? [],
@@ -31,6 +30,5 @@ export function usePostFormDetailViewModel(postId: number | null) {
     postTitle,
     postContent,
     postImageList,
-    postAuthor,
   };
 }
