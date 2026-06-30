@@ -34,7 +34,8 @@ export function mapPostDetailDtoToArticle(
     commentNum,
     timeSincePosted: dto.timeSincePosted ?? 0,
     timeSincePostedText: dto.timeSincePostedText ?? "",
-    author: dto.author ?? dto.authorUsername ?? "",
+    // authorUsername은 식별 정보(또는 자유게시판 null). 표시/도메인 author로 쓰지 않는다.
+    author: dto.author ?? "",
     imageList: images.map(mapImage),
     commentList: comments.map(mapCommentDtoToComment),
     isLiked: dto.isLiked ?? false,

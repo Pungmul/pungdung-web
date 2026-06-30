@@ -86,7 +86,7 @@ describe("fetchPostDetail", () => {
       timeSincePosted: null,
       timeSincePostedText: null,
       author: null,
-      authorUsername: "u@example.com",
+      authorUsername: null,
       categoryId: null,
     });
     mocks.clientApiRequest.mockResolvedValueOnce(dto);

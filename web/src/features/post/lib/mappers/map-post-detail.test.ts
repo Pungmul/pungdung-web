@@ -62,11 +62,64 @@ describe("mapPostDetailDtoToArticle", () => {
 
     expect(article.postId).toBe(1);
     expect(article.thumbnail).toBeNull();
+    expect(article.author).toBe("작성자");
     expect(article.commentList).toHaveLength(1);
     const root = article.commentList[0];
     expect(root?.commentId).toBe(10);
     expect(root?.replies).toHaveLength(1);
     expect(root?.replies[0]?.commentId).toBe(11);
     expect(root?.profile.fullFilePath).toBe(sampleImageProfile.fullFilePath);
+  });
+
+  it("authorUsername이 null이어도 author 닉네임만 도메인 author로 쓴다", () => {
+    const dto = postDetailResponseDtoSchema.parse({
+      postId: 2,
+      title: "제목",
+      content: "본문",
+      thumbnail: null,
+      imageNum: 0,
+      viewCount: 0,
+      likedNum: 0,
+      commentNum: 0,
+      timeSincePosted: 0,
+      timeSincePostedText: "방금",
+      author: "우울한 대포수",
+      authorUsername: null,
+      imageList: [],
+      commentList: [],
+      isLiked: false,
+      isWriter: false,
+      categoryId: 7,
+    });
+
+    const article = mapPostDetailDtoToArticle(dto);
+
+    expect(article.author).toBe("우울한 대포수");
+  });
+
+  it("author가 null이면 빈 문자열로 두고 authorUsername으로 대체하지 않는다", () => {
+    const dto = postDetailResponseDtoSchema.parse({
+      postId: 3,
+      title: "삭제된 게시글",
+      content: "",
+      thumbnail: null,
+      imageNum: 0,
+      viewCount: null,
+      likedNum: null,
+      commentNum: 0,
+      timeSincePosted: null,
+      timeSincePostedText: null,
+      author: null,
+      authorUsername: null,
+      imageList: null,
+      commentList: null,
+      isLiked: null,
+      isWriter: null,
+      categoryId: null,
+    });
+
+    const article = mapPostDetailDtoToArticle(dto);
+
+    expect(article.author).toBe("");
   });
 });

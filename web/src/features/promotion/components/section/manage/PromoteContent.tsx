@@ -21,7 +21,7 @@ export function PromoteContent({
           <div className="flex flex-row justify-between items-start">
             <div className="flex flex-row gap-2 items-center">
               <div className="text-gray-400" style={{ fontSize: 14 }}>
-                {post.author == "Anonymous" ? "익명" : post.author}
+                {post.author}
               </div>
 
               <div className="text-gray-300" style={{ fontSize: 11 }}>

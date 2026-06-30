@@ -65,9 +65,7 @@ export function ReportPostModal() {
             <div>
               작성자:
               {" "}
-              {reportedPost.author === "Anonymous"
-                ? "익명"
-                : reportedPost.author}
+              {reportedPost.author}
             </div>
           </div>
 

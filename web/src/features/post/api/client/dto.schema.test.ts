@@ -57,6 +57,31 @@ describe("post api client dto.schema", () => {
       expect(postDetailResponseDtoSchema.safeParse(raw).success).toBe(true);
     });
 
+    it("authorUsername이 null이어도 통과한다(자유 게시판 정상 응답)", () => {
+      const raw = {
+        postId: 1,
+        title: "제목",
+        content: "본문",
+        viewCount: 0,
+        likedNum: 0,
+        timeSincePosted: 0,
+        timeSincePostedText: "",
+        author: "우울한 대포수",
+        authorUsername: null,
+        imageList: [],
+        commentList: [sampleComment],
+        isLiked: false,
+        isWriter: false,
+        categoryId: 9,
+      };
+      const parsed = postDetailResponseDtoSchema.safeParse(raw);
+      expect(parsed.success).toBe(true);
+      if (parsed.success) {
+        expect(parsed.data.author).toBe("우울한 대포수");
+        expect(parsed.data.authorUsername).toBeNull();
+      }
+    });
+
     it("postId 누락이면 실패한다", () => {
       const raw = {
         title: "제목",

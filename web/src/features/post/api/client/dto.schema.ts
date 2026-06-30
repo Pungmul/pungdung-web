@@ -30,8 +30,11 @@ export const postDetailResponseDtoSchema = z.object({
   timeSincePosted: z.number().nullable(),
   timeSincePostedText: z.string().nullable(),
   author: z.string().nullable(),
-  /** 일부 응답(삭제 게시글 껍데기 등)에서만 내려올 수 있음 */
-  authorUsername: z.string().optional(),
+  /**
+   * 식별용 이메일 등. 자유 게시판에서는 항상 null(정상).
+   * null을 탈퇴/에러로 해석하지 말 것. 표시에는 author(랜덤 닉네임)만 사용.
+   */
+  authorUsername: z.string().nullable().optional(),
   imageList: z.array(imageObjectSchema).nullable(),
   commentList: z.array(commentDtoSchema).nullable(),
   isLiked: z.boolean().nullable(),

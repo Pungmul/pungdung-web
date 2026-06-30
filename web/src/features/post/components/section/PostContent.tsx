@@ -50,7 +50,7 @@ function PostContentImpl({
           <div className="flex flex-row justify-between items-start px-6">
             <div className="flex flex-row gap-2 items-center">
               <div className="text-grey-400 text-sm">
-                {post.author == "Anonymous" ? "익명" : post.author}
+                {post.author}
               </div>
 
               <div className="text-grey-300 text-sm">

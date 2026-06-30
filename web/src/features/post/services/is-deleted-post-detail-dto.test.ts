@@ -18,7 +18,7 @@ describe("isDeletedPostDetailDto", () => {
       timeSincePosted: null,
       timeSincePostedText: null,
       author: null,
-      authorUsername: "chan00516@naver.com",
+      authorUsername: null,
       categoryId: null,
     };
     const dto = postDetailResponseDtoSchema.parse(raw);

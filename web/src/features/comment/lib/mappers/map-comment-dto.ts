@@ -37,6 +37,7 @@ export function mapCommentDtoToComment(raw: unknown): Comment {
     postId: dto.postId,
     parentId: dto.parentId,
     content: dto.content,
+    // userName null만 탈퇴/삭제로 본다. (authorUsername null과는 별개 — 자유게시판 정상값)
     userName: dto.userName ?? "탈퇴한 회원",
     profile:
       dto.profile !== undefined && dto.profile !== null
