@@ -34,10 +34,10 @@ function PostBoxImpl({
               <h2 className="text-[14px] line-clamp-1 text-ellipsis">
                 {post.title}
               </h2>
-              <div className="text-grey-400 text-[11px] max-w-24">
-                {post.author == "Anonymous" ? "익명" : post.author}
+              <div className="text-grey-400 text-[11px]">
+                {post.author}
               </div>
-              <p className="text-grey-800 text-[12px] line-clamp-2 text-ellipsis py-[4px] whitespace-pre-wrap">
+              <p className="text-grey-800 text-[12px] line-clamp-2 overflow-hidden text-ellipsis whitespace-pre-line">
                 {post.content}
               </p>
             </div>

@@ -38,11 +38,11 @@ export const PostBoxWithCategory = memo(
               <div className="text-[14px] line-clamp-1 text-ellipsis">
                 {post.title}
               </div>
-              <div className="text-grey-400 text-[11px] max-w-24">
-                {post.author == "Anonymous" ? "익명" : post.author}
+              <div className="text-grey-400 text-[11px]">
+                {post.author}
               </div>
             </div>
-            <div className="text-grey-800 text-[12px] line-clamp-2 text-ellipsis">
+            <div className="text-grey-800 text-[12px] line-clamp-2 overflow-hidden text-ellipsis">
               {post.content}
             </div>
           </div>

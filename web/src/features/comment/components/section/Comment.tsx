@@ -44,10 +44,9 @@ const Comment = ({
     >
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row gap-2 items-center text-[12px] md:text-[13px]">
-          <div className="text-grey-800 max-w-20 truncate">
+          <div className="text-grey-800 truncate">
             {comment.userName}
           </div>
-          <div className="text-grey-400">{comment.createdAt}</div>
         </div>
         <div className="flex flex-row items-center">
           <div
@@ -70,6 +69,7 @@ const Comment = ({
       <div className="text-[13px] md:text-[15px] text-grey-800 whitespace-pre-wrap">
         {comment.content}
       </div>
+      <div className="text-grey-400 text-[12px]">{comment.createdAt}</div>
     </div>
   );
 };
