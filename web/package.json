@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@heroicons/react": "2.2.0",
+    "@pungdung/design-tokens": "workspace:1.0.0",
     "@hookform/resolvers": "5.2.2",
     "@pungdung/worker-socket-bridge": "workspace:1.0.0",
     "@stomp/stompjs": "7.2.1",

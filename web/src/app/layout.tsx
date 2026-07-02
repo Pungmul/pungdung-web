@@ -1,6 +1,8 @@
 import { Viewport } from "next";
 import localFont from "next/font/local";
 
+import { createWebColorStyleText } from "@pungdung/design-tokens";
+
 import { FCMServiceWorkerRegistration } from "@/features/notification";
 
 import {
@@ -35,6 +37,8 @@ export const viewport: Viewport = {
   viewportFit: "cover" /* PWA stand-alone 시 노치/홈 인디케이터 영역 대응 */,
 };
 
+const colorStyleText = createWebColorStyleText();
+
 export default async function Layout({
   children,
 }: Readonly<{
@@ -50,8 +54,9 @@ export default async function Layout({
       data-theme={
         initialThemePreference === "system" ? undefined : initialThemePreference
       }
-    >
+      >
       <head>
+        <style id="app-color-tokens">{colorStyleText}</style>
         {/* board/main 전용이 아니라 static/cached 라우트 전반의 초기 테마 깜빡임을 막기 위해 전역에 둔다. */}
         <ThemePreferenceBootScript />
       </head>

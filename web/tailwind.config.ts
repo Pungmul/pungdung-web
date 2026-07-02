@@ -21,7 +21,7 @@ const config: Config = {
         "primary-light": "var(--color-primary-light)",
         "primary-dark": "var(--color-primary-dark)",
         secondary: "var(--color-secondary)",
-        correct: "var(--color-right)",
+        correct: "var(--color-correct)",
         warning: "var(--color-warning)",
         green: "var(--color-green)",
         kakao: "var(--color-kakao)",
