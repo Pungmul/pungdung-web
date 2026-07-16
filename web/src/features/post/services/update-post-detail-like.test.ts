@@ -14,8 +14,6 @@ function makeDetail(overrides: Partial<PostArticleDetail> = {}): PostArticleDeta
     fileSize: 0,
     createdAt: "",
   };
-  const baseComment = {} as unknown as PostArticleDetail["commentList"][0];
-
   const base = {
     postId: 1,
     title: "t",
@@ -29,7 +27,6 @@ function makeDetail(overrides: Partial<PostArticleDetail> = {}): PostArticleDeta
     timeSincePostedText: "",
     author: "",
     imageList: [baseImage],
-    commentList: [baseComment],
     isLiked: false,
     isWriter: true,
     categoryId: 1,

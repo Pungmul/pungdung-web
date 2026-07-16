@@ -22,6 +22,8 @@ export const commentDtoSchema: z.ZodType<unknown> = z.lazy(() =>
     postId: z.number(),
     parentId: z.number().nullable(),
     content: z.string(),
+    anonymity: z.boolean(),
+    likedNum: z.number(),
     /**
      * 표시용 이름. 자유 게시판에서는 게시물별 랜덤 닉네임.
      * null은 삭제·탈퇴 등 예외 케이스. authorUsername null과는 의미가 다름.
@@ -32,6 +34,8 @@ export const commentDtoSchema: z.ZodType<unknown> = z.lazy(() =>
     replies: z.array(commentDtoSchema).nullable().optional(),
   })
 );
+
+export const commentListResponseDtoSchema = z.array(commentDtoSchema);
 
 export const createCommentRequestDtoSchema = z.object({
   content: z.string(),
@@ -87,6 +91,9 @@ export const myCommentListPageDtoSchema = z.object({
 export const commentMutationResponseDtoSchema = z.unknown();
 
 export type CommentDto = z.infer<typeof commentDtoSchema>;
+export type CommentListResponseDto = z.infer<
+  typeof commentListResponseDtoSchema
+>;
 export type CommentImageObjectDto = z.infer<typeof commentImageObjectDtoSchema>;
 export type MyCommentDto = z.infer<typeof myCommentDtoSchema>;
 export type MyCommentListPageDto = z.infer<typeof myCommentListPageDtoSchema>;

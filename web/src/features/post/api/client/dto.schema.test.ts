@@ -7,16 +7,6 @@ import {
   reportPostRequestBodySchema,
 } from "./dto.schema";
 
-const sampleComment = {
-  commentId: 1,
-  postId: 42,
-  parentId: null,
-  content: "c",
-  userName: "u",
-  createdAt: "",
-  replies: [],
-};
-
 describe("post api client dto.schema", () => {
   describe("imageObjectSchema", () => {
     it("모든 필드가 채워지면 통과한다", () => {
@@ -45,11 +35,11 @@ describe("post api client dto.schema", () => {
         content: "본문",
         viewCount: 0,
         likedNum: 0,
+        commentNum: 0,
         timeSincePosted: 0,
         timeSincePostedText: "",
         author: "",
         imageList: [],
-        commentList: [sampleComment],
         isLiked: false,
         isWriter: false,
         categoryId: 9,
@@ -64,12 +54,12 @@ describe("post api client dto.schema", () => {
         content: "본문",
         viewCount: 0,
         likedNum: 0,
+        commentNum: 0,
         timeSincePosted: 0,
         timeSincePostedText: "",
         author: "우울한 대포수",
         authorUsername: null,
         imageList: [],
-        commentList: [sampleComment],
         isLiked: false,
         isWriter: false,
         categoryId: 9,
@@ -88,15 +78,34 @@ describe("post api client dto.schema", () => {
         content: "본문",
         viewCount: 0,
         likedNum: 0,
+        commentNum: 0,
         timeSincePosted: 0,
         timeSincePostedText: "",
         author: "",
         imageList: [],
-        commentList: null,
         isLiked: false,
         isWriter: false,
         categoryId: null,
       };
+      expect(postDetailResponseDtoSchema.safeParse(raw).success).toBe(false);
+    });
+
+    it("commentNum이 없으면 실패한다", () => {
+      const raw = {
+        postId: 1,
+        title: "제목",
+        content: "본문",
+        viewCount: 0,
+        likedNum: 0,
+        timeSincePosted: 0,
+        timeSincePostedText: "",
+        author: "",
+        imageList: [],
+        isLiked: false,
+        isWriter: false,
+        categoryId: 9,
+      };
+
       expect(postDetailResponseDtoSchema.safeParse(raw).success).toBe(false);
     });
   });

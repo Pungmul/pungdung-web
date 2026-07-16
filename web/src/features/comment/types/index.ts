@@ -7,6 +7,8 @@ export interface Comment {
   postId: number;
   parentId: number | null;
   content: string;
+  anonymity: boolean;
+  likedNum: number;
   userName: string;
   profile: ImageObject;
   createdAt: string;
@@ -57,5 +59,4 @@ export interface MyCommentResponse {
   navigateFirstPage: number;
   navigateLastPage: number;
 }
-
 

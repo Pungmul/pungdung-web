@@ -27,16 +27,6 @@ import { fetchPostDetail } from "./fetch-post-detail";
 import type { PostArticleDetail } from "../../types";
 import { PostDeletedError } from "./post-deleted-error";
 
-const sampleCommentDto = {
-  commentId: 1,
-  postId: 99,
-  parentId: null,
-  content: "c",
-  userName: "u",
-  createdAt: "",
-  replies: [],
-};
-
 function normalDto(): PostDetailResponseDto {
   return postDetailResponseDtoSchema.parse({
     postId: 99,
@@ -44,11 +34,11 @@ function normalDto(): PostDetailResponseDto {
     content: "본문",
     viewCount: 0,
     likedNum: 0,
+    commentNum: 0,
     timeSincePosted: 0,
     timeSincePostedText: "",
     author: "",
     imageList: [],
-    commentList: [sampleCommentDto],
     isLiked: false,
     isWriter: false,
     categoryId: 1,
@@ -78,7 +68,7 @@ describe("fetchPostDetail", () => {
       title: "삭제된 게시글",
       content: "",
       imageList: null,
-      commentList: null,
+      commentNum: 0,
       viewCount: null,
       isLiked: null,
       isWriter: null,

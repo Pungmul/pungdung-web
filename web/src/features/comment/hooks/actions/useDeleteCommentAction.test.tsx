@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { commentQueries } from "@/features/comment";
 import { postQueries } from "@/features/post";
 import { Toast } from "@/shared/store";
 
@@ -32,7 +33,7 @@ describe("useDeleteCommentAction", () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 
-  it("성공하면 상세 쿼리를 무효화하고 성공 토스트를 띄운다", async () => {
+  it("성공하면 댓글 목록과 상세 쿼리를 무효화하고 성공 토스트를 띄운다", async () => {
     const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
     const { result } = renderHook(() => useDeleteCommentAction(), { wrapper });
@@ -42,6 +43,9 @@ describe("useDeleteCommentAction", () => {
     });
 
     expect(vi.mocked(CommentApi.deleteComment).mock.calls[0]?.[0]).toBe(5);
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: commentQueries.listKey(100),
+    });
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: postQueries.detailKey(100),
     });

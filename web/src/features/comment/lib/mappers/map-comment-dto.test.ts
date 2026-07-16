@@ -19,6 +19,8 @@ describe("mapCommentDtoToComment", () => {
       postId: 10,
       parentId: null,
       content: "댓글",
+      anonymity: false,
+      likedNum: 2,
       userName: "작성자",
       profile: profileDto,
       createdAt: "2026-01-01",
@@ -28,6 +30,8 @@ describe("mapCommentDtoToComment", () => {
           postId: 10,
           parentId: 1,
           content: "대댓글",
+          anonymity: true,
+          likedNum: 1,
           userName: "답글 작성자",
           profile: profileDto,
           createdAt: "2026-01-02",
@@ -37,6 +41,8 @@ describe("mapCommentDtoToComment", () => {
     });
 
     expect(comment.commentId).toBe(1);
+    expect(comment.anonymity).toBe(false);
+    expect(comment.likedNum).toBe(2);
     expect(comment.profile.fullFilePath).toBe(profileDto.fullFilePath);
     expect(comment.replies[0]?.commentId).toBe(2);
   });
@@ -47,6 +53,8 @@ describe("mapCommentDtoToComment", () => {
       postId: 10,
       parentId: null,
       content: "삭제된 댓글입니다.",
+      anonymity: false,
+      likedNum: 0,
       userName: null,
       createdAt: "2026-01-01",
       replies: [],

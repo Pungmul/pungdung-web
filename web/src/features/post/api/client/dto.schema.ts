@@ -2,12 +2,6 @@ import { z } from "zod";
 
 import { POST_REPORT_TYPES } from "../../constants";
 
-/**
- * @note 순환 의존 방지: `@/features/comment` 루트 barrel 대신 스키마 전용 모듈만 참조.
- * @see docs/guides/07-export-rules.md (cross-feature DTO zod 예외)
- */
-import { commentDtoSchema } from "@/features/comment/api/client/dto.schema";
-
 export const imageObjectSchema = z.object({
   id: z.number(),
   originalFilename: z.string(),
@@ -26,7 +20,7 @@ export const postDetailResponseDtoSchema = z.object({
   imageNum: z.number().optional(),
   viewCount: z.number().nullable(),
   likedNum: z.number().nullable(),
-  commentNum: z.number().optional(),
+  commentNum: z.number().int(),
   timeSincePosted: z.number().nullable(),
   timeSincePostedText: z.string().nullable(),
   author: z.string().nullable(),
@@ -36,7 +30,6 @@ export const postDetailResponseDtoSchema = z.object({
    */
   authorUsername: z.string().nullable().optional(),
   imageList: z.array(imageObjectSchema).nullable(),
-  commentList: z.array(commentDtoSchema).nullable(),
   isLiked: z.boolean().nullable(),
   isWriter: z.boolean().nullable(),
   categoryId: z.number().nullable(),

@@ -104,7 +104,7 @@ function PostContentImpl({
               <CommentOutline className="size-full text-grey-400" />
             </div>
             <div className="text-grey-400 leading-6">
-              {post?.commentList?.length ?? 0}
+              {post.commentNum}
             </div>
           </div>
         </div>

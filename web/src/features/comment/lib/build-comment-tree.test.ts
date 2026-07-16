@@ -20,6 +20,8 @@ function createComment(overrides: Partial<Comment>): Comment {
     postId: 10,
     parentId: null,
     content: "댓글",
+    anonymity: false,
+    likedNum: 0,
     userName: "작성자",
     profile: profileStub,
     createdAt: "2026-01-01",

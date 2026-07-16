@@ -1,5 +1,3 @@
-import { mapCommentDtoToComment } from "@/features/comment";
-
 import type { PostDetailResponseDto } from "../../api/client/dto.schema";
 import { imageObjectSchema } from "../../api/client/dto.schema";
 import type { PostArticleDetail } from "../../types/post-article-detail.types";
@@ -19,9 +17,7 @@ export function mapPostDetailDtoToArticle(
       ? null
       : mapImage(dto.thumbnail);
   const images = dto.imageList ?? [];
-  const comments = dto.commentList ?? [];
   const imageNum = dto.imageNum ?? images.length;
-  const commentNum = dto.commentNum ?? comments.length;
 
   return {
     postId: dto.postId,
@@ -31,13 +27,12 @@ export function mapPostDetailDtoToArticle(
     imageNum,
     viewCount: dto.viewCount ?? 0,
     likedNum: dto.likedNum ?? 0,
-    commentNum,
+    commentNum: dto.commentNum,
     timeSincePosted: dto.timeSincePosted ?? 0,
     timeSincePostedText: dto.timeSincePostedText ?? "",
     // authorUsername은 식별 정보(또는 자유게시판 null). 표시/도메인 author로 쓰지 않는다.
     author: dto.author ?? "",
     imageList: images.map(mapImage),
-    commentList: comments.map(mapCommentDtoToComment),
     isLiked: dto.isLiked ?? false,
     isWriter: dto.isWriter ?? false,
     categoryId: dto.categoryId ?? 0,

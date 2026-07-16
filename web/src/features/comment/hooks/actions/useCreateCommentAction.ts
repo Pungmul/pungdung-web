@@ -7,7 +7,7 @@ import { postQueries } from "@/features/post";
 import { Toast } from "@/shared/store";
 
 import type { CreateCommentParams } from "../../api/client";
-import { commentMutationOptions } from "../../queries";
+import { commentMutationOptions, commentQueries } from "../../queries";
 
 export function useCreateCommentAction() {
   const queryClient = useQueryClient();
@@ -15,6 +15,9 @@ export function useCreateCommentAction() {
   return useMutation({
     ...commentMutationOptions.create(),
     onSuccess: (_data, variables: CreateCommentParams) => {
+      queryClient.invalidateQueries({
+        queryKey: commentQueries.listKey(variables.postId),
+      });
       queryClient.invalidateQueries({
         queryKey: postQueries.detailKey(variables.postId),
       });

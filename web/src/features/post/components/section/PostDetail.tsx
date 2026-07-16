@@ -2,8 +2,11 @@
 
 import { useRef } from "react";
 
+import { useQuery } from "@tanstack/react-query";
+
 import {
   CommentComposer,
+  commentQueries,
   CommentsList,
   CommentsThread,
   useCommentsListComposerState,
@@ -35,6 +38,12 @@ export function PostDetailComponent({ postId }: { postId: number }) {
 
   const { post, isLoading, boardName, isWriter, isDeletedPostError } =
     usePostDetailPageViewModel(postId);
+  const canShowComments = Boolean(post && !isDeletedPostError);
+  const { data: comments = [], isError: isCommentListError } = useQuery({
+    ...commentQueries.list(postId),
+    enabled: canShowComments,
+  });
+  const canUseComments = canShowComments && !isCommentListError;
 
   const postBody = (
     <>
@@ -48,16 +57,15 @@ export function PostDetailComponent({ postId }: { postId: number }) {
     </>
   );
 
-  const commentsSection =
-    post && !isDeletedPostError && post.commentList ? (
+  const commentsSection = canUseComments && post ? (
       useMobileKeyboardShell ? (
         <CommentsThread
-          comments={post.commentList}
+          comments={comments}
           postId={post.postId}
           {...composerState}
         />
       ) : (
-        <CommentsList comments={post.commentList} postId={post.postId} />
+        <CommentsList comments={comments} postId={post.postId} />
       )
     ) : null;
 
@@ -93,7 +101,7 @@ export function PostDetailComponent({ postId }: { postId: number }) {
           </div>
         </div>
 
-        {post && !isDeletedPostError && post.commentList && (
+        {canUseComments && post && (
           <CommentComposer
             postId={post.postId}
             variant="anchored"

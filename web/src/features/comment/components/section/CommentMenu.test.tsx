@@ -23,6 +23,8 @@ const commentFixture: Comment = {
   postId: 2,
   parentId: null,
   content: "c",
+  anonymity: false,
+  likedNum: 0,
   userName: "u",
   profile,
   createdAt: "",

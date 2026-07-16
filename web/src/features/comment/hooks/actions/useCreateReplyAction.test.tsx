@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { commentQueries } from "@/features/comment";
 import { postQueries } from "@/features/post";
 import { Toast } from "@/shared/store";
 
@@ -32,7 +33,7 @@ describe("useCreateReplyAction", () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 
-  it("성공하면 해당 게시글 상세 쿼리를 무효화한다", async () => {
+  it("성공하면 댓글 목록과 해당 게시글 상세 쿼리를 무효화한다", async () => {
     const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
     const { result } = renderHook(() => useCreateReplyAction(), { wrapper });
@@ -51,6 +52,9 @@ describe("useCreateReplyAction", () => {
       comment: "답글",
       anonymity: true,
       parentId: 81,
+    });
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: commentQueries.listKey(9),
     });
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: postQueries.detailKey(9),

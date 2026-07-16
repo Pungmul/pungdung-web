@@ -6,7 +6,7 @@ import { postQueries } from "@/features/post";
 
 import { Toast } from "@/shared/store";
 
-import { commentMutationOptions } from "../../queries";
+import { commentMutationOptions, commentQueries } from "../../queries";
 
 export interface DeleteCommentVariables {
   commentId: number;
@@ -19,6 +19,9 @@ export function useDeleteCommentAction() {
   return useMutation({
     ...commentMutationOptions.delete(),
     onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: commentQueries.listKey(variables.postId),
+      });
       queryClient.invalidateQueries({
         queryKey: postQueries.detailKey(variables.postId),
       });

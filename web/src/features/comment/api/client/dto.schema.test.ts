@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  commentListResponseDtoSchema,
   createCommentRequestDtoSchema,
   createReplyRequestDtoSchema,
   myCommentListPageDtoSchema,
@@ -8,6 +9,33 @@ import {
 } from "./dto.schema";
 
 describe("comment dto.schema", () => {
+  it("commentListResponseDtoSchema는 평면 댓글 목록을 검증한다", () => {
+    const parsed = commentListResponseDtoSchema.safeParse([
+      {
+        commentId: 1,
+        postId: 10,
+        parentId: null,
+        content: "댓글입니다.",
+        anonymity: false,
+        likedNum: 0,
+        userName: "작성자",
+        createdAt: "2026-01-01",
+      },
+      {
+        commentId: 2,
+        postId: 10,
+        parentId: 1,
+        content: "대댓글입니다.",
+        anonymity: true,
+        likedNum: 0,
+        userName: "답글 작성자",
+        createdAt: "2026-01-02",
+      },
+    ]);
+
+    expect(parsed.success).toBe(true);
+  });
+
   it("createCommentRequestDtoSchema는 댓글 작성 payload를 통과시킨다", () => {
     const parsed = createCommentRequestDtoSchema.safeParse({
       content: "댓글입니다.",

@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { CommentsList } from "@/features/comment";
+import { commentQueries, CommentsList } from "@/features/comment";
 
 import { LinkChipButton, ListEmptyView } from "@/shared/components";
 
@@ -17,6 +17,12 @@ export function DesktopPostDetail({ postId }: { postId: number }) {
   // 본문·스켈레톤·우측 메뉴 작성자 여부·댓글에 공통으로 사용
   const { data: post, isLoading, error } = useQuery(postQueries.detail(postId));
   const isDeletedPostError = isPostDeletedError(error);
+  const canShowComments = Boolean(post && !isDeletedPostError);
+  const { data: comments = [], isError: isCommentListError } = useQuery({
+    ...commentQueries.list(postId),
+    enabled: canShowComments,
+  });
+  const canUseComments = canShowComments && !isCommentListError;
 
   return (
     <div className="relative w-full h-full overflow-visible flex flex-row">
@@ -49,8 +55,8 @@ export function DesktopPostDetail({ postId }: { postId: number }) {
         </div>
         <div className="relative w-[40%] flex-shrink-0 h-full bg-[#F9F9F9]">
           <div className="h-full overflow-y-auto">
-            {post && !isDeletedPostError && post.commentList && (
-              <CommentsList comments={post.commentList} postId={post.postId} />
+            {canUseComments && post && (
+              <CommentsList comments={comments} postId={post.postId} />
             )}
           </div>
         </div>

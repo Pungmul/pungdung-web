@@ -5,6 +5,7 @@ export { CommentWithPostList } from "./components/section/CommentWithPostList";
 export { CommentedPostBox } from "./components/ui/CommentedPostBox";
 export { useCommentsListComposerState } from "./hooks/state";
 export { mapCommentDtoToComment, mapMyCommentListPageDtoToResponse } from "./lib";
+export { commentQueries } from "./queries";
 export type {
   Comment,
   MyComment,

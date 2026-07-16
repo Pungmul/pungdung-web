@@ -100,7 +100,7 @@ export function PromoteContent({
               </svg>
             </div>
             <div className="text-blue-300">
-              {post?.commentList?.length ?? 0}
+              {post?.commentNum ?? 0}
             </div>
           </div>
         </div>
