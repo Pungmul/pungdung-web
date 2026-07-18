@@ -1,5 +1,6 @@
 import {
   createValidatedUpstreamResponse,
+  fetchPublic,
   fetchWithRefresh,
   proxyFailureError,
 } from "@/core/api/server";
@@ -36,7 +37,7 @@ export async function GET(
       );
     }
     const proxyUrl = `${process.env.BASE_URL}/api/posts/${postIdNumber}`;
-    const proxyResponse = await fetchWithRefresh(proxyUrl);
+    const proxyResponse = await fetchPublic(proxyUrl);
     return createValidatedUpstreamResponse(proxyResponse);
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);

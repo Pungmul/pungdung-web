@@ -1,6 +1,6 @@
 import {
   createValidatedUpstreamResponse,
-  fetchWithRefresh,
+  fetchPublic,
   proxyFailureError,
 } from "@/core/api/server";
 
@@ -25,7 +25,7 @@ export async function GET(
       );
     }
     const proxyUrl = `${process.env.BASE_URL}/api/boards/${boardId}`;
-    const proxyResponse = await fetchWithRefresh(proxyUrl);
+    const proxyResponse = await fetchPublic(proxyUrl);
 
     return createValidatedUpstreamResponse(proxyResponse);
   } catch (error) {

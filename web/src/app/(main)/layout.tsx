@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+
 import { Suspense } from "@suspensive/react";
 
 import { ChatNotificationSocket } from "@/features/chat";
@@ -18,34 +20,41 @@ import ReactQueryProviders from "@/shared/lib/useReactQuery";
 import { AuthenticatedSocketProvider } from "./_AuthenticatedSocketProvider";
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <ReactQueryProviders>
-      <PWAInstallPrompt />
-      <AuthenticatedSocketProvider>
-        <div id="main-contents" className="relative flex">
+  const hasAccessToken = Boolean((await cookies()).get("accessToken"));
+
+  const shell = (
+    <div id="main-contents" className="relative flex">
+      {hasAccessToken && (
+        <>
           <FCMClient />
-          {/* FCM push banner (notification-container) vs action feedback (toast-container) */}
           <NotificationContainer />
           <ChatNotificationSocket />
           <NotificationToast />
-          <Suspense clientOnly fallback={null}>
-            <HeaderProgressBar />
-          </Suspense>
-          <div
-            id="main-shell"
-            className="relative flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-app"
-          >
-            <Tabs />
-            <ToastHost />
-            {children}
-          </div>
-        </div>
-      </AuthenticatedSocketProvider>
+        </>
+      )}
+      <Suspense clientOnly fallback={null}>
+        <HeaderProgressBar />
+      </Suspense>
+      <div
+        id="main-shell"
+        className="relative flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-app"
+      >
+        {hasAccessToken && <Tabs />}
+        <ToastHost />
+        {children}
+      </div>
+    </div>
+  );
+
+  return (
+    <ReactQueryProviders>
+      <PWAInstallPrompt />
+      {hasAccessToken ? <AuthenticatedSocketProvider>{shell}</AuthenticatedSocketProvider> : shell}
     </ReactQueryProviders>
   );
 }

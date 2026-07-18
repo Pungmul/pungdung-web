@@ -3,6 +3,7 @@ export { ChangePasswordForm } from "./section/ChangePasswordForm";
 export { CompleteStep } from "./section/CompleteStep";
 export { EmailCheckForm } from "./section/EmailCheckForm";
 export { LoginForm } from "./section/LoginForm";
+export { LoginRequiredPage } from "./section/LoginRequiredPage";
 export { PersonalStep } from "./section/PersonalStep";
 export { ResetPasswordForm } from "./section/ResetPasswordForm";
 export { TermsStep } from "./section/TermsStep";

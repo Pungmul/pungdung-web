@@ -1,16 +1,31 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
-import { Button, LinkButton, Space } from "@/shared";
+import { resolveLoginReturnPath } from "@/features/auth";
+
+import { Alert, Button, LinkButton, Space } from "@/shared";
 import { KakaoLogo } from "@/shared/components/Icons";
 
 import { LoginForm } from "@/features/auth/components";
 import { useLoginForm } from "@/features/auth/hooks/form";
 
 export default function LoginPage() {
-  const loginForm = useLoginForm();
+  const searchParams = useSearchParams();
+  const returnPath = resolveLoginReturnPath(searchParams.get("next"));
+  const loginForm = useLoginForm({ returnPath });
+
+  useEffect(() => {
+    if (searchParams.get("reason") !== "session_expired") return;
+
+    Alert.alert({
+      title: "로그인 후 이용해주세요.",
+      message: "로그인 세션이 만료되었습니다. 다시 로그인해주세요.",
+    });
+  }, [searchParams]);
 
   return (
     <div className="w-full h-screen flex flex-row relative">
@@ -70,7 +85,7 @@ export default function LoginPage() {
           <Button
             className="flex flex-row items-center justify-center gap-[16px] px-[24px] !bg-kakao "
             onClick={() => {
-              window.location.href = `/api/auth/kakao/login`;
+              window.location.href = `/api/auth/kakao/login?redirectURL=${encodeURIComponent(returnPath)}`;
             }}
           >
             <span className="flex size-5 items-center justify-center">

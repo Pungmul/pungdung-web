@@ -1,0 +1,86 @@
+"use client";
+
+import { useRef } from "react";
+
+import { Suspense } from "@suspensive/react";
+import { AnimatePresence } from "framer-motion";
+
+import {
+  LightningListOverlay,
+  LightningMapSection,
+  LightningParticipationOverlay,
+  LightningSocketReconnectIndicator,
+  useLightningBottomSheetState,
+  useLightningLists,
+  useLightningListViewModel,
+  useLightningSocketReconnectRecovery,
+  useSchoolLightningSocket,
+  useSyncUserLocation,
+  useWholeLightningSocket,
+} from "@/features/lightning";
+import { UserProfileCardModalHost } from "@/features/user";
+
+import { Spinner } from "@/shared";
+
+import "swiper/css";
+import "swiper/css/pagination";
+
+export function LightningPageClient() {
+  return (
+    <Suspense
+      clientOnly
+      fallback={
+        <div className="flex items-center justify-center h-full w-full flex-grow">
+          <Spinner size={32} />
+        </div>
+      }
+    >
+      <LightningPageContent />
+    </Suspense>
+  );
+}
+
+function LightningPageContent() {
+  useSyncUserLocation();
+  useLightningSocketReconnectRecovery();
+  useWholeLightningSocket();
+  useSchoolLightningSocket();
+
+  const { wholeLightningList, schoolLightningList } = useLightningLists();
+  const { target, setTarget, lightningList } = useLightningListViewModel({
+    wholeLightningList,
+    schoolLightningList,
+  });
+  const { bottomSheetRef, swiperRef } = useLightningBottomSheetState();
+  const mapPanToCurrentRef = useRef<(() => void) | null>(null);
+  const mapMoveToLightningIndexRef = useRef<
+    ((index: number, speed?: number) => void) | null
+  >(null);
+
+  return (
+    <AnimatePresence mode="sync" key="main-animate-presence">
+      <main className="relative w-full h-full flex-grow flex flex-col justify-end md:flex-row-reverse overflow-hidden">
+        <LightningSocketReconnectIndicator />
+        <LightningMapSection
+          lightningList={lightningList}
+          bottomSheetRef={bottomSheetRef}
+          swiperRef={swiperRef}
+          mapPanToCurrentRef={mapPanToCurrentRef}
+          mapMoveToLightningIndexRef={mapMoveToLightningIndexRef}
+        >
+          <LightningParticipationOverlay />
+        </LightningMapSection>
+        <LightningListOverlay
+          lightningList={lightningList}
+          target={target}
+          setTarget={setTarget}
+          bottomSheetRef={bottomSheetRef}
+          swiperRef={swiperRef}
+          mapPanToCurrentRef={mapPanToCurrentRef}
+          mapMoveToLightningIndexRef={mapMoveToLightningIndexRef}
+        />
+      </main>
+      <UserProfileCardModalHost />
+    </AnimatePresence>
+  );
+}

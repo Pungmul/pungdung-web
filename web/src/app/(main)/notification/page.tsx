@@ -1,7 +1,9 @@
 import { Metadata } from "next";
+import { cookies } from "next/headers";
 
 import { Suspense } from "@suspensive/react";
 
+import { LoginRequiredPage } from "@/features/auth";
 import { NotificationList } from "@/features/notification";
 
 import { Header, Spinner } from "@/shared";
@@ -14,7 +16,11 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
-export default function NotificationPage() {
+export default async function NotificationPage() {
+  if (!(await cookies()).get("accessToken")) {
+    return <LoginRequiredPage returnPath="/notification" />;
+  }
+
   return (
     <div className="flex flex-col h-full">
       <Header title="알림" />

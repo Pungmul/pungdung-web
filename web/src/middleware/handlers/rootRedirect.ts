@@ -14,5 +14,5 @@ export const rootRedirectHandler: MiddlewareHandler = (ctx) => {
   }
 
   clearAuthCookies(ctx);
-  return NextResponse.redirect(new URL("/login", ctx.req.url));
+  return NextResponse.redirect(new URL("/home", ctx.req.url));
 };

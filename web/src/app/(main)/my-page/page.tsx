@@ -1,4 +1,7 @@
 import { Metadata } from "next";
+import { cookies } from "next/headers";
+
+import { LoginRequiredPage } from "@/features/auth";
 
 import { Header, Space } from "@/shared";
 
@@ -13,7 +16,11 @@ export const metadata: Metadata = {
   title: `풍덩 | 마이 페이지`,
 };
 
-export default function MyPagePage() {
+export default async function MyPagePage() {
+  if (!(await cookies()).get("accessToken")) {
+    return <LoginRequiredPage returnPath="/my-page" />;
+  }
+
   return (
     <div className="bg-grey-100 h-full w-full">
       <div className="flex flex-col h-full w-full min-w-[360px] max-w-[768px] mx-auto relative bg-grey-100">

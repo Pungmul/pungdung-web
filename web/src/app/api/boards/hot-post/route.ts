@@ -1,6 +1,6 @@
 import {
   createValidatedUpstreamResponse,
-  fetchWithRefresh,
+  fetchPublic,
   proxyFailureError,
 } from "@/core/api/server";
 
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const size = searchParams.get("size") ?? "10";
     const proxyUrl = `${process.env.BASE_URL}/api/boards/hot?page=${encodeURIComponent(page)}&size=${encodeURIComponent(size)}`;
 
-    const proxyResponse = await fetchWithRefresh(proxyUrl);
+    const proxyResponse = await fetchPublic(proxyUrl);
 
     return createValidatedUpstreamResponse(proxyResponse, {
       transformEnvelopeResponse: (innerResponse) => {

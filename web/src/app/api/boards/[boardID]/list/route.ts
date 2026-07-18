@@ -1,6 +1,6 @@
 import {
   createValidatedUpstreamResponse,
-  fetchWithRefresh,
+  fetchPublic,
   proxyFailureError,
 } from "@/core/api/server";
 
@@ -23,7 +23,7 @@ export async function GET(
 
     if (size) proxyUrl.searchParams.set("size", size);
 
-    const proxyResponse = await fetchWithRefresh(proxyUrl);
+    const proxyResponse = await fetchPublic(proxyUrl);
 
     return createValidatedUpstreamResponse(proxyResponse);
   } catch (error) {

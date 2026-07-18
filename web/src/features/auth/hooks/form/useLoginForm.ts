@@ -10,7 +10,7 @@ import { authMutationOptions } from "../../queries";
 import { useLoginStore } from "../../store";
 import { LoginFormType, loginSchema } from "../../types/schemas";
 
-export const useLoginForm = () => {
+export const useLoginForm = ({ returnPath = "/home" }: { returnPath?: string } = {}) => {
   const router = useRouter();
   const setLogin = useLoginStore((state) => state.setLogin);
   const {
@@ -36,7 +36,7 @@ export const useLoginForm = () => {
     loginRequest(data, {
       onSuccess: () => {
         setLogin("email");
-        router.replace("/home");
+        router.replace(returnPath);
       },
     });
   };

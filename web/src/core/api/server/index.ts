@@ -1,4 +1,5 @@
 export { extractErrorCode } from "./extractErrorCode";
+export { fetchPublic } from "./fetch-public";
 export { fetchWithRefresh } from "./fetchWithRefresh";
 export { proxyFailureError } from "./proxy-failure-error";
 export type { UpstreamEnvelope, ValidateUpstreamResult } from "./type";

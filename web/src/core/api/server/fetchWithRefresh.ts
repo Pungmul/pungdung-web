@@ -27,7 +27,7 @@ export async function fetchWithRefresh(
     // accessToken이 없으면 먼저 재발급 시도
     if (!accessToken) {
       const newTokens = await refreshAccessToken(refreshToken);
-      updateTokenCookies(newTokens);
+      await updateTokenCookies(newTokens);
     }
 
     // 새로운 accessToken 가져오기
@@ -54,7 +54,7 @@ export async function fetchWithRefresh(
 
     // 토큰 재발급 후 재시도
     const newTokens = await refreshAccessToken(refreshToken);
-    updateTokenCookies(newTokens);
+    await updateTokenCookies(newTokens);
 
     // 새 토큰으로 원래 요청 재시도
     return fetchWithRefresh(input, init, retryCount + 1);
@@ -71,7 +71,7 @@ export async function fetchWithRefresh(
   }
 }
 
-async function refreshAccessToken(
+export async function refreshAccessToken(
   refreshToken: string
 ): Promise<RefreshTokenResponse> {
   const refreshResponse = await fetch(

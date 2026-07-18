@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 
+import { resolveLoginReturnPath } from "@/features/auth";
+
 export const dynamic = "force-dynamic";
 
 // POST 요청으로 카카오 로그인 콜백 처리(수정 불가)
@@ -36,7 +38,7 @@ export async function GET(req: Request) {
       });
 
       return Response.redirect(
-        new URL(redirectURL ?? "/home", reqUrl).href,
+        new URL(resolveLoginReturnPath(redirectURL), reqUrl).href,
         302
       );
     }
