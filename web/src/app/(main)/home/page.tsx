@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import dayjs from "dayjs";
 import { Suspense } from "@suspensive/react";
 
-import { LoginRequiredPage } from "@/features/auth";
+import { hasAuthSessionCookie, LoginRequiredPage } from "@/features/auth";
 import { FrequentBoards } from "@/features/board";
 import { HomeHeader, HomeHotPostList } from "@/features/home";
 import { NearLightningContent } from "@/features/lightning";
@@ -12,7 +12,13 @@ import { NotificationPermissionRequestCTA } from "@/features/notification";
 import { SkeletonView } from "@/shared";
 
 export default async function Home() {
-  if (!(await cookies()).get("accessToken")) {
+  const cookieStore = await cookies();
+  if (
+    !hasAuthSessionCookie(
+      cookieStore.get("accessToken")?.value,
+      cookieStore.get("refreshToken")?.value
+    )
+  ) {
     return <LoginRequiredPage returnPath="/home" />;
   }
 

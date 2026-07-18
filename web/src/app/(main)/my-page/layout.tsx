@@ -1,13 +1,19 @@
 import { cookies } from "next/headers";
 
-import { LoginRequiredPage } from "@/features/auth";
+import { hasAuthSessionCookie, LoginRequiredPage } from "@/features/auth";
 
 export default async function MyPageLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  if (!(await cookies()).get("accessToken")) {
+  const cookieStore = await cookies();
+  if (
+    !hasAuthSessionCookie(
+      cookieStore.get("accessToken")?.value,
+      cookieStore.get("refreshToken")?.value
+    )
+  ) {
     return <LoginRequiredPage returnPath="/my-page" />;
   }
 

@@ -5,9 +5,17 @@ import { useSearchParams } from "next/navigation";
 
 import { PencilIcon } from "@heroicons/react/24/outline";
 
+import { useLoginRequiredConfirmAction } from "@/features/auth";
+
 import { useScrollHideComponent } from "@/shared";
 
-export function PostingButton({ boardID }: { boardID: number | "promote" }) {
+export function PostingButton({
+  boardID,
+  isGuest = false,
+}: {
+  boardID: number | "promote";
+  isGuest?: boolean;
+}) {
   // 스크롤 방향에 따라 하단 작성 버튼 표시 토글
   const { componentRef, isVisible } = useScrollHideComponent();
   const searchParams = useSearchParams();
@@ -16,6 +24,7 @@ export function PostingButton({ boardID }: { boardID: number | "promote" }) {
   const canUseTabBoardId =
     typeof boardID === "number" && Number.isFinite(tabBoardId) && tabBoardId > 0;
   const postingBoardId = canUseTabBoardId ? tabBoardId : boardID;
+  const { requestLogin } = useLoginRequiredConfirmAction();
 
   return (
     <div
@@ -32,6 +41,14 @@ export function PostingButton({ boardID }: { boardID: number | "promote" }) {
           },
         }}
         scroll={false}
+        onClick={(event) => {
+          if (!isGuest) {
+            return;
+          }
+
+          event.preventDefault();
+          requestLogin();
+        }}
       >
         <div className="text-[14px] text-grey-800">게시글 작성</div>
         <div

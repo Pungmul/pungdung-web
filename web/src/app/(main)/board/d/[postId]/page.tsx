@@ -1,10 +1,12 @@
 import { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { Suspense } from "@suspensive/react";
 
 import { getQueryClient } from "@/core";
 
+import { hasAuthSessionCookie } from "@/features/auth";
 import { boardQueries, prefetchBoardInfoList } from "@/features/board";
 import { PostContentSkeleton, PostDetailComponent } from "@/features/post";
 
@@ -20,6 +22,7 @@ export default async function Page({
   params: Promise<{ postId?: string | number }>;
 }) {
   const { postId } = await params;
+  const cookieStore = await cookies();
   const queryClient = getQueryClient();
   await queryClient.prefetchQuery({
     ...boardQueries.list(),
@@ -43,6 +46,12 @@ export default async function Page({
       >
         <PostDetailComponent
           postId={Number(postId)}
+          isGuest={
+            !hasAuthSessionCookie(
+              cookieStore.get("accessToken")?.value,
+              cookieStore.get("refreshToken")?.value
+            )
+          }
         />
       </Suspense>
     </div>

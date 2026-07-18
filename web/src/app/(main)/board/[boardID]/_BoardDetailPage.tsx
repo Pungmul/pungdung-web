@@ -17,7 +17,13 @@ import { boardQueries } from "@/features/board/queries";
 
 
 /** 게시판 상세: 자식 탭·게시글 목록·핫글 배너를 조합하는 클라이언트 페이지 */
-export function BoardDetailPage({ boardId }: { boardId: number }) {
+export function BoardDetailPage({
+  boardId,
+  isGuest,
+}: {
+  boardId: number;
+  isGuest: boolean;
+}) {
   const { data: boardData } = useSuspenseQuery(boardQueries.detail(boardId));
   const {
     hasChildCategories,
@@ -54,6 +60,7 @@ export function BoardDetailPage({ boardId }: { boardId: number }) {
           boardData={boardData}
           postListBoardId={postListBoardId}
           hasChildCategories={hasChildCategories}
+          isGuest={isGuest}
         />
       </Suspense>
     </section>

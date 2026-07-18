@@ -12,9 +12,11 @@ import type { PostArticleDetail } from "../../types";
 function PostContentImpl({
   post,
   fitMode = "full",
+  isGuest = false,
 }: {
   post: PostArticleDetail;
   fitMode?: "fit" | "full";
+  isGuest?: boolean;
 }) {
   // ImageViewer: 열림 상태 + 선택 슬라이드
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
@@ -98,6 +100,7 @@ function PostContentImpl({
             isLiked={post.isLiked}
             postId={post.postId}
             likedNum={post.likedNum}
+            isGuest={isGuest}
           />
           <div className="flex items-center flex-row cursor-pointer">
             <div className="flex size-7 p-1 items-center justify-center">

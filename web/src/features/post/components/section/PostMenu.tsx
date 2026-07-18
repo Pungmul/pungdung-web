@@ -7,6 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
+import { useLoginRequiredConfirmAction } from "@/features/auth";
+
 import { useClickOutside } from "@/shared/hooks";
 import { alertStore } from "@/shared/store";
 
@@ -14,7 +16,13 @@ import { useDeletePostAction } from "../../hooks/actions";
 import { useReportPost } from "../../hooks/state";
 import { postQueries } from "../../queries";
 
-function PostMenuImpl({ isWriter }: { isWriter: boolean }) {
+function PostMenuImpl({
+  isWriter,
+  isGuest = false,
+}: {
+  isWriter: boolean;
+  isGuest?: boolean;
+}) {
   // 현재 상세 글 id·수정 화면 이동용 라우팅
   const router = useRouter();
   const { postId: postIdParam } = useParams<{ postId: string }>();
@@ -33,12 +41,19 @@ function PostMenuImpl({ isWriter }: { isWriter: boolean }) {
     postQueries.detail(postIdParam ? Number(postIdParam) : null)
   );
   const { openModalToReport } = useReportPost();
+  const { requestLogin } = useLoginRequiredConfirmAction();
 
   // 삭제: 서버 mutation + 확인 다이얼로그
   const { mutate: deletePost } = useDeletePostAction();
   const Alert = alertStore();
 
   const handleReportClick = () => {
+    if (isGuest) {
+      requestLogin();
+      setOpen(false);
+      return;
+    }
+
     if (!postDetail || !postIdParam) return;
 
     openModalToReport({

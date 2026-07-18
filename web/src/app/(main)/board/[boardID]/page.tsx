@@ -1,8 +1,10 @@
 import React from "react";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { Suspense } from "@suspensive/react";
 
+import { hasAuthSessionCookie } from "@/features/auth";
 import { HotPostBannerSkeleton } from "@/features/board";
 import { PostBoxSkeleton } from "@/features/post";
 
@@ -16,6 +18,7 @@ type BoardPageProps = {
 
 export default async function BoardPage({ params }: BoardPageProps) {
   const { boardID: boardIdParam } = await params;
+  const cookieStore = await cookies();
   const numericBoardId = Number(boardIdParam);
 
   if (!Number.isFinite(numericBoardId)) {
@@ -25,7 +28,15 @@ export default async function BoardPage({ params }: BoardPageProps) {
   return (
     <section className="relative flex w-full flex-col bg-background">
       <Suspense clientOnly fallback={<BoardByIdLoading />}>
-        <BoardDetailPage boardId={numericBoardId} />
+        <BoardDetailPage
+          boardId={numericBoardId}
+          isGuest={
+            !hasAuthSessionCookie(
+              cookieStore.get("accessToken")?.value,
+              cookieStore.get("refreshToken")?.value
+            )
+          }
+        />
       </Suspense>
     </section>
   );

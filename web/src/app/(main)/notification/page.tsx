@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 import { Suspense } from "@suspensive/react";
 
-import { LoginRequiredPage } from "@/features/auth";
+import { hasAuthSessionCookie, LoginRequiredPage } from "@/features/auth";
 import { NotificationList } from "@/features/notification";
 
 import { Header, Spinner } from "@/shared";
@@ -17,7 +17,13 @@ export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 export default async function NotificationPage() {
-  if (!(await cookies()).get("accessToken")) {
+  const cookieStore = await cookies();
+  if (
+    !hasAuthSessionCookie(
+      cookieStore.get("accessToken")?.value,
+      cookieStore.get("refreshToken")?.value
+    )
+  ) {
     return <LoginRequiredPage returnPath="/notification" />;
   }
 

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 
-import { LoginRequiredPage } from "@/features/auth";
+import { hasAuthSessionCookie, LoginRequiredPage } from "@/features/auth";
 
 import { Header, Space } from "@/shared";
 
@@ -17,7 +17,13 @@ export const metadata: Metadata = {
 };
 
 export default async function MyPagePage() {
-  if (!(await cookies()).get("accessToken")) {
+  const cookieStore = await cookies();
+  if (
+    !hasAuthSessionCookie(
+      cookieStore.get("accessToken")?.value,
+      cookieStore.get("refreshToken")?.value
+    )
+  ) {
     return <LoginRequiredPage returnPath="/my-page" />;
   }
 

@@ -5,10 +5,11 @@ import dynamic from "next/dynamic";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
+import { useLoginRequiredConfirmAction } from "@/features/auth";
 import { PromotionProfile } from "@/features/promotion";
 import { promotionQueries } from "@/features/promotion";
 
-import { BottomFixedLinkButton, Header, Spinner } from "@/shared";
+import { BottomFixedButton, BottomFixedLinkButton, Header, Spinner } from "@/shared";
 
 const Viewer = dynamic(
   () =>
@@ -29,9 +30,12 @@ const Viewer = dynamic(
 
 export function PromotionDetailPage({
   performaceId,
+  isGuest,
 }: {
   performaceId: string;
+  isGuest: boolean;
 }) {
+  const { requestLogin } = useLoginRequiredConfirmAction();
   const { data: promotionDetail } = useSuspenseQuery({
     ...promotionQueries.detail(performaceId),
   });
@@ -59,9 +63,15 @@ export function PromotionDetailPage({
           />
           <PromotionTabs description={promotionDetail.description} />
         </section>
-        <BottomFixedLinkButton href={`/board/promote/d/${performaceId}/survey`}>
-          참가 신청하기
-        </BottomFixedLinkButton>
+        {isGuest ? (
+          <BottomFixedButton type="button" onClick={requestLogin}>
+            참가 신청하기
+          </BottomFixedButton>
+        ) : (
+          <BottomFixedLinkButton href={`/board/promote/d/${performaceId}/survey`}>
+            참가 신청하기
+          </BottomFixedLinkButton>
+        )}
       </article>
     </div>
   );

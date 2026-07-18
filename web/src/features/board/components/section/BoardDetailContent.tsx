@@ -7,6 +7,7 @@ import {
 
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 
+import { useLoginRequiredConfirmAction } from "@/features/auth";
 import { PostBoxSkeleton, PostList } from "@/features/post";
 
 import { LinkChipButton, ListEmptyView } from "@/shared/components";
@@ -28,6 +29,7 @@ export interface BoardDetailContentProps {
   postListBoardId: number;
   /** 자식 카테고리 탭 존재 여부. `true`이면 부모 `recentPostList` 폴백을 쓰지 않는다 */
   hasChildCategories: boolean;
+  isGuest: boolean;
 }
 
 /**
@@ -38,6 +40,7 @@ export function BoardDetailContent({
   boardData,
   postListBoardId,
   hasChildCategories,
+  isGuest,
 }: BoardDetailContentProps) {
   const { data: postListBoardData } = useSuspenseQuery(
     boardQueries.detail(postListBoardId)
@@ -74,7 +77,9 @@ export function BoardDetailContent({
         isLoading={postList.isFetchingNextPage}
         hasNextPage={hasNextPageForList}
         onLoadMore={loadMore}
-        ListEmptyComponent={<BoardPostListEmpty boardId={postListBoardId} />}
+        ListEmptyComponent={
+          <BoardPostListEmpty boardId={postListBoardId} isGuest={isGuest} />
+        }
       />
     </>
   );
@@ -92,7 +97,15 @@ export function BoardDetailContentLoading() {
   );
 }
 
-function BoardPostListEmpty({ boardId }: { boardId: number }) {
+function BoardPostListEmpty({
+  boardId,
+  isGuest,
+}: {
+  boardId: number;
+  isGuest: boolean;
+}) {
+  const { requestLogin } = useLoginRequiredConfirmAction();
+
   return (
     <ListEmptyView
       message="게시판에 게시글이 없어요."
@@ -101,6 +114,14 @@ function BoardPostListEmpty({ boardId }: { boardId: number }) {
           href={`/board/p?boardId=${boardId}`}
           filled
           className="inline-flex items-center gap-1"
+          onClick={(event) => {
+            if (!isGuest) {
+              return;
+            }
+
+            event.preventDefault();
+            requestLogin();
+          }}
         >
           이 게시판의 첫 글 쓰기
           <span className="size-4 flex items-center justify-center flex-shrink-0">

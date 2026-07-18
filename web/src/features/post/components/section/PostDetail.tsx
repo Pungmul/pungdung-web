@@ -9,6 +9,7 @@ import {
   commentQueries,
   CommentsList,
   CommentsThread,
+  GuestCommentCta,
   useCommentsListComposerState,
 } from "@/features/comment";
 
@@ -23,7 +24,13 @@ import type { PostArticleDetail } from "../../types";
 import { ReportPostModal } from "../overlay/ReportPostModal";
 import { PostContentSkeleton } from "../ui/PostContentSkeleton";
 
-export function PostDetailComponent({ postId }: { postId: number }) {
+export function PostDetailComponent({
+  postId,
+  isGuest,
+}: {
+  postId: number;
+  isGuest: boolean;
+}) {
   const view = useView();
   const useMobileKeyboardShell = view !== "desktop";
 
@@ -41,9 +48,14 @@ export function PostDetailComponent({ postId }: { postId: number }) {
   const canShowComments = Boolean(post && !isDeletedPostError);
   const { data: comments = [], isError: isCommentListError } = useQuery({
     ...commentQueries.list(postId),
-    enabled: canShowComments,
+    enabled: canShowComments && !isGuest,
   });
-  const canUseComments = canShowComments && !isCommentListError;
+  const canUseComments = canShowComments && !isCommentListError && !isGuest;
+  const guestCommentCta = post ? (
+    <GuestCommentCta
+      loginHref={`/login?next=${encodeURIComponent(`/board/d/${post.postId}`)}`}
+    />
+  ) : null;
 
   const postBody = (
     <>
@@ -52,12 +64,15 @@ export function PostDetailComponent({ postId }: { postId: number }) {
         isLoading={isLoading}
         isDeletedPostError={isDeletedPostError}
         post={post}
+        isGuest={isGuest}
       />
       <div className="h-4" />
     </>
   );
 
-  const commentsSection = canUseComments && post ? (
+  const commentsSection = isGuest ? (
+    guestCommentCta
+  ) : canUseComments && post ? (
       useMobileKeyboardShell ? (
         <CommentsThread
           comments={comments}
@@ -83,7 +98,9 @@ export function PostDetailComponent({ postId }: { postId: number }) {
           title={boardName || ""}
           className="z-30 shrink-0"
           rightBtn={
-            isDeletedPostError ? undefined : <PostMenu isWriter={isWriter} />
+            isDeletedPostError ? undefined : (
+              <PostMenu isWriter={isWriter} isGuest={isGuest} />
+            )
           }
         />
 
@@ -95,7 +112,7 @@ export function PostDetailComponent({ postId }: { postId: number }) {
             [-webkit-overflow-scrolling:touch]
           "
         >
-          <div className="flex flex-col bg-grey-100">
+          <div className="flex min-h-full flex-col bg-grey-100">
             {postBody}
             {commentsSection}
           </div>
@@ -120,7 +137,9 @@ export function PostDetailComponent({ postId }: { postId: number }) {
         title={boardName || ""}
         className="z-30 shrink-0"
         rightBtn={
-          isDeletedPostError ? undefined : <PostMenu isWriter={isWriter} />
+          isDeletedPostError ? undefined : (
+            <PostMenu isWriter={isWriter} isGuest={isGuest} />
+          )
         }
       />
       <article className="flex flex-grow flex-col">
@@ -138,10 +157,12 @@ function PostDetailMainContent({
   isLoading,
   isDeletedPostError,
   post,
+  isGuest,
 }: {
   isLoading: boolean;
   isDeletedPostError: boolean;
   post: PostArticleDetail | null | undefined;
+  isGuest: boolean;
 }) {
   if (isLoading) {
     return <PostContentSkeleton />;
@@ -162,5 +183,5 @@ function PostDetailMainContent({
   if (!post) {
     return null;
   }
-  return <PostContent post={post} fitMode="fit" />;
+  return <PostContent post={post} fitMode="fit" isGuest={isGuest} />;
 }

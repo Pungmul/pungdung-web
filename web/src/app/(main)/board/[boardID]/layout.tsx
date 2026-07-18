@@ -1,7 +1,10 @@
+import { cookies } from "next/headers";
+
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { getQueryClient } from "@/core";
 
+import { hasAuthSessionCookie } from "@/features/auth";
 import {
   BoardHeader,
   BoardListNav,
@@ -39,6 +42,7 @@ export default async function BoardPageLayout({
   }>;
 }) {
   const { boardID: boardIdParam } = await params;
+  const cookieStore = await cookies();
 
   const queryClient = getQueryClient();
 
@@ -67,7 +71,15 @@ export default async function BoardPageLayout({
               }
             : {})}
         />
-        <PostingButton boardID={Number(boardIdParam)} />
+        <PostingButton
+          boardID={Number(boardIdParam)}
+          isGuest={
+            !hasAuthSessionCookie(
+              cookieStore.get("accessToken")?.value,
+              cookieStore.get("refreshToken")?.value
+            )
+          }
+        />
         <ScrollToTopButton />
         <div className="relative flex flex-grow flex-col w-full">
           <div className="flex h-full w-full flex-row justify-center">
