@@ -43,6 +43,10 @@ export default async function BoardPageLayout({
 }) {
   const { boardID: boardIdParam } = await params;
   const cookieStore = await cookies();
+  const isGuest = !hasAuthSessionCookie(
+    cookieStore.get("accessToken")?.value,
+    cookieStore.get("refreshToken")?.value
+  );
 
   const queryClient = getQueryClient();
 
@@ -73,17 +77,12 @@ export default async function BoardPageLayout({
         />
         <PostingButton
           boardID={Number(boardIdParam)}
-          isGuest={
-            !hasAuthSessionCookie(
-              cookieStore.get("accessToken")?.value,
-              cookieStore.get("refreshToken")?.value
-            )
-          }
+          isGuest={isGuest}
         />
         <ScrollToTopButton />
         <div className="relative flex flex-grow flex-col w-full">
           <div className="flex h-full w-full flex-row justify-center">
-            <BoardListNav />
+            <BoardListNav isGuest={isGuest} />
             <div className="z-10 w-full md:max-w-[768px]">{children}</div>
           </div>
         </div>

@@ -1,9 +1,11 @@
 import { Metadata } from "next";
+import { cookies } from "next/headers";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { getQueryClient } from "@/core";
 
+import { hasAuthSessionCookie } from "@/features/auth";
 import {
   BoardHeader,
   BoardListNav,
@@ -22,6 +24,11 @@ export default async function BoardPageLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const isGuest = !hasAuthSessionCookie(
+    cookieStore.get("accessToken")?.value,
+    cookieStore.get("refreshToken")?.value
+  );
   const queryClient = getQueryClient();
 
   await queryClient.prefetchQuery({
@@ -38,7 +45,7 @@ export default async function BoardPageLayout({
         <ScrollToTopButton />
         <div className="relative flex flex-grow flex-col items-center w-full">
           <div className="flex h-full w-full flex-row justify-center">
-            <BoardListNav />
+            <BoardListNav isGuest={isGuest} />
             <div className="z-10 w-full md:max-w-[768px]">{children}</div>
           </div>
         </div>

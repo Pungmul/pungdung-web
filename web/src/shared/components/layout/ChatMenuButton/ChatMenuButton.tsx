@@ -14,6 +14,7 @@ type ChatMenuButtonProps = {
   iconWrapClassName: string;
   labelClassName: (isActive: boolean) => string;
   iconClassName: (isActive: boolean) => string;
+  isAuthenticated: boolean;
 };
 
 function ChatMenuIcon({
@@ -55,28 +56,37 @@ export function ChatMenuButton({
   iconWrapClassName,
   labelClassName,
   iconClassName,
+  isAuthenticated,
 }: ChatMenuButtonProps) {
   const pathname = usePathname();
   const isActive = pathname.startsWith("/chats");
 
   return (
     <Link href="/chats/r/inbox" className={linkClassName} prefetch>
-      <Suspense
-        clientOnly
-        fallback={
-          <ChatMenuIconFallback
+      {isAuthenticated ? (
+        <Suspense
+          clientOnly
+          fallback={
+            <ChatMenuIconFallback
+              isActive={isActive}
+              iconWrapClassName={iconWrapClassName}
+              iconClassName={iconClassName}
+            />
+          }
+        >
+          <ChatMenuIcon
             isActive={isActive}
             iconWrapClassName={iconWrapClassName}
             iconClassName={iconClassName}
           />
-        }
-      >
-        <ChatMenuIcon
+        </Suspense>
+      ) : (
+        <ChatMenuIconFallback
           isActive={isActive}
           iconWrapClassName={iconWrapClassName}
           iconClassName={iconClassName}
         />
-      </Suspense>
+      )}
       <span className={labelClassName(isActive)}>채팅</span>
     </Link>
   );

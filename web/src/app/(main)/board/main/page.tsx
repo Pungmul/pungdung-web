@@ -1,5 +1,8 @@
+import { cookies } from "next/headers";
+
 import { getQueryClient } from "@/core";
 
+import { hasAuthSessionCookie } from "@/features/auth";
 import {
   BoardMainPageContent,
   boardQueries,
@@ -13,10 +16,10 @@ export const metadata = {
 };
 
 // ISR 설정: 15분마다 재생성
-export const revalidate = 900;
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export default async function BoardMainPage() {
+  const cookieStore = await cookies();
   const queryClient = getQueryClient();
 
   const boardList = await queryClient.fetchQuery({
@@ -27,5 +30,16 @@ export default async function BoardMainPage() {
   const boardsForMain = filterBoardsForMainPage(boardList);
   const time = Date.now();
 
-  return <BoardMainPageContent boardList={boardsForMain} time={time} />;
+  return (
+    <BoardMainPageContent
+      boardList={boardsForMain}
+      time={time}
+      isGuest={
+        !hasAuthSessionCookie(
+          cookieStore.get("accessToken")?.value,
+          cookieStore.get("refreshToken")?.value
+        )
+      }
+    />
+  );
 }

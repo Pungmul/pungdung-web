@@ -8,7 +8,7 @@ import { Conditional, Space } from "@/shared";
 
 import { PROMOTION_TABS, type TabItem } from "@/features/promotion/constants";
 
-export function PromotionListPage() {
+export function PromotionListPage({ isGuest }: { isGuest: boolean }) {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") ?? PROMOTION_TABS[0]!.value;
   const selectedTab = PROMOTION_TABS.find((t) => t.value === tab)!;
@@ -31,6 +31,7 @@ export function PromotionListPage() {
       <PromotionMainTabs
         selectedTab={selectedTab}
         onTabChange={handleTabChange}
+        isGuest={isGuest}
       />
       <Space className="bg-background h-4 sticky top-12 z-20" />
       <Conditional

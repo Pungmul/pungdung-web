@@ -5,6 +5,14 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { BoardList } from "./BoardList";
 
+const { requestLoginMock } = vi.hoisted(() => ({
+  requestLoginMock: vi.fn(),
+}));
+
+vi.mock("@/features/auth", () => ({
+  useLoginRequiredConfirmAction: () => ({ requestLogin: requestLoginMock }),
+}));
+
 vi.mock("@/shared/components", () => ({
   WebViewLink: ({
     href,
@@ -36,7 +44,9 @@ describe("BoardList", () => {
 
   it("localStorage favoriteBoard가 있으면 즐겨찾기 게시판 링크가 먼저 온다", async () => {
     localStorage.setItem("favoriteBoard", JSON.stringify([2]));
-    const { container } = render(<BoardList boardList={[...boards]} />);
+    const { container } = render(
+      <BoardList boardList={[...boards]} isGuest={false} />
+    );
 
     await waitFor(() => {
       const links = container.querySelectorAll('a[href^="/board/"]');
@@ -46,7 +56,9 @@ describe("BoardList", () => {
   });
 
   it("별 클릭 시 즐겨찾기가 localStorage에 반영된다", async () => {
-    const { container } = render(<BoardList boardList={[...boards]} />);
+    const { container } = render(
+      <BoardList boardList={[...boards]} isGuest={false} />
+    );
 
     await waitFor(() => {
       expect(localStorage.getItem("favoriteBoard")).not.toBeNull();
@@ -71,7 +83,9 @@ describe("BoardList", () => {
     const removeSpy = vi.spyOn(Storage.prototype, "removeItem");
     localStorage.setItem("favoriteBoard", "not-json");
 
-    const { container } = render(<BoardList boardList={[...boards]} />);
+    const { container } = render(
+      <BoardList boardList={[...boards]} isGuest={false} />
+    );
 
     await waitFor(() => {
       expect(removeSpy).toHaveBeenCalledWith("favoriteBoard");
@@ -84,5 +98,31 @@ describe("BoardList", () => {
     });
 
     removeSpy.mockRestore();
+  });
+
+  it("비로그인이 회원 전용 게시판을 누르면 로그인 확인을 요청한다", () => {
+    const { getByRole } = render(<BoardList boardList={[...boards]} isGuest />);
+
+    fireEvent.click(getByRole("link", { name: "Bravo" }));
+
+    expect(requestLoginMock).toHaveBeenCalledOnce();
+  });
+
+  it("비로그인이 회원 전용 게시판에서 Enter를 누르면 로그인 확인을 요청한다", () => {
+    const { getByRole } = render(<BoardList boardList={[...boards]} isGuest />);
+
+    fireEvent.keyDown(getByRole("link", { name: "Bravo" }), {
+      key: "Enter",
+    });
+
+    expect(requestLoginMock).toHaveBeenCalledOnce();
+  });
+
+  it("비로그인이 공개 게시판을 누르면 로그인 확인을 요청하지 않는다", () => {
+    const { getByRole } = render(<BoardList boardList={[...boards]} isGuest />);
+
+    fireEvent.click(getByRole("link", { name: "Alpha" }));
+
+    expect(requestLoginMock).not.toHaveBeenCalled();
   });
 });

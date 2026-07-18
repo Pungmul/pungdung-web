@@ -24,10 +24,17 @@ function isMobileTabExactPath(pathname: string) {
   return MOBILE_TAB_EXACT_PATHS.includes(pathname);
 }
 
-export default function Tabs() {
+export default function Tabs({
+  isAuthenticated,
+}: {
+  isAuthenticated: boolean;
+}) {
   const view = useView();
   const pathname = usePathname();
-  const { data: myPageInfo, isLoading } = useQuery(myPageQueries.info());
+  const { data: myPageInfo, isLoading } = useQuery({
+    ...myPageQueries.info(),
+    enabled: isAuthenticated,
+  });
 
   useWebViewCookieBridge();
 
@@ -46,6 +53,7 @@ export default function Tabs() {
     isMyPageActive: pathname.startsWith("/my-page"),
     isProfileLoading: isLoading,
     myPageInfo,
+    isAuthenticated,
   };
 
   return (

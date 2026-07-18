@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { isAccessTokenExpired } from "../is-access-token-expired";
 import { getGuestRoutePolicy, toInternalNext } from "../route-policy";
 import { clearAuthCookies, tryReissueToken } from "../token";
 import type { MiddlewareContext, MiddlewareHandler } from "../types";
+
+import { isAccessTokenExpired } from "@/features/auth/lib";
 
 const withoutAuthCookies = (cookieHeader: string | null): string | null => {
   if (!cookieHeader) return null;
@@ -27,6 +28,29 @@ const nextAsGuest = (ctx: MiddlewareContext) => {
   } else {
     headers.delete("cookie");
   }
+  return NextResponse.next({ request: { headers } });
+};
+
+const nextWithReissuedAuthCookies = (ctx: MiddlewareContext) => {
+  const accessToken = ctx.tokens.accessToken;
+  const refreshToken = ctx.tokens.refreshToken;
+
+  if (!accessToken || !refreshToken) {
+    return NextResponse.next();
+  }
+
+  const headers = new Headers(ctx.req.headers);
+  const cookieHeader = withoutAuthCookies(headers.get("cookie"));
+  const authCookies = [
+    `accessToken=${accessToken}`,
+    `refreshToken=${refreshToken}`,
+  ];
+
+  headers.set(
+    "cookie",
+    [cookieHeader, ...authCookies].filter(Boolean).join("; ")
+  );
+
   return NextResponse.next({ request: { headers } });
 };
 
@@ -59,12 +83,14 @@ export const protectedRoutesHandler: MiddlewareHandler = async (ctx) => {
 
   if (!hasAccessToken && hasRefreshToken) {
     const reissued = await tryReissueToken(ctx);
-    if (!reissued) {
-      if (policy === "public") {
-        return nextAsGuest(ctx);
-      }
-      return NextResponse.redirect(loginUrl("session_expired"));
+    if (reissued) {
+      return nextWithReissuedAuthCookies(ctx);
     }
+
+    if (policy === "public") {
+      return nextAsGuest(ctx);
+    }
+    return NextResponse.redirect(loginUrl("session_expired"));
   }
 
   return null;

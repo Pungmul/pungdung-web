@@ -8,6 +8,7 @@ export {
   getChangePasswordDescription,
   getChangePasswordIntro,
   hasAuthSessionCookie,
+  hasValidAccessToken,
   requiresCurrentPassword,
   resolveLoginReturnPath,
 } from "./lib";

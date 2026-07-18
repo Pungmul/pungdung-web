@@ -25,6 +25,7 @@ type TabsContentProps = {
   isMyPageActive: boolean;
   isProfileLoading: boolean;
   myPageInfo: MyPageInfo | undefined;
+  isAuthenticated: boolean;
 };
 
 type TabLinkProps = {
@@ -102,6 +103,7 @@ export function Sidebar({
   isMyPageActive,
   isProfileLoading,
   myPageInfo,
+  isAuthenticated,
 }: TabsContentProps) {
   const tabsRef = useRef<HTMLDivElement>(null);
   const notificationOverlayRef = useRef<HTMLDivElement>(null);
@@ -126,7 +128,7 @@ export function Sidebar({
   }, []);
 
   useEffect(() => {
-    if (!isNotificationOpen) {
+    if (!isAuthenticated || !isNotificationOpen) {
       return;
     }
 
@@ -145,7 +147,7 @@ export function Sidebar({
     return () => {
       document.removeEventListener("click", handleOutsideClick);
     };
-  }, [isNotificationOpen]);
+  }, [isAuthenticated, isNotificationOpen]);
 
   return (
     <>
@@ -201,25 +203,28 @@ export function Sidebar({
               iconWrapClassName={sidebarTabIconWrapClassName}
               labelClassName={sidebarTabLabelClassName}
               iconClassName={bottomTabIconClassName}
+              isAuthenticated={isAuthenticated}
             />
           </li>
 
-          <li>
-            <button
-              type="button"
-              className={sidebarTabLinkClassName}
-              onClick={() => setIsNotificationOpen(true)}
-            >
-              <span className={sidebarTabIconWrapClassName}>
-                <NotificationIcon
-                  className={bottomTabIconClassName(isNotificationOpen)}
-                />
-              </span>
-              <span className={sidebarTabLabelClassName(isNotificationOpen)}>
-                알림
-              </span>
-            </button>
-          </li>
+          {isAuthenticated && (
+            <li>
+              <button
+                type="button"
+                className={sidebarTabLinkClassName}
+                onClick={() => setIsNotificationOpen(true)}
+              >
+                <span className={sidebarTabIconWrapClassName}>
+                  <NotificationIcon
+                    className={bottomTabIconClassName(isNotificationOpen)}
+                  />
+                </span>
+                <span className={sidebarTabLabelClassName(isNotificationOpen)}>
+                  알림
+                </span>
+              </button>
+            </li>
+          )}
 
           <li>
             <SidebarTabLink
@@ -238,12 +243,14 @@ export function Sidebar({
           </li>
         </ul>
       </nav>
-      <NotificationPanelOverlay
-        isOpen={isNotificationOpen}
-        tabsWidth={tabsWidth}
-        onClose={() => setIsNotificationOpen(false)}
-        overlayRef={notificationOverlayRef}
-      />
+      {isAuthenticated && (
+        <NotificationPanelOverlay
+          isOpen={isNotificationOpen}
+          tabsWidth={tabsWidth}
+          onClose={() => setIsNotificationOpen(false)}
+          overlayRef={notificationOverlayRef}
+        />
+      )}
     </>
   );
 }

@@ -9,12 +9,18 @@ import { PROMOTION_TABS, type TabItem } from "../../../constants";
 interface PromotionMainTabsProps {
   selectedTab: TabItem;
   onTabChange: (tab: TabItem) => void;
+  isGuest: boolean;
 }
 
 export function PromotionMainTabs({
   selectedTab,
   onTabChange,
+  isGuest,
 }: PromotionMainTabsProps) {
+  const visibleTabs = isGuest
+    ? PROMOTION_TABS.filter((item) => item.value === "promotion-list")
+    : PROMOTION_TABS;
+
   return (
     <AnimatePresence>
       <nav
@@ -22,7 +28,7 @@ export function PromotionMainTabs({
         key="promotion-tabs-nav"
       >
         <ul className="flex flex-row w-full px-3 md:px-5 flex-grow">
-          {PROMOTION_TABS.map((item) => (
+          {visibleTabs.map((item) => (
             <motion.li
               key={item.label}
               initial={false}

@@ -21,6 +21,7 @@ type TabsContentProps = {
   isMyPageActive: boolean;
   isProfileLoading: boolean;
   myPageInfo: MyPageInfo | undefined;
+  isAuthenticated: boolean;
 };
 
 type TabLinkProps = {
@@ -99,6 +100,7 @@ export function BottomTabs({
   isMyPageActive,
   isProfileLoading,
   myPageInfo,
+  isAuthenticated,
 }: TabsContentProps) {
   return (
     <nav className="sticky bottom-0 z-30 w-full flex-shrink-0 bg-background px-7 py-2 md:hidden">
@@ -143,6 +145,7 @@ export function BottomTabs({
             iconWrapClassName={bottomTabIconWrapClassName}
             labelClassName={bottomTabMobileLabelClassName}
             iconClassName={bottomTabIconClassName}
+            isAuthenticated={isAuthenticated}
           />
         </li>
 

@@ -1,10 +1,10 @@
-export type GuestRoutePolicy = "public" | "induction" | "member-only";
+import { isPublicBoardId } from "@/core/policy/public-board";
 
-const PUBLIC_BOARD_IDS = new Set(["1", "3", "4", "5", "6"]);
+export type GuestRoutePolicy = "public" | "induction" | "member-only";
 
 const isPublicBoardRoute = (pathname: string): boolean => {
   const match = /^\/board\/(\d+)\/?$/.exec(pathname);
-  return match !== null && PUBLIC_BOARD_IDS.has(match[1]!);
+  return match !== null && isPublicBoardId(match[1]!);
 };
 
 export function getGuestRoutePolicy(
@@ -18,12 +18,11 @@ export function getGuestRoutePolicy(
     promotionTab !== null &&
     promotionTab !== "promotion-list"
   ) {
-    return "induction";
+    return "member-only";
   }
 
   if (
     pathname === "/board/main" ||
-    pathname === "/board/hot-post" ||
     pathname === "/board/promote" ||
     pathname === "/board/promote/l" ||
     (/^\/board\/promote\/d\/[^/]+\/?$/.test(pathname)) ||

@@ -5,6 +5,10 @@ import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { StarIcon as StarIconOutline } from "@heroicons/react/24/outline";
 import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
 
+import { isPublicBoardId } from "@/core/policy/public-board";
+
+import { useLoginRequiredConfirmAction } from "@/features/auth";
+
 import { WebViewLink } from "@/shared/components";
 
 import { boardHrefSegment } from "../../lib";
@@ -13,9 +17,13 @@ import type { BoardSummary } from "../../types";
 
 interface BoardListProps {
   boardList: BoardSummary[];
+  isGuest: boolean;
 }
 
-const BoardList = memo(function BoardList({ boardList }: BoardListProps) {
+const BoardList = memo(function BoardList({
+  boardList,
+  isGuest,
+}: BoardListProps) {
   // 즐겨찾기 게시판 id 목록 · 로컬 스토리지 동기화(로드 후에만 저장)
   const [bookmarkedBoardList, setBookmarkedBoardList] = useState<
     (number | string)[]
@@ -71,6 +79,7 @@ const BoardList = memo(function BoardList({ boardList }: BoardListProps) {
             isBookmarked={isBookmarked}
             board={board}
             toggleBookmark={toggleBookmark}
+            isGuest={isGuest}
           />
         );
       })}
@@ -85,11 +94,16 @@ const BoardListItem = memo(
     isBookmarked,
     board,
     toggleBookmark,
+    isGuest,
   }: {
     isBookmarked: boolean;
     board: BoardSummary;
     toggleBookmark: (board: BoardSummary) => void;
+    isGuest: boolean;
   }) => {
+    const { requestLogin } = useLoginRequiredConfirmAction();
+    const isPublic = isPublicBoardId(board.id);
+
     return (
       <li className="w-full px-[12px] py-[8px] flex flex-row items-center gap-[8px]">
         <div
@@ -109,13 +123,37 @@ const BoardListItem = memo(
             </span>
           )}
         </div>
-        <WebViewLink
-          href={`/board/${boardHrefSegment(board.id)}`}
-          className="flex-grow text-[15px] leading-7 text-grey-600"
-          prefetch
+        <div
+          className="flex-grow"
+          onClickCapture={(event) => {
+            if (!isGuest || isPublic) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            requestLogin();
+          }}
+          onKeyDownCapture={(event) => {
+            if (
+              !isGuest ||
+              isPublic ||
+              (event.key !== "Enter" && event.key !== " ")
+            ) {
+              return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            requestLogin();
+          }}
         >
-          {board.name}
-        </WebViewLink>
+          <WebViewLink
+            href={`/board/${boardHrefSegment(board.id)}`}
+            className="text-[15px] leading-7 text-grey-600"
+            prefetch
+          >
+            {board.name}
+          </WebViewLink>
+        </div>
       </li>
     );
   }

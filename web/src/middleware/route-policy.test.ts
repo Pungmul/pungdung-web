@@ -10,13 +10,14 @@ describe("getGuestRoutePolicy", () => {
     expect(getGuestRoutePolicy("/board/promote/l", "?tab=promotion-list")).toBe(
       "public"
     );
-    expect(getGuestRoutePolicy("/board/promote/l", "?tab=my-performance")).toBe(
-      "induction"
-    );
+    expect(
+      getGuestRoutePolicy("/board/promote/l", "?tab=my-promotion-form-list")
+    ).toBe("member-only");
     expect(getGuestRoutePolicy("/board/promote/d/public-key")).toBe("public");
     expect(getGuestRoutePolicy("/board/promote/d/public-key/survey")).toBe(
       "member-only"
     );
+    expect(getGuestRoutePolicy("/board/hot-post")).toBe("member-only");
     expect(getGuestRoutePolicy("/board/2")).toBe("member-only");
     expect(getGuestRoutePolicy("/board/1/search")).toBe("member-only");
   });

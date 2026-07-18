@@ -5,6 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { useQuery } from "@tanstack/react-query";
 
+import { isPublicBoardId } from "@/core/policy/public-board";
+
+import { useLoginRequiredConfirmAction } from "@/features/auth";
+
 import { cn } from "@/shared";
 
 import { boardHrefSegment } from "../../lib";
@@ -21,12 +25,13 @@ function isBoardPathActive(pathname: string, segment: string): boolean {
   return pathname === basePath || pathname.startsWith(`${basePath}/`);
 }
 
-export function BoardListNav() {
+export function BoardListNav({ isGuest = false }: { isGuest?: boolean }) {
   // 현재 경로와 핫게시판·각 게시판 활성 표시 매칭
   const pathname = usePathname();
   const router = useRouter();
   // 게시판 사이드바 목록
   const { data: boardList = [] } = useQuery(boardQueries.list());
+  const { requestLogin } = useLoginRequiredConfirmAction();
 
   return (
     <aside>
@@ -41,10 +46,18 @@ export function BoardListNav() {
                 isBoardPathActive(pathname, "hot-post")
               )}
               onMouseEnter={() => {
+                if (isGuest) return;
                 void router.prefetch("/board/hot-post");
               }}
               onTouchStart={() => {
+                if (isGuest) return;
                 void router.prefetch("/board/hot-post");
+              }}
+              onClick={(event) => {
+                if (!isGuest) return;
+
+                event.preventDefault();
+                requestLogin();
               }}
             >
               인기 게시글
@@ -52,6 +65,7 @@ export function BoardListNav() {
           </li>
           {boardList.map((board) => {
             const segment = boardHrefSegment(board.id);
+            const isPublic = isPublicBoardId(board.id);
             return (
               <li key={board.id}>
                 <Link
@@ -61,10 +75,18 @@ export function BoardListNav() {
                     isBoardPathActive(pathname, segment)
                   )}
                   onMouseEnter={() => {
+                    if (isGuest && !isPublic) return;
                     void router.prefetch(`/board/${segment}`);
                   }}
                   onTouchStart={() => {
+                    if (isGuest && !isPublic) return;
                     void router.prefetch(`/board/${segment}`);
+                  }}
+                  onClick={(event) => {
+                    if (!isGuest || isPublic) return;
+
+                    event.preventDefault();
+                    requestLogin();
                   }}
                 >
                   {board.name}

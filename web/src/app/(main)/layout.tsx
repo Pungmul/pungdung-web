@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 
 import { Suspense } from "@suspensive/react";
 
+import { hasValidAccessToken } from "@/features/auth";
 import { ChatNotificationSocket } from "@/features/chat";
 import {
   FCMClient,
@@ -25,7 +26,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const hasAccessToken = Boolean((await cookies()).get("accessToken"));
+  const cookieStore = await cookies();
+  const hasAccessToken = hasValidAccessToken(
+    cookieStore.get("accessToken")?.value
+  );
 
   const shell = (
     <div id="main-contents" className="relative flex">
@@ -44,7 +48,7 @@ export default async function RootLayout({
         id="main-shell"
         className="relative flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-app"
       >
-        {hasAccessToken && <Tabs />}
+        <Tabs isAuthenticated={hasAccessToken} />
         <ToastHost />
         {children}
       </div>
@@ -54,7 +58,11 @@ export default async function RootLayout({
   return (
     <ReactQueryProviders>
       <PWAInstallPrompt />
-      {hasAccessToken ? <AuthenticatedSocketProvider>{shell}</AuthenticatedSocketProvider> : shell}
+      {hasAccessToken ? (
+        <AuthenticatedSocketProvider>{shell}</AuthenticatedSocketProvider>
+      ) : (
+        shell
+      )}
     </ReactQueryProviders>
   );
 }
