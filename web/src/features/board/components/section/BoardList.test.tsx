@@ -114,9 +114,12 @@ describe("BoardList", () => {
     const links = container.querySelectorAll('a[href^="/board/"]');
     expect(links[0]).toHaveTextContent("자유 게시판");
     expect(links[1]).toHaveTextContent("악기 게시판");
+    expect(links[2]).toHaveTextContent("홍보 게시판");
     expect(getByText("바로 풍덩 빠져보세요")).toBeInTheDocument();
     expect(getByRole("button", { name: "카카오 로그인" })).toBeInTheDocument();
-    expect(getByText("홍보 게시판").closest("ul")).toHaveAttribute("inert");
+    expect(getByText("홍보 게시판").closest("ul")).not.toHaveAttribute(
+      "inert"
+    );
   });
 
   it("비로그인 잠금 영역은 상호작용에서 제외한다", () => {

@@ -19,11 +19,11 @@ interface BoardListProps {
   isGuest: boolean;
 }
 
-/** 비로그인 목록에서 자유·악기 게시판의 노출 우선순위를 반환한다. */
+/** 비로그인 목록에서 자유·악기와 나머지 공개 게시판의 노출 우선순위를 반환한다. */
 function getGuestFeaturedBoardOrder(board: BoardSummary): number {
   if (board.name === "자유게시판" || board.name === "자유 게시판") return 0;
   if (board.name === "악기 게시판") return 1;
-  return -1;
+  return board.isPublic ? 2 : -1;
 }
 
 const BoardList = memo(function BoardList({
@@ -87,7 +87,7 @@ const BoardList = memo(function BoardList({
   const guestRestrictedBoardList = useMemo(
     () =>
       sortedBoardList.filter(
-        (board) => getGuestFeaturedBoardOrder(board) === -1
+        (board) => !board.isPublic
       ),
     [sortedBoardList]
   );

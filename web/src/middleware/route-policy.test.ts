@@ -3,9 +3,7 @@ import { describe, expect, it } from "vitest";
 import { getGuestRoutePolicy, toInternalNext } from "./route-policy";
 
 describe("getGuestRoutePolicy", () => {
-  it("임시 공개 게시판과 홍보 경로만 공개 열람으로 분류한다", () => {
-    expect(getGuestRoutePolicy("/board/1")).toBe("public");
-    expect(getGuestRoutePolicy("/board/6")).toBe("public");
+  it("고정 공개 경로와 홍보 경로만 공개 열람으로 분류한다", () => {
     expect(getGuestRoutePolicy("/board/main")).toBe("public");
     expect(getGuestRoutePolicy("/board/promote/l", "?tab=promotion-list")).toBe(
       "public"
@@ -18,7 +16,8 @@ describe("getGuestRoutePolicy", () => {
       "member-only"
     );
     expect(getGuestRoutePolicy("/board/hot-post")).toBe("member-only");
-    expect(getGuestRoutePolicy("/board/2")).toBe("member-only");
+    expect(getGuestRoutePolicy("/board/1")).toBe("member-only");
+    expect(getGuestRoutePolicy("/board/d/10")).toBe("member-only");
     expect(getGuestRoutePolicy("/board/1/search")).toBe("member-only");
   });
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { getGuestRoutePolicy, toInternalNext } from "../route-policy";
+import { resolveGuestRoutePolicy } from "../guest-board-route-policy";
+import { toInternalNext } from "../route-policy";
 import { clearAuthCookies, tryReissueToken } from "../token";
 import type { MiddlewareContext, MiddlewareHandler } from "../types";
 
@@ -60,7 +61,6 @@ export const protectedRoutesHandler: MiddlewareHandler = async (ctx) => {
     ctx.tokens.accessToken && !isAccessTokenExpired(ctx.tokens.accessToken)
   );
   const hasRefreshToken = Boolean(ctx.tokens.refreshToken);
-  const policy = getGuestRoutePolicy(ctx.pathname, ctx.req.nextUrl.search);
   const loginUrl = (reason: "auth_required" | "session_expired") => {
     const url = new URL("/login", ctx.req.url);
     url.searchParams.set(
@@ -72,6 +72,11 @@ export const protectedRoutesHandler: MiddlewareHandler = async (ctx) => {
   };
 
   if (!hasAccessToken && !hasRefreshToken) {
+    const policy = await resolveGuestRoutePolicy(
+      ctx.pathname,
+      ctx.req.nextUrl.search
+    );
+
     if (policy !== "member-only") {
       clearAuthCookies(ctx);
       return nextAsGuest(ctx);
@@ -86,6 +91,11 @@ export const protectedRoutesHandler: MiddlewareHandler = async (ctx) => {
     if (reissued) {
       return nextWithReissuedAuthCookies(ctx);
     }
+
+    const policy = await resolveGuestRoutePolicy(
+      ctx.pathname,
+      ctx.req.nextUrl.search
+    );
 
     if (policy === "public") {
       return nextAsGuest(ctx);

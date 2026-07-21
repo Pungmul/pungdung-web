@@ -1,11 +1,4 @@
-import { isPublicBoardId } from "@/core/policy/public-board";
-
 export type GuestRoutePolicy = "public" | "induction" | "member-only";
-
-const isPublicBoardRoute = (pathname: string): boolean => {
-  const match = /^\/board\/(\d+)\/?$/.exec(pathname);
-  return match !== null && isPublicBoardId(match[1]!);
-};
 
 export function getGuestRoutePolicy(
   pathname: string,
@@ -25,9 +18,7 @@ export function getGuestRoutePolicy(
     pathname === "/board/main" ||
     pathname === "/board/promote" ||
     pathname === "/board/promote/l" ||
-    (/^\/board\/promote\/d\/[^/]+\/?$/.test(pathname)) ||
-    pathname.startsWith("/board/d/") ||
-    isPublicBoardRoute(pathname)
+    (/^\/board\/promote\/d\/[^/]+\/?$/.test(pathname))
   ) {
     return "public";
   }
