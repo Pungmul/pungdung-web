@@ -36,6 +36,7 @@ describe("board dto.schema", () => {
         parentId: null,
         name: "자유",
         description: "desc",
+        isPublic: true,
       },
     ]);
     expect(parsed.success).toBe(true);
@@ -43,7 +44,7 @@ describe("board dto.schema", () => {
 
   it("briefBoardInfoListDtoSchema는 잘못된 요소에서 실패한다", () => {
     const parsed = briefBoardInfoListDtoSchema.safeParse([
-      { id: "x", parentId: null, name: 1, description: "d" },
+      { id: "x", parentId: null, name: 1, description: "d", isPublic: true },
     ]);
     expect(parsed.success).toBe(false);
   });
@@ -66,9 +67,12 @@ describe("board dto.schema", () => {
 
   it("boardDataDtoSchema는 boardInfo.rootCategoryName이 null이어도 통과한다", () => {
     const parsed = boardDataDtoSchema.safeParse({
+      currentCategoryId: 1,
       boardInfo: {
+        rootCategoryId: 1,
         rootCategoryName: null,
         childCategoryName: null,
+        isPublic: true,
       },
       hotPost: { postId: null },
       recentPostList: {
@@ -87,9 +91,12 @@ describe("board dto.schema", () => {
 
   it("boardDataDtoSchema는 childCategories를 게시판 정보 안에서 통과시킨다", () => {
     const parsed = boardDataDtoSchema.safeParse({
+      currentCategoryId: 4,
       boardInfo: {
+        rootCategoryId: 3,
         rootCategoryName: "악기 게시판",
         childCategoryName: null,
+        isPublic: true,
         childCategories: [
           {
             id: 4,

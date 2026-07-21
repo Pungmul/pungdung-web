@@ -31,8 +31,8 @@ vi.mock("@/shared/components", () => ({
 }));
 
 const boards = [
-  { id: 1, parentId: null, name: "Alpha", description: "d1" },
-  { id: 2, parentId: null, name: "Bravo", description: "d2" },
+  { id: 1, parentId: null, name: "Alpha", description: "d1", isPublic: true },
+  { id: 2, parentId: null, name: "Bravo", description: "d2", isPublic: false },
 ] as const;
 
 describe("BoardList", () => {
@@ -100,29 +100,28 @@ describe("BoardList", () => {
     removeSpy.mockRestore();
   });
 
-  it("비로그인이 회원 전용 게시판을 누르면 로그인 확인을 요청한다", () => {
-    const { getByRole } = render(<BoardList boardList={[...boards]} isGuest />);
+  it("비로그인 목록은 자유·악기 게시판을 최상단에 두고 나머지 영역에 로그인 안내를 표시한다", () => {
+    const boardList = [
+      { id: 2, parentId: null, name: "다른 게시판", description: "d1", isPublic: false },
+      { id: 6, parentId: null, name: "악기 게시판", description: "d2", isPublic: true },
+      { id: 1, parentId: null, name: "자유 게시판", description: "d3", isPublic: true },
+      { id: "promote", parentId: null, name: "홍보 게시판", description: "d4", isPublic: true },
+    ];
+    const { container, getByRole, getByText } = render(
+      <BoardList boardList={boardList} isGuest />
+    );
 
-    fireEvent.click(getByRole("link", { name: "Bravo" }));
-
-    expect(requestLoginMock).toHaveBeenCalledOnce();
+    const links = container.querySelectorAll('a[href^="/board/"]');
+    expect(links[0]).toHaveTextContent("자유 게시판");
+    expect(links[1]).toHaveTextContent("악기 게시판");
+    expect(getByText("바로 풍덩 빠져보세요")).toBeInTheDocument();
+    expect(getByRole("button", { name: "카카오 로그인" })).toBeInTheDocument();
+    expect(getByText("홍보 게시판").closest("ul")).toHaveAttribute("inert");
   });
 
-  it("비로그인이 회원 전용 게시판에서 Enter를 누르면 로그인 확인을 요청한다", () => {
-    const { getByRole } = render(<BoardList boardList={[...boards]} isGuest />);
+  it("비로그인 잠금 영역은 상호작용에서 제외한다", () => {
+    const { getByText } = render(<BoardList boardList={[...boards]} isGuest />);
 
-    fireEvent.keyDown(getByRole("link", { name: "Bravo" }), {
-      key: "Enter",
-    });
-
-    expect(requestLoginMock).toHaveBeenCalledOnce();
-  });
-
-  it("비로그인이 공개 게시판을 누르면 로그인 확인을 요청하지 않는다", () => {
-    const { getByRole } = render(<BoardList boardList={[...boards]} isGuest />);
-
-    fireEvent.click(getByRole("link", { name: "Alpha" }));
-
-    expect(requestLoginMock).not.toHaveBeenCalled();
+    expect(getByText("Bravo").closest("ul")).toHaveAttribute("inert");
   });
 });

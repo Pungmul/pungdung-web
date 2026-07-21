@@ -5,8 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { isPublicBoardId } from "@/core/policy/public-board";
-
 import { useLoginRequiredConfirmAction } from "@/features/auth";
 
 import { cn } from "@/shared";
@@ -65,7 +63,7 @@ export function BoardListNav({ isGuest = false }: { isGuest?: boolean }) {
           </li>
           {boardList.map((board) => {
             const segment = boardHrefSegment(board.id);
-            const isPublic = isPublicBoardId(board.id);
+            const { isPublic } = board;
             return (
               <li key={board.id}>
                 <Link

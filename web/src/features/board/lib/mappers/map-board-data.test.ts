@@ -20,9 +20,12 @@ function minimalRecentPostList(): BoardDataDto["recentPostList"] {
 describe("mapBoardDataDtoToBoardOverview", () => {
   it("rootCategoryName이 null이면 빈 문자열로 변환한다", () => {
     const dto: BoardDataDto = {
+      currentCategoryId: 4,
       boardInfo: {
+        rootCategoryId: 3,
         rootCategoryName: null,
         childCategoryName: "자식",
+        isPublic: true,
         childCategories: [],
       },
       hotPost: { postId: 1 },
@@ -33,6 +36,9 @@ describe("mapBoardDataDtoToBoardOverview", () => {
 
     expect(overview.boardInfo.rootCategoryName).toBe("");
     expect(overview.boardInfo.childCategoryName).toBe("자식");
+    expect(overview.currentCategoryId).toBe(4);
+    expect(overview.boardInfo.rootCategoryId).toBe(3);
+    expect(overview.boardInfo.isPublic).toBe(true);
   });
 
   it("recentPostList와 hotPost 매핑을 유지한다", () => {
@@ -44,9 +50,12 @@ describe("mapBoardDataDtoToBoardOverview", () => {
     };
 
     const dto: BoardDataDto = {
+      currentCategoryId: 1,
       boardInfo: {
+        rootCategoryId: 1,
         rootCategoryName: "루트",
         childCategoryName: null,
+        isPublic: false,
         childCategories: [],
       },
       hotPost,
@@ -60,11 +69,14 @@ describe("mapBoardDataDtoToBoardOverview", () => {
     expect(overview.recentPostList.list).toEqual([{ postId: 1 }]);
   });
 
-  it("childCategories를 게시판 클라이언트 모델에 포함한다", () => {
+  it("childCategories와 null hotPost를 게시판 클라이언트 모델에 보존한다", () => {
     const dto: BoardDataDto = {
+      currentCategoryId: 4,
       boardInfo: {
+        rootCategoryId: 3,
         rootCategoryName: "악기 게시판",
         childCategoryName: null,
+        isPublic: true,
         childCategories: [
           {
             id: 4,
@@ -88,5 +100,23 @@ describe("mapBoardDataDtoToBoardOverview", () => {
         description: null,
       },
     ]);
+    expect(overview.hotPost).toBeNull();
+  });
+
+  it("배너 필드가 없는 hotPost는 미노출 상태로 정규화한다", () => {
+    const dto: BoardDataDto = {
+      currentCategoryId: 1,
+      boardInfo: {
+        rootCategoryId: 1,
+        rootCategoryName: "루트",
+        childCategoryName: null,
+        isPublic: true,
+        childCategories: [],
+      },
+      hotPost: { postId: null },
+      recentPostList: minimalRecentPostList(),
+    };
+
+    expect(mapBoardDataDtoToBoardOverview(dto).hotPost).toBeNull();
   });
 });

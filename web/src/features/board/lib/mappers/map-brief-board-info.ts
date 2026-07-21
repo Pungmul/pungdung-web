@@ -11,5 +11,6 @@ export function mapBriefBoardInfoDtoToBoardSummary(
     parentId: dto.parentId,
     name: dto.name,
     description: dto.description ?? buildFallbackDescription(dto.name),
+    isPublic: dto.isPublic,
   };
 }

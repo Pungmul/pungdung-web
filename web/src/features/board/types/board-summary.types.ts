@@ -4,4 +4,5 @@ export type BoardSummary = {
   parentId: number | null;
   name: string;
   description: string;
+  isPublic: boolean;
 };

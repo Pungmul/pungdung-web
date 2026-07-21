@@ -22,14 +22,17 @@ export const childBoardCategoryDtoSchema = z.object({
 });
 
 export const boardInfoDtoSchema = z.object({
+  rootCategoryId: z.number(),
   /** 목록 전용 호출 등에서 null로 올 수 있음 */
   rootCategoryName: z.string().nullable(),
   childCategoryName: z.string().nullable(),
+  isPublic: z.boolean(),
   childCategories: z.array(childBoardCategoryDtoSchema).default([]),
 });
 
 /** 게시판 상세 + 목록 첫 페이지 (`/api/boards/:id`) */
 export const boardDataDtoSchema = z.object({
+  currentCategoryId: z.number(),
   boardInfo: boardInfoDtoSchema,
   hotPost: z.unknown(),
   recentPostList: postListPageDtoSchema,
@@ -42,6 +45,7 @@ export const briefBoardInfoDtoSchema = z.object({
   parentId: z.number().nullable(),
   name: z.string(),
   description: z.string().nullable(),
+  isPublic: z.boolean(),
 });
 
 export const briefBoardInfoListDtoSchema = z.array(briefBoardInfoDtoSchema);

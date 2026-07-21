@@ -10,6 +10,7 @@ const PROMOTE_BOARD = {
   parentId: null,
   name: "홍보 게시판",
   description: "공연 모집 정보를 공유하는 게시판입니다",
+  isPublic: true,
 };
 
 function okEnvelope(response: unknown) {
@@ -98,6 +99,7 @@ describe("prefetchBoardInfoList", () => {
             parentId: null,
             name: "자유",
             description: "desc",
+            isPublic: true,
           },
         ])
       ),
@@ -111,6 +113,7 @@ describe("prefetchBoardInfoList", () => {
         parentId: null,
         name: "자유",
         description: "desc",
+        isPublic: true,
       },
       PROMOTE_BOARD,
     ]);
@@ -122,7 +125,9 @@ describe("prefetchBoardInfoList", () => {
       ok: false,
       status: 500,
       json: vi.fn().mockResolvedValue(
-        okEnvelope([{ id: 1, parentId: null, name: "n", description: "d" }])
+        okEnvelope([
+          { id: 1, parentId: null, name: "n", description: "d", isPublic: true },
+        ])
       ),
     } as unknown as Response);
 

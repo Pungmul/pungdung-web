@@ -9,6 +9,7 @@ const PROMOTE_BOARD: BoardSummary = {
   parentId: null,
   name: "홍보 게시판",
   description: "공연 모집 정보를 공유하는 게시판입니다",
+  isPublic: true,
 };
 
 export const fetchBoardInfoList = () =>

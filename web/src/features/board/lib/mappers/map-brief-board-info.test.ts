@@ -9,12 +9,14 @@ describe("mapBriefBoardInfoDtoToBoardSummary", () => {
       parentId: null as number | null,
       name: "자유",
       description: "desc",
+      isPublic: true,
     };
     expect(mapBriefBoardInfoDtoToBoardSummary(dto)).toEqual({
       id: 1,
       parentId: null,
       name: "자유",
       description: "desc",
+      isPublic: true,
     });
   });
 });

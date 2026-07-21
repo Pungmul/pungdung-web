@@ -33,9 +33,12 @@ const emptyPostListPage = (): PostListPage => ({
 });
 
 const boardDataStub: BoardOverview = {
+  currentCategoryId: 1,
   boardInfo: {
+    rootCategoryId: 1,
     rootCategoryName: "root",
     childCategoryName: null,
+    isPublic: true,
     childCategories: [],
   },
   hotPost: postStub,

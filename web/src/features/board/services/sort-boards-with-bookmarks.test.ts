@@ -9,18 +9,21 @@ const a: BoardSummary = {
   parentId: null,
   name: "A",
   description: "",
+  isPublic: true,
 };
 const b: BoardSummary = {
   id: 2,
   parentId: null,
   name: "B",
   description: "",
+  isPublic: false,
 };
 const c: BoardSummary = {
   id: "x",
   parentId: null,
   name: "X",
   description: "",
+  isPublic: false,
 };
 
 describe("sortBoardsWithBookmarks", () => {

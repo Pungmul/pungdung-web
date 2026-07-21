@@ -10,18 +10,21 @@ const sample: BoardSummary[] = [
     parentId: null,
     name: "자유",
     description: "",
+    isPublic: true,
   },
   {
     id: "promote",
     parentId: null,
     name: "홍보",
     description: "",
+    isPublic: true,
   },
   {
     id: "other-string",
     parentId: null,
     name: "제외",
     description: "",
+    isPublic: false,
   },
 ];
 

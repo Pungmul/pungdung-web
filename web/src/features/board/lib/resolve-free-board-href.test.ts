@@ -10,12 +10,14 @@ const boards: BoardSummary[] = [
     parentId: null,
     name: "자유게시판",
     description: "",
+    isPublic: true,
   },
   {
     id: 2,
     parentId: null,
     name: "기타",
     description: "",
+    isPublic: false,
   },
 ];
 
@@ -27,7 +29,15 @@ describe("resolveFreeBoardHref", () => {
   it("매칭이 없으면 id 1로 폴백한다", () => {
     expect(
       resolveFreeBoardHref(
-        [{ id: 2, parentId: null, name: "없음", description: "" }],
+        [
+          {
+            id: 2,
+            parentId: null,
+            name: "없음",
+            description: "",
+            isPublic: false,
+          },
+        ],
         { nameHint: "자유" }
       )
     ).toBe("/board/1");
