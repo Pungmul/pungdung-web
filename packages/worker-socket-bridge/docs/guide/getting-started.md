@@ -80,6 +80,14 @@ function SocketBootstrap({ token }) {
 }
 ```
 
+## E2E 검증
+
+```bash
+yarn test:e2e
+```
+
+임시 SockJS/STOMP 서버와 Chromium을 실행해 SharedWorker 연결 후 `MESSAGE`가 `SocketManager` 구독 콜백까지 전달되는지 확인합니다.
+
 ## Export 경로
 
 | Path | 내용 |

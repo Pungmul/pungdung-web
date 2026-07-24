@@ -72,8 +72,8 @@ flowchart LR
 
 모든 cross-boundary 메시지는 `protocol/`의 `CommandEnvelope` / `ResponseEnvelope`를 따릅니다.
 
-- **RPC**: `CONNECT`, `PING`, `SUBSCRIBE`, `SEND_MESSAGE` — `commandId` + Promise
-- **Post**: `UNSUBSCRIBE`, `DISCONNECT` — 즉시 dispatch
+- **RPC**: `CONNECT`, `PING`, `SUBSCRIBE`, `SEND_MESSAGE`, `DISCONNECT` — `commandId` + Promise
+- **Post**: `UNSUBSCRIBE` — 즉시 dispatch
 
 ## 모듈 문서
 

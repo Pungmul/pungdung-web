@@ -56,6 +56,7 @@ React 앱에서는 `@pungdung/worker-socket-bridge/react`의 `SocketManagerProvi
 |------|------|
 | `yarn build:workers` | `workers/` → 앱 `public/*.js` 번들 |
 | `yarn build:workers:watch` | Worker 번들 watch 모드 |
+| `yarn test:e2e` | Chromium에서 SharedWorker·SockJS/STOMP 메시지 전달 E2E 실행 |
 | `yarn docs:sync` | README → docs/modules 동기화 |
 | `yarn docs:dev` | VitePress 개발 서버 (`predocs:dev`로 자동 sync) |
 | `yarn docs:build` | VitePress 정적 사이트 빌드 |
@@ -66,6 +67,10 @@ React 앱에서는 `@pungdung/worker-socket-bridge/react`의 `SocketManagerProvi
 - 각 모듈 폴더의 `README.md` — 파일별 책임 정리 (단일 소스)
 - `yarn docs:sync` — README → VitePress `docs/modules/` 동기화
 - `yarn docs:dev` — 아키텍처 다이어그램·탐색 가능한 문서 사이트
+
+## E2E 검증
+
+`yarn test:e2e`는 임시 SockJS/STOMP 서버와 실제 Chromium을 실행합니다. SharedWorker를 선택한 뒤 `MESSAGE`가 `SocketManager` 구독 콜백까지 전달되는지 확인합니다.
 
 ## 데이터 흐름 (요약)
 
