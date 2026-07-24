@@ -13,10 +13,12 @@ export class SocketSubscriptions {
     private readonly deps: {
       topicBuffer: TopicBuffer;
       hasRuntime: () => boolean;
+      ensureConnected: () => Promise<void>;
       invokeSubscribe: (topic: string) => Promise<void>;
       postUnsubscribe: (topic: string) => void;
       onStateChanged: () => void;
       touchInboundMessageActivity: () => void;
+      onListenerTopicCountChanged: () => void;
     }
   ) {}
 
@@ -27,6 +29,7 @@ export class SocketSubscriptions {
       this.listenersByTopic.set(topic, listeners);
     }
     listeners.push(callback);
+    this.deps.onListenerTopicCountChanged();
     return listeners.length === 1;
   }
 
@@ -47,6 +50,7 @@ export class SocketSubscriptions {
     }
 
     this.listenersByTopic.delete(topic);
+    this.deps.onListenerTopicCountChanged();
     this.scheduleUnsubscribe(topic);
     return true;
   }
@@ -86,6 +90,13 @@ export class SocketSubscriptions {
 
       this.markTopicPending(topic);
       this.deps.onStateChanged();
+
+      try {
+        await this.deps.ensureConnected();
+      } catch (connectError) {
+        this.removeListener(topic, callback);
+        throw connectError;
+      }
 
       if (this.deps.hasRuntime()) {
         try {

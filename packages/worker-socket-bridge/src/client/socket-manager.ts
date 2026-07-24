@@ -27,16 +27,23 @@ import { TopicBuffer } from "./topic-buffer";
 export type { SocketConnectionStateCheck } from "./socket-probe";
 
 export type CreateSocketManagerOptions = CreateSocketRuntimeOptions & {
+  /** 소켓 명령 요청이 응답을 기다리는 최대 시간(ms) */
   commandTimeoutMs?: number;
+  /** 마지막 리스너 해제 후 worker UNSUBSCRIBE를 미루는 시간(ms) */
   graceMs?: number;
+  /** 모든 로컬 구독이 사라진 뒤 연결을 종료하기까지의 시간(ms). 0이면 종료하지 않음 */
+  idleDisconnectMs?: number;
+  /** 토픽별로 보관할 수신 메시지의 최대 개수 */
   maxMessagesPerTopic?: number;
   /** 구독 중인데 inbound MESSAGE가 이 시간 동안 없으면 probe 대상 */
   messageInactivityProbeMs?: number;
+  /** runtime 실행 방식이 변경될 때 호출되는 콜백 */
   onRuntimeChange?: (mode: SocketRuntime["mode"]) => void;
 };
 
 const DEFAULT_COMMAND_TIMEOUT_MS = 30_000;
 const DEFAULT_GRACE_MS = 30_000;
+const DEFAULT_IDLE_DISCONNECT_MS = 60_000;
 const DEFAULT_MAX_MESSAGES_PER_TOPIC = 100;
 const DEFAULT_PUBLISH_COMMAND_TIMEOUT_MS = 8_000;
 
@@ -51,6 +58,7 @@ export class SocketManager {
   private readonly probe: SocketProbe;
   private readonly pushHandler: SocketPushHandler;
   private readonly connection: SocketConnectionLifecycle;
+  private idleDisconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(options: CreateSocketManagerOptions = {}) {
     this.managerOptions = options;
@@ -68,12 +76,14 @@ export class SocketManager {
     this.subscriptions = new SocketSubscriptions({
       topicBuffer: this.topicBuffer,
       hasRuntime: () => this.connection.hasRuntime(),
+      ensureConnected: () => this.connection.ensureConnected(),
       invokeSubscribe: async (topic) => {
         await this.bridge.invoke("SUBSCRIBE", { topic });
       },
       postUnsubscribe: (topic) => this.bridge.post("UNSUBSCRIBE", { topic }),
       onStateChanged: () => snapshotStore.notifyStateSubscriptions(),
       touchInboundMessageActivity: () => this.probe.touchInboundMessageActivity(),
+      onListenerTopicCountChanged: () => this.syncIdleDisconnectTimer(),
     });
     this.snapshotStore = snapshotStore = new SocketSnapshotStore({
       getConnectionStatus: () => this.connectionStatusStore.get(),
@@ -219,7 +229,36 @@ export class SocketManager {
   }
 
   disconnect(): void {
+    this.clearIdleDisconnectTimer();
     this.connection.disconnect();
+  }
+
+  private syncIdleDisconnectTimer(): void {
+    if (this.subscriptions.getListenerTopicSize() > 0) {
+      this.clearIdleDisconnectTimer();
+      return;
+    }
+
+    const idleDisconnectMs =
+      this.managerOptions.idleDisconnectMs ?? DEFAULT_IDLE_DISCONNECT_MS;
+    if (idleDisconnectMs === 0 || this.idleDisconnectTimer) {
+      return;
+    }
+
+    this.idleDisconnectTimer = setTimeout(() => {
+      this.idleDisconnectTimer = null;
+      if (this.subscriptions.getListenerTopicSize() === 0) {
+        this.disconnect();
+      }
+    }, idleDisconnectMs);
+  }
+
+  private clearIdleDisconnectTimer(): void {
+    if (!this.idleDisconnectTimer) {
+      return;
+    }
+    clearTimeout(this.idleDisconnectTimer);
+    this.idleDisconnectTimer = null;
   }
 
   getConnectionStatus(): boolean {
