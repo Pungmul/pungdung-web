@@ -35,7 +35,7 @@ export function useSocketReconnectTokenRefresh() {
         staleTime: 0,
       })
       .catch(() => {
-        socket.disconnect();
+        void socket.disconnect();
       });
   }, [phase, queryClient, socket]);
 }

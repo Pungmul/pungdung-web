@@ -5,7 +5,7 @@ import { SOCKET_NOT_CONNECTED_REASON } from "../stomp/constants";
 import { formatWorkerError, safeParseMessageBody } from "../stomp/message-envelope-utils";
 import { createStompLivenessTracker } from "../stomp/stomp-liveness";
 import { createHubClientResponseDispatch } from "../stomp/stomp-response-dispatch";
-import { buildMessage, buildPong } from "../stomp/stomp-response-emitters";
+import { buildDisconnected, buildMessage, buildPong } from "../stomp/stomp-response-emitters";
 import {
   activateStompTransport,
   type StompTransportRefs,
@@ -28,7 +28,7 @@ type ClientId = number;
 export type SharedStompHub = {
   connectClient(port: MessagePort): ClientId;
   handleMessage(data: WorkerMessage, clientId: ClientId): void;
-  disconnectClient(clientId: ClientId): void;
+  disconnectClient(clientId: ClientId): Promise<void>;
 };
 
 export function createSharedStompHub(): SharedStompHub {
@@ -374,7 +374,7 @@ export function createSharedStompHub(): SharedStompHub {
     }
   }
 
-  function disconnectClient(clientId: ClientId): void {
+  async function disconnectClient(clientId: ClientId, commandId: string | null = null): Promise<void> {
     topicSubscribers.forEach((subscribers, topic) => {
       subscribers.delete(clientId);
       removeTopicSubscribeAck(topic, clientId);
@@ -393,11 +393,11 @@ export function createSharedStompHub(): SharedStompHub {
     pendingSubscriptions.delete(clientId);
     pendingPublishes.delete(clientId);
     pendingConnectCommands.delete(clientId);
-    connections.delete(clientId);
+    const isLastClient = connections.size === 1;
 
-    if (connections.size === 0 && transportRefs.stompClient) {
+    if (isLastClient && transportRefs.stompClient) {
       connectionPhase = "disconnected";
-      transportRefs.stompClient.deactivate();
+      await transportRefs.stompClient.deactivate();
       transportRefs.stompClient = null;
       transportRefs.transportSocket = null;
       liveness.resetServerActivity();
@@ -408,6 +408,9 @@ export function createSharedStompHub(): SharedStompHub {
       pendingSubscriptions.clear();
       pendingPublishes.clear();
     }
+
+    sendToClient(clientId, buildDisconnected(commandId));
+    connections.delete(clientId);
   }
 
   function enqueueTopicSubscribeAck(
@@ -502,7 +505,7 @@ export function createSharedStompHub(): SharedStompHub {
         publishMessage(messageData as TopicPayload, clientId, commandId ?? null);
         break;
       case "DISCONNECT":
-        disconnectClient(clientId);
+        void disconnectClient(clientId, commandId ?? null);
         break;
     }
   }

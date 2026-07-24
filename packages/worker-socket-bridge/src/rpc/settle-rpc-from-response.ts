@@ -38,6 +38,7 @@ export function settleRpcFromResponse(
 
   switch (type) {
     case "CONNECTED":
+    case "DISCONNECTED":
       pending.resolve(commandId, undefined);
       return { kind: "resolved", commandId };
 

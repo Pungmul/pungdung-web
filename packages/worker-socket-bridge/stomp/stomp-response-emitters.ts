@@ -28,6 +28,10 @@ export function buildConnectionState(
   };
 }
 
+export function buildDisconnected(commandId: string | null): ResponseEnvelope {
+  return withOptionalCommandId({ type: "DISCONNECTED" }, commandId);
+}
+
 export function buildSubscriptionState(
   topic: string,
   status: SubscriptionStatus,

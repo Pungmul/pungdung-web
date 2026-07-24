@@ -261,11 +261,11 @@ export function createStompSession(
     }
   }
 
-  function disconnectWebSocket(): void {
+  async function disconnectWebSocket(commandId: string | null = null): Promise<void> {
     connectionPhase = "disconnected";
     dispatch.connectionState("disconnected", false);
     if (transportRefs.stompClient) {
-      transportRefs.stompClient.deactivate();
+      await transportRefs.stompClient.deactivate();
       transportRefs.stompClient = null;
       transportRefs.transportSocket = null;
       liveness.resetServerActivity();
@@ -274,6 +274,7 @@ export function createStompSession(
       pendingSubscriptions.length = 0;
       pendingPublishes.length = 0;
     }
+    dispatch.disconnected(commandId);
   }
 
   return {
@@ -302,7 +303,7 @@ export function createStompSession(
           publishMessage(data as TopicPayload, commandId ?? null);
           break;
         case "DISCONNECT":
-          disconnectWebSocket();
+          void disconnectWebSocket(commandId);
           break;
       }
     },

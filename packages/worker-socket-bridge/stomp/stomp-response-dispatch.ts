@@ -3,6 +3,7 @@ import type { ResponseEnvelope, SubscriptionStatus } from "../src/protocol";
 import {
   buildCommandError,
   buildConnected,
+  buildDisconnected,
   buildConnectionState,
   buildPublished,
   buildPublishState,
@@ -62,6 +63,7 @@ export function createSessionResponseDispatch(
     connected(commandId: string) {
       emit(buildConnected(commandId));
     },
+    disconnected(commandId: string | null) { emit(buildDisconnected(commandId)); },
   };
 }
 

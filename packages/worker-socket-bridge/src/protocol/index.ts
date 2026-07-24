@@ -43,6 +43,7 @@ export type CommandType =
 /** Worker (or runtime) → main response envelope */
 export type ResponseType =
   | "CONNECTED"
+  | "DISCONNECTED"
   | "PONG"
   | "SUBSCRIBED"
   | "MESSAGE"
@@ -53,16 +54,10 @@ export type ResponseType =
   | "RETRYING";
 
 /** Promise settle이 필요한 command */
-export type RpcCommandType = Extract<
-  CommandType,
-  "CONNECT" | "PING" | "SUBSCRIBE" | "SEND_MESSAGE"
->;
+export type RpcCommandType = Extract<CommandType, "CONNECT" | "DISCONNECT" | "PING" | "SUBSCRIBE" | "SEND_MESSAGE">;
 
 /** fire-and-forget command */
-export type PostCommandType = Extract<
-  CommandType,
-  "UNSUBSCRIBE" | "DISCONNECT"
->;
+export type PostCommandType = Extract<CommandType, "UNSUBSCRIBE">;
 
 export interface CommandEnvelope {
   type: CommandType;
@@ -137,6 +132,7 @@ export interface PongPayload {
 
 export const RPC_COMMAND_TYPES = [
   "CONNECT",
+  "DISCONNECT",
   "PING",
   "SUBSCRIBE",
   "SEND_MESSAGE",
@@ -144,7 +140,6 @@ export const RPC_COMMAND_TYPES = [
 
 export const POST_COMMAND_TYPES = [
   "UNSUBSCRIBE",
-  "DISCONNECT",
 ] as const satisfies readonly PostCommandType[];
 
 export function isRpcCommandType(type: CommandType): type is RpcCommandType {

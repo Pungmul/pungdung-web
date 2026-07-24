@@ -33,7 +33,7 @@ export class SocketConnectionLifecycle {
         command: "CONNECT" | "SUBSCRIBE",
         payload: SocketConfig | { topic: string }
       ) => Promise<unknown>;
-      postDisconnect: () => void;
+      postDisconnect: () => Promise<void>;
       rejectAllPendingRpc: (error: Error | unknown) => void;
       getPendingRpcSize: () => number;
       getConnectionStatus: () => SocketConnectionStatus;
@@ -236,7 +236,7 @@ export class SocketConnectionLifecycle {
     }
 
     if (this.runtime) {
-      this.deps.postDisconnect();
+      void this.deps.postDisconnect();
       this.deps.updateConnectionStatus({ phase: "reconnecting", isConnected: false });
       this.shouldResyncSubscriptionsOnConnect = true;
     }
@@ -253,9 +253,9 @@ export class SocketConnectionLifecycle {
     return this.connect(config, { skipConnectedProbe: true });
   }
 
-  disconnect(): void {
+  async disconnect(): Promise<void> {
     if (this.runtime) {
-      this.deps.postDisconnect();
+      await this.deps.postDisconnect();
       this.runtime.dispose();
     }
 

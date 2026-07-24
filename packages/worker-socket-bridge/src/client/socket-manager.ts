@@ -105,7 +105,7 @@ export class SocketManager {
         command === "CONNECT"
           ? this.bridge.invoke("CONNECT", payload as SocketConfig)
           : this.bridge.invoke("SUBSCRIBE", payload as { topic: string }),
-      postDisconnect: () => this.bridge.post("DISCONNECT"),
+      postDisconnect: () => this.bridge.invoke("DISCONNECT").then(() => undefined),
       rejectAllPendingRpc: (error) => this.bridge.rejectAll(error),
       getPendingRpcSize: () => this.bridge.pending.size(),
       getConnectionStatus: () => this.connectionStatusStore.get(),
@@ -228,9 +228,9 @@ export class SocketManager {
     });
   }
 
-  disconnect(): void {
+  async disconnect(): Promise<void> {
     this.clearIdleDisconnectTimer();
-    this.connection.disconnect();
+    await this.connection.disconnect();
   }
 
   private syncIdleDisconnectTimer(): void {
@@ -248,7 +248,7 @@ export class SocketManager {
     this.idleDisconnectTimer = setTimeout(() => {
       this.idleDisconnectTimer = null;
       if (this.subscriptions.getListenerTopicSize() === 0) {
-        this.disconnect();
+        void this.disconnect();
       }
     }, idleDisconnectMs);
   }

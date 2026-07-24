@@ -16,7 +16,7 @@ export function useInitSocketConnect(
   useEffect(() => {
     if (!accessToken) {
       if (socket.getConnectionStatus()) {
-        socket.disconnect();
+        void socket.disconnect();
       }
       return;
     }
@@ -30,7 +30,7 @@ export function useInitSocketConnect(
 
   useEffect(() => {
     return () => {
-      socket.disconnect();
+      void socket.disconnect();
     };
   }, [socket]);
 }
