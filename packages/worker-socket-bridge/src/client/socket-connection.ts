@@ -5,6 +5,7 @@ import {
   type SocketRuntime,
   type SocketRuntimeFallbackController,
 } from "../runtime";
+import { createSharedWorkerName } from "../runtime/transport/create-shared-worker-name";
 
 import type { SocketProbe } from "./socket-probe";
 import type { SocketSubscriptions } from "./socket-subscriptions";
@@ -44,9 +45,7 @@ export class SocketConnectionLifecycle {
       onStateChanged: () => void;
       onRuntimeReady: (runtime: SocketRuntime | null) => void;
     }
-  ) {
-    this.initRuntimeController();
-  }
+  ) {}
 
   getRuntime(): SocketRuntime | null {
     return this.runtime;
@@ -70,9 +69,10 @@ export class SocketConnectionLifecycle {
     });
   }
 
-  initRuntimeController(): void {
+  private initRuntimeController(config: SocketConfig): void {
     this.runtimeController = createSocketRuntimeWithFallback({
       ...this.deps.managerOptions,
+      sharedWorkerName: createSharedWorkerName(config.url),
       onRuntimeChange: (mode) => {
         this.deps.managerOptions.onRuntimeChange?.(mode);
       },
@@ -81,12 +81,15 @@ export class SocketConnectionLifecycle {
     this.deps.onRuntimeReady(this.runtime);
   }
 
-  recreateRuntime(): void {
+  recreateRuntime(config: SocketConfig = this.lastConnectConfig!): void {
+    if (!config) {
+      return;
+    }
     this.runtime?.dispose();
     this.runtime = null;
     this.runtimeController = null;
     this.deps.rejectAllPendingRpc(new Error("Socket runtime recreated"));
-    this.initRuntimeController();
+    this.initRuntimeController(config);
     this.shouldResyncSubscriptionsOnConnect = true;
     this.connectPromise = null;
     this.deps.probe.resetActivity();
@@ -133,6 +136,10 @@ export class SocketConnectionLifecycle {
   async connect(config: SocketConfig, options: ConnectOptions = {}): Promise<void> {
     this.lastConnectConfig = config;
 
+    if (!this.runtimeController) {
+      this.initRuntimeController(config);
+    }
+
     if (
       !options.skipConnectedProbe &&
       this.runtime &&
@@ -163,7 +170,7 @@ export class SocketConnectionLifecycle {
         } catch (error) {
           const nextRuntime = this.runtimeController.tryNextRuntime();
           if (!nextRuntime) {
-            this.recreateRuntime();
+            this.recreateRuntime(config);
             if (attempts >= MAX_CONNECT_ATTEMPTS) {
               throw error;
             }
@@ -225,7 +232,7 @@ export class SocketConnectionLifecycle {
 
 
     if (!this.runtime) {
-      this.initRuntimeController();
+      this.initRuntimeController(config);
     }
 
     if (this.runtime) {
@@ -242,7 +249,7 @@ export class SocketConnectionLifecycle {
     if (this.connectPromise) {
       return this.connectPromise;
     }
-    this.recreateRuntime();
+    this.recreateRuntime(config);
     return this.connect(config, { skipConnectedProbe: true });
   }
 
@@ -261,7 +268,6 @@ export class SocketConnectionLifecycle {
     this.runtimeController = null;
     this.deps.probe.resetActivity();
     this.deps.probe.invalidateTransportProbeCache();
-    this.initRuntimeController();
     this.deps.onStateChanged();
   }
 }

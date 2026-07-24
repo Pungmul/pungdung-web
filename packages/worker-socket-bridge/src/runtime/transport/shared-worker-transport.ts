@@ -11,8 +11,15 @@ export class SharedWorkerTransport implements WorkerTransport {
     this.sharedWorker.port.start();
   }
 
-  static create(url: string = SHARED_WORKER_URL): SharedWorkerTransport {
-    return new SharedWorkerTransport(new SharedWorker(url));
+  static create(
+    url: string = SHARED_WORKER_URL,
+    name?: string
+  ): SharedWorkerTransport {
+    const worker = name
+      ? new SharedWorker(url, { name })
+      : new SharedWorker(url);
+
+    return new SharedWorkerTransport(worker);
   }
 
   postMessage(message: CommandEnvelope): void {

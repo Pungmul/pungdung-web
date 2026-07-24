@@ -27,7 +27,8 @@
   "dependencies": {
     "@stomp/stompjs": "7.2.1",
     "sockjs-client": "1.6.1",
-    "use-sync-external-store": "1.6.0"
+    "use-sync-external-store": "1.6.0",
+    "uuid": "13.0.0"
   },
   "peerDependencies": {
     "react": ">=18"

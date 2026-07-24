@@ -12,7 +12,9 @@ import {
 } from "../transport";
 import type { SocketRuntime, SocketRuntimeMode } from "../types";
 
-export type CreateSocketRuntimeOptions = ResolveWorkerUrlsOptions;
+export type CreateSocketRuntimeOptions = ResolveWorkerUrlsOptions & {
+  sharedWorkerName?: string;
+};
 
 /** 테스트용: 브라우저에서는 dedicated worker만 사용. SSR/prerender는 Worker API가 없어 main-thread로 대체. */
 const FORCE_DEDICATED_WORKER_FOR_TESTING = false;
@@ -43,7 +45,9 @@ export function createSocketRuntime(
 
   switch (mode) {
     case "shared":
-      return new WorkerSocketRuntime(SharedWorkerTransport.create(urls.shared));
+      return new WorkerSocketRuntime(
+        SharedWorkerTransport.create(urls.shared, options.sharedWorkerName)
+      );
     case "dedicated":
       return new WorkerSocketRuntime(
         DedicatedWorkerTransport.create(urls.dedicated)
