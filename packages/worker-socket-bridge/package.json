@@ -18,6 +18,7 @@
     "build:workers": "node ./scripts/build-workers.mjs",
     "build:workers:watch": "node ./scripts/build-workers.mjs --watch",
     "docs:sync": "node ./scripts/sync-docs.mjs",
+    "test:e2e": "playwright test -c ./e2e/playwright.config.ts",
     "predocs:dev": "node ./scripts/sync-docs.mjs",
     "predocs:build": "node ./scripts/sync-docs.mjs",
     "docs:dev": "vitepress dev docs",
