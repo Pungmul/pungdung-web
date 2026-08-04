@@ -19,6 +19,8 @@ describe("mapCommentDtoToComment", () => {
       postId: 10,
       parentId: null,
       content: "댓글",
+      deleted: false,
+      hide: false,
       anonymity: false,
       likedNum: 2,
       userName: "작성자",
@@ -30,6 +32,8 @@ describe("mapCommentDtoToComment", () => {
           postId: 10,
           parentId: 1,
           content: "대댓글",
+          deleted: false,
+          hide: false,
           anonymity: true,
           likedNum: 1,
           userName: "답글 작성자",
@@ -53,14 +57,17 @@ describe("mapCommentDtoToComment", () => {
       postId: 10,
       parentId: null,
       content: "삭제된 댓글입니다.",
+      deleted: true,
+      hide: false,
       anonymity: false,
-      likedNum: 0,
+      likedNum: null,
       userName: null,
       createdAt: "2026-01-01",
       replies: [],
     });
 
     expect(comment.userName).toBe("탈퇴한 회원");
+    expect(comment.likedNum).toBe(0);
   });
 
   it("필수 댓글 필드가 없으면 실패한다", () => {

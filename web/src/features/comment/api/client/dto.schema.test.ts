@@ -16,6 +16,8 @@ describe("comment dto.schema", () => {
         postId: 10,
         parentId: null,
         content: "댓글입니다.",
+        deleted: false,
+        hide: false,
         anonymity: false,
         likedNum: 0,
         userName: "작성자",
@@ -26,10 +28,31 @@ describe("comment dto.schema", () => {
         postId: 10,
         parentId: 1,
         content: "대댓글입니다.",
+        deleted: true,
+        hide: false,
         anonymity: true,
-        likedNum: 0,
+        likedNum: null,
         userName: "답글 작성자",
         createdAt: "2026-01-02",
+      },
+    ]);
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it("댓글의 deleted, hide와 null 추천 수를 검증한다", () => {
+    const parsed = commentListResponseDtoSchema.safeParse([
+      {
+        commentId: 1,
+        postId: 10,
+        parentId: null,
+        content: "삭제된 댓글입니다.",
+        userName: "작성자",
+        deleted: true,
+        hide: false,
+        anonymity: true,
+        likedNum: null,
+        createdAt: "07/21 14:09",
       },
     ]);
 

@@ -28,6 +28,8 @@ describe("fetchCommentList", () => {
         postId: 10,
         parentId: null,
         content: "댓글입니다.",
+        deleted: false,
+        hide: false,
         anonymity: false,
         likedNum: 3,
         userName: "작성자",

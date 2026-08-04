@@ -26,8 +26,10 @@ export function mapCommentDtoToComment(raw: unknown): Comment {
     postId: number;
     parentId: number | null;
     content: string;
+    deleted: boolean;
+    hide: boolean;
     anonymity: boolean;
-    likedNum: number;
+    likedNum: number | null;
     userName: string | null;
     profile?: unknown | null;
     createdAt: string;
@@ -40,7 +42,7 @@ export function mapCommentDtoToComment(raw: unknown): Comment {
     parentId: dto.parentId,
     content: dto.content,
     anonymity: dto.anonymity,
-    likedNum: dto.likedNum,
+    likedNum: dto.likedNum ?? 0,
     // userName null만 탈퇴/삭제로 본다. (authorUsername null과는 별개 — 자유게시판 정상값)
     userName: dto.userName ?? "탈퇴한 회원",
     profile:

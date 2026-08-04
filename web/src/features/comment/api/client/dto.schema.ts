@@ -22,8 +22,10 @@ export const commentDtoSchema: z.ZodType<unknown> = z.lazy(() =>
     postId: z.number(),
     parentId: z.number().nullable(),
     content: z.string(),
+    deleted: z.boolean(),
+    hide: z.boolean(),
     anonymity: z.boolean(),
-    likedNum: z.number(),
+    likedNum: z.number().nullable(),
     /**
      * 표시용 이름. 자유 게시판에서는 게시물별 랜덤 닉네임.
      * null은 삭제·탈퇴 등 예외 케이스. authorUsername null과는 의미가 다름.
