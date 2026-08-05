@@ -27,7 +27,7 @@ export const NearLightningCard = memo(function NearLightningCard({
             <span className="flex size-5 items-center justify-center">
               <MapPinIcon className="size-full text-primary" />
             </span>
-            <span className="text-grey-700 text-[12px]">{parseDistanceToString(distanceInMeters)}</span>
+            <span className="text-grey-500 text-[12px]">{parseDistanceToString(distanceInMeters)}</span>
           </span>
         </div>
         <h1 className="text-grey-800 text-center font-semibold text-[16px] h-[36px]">

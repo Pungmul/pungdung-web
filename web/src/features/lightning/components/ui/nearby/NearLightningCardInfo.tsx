@@ -34,7 +34,7 @@ function NearLightningLocation({ buildingName, locationDetail }: { buildingName:
         <span className="size-5 flex items-center justify-center">
           <MapPinIcon className="size-full text-primary" />
         </span>
-        <h3 className="text-m1 font-normal text-grey-600">{locationDetail}</h3>
+        <h3 className="text-m1 font-normal text-grey-500">{locationDetail}</h3>
       </div>
     );
   }
@@ -45,7 +45,7 @@ function NearLightningLocation({ buildingName, locationDetail }: { buildingName:
         <span className="size-5 flex items-center justify-center">
           <MapPinIcon className="size-full text-primary" />
         </span>
-        <h3 className="text-m1 font-normal text-grey-600">{buildingName}</h3>
+        <h3 className="text-m1 font-normal text-grey-500">{buildingName}</h3>
       </div>
     );
   }
@@ -56,8 +56,8 @@ function NearLightningLocation({ buildingName, locationDetail }: { buildingName:
         <MapPinIcon className="size-full text-primary" />
       </span>
       <div className="flex flex-col items-start gap-4">
-        <h3 className="text-m1 font-normal text-grey-600">{buildingName}</h3>
-        <h3 className="text-m1 font-normal text-grey-600">{locationDetail}</h3>
+        <h3 className="text-m1 font-normal text-grey-500">{buildingName}</h3>
+        <h3 className="text-m1 font-normal text-grey-500">{locationDetail}</h3>
       </div>
     </div>
   );
@@ -69,7 +69,7 @@ function NearLightningTime({ startTime, endTime }: { startTime: string, endTime:
       <span className="size-5 flex items-center justify-center">
         <ClockIcon className="size-full text-primary" />
       </span>
-      <h3 className="text-m1 font-normal text-grey-600">{dayjs(startTime).format("HH:mm")}~{dayjs(endTime).format("HH:mm")}</h3>
+      <h3 className="text-m1 font-normal text-grey-500">{dayjs(startTime).format("HH:mm")}~{dayjs(endTime).format("HH:mm")}</h3>
     </div>
   );
 }
