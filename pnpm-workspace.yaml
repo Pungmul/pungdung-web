@@ -10,6 +10,7 @@ overrides:
   "@types/react-dom": 19.2.3
 allowBuilds:
   '@firebase/util': true
+  '@sentry/cli': false
   core-js: true
   es5-ext: true
   esbuild: true
