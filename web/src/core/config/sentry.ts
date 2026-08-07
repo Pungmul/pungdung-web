@@ -76,6 +76,10 @@ function isOfflineNetworkError(error: unknown): boolean {
   const status = "status" in error ? error.status : undefined;
   const code = "code" in error ? error.code : undefined;
 
+  if (code === "INVALID_REQUEST_BODY") {
+    return false;
+  }
+
   // fetch 실패를 ClientApiError(status 0, NETWORK_ERROR)로 감싼 경우. 기기 오프라인/탭 이동이지 서버 장애 아님
   return status === 0 || code === "NETWORK_ERROR";
 }
@@ -100,6 +104,10 @@ function scrubSentryEvent(
   event: ErrorEvent,
   hint: EventHint
 ): ErrorEvent | null {
+  if (String(event.tags?.report_class ?? "") !== "failure") {
+    return null;
+  }
+
   const original = hint.originalException;
 
   // 요청 취소나 네트워크 단절 이벤트는 이슈에서 제외
