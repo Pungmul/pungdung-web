@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { reportAppError } from "@/core/config/report-app-error";
+
 import { ClientApiError } from "./client-api-error";
 import { CLIENT_API_ERROR_CODE } from "./constant";
 import { resolveClientApiBody } from "./resolve-client-api-body";
@@ -143,40 +145,45 @@ export async function clientApiRequest<
   responseSchema,
   signal,
 }: ClientApiRequestOptions<TResponse, TRequestSchema>): Promise<TResponse> {
-  if (body !== undefined && requestBodySchema) {
-    const parsedRequestBody = requestBodySchema.safeParse(body);
-    if (!parsedRequestBody.success) {
-      throw createClientApiError({
-        status: 0,
-        code: CLIENT_API_ERROR_CODE.INVALID_REQUEST_BODY,
-        message: "요청 바디 형식이 올바르지 않습니다.",
-        payload: JSON.stringify(body),
-        details: parsedRequestBody.error.issues,
-      });
+  try {
+    if (body !== undefined && requestBodySchema) {
+      const parsedRequestBody = requestBodySchema.safeParse(body);
+      if (!parsedRequestBody.success) {
+        throw createClientApiError({
+          status: 0,
+          code: CLIENT_API_ERROR_CODE.INVALID_REQUEST_BODY,
+          message: "요청 바디 형식이 올바르지 않습니다.",
+          payload: JSON.stringify(body),
+          details: parsedRequestBody.error.issues,
+        });
+      }
     }
-  }
 
-  const requestInitInput: {
-    method?: HttpMethod;
-    headers?: HeadersInit;
-    body?: unknown;
-  } = { method, body };
-  if (headers !== undefined) {
-    requestInitInput.headers = headers;
-  }
+    const requestInitInput: {
+      method?: HttpMethod;
+      headers?: HeadersInit;
+      body?: unknown;
+    } = { method, body };
+    if (headers !== undefined) {
+      requestInitInput.headers = headers;
+    }
 
-  const init: RequestInit = createRequestInit(requestInitInput);
-  if (signal !== undefined) {
-    init.signal = signal;
-  }
+    const init: RequestInit = createRequestInit(requestInitInput);
+    if (signal !== undefined) {
+      init.signal = signal;
+    }
 
-  const response = await safeFetch(url, init);
-  const parsedJson = await parseJsonSafely(response);
-  const raw = parsedJson.ok ? parsedJson.data : null;
-  return resolveClientApiBody(
-    raw,
-    response.ok,
-    response.status,
-    responseSchema
-  );
+    const response = await safeFetch(url, init);
+    const parsedJson = await parseJsonSafely(response);
+    const raw = parsedJson.ok ? parsedJson.data : null;
+    return resolveClientApiBody(
+      raw,
+      response.ok,
+      response.status,
+      responseSchema
+    );
+  } catch (error) {
+    reportAppError(error, { boundary: "api", endpoint: url, method });
+    throw error;
+  }
 }

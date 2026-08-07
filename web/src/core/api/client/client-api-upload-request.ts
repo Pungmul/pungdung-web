@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { reportAppError } from "@/core/config/report-app-error";
+
 import { ClientApiError } from "./client-api-error";
 import { CLIENT_API_ERROR_CODE } from "./constant";
 import { resolveClientApiBody } from "./resolve-client-api-body";
@@ -51,6 +53,11 @@ export function clientApiMultipartUploadRequest<TResponse>({
   onUploadFinished?: () => void;
 }): Promise<TResponse> {
   return new Promise((resolve, reject) => {
+    const rejectReported = (error: unknown) => {
+      reportAppError(error, { boundary: "api", endpoint: url, method });
+      reject(error);
+    };
+
     const xhr = new XMLHttpRequest();
     xhr.withCredentials = true;
 
@@ -85,7 +92,7 @@ export function clientApiMultipartUploadRequest<TResponse>({
     });
 
     xhr.onerror = () => {
-      reject(
+      rejectReported(
         new ClientApiError({
           status: 0,
           code: CLIENT_API_ERROR_CODE.NETWORK_ERROR,
@@ -100,7 +107,7 @@ export function clientApiMultipartUploadRequest<TResponse>({
       try {
         const text = xhr.responseText;
         if (!text.trim()) {
-          reject(
+          rejectReported(
             new ClientApiError({
               status: xhr.status,
               code: CLIENT_API_ERROR_CODE.INVALID_RESPONSE,
@@ -112,7 +119,7 @@ export function clientApiMultipartUploadRequest<TResponse>({
         }
         raw = JSON.parse(text) as unknown;
       } catch (error) {
-        reject(
+        rejectReported(
           new ClientApiError({
             status: xhr.status,
             code: CLIENT_API_ERROR_CODE.INVALID_RESPONSE,
@@ -129,7 +136,7 @@ export function clientApiMultipartUploadRequest<TResponse>({
           resolveClientApiBody(raw, httpOk, xhr.status, responseSchema)
         );
       } catch (error) {
-        reject(error);
+        rejectReported(error);
       }
     };
 

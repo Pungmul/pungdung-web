@@ -1,5 +1,8 @@
+import { ROUTE_FAILURE_CODE } from "@/core/config/route-failure-code";
+
 import { AuthError } from "./auth-error.class";
 import { clearTokenCookies } from "./clean-token-cookies";
+import { reportRouteAppError } from "./report-route-app-error";
 
 export function isUserFacingError(message: string): boolean {
   return (
@@ -31,8 +34,18 @@ export function proxyFailureError(
     );
   }
 
+  reportRouteAppError({
+    status: 500,
+    code: ROUTE_FAILURE_CODE.PROXY_FAILURE,
+    message,
+  });
   return Response.json(
-    { code: "PROXY_FAILURE", message, response: null, isSuccess: false },
+    {
+      code: ROUTE_FAILURE_CODE.PROXY_FAILURE,
+      message,
+      response: null,
+      isSuccess: false,
+    },
     { status: 500 }
   );
 }

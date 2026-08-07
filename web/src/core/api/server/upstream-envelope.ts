@@ -1,3 +1,6 @@
+import { ROUTE_FAILURE_CODE } from "@/core/config/route-failure-code";
+
+import { reportRouteAppError } from "./report-route-app-error";
 import type { ValidateUpstreamResult } from "./type";
 import { upstreamEnvelopeSchema } from "./type";
 
@@ -7,34 +10,18 @@ export async function validateUpstreamJsonResponse(
   const raw = await response.json().catch(() => null);
 
   if (raw === null) {
-    return {
-      ok: false,
-      error: {
-        status: 502,
-        body: {
-          code: "UPSTREAM_INVALID_JSON",
-          message: "서버 응답을 해석할 수 없습니다.",
-          response: null,
-          isSuccess: false,
-        },
-      },
-    };
+    return invalidUpstreamResult(
+      ROUTE_FAILURE_CODE.UPSTREAM_INVALID_JSON,
+      "서버 응답을 해석할 수 없습니다."
+    );
   }
 
   const parsed = upstreamEnvelopeSchema.safeParse(raw);
   if (!parsed.success) {
-    return {
-      ok: false,
-      error: {
-        status: 502,
-        body: {
-          code: "UPSTREAM_INVALID_RESPONSE",
-          message: "서버 응답 형식이 올바르지 않습니다.",
-          response: null,
-          isSuccess: false,
-        },
-      },
-    };
+    return invalidUpstreamResult(
+      ROUTE_FAILURE_CODE.UPSTREAM_INVALID_RESPONSE,
+      "서버 응답 형식이 올바르지 않습니다."
+    );
   }
 
   return {
@@ -66,4 +53,27 @@ export async function createValidatedUpstreamResponse(
     },
     { status: response.status }
   );
+}
+
+function invalidUpstreamResult(
+  code: string,
+  message: string
+): Extract<ValidateUpstreamResult, { ok: false }> {
+  reportRouteAppError({
+    status: 502,
+    code,
+    message,
+  });
+  return {
+    ok: false,
+    error: {
+      status: 502,
+      body: {
+        code,
+        message,
+        response: null,
+        isSuccess: false,
+      },
+    },
+  };
 }

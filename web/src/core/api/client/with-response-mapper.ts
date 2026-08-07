@@ -1,3 +1,5 @@
+import { reportAppError } from "@/core/config/report-app-error";
+
 import { ClientApiError } from "./client-api-error";
 import { ClientMapperError } from "./client-mapper-error";
 
@@ -18,10 +20,15 @@ export async function withResponseMapper<TDto, TModel>(options: {
     if (error instanceof ClientApiError) {
       throw error;
     }
-    throw new ClientMapperError({
+    const mapperError = new ClientMapperError({
       message: "응답을 앱 모델로 변환하는 데 실패했습니다.",
       context: options.context,
       cause: error,
     });
+    reportAppError(mapperError, {
+      boundary: "api",
+      endpoint: options.context,
+    });
+    throw mapperError;
   }
 }
