@@ -12,15 +12,15 @@ import { PostBoxSkeleton, PostList } from "@/features/post";
 
 import { LinkChipButton, ListEmptyView } from "@/shared/components";
 
-import { useDebouncedFetchNextPage } from "../../hooks/view-model/useDebouncedFetchNextPage";
-import { boardQueries } from "../../queries";
+import { useDebouncedFetchNextPage } from "../../../hooks/view-model/useDebouncedFetchNextPage";
+import { boardQueries } from "../../../queries";
 import {
   deriveBoardPostList,
   deriveBoardPostListHasNextPage,
-} from "../../services";
-import type { BoardOverview } from "../../types";
-import { HotPostBanner } from "../ui/HotPostBanner";
-import { HotPostBannerSkeleton } from "../ui/HotPostBannerSkeleton";
+} from "../../../services";
+import type { BoardOverview } from "../../../types";
+import { HotPostBanner } from "../../ui/HotPostBanner";
+import { HotPostBannerSkeleton } from "../../ui/HotPostBannerSkeleton";
 
 export interface BoardDetailContentProps {
   /** 루트 게시판 상세(자식 탭 없을 때 목록 폴백 소스) */

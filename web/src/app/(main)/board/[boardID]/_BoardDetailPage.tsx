@@ -2,14 +2,11 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { Suspense } from "@suspensive/react";
-
 import { SkeletonView } from "@/shared";
 
 import {
   BoardChildCategoryTabs,
   BoardDetailContent,
-  BoardDetailContentLoading,
 } from "@/features/board/components";
 import { useTrackBoardVisit } from "@/features/board/hooks/actions";
 import { useBoardTabNavigation } from "@/features/board/hooks/view-model";
@@ -52,17 +49,13 @@ export function BoardDetailPage({
         ) :
           <SkeletonView className="w-80 h-10 rounded-sm" />
         : null}
-      <Suspense
-        key={`board-detail-content-${postListBoardId}`}
-        fallback={<BoardDetailContentLoading />}
-      >
         <BoardDetailContent
+          key={`board-detail-content-${postListBoardId}`}
           boardData={boardData}
           postListBoardId={postListBoardId}
           hasChildCategories={hasChildCategories}
           isGuest={isGuest}
         />
-      </Suspense>
     </section>
   );
 }

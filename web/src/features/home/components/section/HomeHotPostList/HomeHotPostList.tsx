@@ -8,7 +8,10 @@ import { boardQueries } from "@/features/board";
 import { PostBox } from "@/features/post";
 
 export function HomeHotPostList() {
-  const { data } = useInfiniteQuery(boardQueries.hotPostList());
+  const { data } = useInfiniteQuery({
+    ...boardQueries.hotPostList(),
+    throwOnError: true,
+  });
   const hotPosts = data?.pages[0]?.list;
 
   const firstThumbnailIndex =

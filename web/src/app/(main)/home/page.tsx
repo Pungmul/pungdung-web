@@ -53,14 +53,7 @@ export default async function Home() {
               <span className="text-grey-400 text-m1">{timeString}기준</span>
             </div>
             <div className="px-[32px]">
-              <Suspense
-                clientOnly
-                fallback={
-                  <SkeletonView className="w-full h-[560px] rounded-[8px] md:rounded-[4px]" />
-                }
-              >
-                <HomeHotPostList />
-              </Suspense>
+              <HomeHotPostList />
             </div>
           </section>
         </main>

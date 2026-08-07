@@ -17,12 +17,12 @@ import { Header, LinkChipButton, ListEmptyView } from "@/shared/components";
 import { useBodyScrollLock, useViewportHeightVar } from "@/shared/hooks";
 import { cn, useView } from "@/shared/lib";
 
-import { PostContent } from "./PostContent";
-import { PostMenu } from "./PostMenu";
-import { usePostDetailPageViewModel } from "../../hooks/view-model";
-import type { PostArticleDetail } from "../../types";
-import { ReportPostModal } from "../overlay/ReportPostModal";
-import { PostContentSkeleton } from "../ui/PostContentSkeleton";
+import { usePostDetailPageViewModel } from "../../../hooks/view-model";
+import type { PostArticleDetail } from "../../../types";
+import { ReportPostModal } from "../../overlay/ReportPostModal";
+import { PostContentSkeleton } from "../../ui/PostContentSkeleton";
+import { PostContent } from "../PostContent";
+import { PostMenu } from "../PostMenu";
 
 export function PostDetailComponent({
   postId,

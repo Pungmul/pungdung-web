@@ -7,7 +7,7 @@ export { default as NotificationIcon } from "./ui/NotificationIcon";
 export { default as NotificationToggle } from "./ui/NotificationToggle";
 
 // Notification Section Components
-export { default as NotificationList } from "./section/NotificationList";
+export { NotificationList } from "./section/NotificationList";
 export { default as NotificationPermissionRequestCTA } from "./section/NotificationPermissionRequestCTA";
 
 // Notification Overlay Components

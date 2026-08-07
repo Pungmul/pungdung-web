@@ -1,12 +1,10 @@
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 
-import { Suspense } from "@suspensive/react";
-
 import { hasAuthSessionCookie, LoginRequiredPage } from "@/features/auth";
 import { NotificationList } from "@/features/notification";
 
-import { Header, Spinner } from "@/shared";
+import { Header } from "@/shared";
 
 export const metadata: Metadata = {
   title: "풍덩 | 알림",
@@ -30,15 +28,7 @@ export default async function NotificationPage() {
   return (
     <div className="flex flex-col h-full">
       <Header title="알림" />
-      <Suspense
-        clientOnly
-        fallback={
-          <div className="flex items-center justify-center h-full">
-            <Spinner size={32} />
-          </div>
-        }>
-        <NotificationList />
-      </Suspense>
+      <NotificationList />
     </div>
   );
 }

@@ -1,11 +1,11 @@
 "use client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import UnreadNotificationItems from "./UnreadNotificationItems";
-import { useNotificationReadActions } from "../../hooks/actions";
-import { notificationQueries } from "../../queries";
+import { useNotificationReadActions } from "../../../hooks/actions";
+import { notificationQueries } from "../../../queries";
+import UnreadNotificationItems from "../UnreadNotificationItems";
 
-export default function NotificationList() {
+export function NotificationList() {
   const { data: notReadMessage } = useSuspenseQuery(
     notificationQueries.unreadList()
   );

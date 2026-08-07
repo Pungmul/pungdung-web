@@ -2,14 +2,12 @@
 
 import { type RefObject } from "react";
 
-import { Suspense } from "@suspensive/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { Spinner } from "@/shared";
 import { Header } from "@/shared/components/layout/Header";
 
-import NotificationList from "../section/NotificationList";
+import { NotificationList } from "../section/NotificationList";
 
 interface NotificationPanelOverlayProps {
   isOpen: boolean;
@@ -52,16 +50,7 @@ export default function NotificationPanelOverlay({
                 </div>
               }
             />
-            <Suspense
-              clientOnly
-              fallback={
-                <div className="flex items-center justify-center h-full">
-                  <Spinner size={32} />
-                </div>
-              }
-            >
-              <NotificationList />
-            </Suspense>
+            <NotificationList />
           </div>
         </motion.div>
       ) : null}

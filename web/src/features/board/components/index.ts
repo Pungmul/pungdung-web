@@ -1,6 +1,5 @@
 export {
   BoardDetailContent,
-  BoardDetailContentLoading,
   type BoardDetailContentProps,
 } from "./section/BoardDetailContent";
 export { BoardHeader } from "./section/BoardHeader";

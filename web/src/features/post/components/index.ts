@@ -4,7 +4,7 @@ export { ReportPostModal } from "./overlay/ReportPostModal";
 /** section */
 export { DesktopPostDetail } from "./section/DesktopPostDetail";
 export { PostContent } from "./section/PostContent";
-export { PostDetailComponent } from "./section/PostDetail";
+export { PostDetailComponent } from "./section/PostDetailComponent";
 export { PostImageList } from "./section/PostImageList";
 export { PostLikeButton } from "./section/PostLikeButton";
 export { PostList } from "./section/PostList";
