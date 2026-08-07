@@ -4,7 +4,8 @@ import { useEffect } from "react";
 import Link from "next/link";
 
 import { createWebColorStyleText } from "@pungdung/design-tokens";
-import * as Sentry from "@sentry/nextjs";
+
+import { reportAppError } from "@/core/config/report-app-error";
 
 import { ThemePreferenceBootScript } from "@/shared/components";
 
@@ -21,7 +22,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    reportAppError(error, { boundary: "global" });
   }, [error]);
 
   return (
