@@ -8,15 +8,15 @@ import dayjs from "dayjs";
 
 import { Button, Header } from "@/shared";
 
-import { usePromotionResponseCancelFlow } from "../../../hooks/actions";
-import { promotionQueries } from "../../../queries";
+import { usePromotionResponseCancelFlow } from "../../../../hooks/actions";
+import { promotionQueries } from "../../../../queries";
 import type {
   PromotionApplicantAnswer,
   PromotionApplicationDetail,
   PromotionDetail,
   PromotionPublishedQuestion,
-} from "../../../types";
-import { PromotionProfile } from "../manage/PromotionProfile";
+} from "../../../../types";
+import { PromotionProfile } from "../../manage/PromotionProfile";
 
 export function ResponseDetail({ responseId }: { responseId: string }) {
   const targetPerformanceKey = useSearchParams().get("targetPerformanceKey");

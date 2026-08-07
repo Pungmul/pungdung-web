@@ -8,8 +8,6 @@ import { BoardHeader, boardQueries } from "@/features/board";
 import { prefetchBoardInfoList } from "@/features/board";
 import { UpcomingPerformanceList } from "@/features/promotion";
 
-import UpcomingPromotionsBoundary from "./_UpcomingPromotionsBoundary";
-
 export const metadata: Metadata = {
   title: "풍덩 | 관람 예정 공연",
   description: "관람 예정된 공연 목록 입니다.",
@@ -34,9 +32,7 @@ export default async function UpcomingPerformancePage() {
         <div className="flex flex-col w-full flex-grow relative items-center">
           <div className="w-full max-w-[768px]">
             <section key="upcoming-performance-list-section" className="relative h-full flex flex-col">
-              <UpcomingPromotionsBoundary>
-                <UpcomingPerformanceList />
-              </UpcomingPromotionsBoundary>
+              <UpcomingPerformanceList />
             </section>
           </div>
         </div>

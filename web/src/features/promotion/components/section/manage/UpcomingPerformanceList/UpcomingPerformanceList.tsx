@@ -10,7 +10,7 @@ import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { LinkChipButton, ListEmptyView } from "@/shared/components";
 import type { Address } from "@/shared/types";
 
-import { promotionQueries } from "../../../queries/promotion.query";
+import { promotionQueries } from "../../../../queries/promotion.query";
 
 const defaultUpcomingEmpty = (
   <ListEmptyView
