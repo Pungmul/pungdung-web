@@ -4,6 +4,12 @@ import { useCallback, useState } from "react";
 
 import { useSocketSubscription } from "@pungdung/worker-socket-bridge/react";
 
+import { ClientMapperError } from "@/core/api/client/client-mapper-error";
+import {
+  createSocketContractError,
+  reportAppError,
+} from "@/core/config/report-app-error";
+
 import { normalizeSocketImageMessage } from "../services";
 import { normalizeSocketTextMessage } from "../services";
 import { isImageMessage, isTextMessage, type Message } from "../types";
@@ -70,12 +76,36 @@ export function useChatRoomSocket({
     (raw: unknown) => {
       const parsed = stompTimelineSocketPayloadSchema.safeParse(raw);
       if (!parsed.success) {
+        reportAppError(createSocketContractError(parsed.error.issues), {
+          boundary: "api",
+          feature: "chat",
+          endpoint: `/sub/chat/message/${roomId}`,
+        });
         return;
       }
 
-      onSocketTypedMessage(mapStompTimelineSocketPayloadToMessage(parsed.data));
+      try {
+        onSocketTypedMessage(
+          mapStompTimelineSocketPayloadToMessage(parsed.data)
+        );
+      } catch (error) {
+        const mapperError =
+          error instanceof ClientMapperError
+            ? error
+            : new ClientMapperError({
+                message: "소켓 응답을 앱 모델로 변환하는 데 실패했습니다.",
+                context: `/sub/chat/message/${roomId}`,
+                cause: error,
+              });
+        reportAppError(mapperError, {
+          boundary: "api",
+          feature: "chat",
+          endpoint: `/sub/chat/message/${roomId}`,
+        });
+        throw mapperError;
+      }
     },
-    [onSocketTypedMessage]
+    [onSocketTypedMessage, roomId]
   );
 
   useSocketSubscription({

@@ -10,6 +10,11 @@ import {
   useSocketSubscription,
 } from "@pungdung/worker-socket-bridge/react";
 
+import {
+  createSocketContractError,
+  reportAppError,
+} from "@/core/config/report-app-error";
+
 import { myPageQueries } from "@/features/my-page";
 
 import { MAX_ATTEMPTS, READ_SIGN_CATCH_UP_DELAY_MS } from "../constants";
@@ -262,6 +267,11 @@ export function useRoomReadSocket(
       const runtime = runtimeRef.current;
       const parsed = readSocketMessageSchema.safeParse(message);
       if (!parsed.success) {
+        reportAppError(createSocketContractError(parsed.error.issues), {
+          boundary: "api",
+          feature: "chat",
+          endpoint: `/sub/chat/read/${roomId}`,
+        });
         logReadSignDebug("receive.parse_failed", {
           roomId,
           issues: parsed.error.issues.map((issue) => issue.message),

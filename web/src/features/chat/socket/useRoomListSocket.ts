@@ -6,6 +6,11 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { useSocketSubscription } from "@pungdung/worker-socket-bridge/react";
 
+import {
+  createSocketContractError,
+  reportAppError,
+} from "@/core/config/report-app-error";
+
 import { myPageQueries } from "@/features/my-page";
 
 import { chatQueries } from "../queries";
@@ -32,7 +37,14 @@ export function useRoomListSocket() {
   const receiveMessage = useCallback(
     (raw: unknown) => {
       const parsed = chatRoomUpdateMessageSchema.safeParse(raw);
-      if (!parsed.success) return;
+      if (!parsed.success) {
+        reportAppError(createSocketContractError(parsed.error.issues), {
+          boundary: "api",
+          feature: "chat",
+          endpoint: "/sub/chat/notification",
+        });
+        return;
+      }
 
       if (parsed.data.type === "READ") {
         void applyResetRoomUnreadCount(parsed.data.chatRoomUUID);
