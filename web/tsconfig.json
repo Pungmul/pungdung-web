@@ -45,11 +45,6 @@
   ],
   "exclude": [
     "node_modules",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "src/test/**",
     "vitest.config.ts",
     "../packages/worker-socket-bridge/workers",
     "../packages/worker-socket-bridge/stomp"
