@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 
-import { ErrorBoundary } from "@suspensive/react";
+import { RoomContainer } from "@/features/chat";
 
-import { ChatLoadFailFallback, RoomContainer } from "@/features/chat";
+import { ChatsLayoutBoundary } from "./_ChatsLayoutBoundary";
 
 import { TokenProvider } from "@/features/auth/providers";
 
@@ -14,12 +14,10 @@ export default async function ChatsLayout({
   const token = (await cookies()).get("accessToken")?.value;
 
   return (
-    <ErrorBoundary
-      fallback={ChatLoadFailFallback}
-    >
+    <ChatsLayoutBoundary>
       <TokenProvider token={token}>
         <RoomContainer>{children}</RoomContainer>
       </TokenProvider>
-    </ErrorBoundary>
+    </ChatsLayoutBoundary>
   );
 }

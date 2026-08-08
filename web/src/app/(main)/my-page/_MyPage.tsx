@@ -7,6 +7,10 @@ import { useSuspenseQueries, useSuspenseQuery } from "@tanstack/react-query";
 
 import { ErrorBoundary, Suspense } from "@suspensive/react";
 
+import {
+  isSectionAuthError,
+} from "@/core/config/report-app-error";
+
 import { authQueries, canChangePassword } from "@/features/auth";
 import type { MyPageInfo } from "@/features/my-page";
 import {
@@ -29,6 +33,7 @@ export function MyPageClient() {
         {({ reset: resetQueries }) => (
           <ErrorBoundary
             onReset={resetQueries}
+            shouldCatch={(error) => !isSectionAuthError(error)}
             fallback={() => (
               <Suspense clientOnly fallback={<MyPageClientSkeleton />}>
                 <MyPageClientWithoutPasswordMenu />

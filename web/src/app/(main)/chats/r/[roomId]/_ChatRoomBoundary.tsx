@@ -8,6 +8,11 @@ import type { ErrorBoundaryFallbackProps } from "@suspensive/react";
 import { ErrorBoundary, Suspense } from "@suspensive/react";
 
 import {
+  isSectionAuthError,
+  reportPageRouteAppError,
+} from "@/core/config/report-app-error";
+
+import {
   chatQueries,
   ChatRoomHeader,
   type ChatRoomListItem,
@@ -78,6 +83,10 @@ export default function ChatRoomBoundary({
       {({ reset: resetQueries }) => (
         <ErrorBoundary
           onReset={resetQueries}
+          shouldCatch={(error) => !isSectionAuthError(error)}
+          onError={(error) => {
+            reportPageRouteAppError(error, import.meta.url);
+          }}
           fallback={ChatRoomErrorFallback}
         >
           <Suspense clientOnly fallback={<ChatRoomSuspenseFallback />}>

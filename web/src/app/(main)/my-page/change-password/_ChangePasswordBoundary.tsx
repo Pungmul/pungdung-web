@@ -5,6 +5,11 @@ import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import type { ErrorBoundaryFallbackProps } from "@suspensive/react";
 import { ErrorBoundary, Suspense } from "@suspensive/react";
 
+import {
+  isSectionAuthError,
+  reportPageRouteAppError,
+} from "@/core/config/report-app-error";
+
 import { Button } from "@/shared";
 
 import {
@@ -49,6 +54,10 @@ export default function ChangePasswordBoundary({
       {({ reset: resetQueries }) => (
         <ErrorBoundary
           onReset={resetQueries}
+          shouldCatch={(error) => !isSectionAuthError(error)}
+          onError={(error) => {
+            reportPageRouteAppError(error, import.meta.url);
+          }}
           fallback={ChangePasswordErrorFallback}
         >
           <Suspense clientOnly fallback={<ChangePasswordSuspenseFallback />}>

@@ -5,6 +5,11 @@ import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import type { ErrorBoundaryFallbackProps } from "@suspensive/react";
 import { ErrorBoundary, Suspense } from "@suspensive/react";
 
+import {
+  isSectionAuthError,
+  reportPageRouteAppError,
+} from "@/core/config/report-app-error";
+
 import { Button, Header, Spinner } from "@/shared";
 
 function PromotionDetailSuspenseFallback() {
@@ -43,6 +48,10 @@ export default function PromotionDetailBoundary({ children }: { children: React.
       {({ reset: resetQueries }) => (
         <ErrorBoundary
           onReset={resetQueries}
+          shouldCatch={(error) => !isSectionAuthError(error)}
+          onError={(error) => {
+            reportPageRouteAppError(error, import.meta.url);
+          }}
           fallback={PromotionDetailErrorFallback}
         >
           <Suspense clientOnly fallback={<PromotionDetailSuspenseFallback />}>
