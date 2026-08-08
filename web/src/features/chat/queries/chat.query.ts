@@ -32,7 +32,6 @@ export const chatQueries = {
     queryOptions({
       queryKey: chatQueryInternal.roomLists(),
       queryFn: loadChatRoomList,
-      retry: 2,
       staleTime: DEFAULT_STALE_TIME_MS,
       gcTime: DEFAULT_GC_TIME_MS,
       refetchOnMount: "always",

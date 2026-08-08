@@ -16,6 +16,5 @@ export const clubQueries = {
       queryKey: clubListQueryKeys.list(),
       queryFn: clubListApi,
       staleTime: 1000 * 60 * 60, // 1시간
-      retry: 2,
     }),
 };

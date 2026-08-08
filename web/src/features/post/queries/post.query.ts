@@ -1,5 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 
+import { shouldRetryQuery } from "@/core/config/should-retry-query";
+
 import { fetchPostDetail, isPostDeletedError } from "../api/client";
 
 const postKey = ["post"] as const;
@@ -27,8 +29,10 @@ export const postQueries = {
       },
       staleTime: 1000 * 5,
       retry: (failureCount, error) => {
-        if (isPostDeletedError(error)) return false;
-        return failureCount < 2;
+        if (isPostDeletedError(error)) {
+          return false;
+        }
+        return shouldRetryQuery(failureCount, error);
       },
       refetchOnMount: true,
       refetchOnWindowFocus: true,

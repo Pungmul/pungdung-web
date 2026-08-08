@@ -1,4 +1,6 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient } from "@tanstack/react-query";
+
+import { shouldRetryQuery } from "./should-retry-query";
 
 export function makeQueryClient() {
   return new QueryClient({
@@ -10,13 +12,9 @@ export function makeQueryClient() {
         refetchOnWindowFocus: false,
         refetchOnReconnect: true,
         refetchOnMount: false, // 컴포넌트 마운트 시 자동 리페칭 비활성화
-        retry: (failureCount, error: unknown) => {
-          // 4xx 에러는 재시도하지 않음
-          if (error instanceof Error && error.message.includes("400")) {
-            return false;
-          }
-          return failureCount < 3;
-        },
+        // 실패 후 queryFn 재실행 여부
+        // 4xx는 재시도하지 않음
+        retry: shouldRetryQuery,
       },
       mutations: {
         retry: false,

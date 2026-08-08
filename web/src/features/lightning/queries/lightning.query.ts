@@ -34,7 +34,6 @@ export const lightningQueries = {
       gcTime: 30 * 1000,
       staleTime: 10 * 1000,
       refetchOnMount: true,
-      retry: 2,
     }),
 
   /** 위치 쿼리 키는 `@/features/location`과 동일하게 맞춘다. */
@@ -46,6 +45,5 @@ export const lightningQueries = {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
-      retry: 2,
     }),
 };
