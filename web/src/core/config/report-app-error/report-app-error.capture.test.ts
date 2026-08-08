@@ -59,7 +59,10 @@ describe("reportAppError capture", () => {
         message: "body",
         status: 0,
         code: CLIENT_API_ERROR_CODE.INVALID_REQUEST_BODY,
-        payload: JSON.stringify({ email: "user@example.com", password: "secret" }),
+        payload: JSON.stringify({
+          email: "user@example.com",
+          password: "secret",
+        }),
       }),
       { boundary: "api", endpoint: "/api/auth/sign-up", method: "POST" }
     );
@@ -106,5 +109,28 @@ describe("reportAppError capture", () => {
     );
     expect(lastScope.level).toBe("fatal");
     expect(lastScope.tags.critical_flow).toBe("signup");
+  });
+
+  it("Sentry name만 정규화하고 원본 name은 유지한다", () => {
+    const error = new ClientApiError({
+      message: "down",
+      status: 502,
+      code: "UPSTREAM_BAD_GATEWAY",
+    });
+    reportAppError(error, {
+      boundary: "api",
+      endpoint: "/api/posts/3?q=1",
+      method: "GET",
+    });
+    expect(error.name).toBe("ClientApiError");
+    expect((captureException.mock.calls[0]?.[0] as Error).name).toBe(
+      "[502] GET /api/posts/{id}"
+    );
+    expect(lastScope.fingerprint).toEqual([
+      "failure",
+      "http",
+      "GET",
+      "/api/posts/{id}",
+    ]);
   });
 });

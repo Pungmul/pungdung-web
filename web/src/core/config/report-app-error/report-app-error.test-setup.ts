@@ -4,6 +4,7 @@ export const lastScope = {
   level: undefined as string | undefined,
   tags: {} as Record<string, string>,
   extras: {} as Record<string, unknown>,
+  fingerprint: [] as string[],
 };
 
 export const captureException = vi.fn();
@@ -19,6 +20,7 @@ export function withScope(
   lastScope.level = undefined;
   lastScope.tags = {};
   lastScope.extras = {};
+  lastScope.fingerprint = [];
   callback({
     setLevel: (value) => {
       lastScope.level = value;
@@ -29,7 +31,9 @@ export function withScope(
     setExtra: (key, value) => {
       lastScope.extras[key] = value;
     },
-    setFingerprint: vi.fn(),
+    setFingerprint: (value) => {
+      lastScope.fingerprint = value;
+    },
   });
 }
 
@@ -38,4 +42,5 @@ export function resetSentryMock() {
   lastScope.level = undefined;
   lastScope.tags = {};
   lastScope.extras = {};
+  lastScope.fingerprint = [];
 }

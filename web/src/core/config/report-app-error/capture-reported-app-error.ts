@@ -1,6 +1,9 @@
 import * as Sentry from "@sentry/nextjs";
 
+import { createSentryCaptureError } from "./create-sentry-capture-error";
+import { getReportAppErrorFingerprint } from "./get-report-app-error-fingerprint";
 import { getReportAppErrorLevel } from "./get-report-app-error-level";
+import { getReportAppErrorName } from "./get-report-app-error-name";
 import type {
   ReportAppErrorContext,
   ReportedAppError,
@@ -26,16 +29,14 @@ export function captureReportedAppError(
     if (classified.criticalFlow) {
       scope.setTag("critical_flow", classified.criticalFlow);
     }
-    if (ctx.endpoint) {
-      scope.setFingerprint(["failure", classified.errorKind, ctx.endpoint]);
-    }
+    scope.setFingerprint(getReportAppErrorFingerprint(ctx, classified));
     for (const [key, value] of Object.entries(extras)) {
       if (value !== undefined) {
         scope.setExtra(key, value);
       }
     }
     Sentry.captureException(
-      error instanceof Error ? error : new Error("분류되지 않은 앱 오류")
+      createSentryCaptureError(error, getReportAppErrorName(ctx, classified))
     );
   });
 }
