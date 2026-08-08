@@ -35,6 +35,7 @@ describe("reportAppError capture", () => {
     expect(lastScope.extras.payload).toBeUndefined();
     expect(lastScope.extras.topic).toBeUndefined();
     expect(lastScope.extras.contract_layer).toBe("client_envelope");
+    expect(lastScope.level).toBe("error");
   });
 
   it("INVALID_RESPONSE_SCHEMA는 zod path만 extra에 넣는다", () => {
@@ -65,6 +66,7 @@ describe("reportAppError capture", () => {
     expect(lastScope.tags.error_kind).toBe("http");
     expect(lastScope.extras.payload).toBeUndefined();
     expect(lastScope.extras.payload_bytes).toBeTypeOf("number");
+    expect(lastScope.level).toBe("error");
   });
 
   it("ClientMapperError와 5xx, 렌더 Error를 capture한다", () => {
@@ -90,5 +92,19 @@ describe("reportAppError capture", () => {
       error_kind: "unknown",
       boundary: "global",
     });
+    expect(lastScope.level).toBe("fatal");
+  });
+
+  it("가입 POST 4xx는 fatal이다", () => {
+    reportAppError(
+      new ClientApiError({
+        message: "dup",
+        status: 400,
+        code: "DUPLICATE",
+      }),
+      { boundary: "api", endpoint: "/api/auth/sign-up", method: "POST" }
+    );
+    expect(lastScope.level).toBe("fatal");
+    expect(lastScope.tags.critical_flow).toBe("signup");
   });
 });

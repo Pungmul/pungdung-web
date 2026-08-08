@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 
+import { getReportAppErrorLevel } from "./get-report-app-error-level";
 import type {
   ReportAppErrorContext,
   ReportedAppError,
@@ -15,6 +16,7 @@ export function captureReportedAppError(
   // beforeSend는 report_class=failure만 통과
   // 태그로 이슈를 거름
   Sentry.withScope((scope) => {
+    scope.setLevel(getReportAppErrorLevel(ctx, classified));
     scope.setTag("report_class", "failure");
     scope.setTag("error_kind", classified.errorKind);
     scope.setTag("boundary", ctx.boundary);
