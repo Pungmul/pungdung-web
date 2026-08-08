@@ -3,6 +3,8 @@ export { useBodyScrollLock } from "./useBodyScrollLock";
 export { useClickOutside } from "./useClickOutside";
 export { useIOSKeyboardOpacityFix } from "./useIOSKeyboardOpacityFix";
 export { useKakaoMaps, useKakaoMapsEffect } from "./useKakaoMaps";
+export { useOnlineStatus } from "./useOnlineStatus";
+export { useRecoverOnOnline } from "./useRecoverOnOnline";
 export { useScrollHideComponent } from "./useScrollHideComponent";
 export { useThemePreference } from "./useThemePreference";
 export { useViewportHeightVar } from "./useViewportHeightVar";

@@ -12,6 +12,7 @@ import {
 
 import {
   HeaderProgressBar,
+  OfflineNotice,
   PWAInstallPrompt,
   Tabs,
   ToastHost,
@@ -43,6 +44,9 @@ export default async function RootLayout({
       )}
       <Suspense clientOnly fallback={null}>
         <HeaderProgressBar />
+      </Suspense>
+      <Suspense clientOnly fallback={null}>
+        <OfflineNotice />
       </Suspense>
       <div
         id="main-shell"

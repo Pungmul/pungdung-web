@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { ClientApiError } from "@/core/api/client/client-api-error";
 import { CLIENT_API_ERROR_CODE } from "@/core/api/client/constant";
@@ -50,6 +50,20 @@ describe("shouldRetryQuery", () => {
       count: 0,
       retry: false,
     },
+    {
+      name: "오프라인 네트워크",
+      error: apiError(0, CLIENT_API_ERROR_CODE.NETWORK_ERROR),
+      count: 0,
+      retry: false,
+      offline: true,
+    },
+    {
+      name: "오프라인",
+      error: apiError(502, "UPSTREAM"),
+      count: 0,
+      retry: false,
+      offline: true,
+    },
     { name: "502", error: apiError(502, "UPSTREAM"), count: 0, retry: true },
     {
       name: "502 한도",
@@ -63,7 +77,13 @@ describe("shouldRetryQuery", () => {
       count: 1,
       retry: true,
     },
-  ])("$name", ({ error, count, retry }) => {
+  ])("$name", ({ error, count, retry, offline }) => {
+    if (offline) {
+      vi.stubGlobal("navigator", { ...navigator, onLine: false });
+    }
     expect(shouldRetryQuery(count, error)).toBe(retry);
+    if (offline) {
+      vi.unstubAllGlobals();
+    }
   });
 });

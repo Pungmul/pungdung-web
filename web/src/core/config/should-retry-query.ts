@@ -11,6 +11,9 @@ export function shouldRetryQuery(
   failureCount: number,
   error: unknown
 ): boolean {
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    return false;
+  }
   if (failureCount >= MAX_QUERY_RETRIES) {
     return false;
   }

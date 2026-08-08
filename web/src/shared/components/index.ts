@@ -48,6 +48,7 @@ export { Responsive } from "./Responsive";
 // Note: Responsive는 클라이언트 전용이므로 필요시 직접 import 사용
 // export { Responsive } from './Responsive'
 export { default as MapContainer } from "./MapContainer";
+export { OfflineNotice } from "./OfflineNotice";
 export { PinchZoomPreventionScript } from "./PreventPinchZoom";
 export { default as PromotionList } from "./PromotionList";
 export { default as PWAInstallPrompt } from "./PWAInstallPrompt";
