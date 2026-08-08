@@ -9,7 +9,7 @@ import {
 
 import {
   isSectionAuthError,
-  reportAppError,
+  reportSectionAppError,
 } from "@/core/config/report-app-error";
 
 function NotificationListErrorFallback({
@@ -43,10 +43,7 @@ export function NotificationListErrorBoundary({
           onReset={reset}
           shouldCatch={(error) => !isSectionAuthError(error)}
           onError={(error) => {
-            reportAppError(error, {
-              boundary: "section",
-              feature: "notification",
-            });
+            reportSectionAppError(error, import.meta.url);
           }}
           fallback={NotificationListErrorFallback}
         >

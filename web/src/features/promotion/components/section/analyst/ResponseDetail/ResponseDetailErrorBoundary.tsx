@@ -9,7 +9,7 @@ import {
 
 import {
   isSectionAuthError,
-  reportAppError,
+  reportSectionAppError,
 } from "@/core/config/report-app-error";
 
 import { Button, Header } from "@/shared";
@@ -48,7 +48,7 @@ export function ResponseDetailErrorBoundary({
           onReset={reset}
           shouldCatch={(error) => !isSectionAuthError(error)}
           onError={(error) => {
-            reportAppError(error, { boundary: "section", feature: "promotion" });
+            reportSectionAppError(error, import.meta.url);
           }}
           fallback={ResponseDetailErrorFallback}
         >

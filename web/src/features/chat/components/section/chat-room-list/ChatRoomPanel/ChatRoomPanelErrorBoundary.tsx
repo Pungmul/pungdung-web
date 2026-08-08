@@ -6,7 +6,7 @@ import { ErrorBoundary } from "@suspensive/react";
 
 import {
   isSectionAuthError,
-  reportAppError,
+  reportSectionAppError,
 } from "@/core/config/report-app-error";
 
 import { ChatRoomPanelErrorFallback } from "./ChatRoomPanelErrorFallback";
@@ -23,7 +23,7 @@ export function ChatRoomPanelErrorBoundary({
           onReset={reset}
           shouldCatch={(error) => !isSectionAuthError(error)}
           onError={(error) => {
-            reportAppError(error, { boundary: "section", feature: "chat" });
+            reportSectionAppError(error, import.meta.url);
           }}
           fallback={ChatRoomPanelErrorFallback}
         >

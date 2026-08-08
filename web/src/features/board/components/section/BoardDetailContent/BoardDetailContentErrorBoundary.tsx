@@ -9,7 +9,7 @@ import {
 
 import {
   isSectionAuthError,
-  reportAppError,
+  reportSectionAppError,
 } from "@/core/config/report-app-error";
 
 function BoardDetailContentErrorFallback({
@@ -43,7 +43,7 @@ export function BoardDetailContentErrorBoundary({
           onReset={reset}
           shouldCatch={(error) => !isSectionAuthError(error)}
           onError={(error) => {
-            reportAppError(error, { boundary: "section", feature: "board" });
+            reportSectionAppError(error, import.meta.url);
           }}
           fallback={BoardDetailContentErrorFallback}
         >

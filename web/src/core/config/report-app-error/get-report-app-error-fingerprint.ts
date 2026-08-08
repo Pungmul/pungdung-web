@@ -6,7 +6,7 @@ import type {
 
 // 이슈 그룹
 // API는 정규화 경로. feature는 태그
-// 렌더는 경계와 feature
+// 렌더는 경계/feature/component
 export function getReportAppErrorFingerprint(
   ctx: ReportAppErrorContext,
   classified: ReportedAppError
@@ -21,7 +21,13 @@ export function getReportAppErrorFingerprint(
     ctx.boundary === "segment" ||
     ctx.boundary === "global"
   ) {
-    return ["failure", "render", ctx.boundary, ctx.feature ?? "none"];
+    return [
+      "failure",
+      "render",
+      ctx.boundary,
+      ctx.feature ?? "none",
+      ctx.component ?? "none",
+    ];
   }
   return ["failure", classified.errorKind, ctx.boundary];
 }

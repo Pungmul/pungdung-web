@@ -13,6 +13,7 @@ export type ReportAppErrorBoundary =
 export type ReportAppErrorContext = {
   boundary: ReportAppErrorBoundary;
   feature?: string;
+  component?: string;
   endpoint?: string;
   method?: string;
 };

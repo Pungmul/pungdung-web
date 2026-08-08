@@ -24,12 +24,22 @@ describe("getReportAppErrorFingerprint", () => {
     ).toEqual(["failure", "http", "GET", "/api/posts/{id}"]);
   });
 
-  it("렌더는 경계와 feature로 묶는다", () => {
+  it("렌더는 경계와 feature, 컴포넌트로 묶는다", () => {
     expect(
       getReportAppErrorFingerprint(
-        { boundary: "section", feature: "home" },
+        {
+          boundary: "section",
+          feature: "home",
+          component: "HomeHotPostList",
+        },
         { action: "report", errorKind: "unknown", extras: {} }
       )
-    ).toEqual(["failure", "render", "section", "home"]);
+    ).toEqual([
+      "failure",
+      "render",
+      "section",
+      "home",
+      "HomeHotPostList",
+    ]);
   });
 });

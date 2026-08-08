@@ -9,7 +9,7 @@ import {
 
 import {
   isSectionAuthError,
-  reportAppError,
+  reportSectionAppError,
 } from "@/core/config/report-app-error";
 
 import { Button } from "@/shared";
@@ -47,7 +47,7 @@ export function UpcomingPerformanceListErrorBoundary({
           onReset={reset}
           shouldCatch={(error) => !isSectionAuthError(error)}
           onError={(error) => {
-            reportAppError(error, { boundary: "section", feature: "promotion" });
+            reportSectionAppError(error, import.meta.url);
           }}
           fallback={UpcomingPerformanceListErrorFallback}
         >

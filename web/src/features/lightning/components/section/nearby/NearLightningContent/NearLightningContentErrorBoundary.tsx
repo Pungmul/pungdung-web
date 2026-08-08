@@ -9,7 +9,7 @@ import {
 
 import {
   isSectionAuthError,
-  reportAppError,
+  reportSectionAppError,
 } from "@/core/config/report-app-error";
 
 function NearLightningContentErrorFallback({
@@ -51,7 +51,7 @@ export function NearLightningContentErrorBoundary({
           onReset={reset}
           shouldCatch={(error) => !isSectionAuthError(error)}
           onError={(error) => {
-            reportAppError(error, { boundary: "section", feature: "lightning" });
+            reportSectionAppError(error, import.meta.url);
           }}
           fallback={NearLightningContentErrorFallback}
         >

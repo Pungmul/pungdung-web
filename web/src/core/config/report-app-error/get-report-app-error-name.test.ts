@@ -19,13 +19,17 @@ describe("getReportAppErrorName", () => {
     ).toBe("[502] GET /api/posts/{id}");
   });
 
-  it("섹션 렌더는 경계와 feature를 넣는다", () => {
+  it("섹션 렌더는 경계, feature, 컴포넌트를 넣는다", () => {
     expect(
       getReportAppErrorName(
-        { boundary: "section", feature: "home" },
+        {
+          boundary: "section",
+          feature: "home",
+          component: "HomeHotPostList",
+        },
         { action: "report", errorKind: "unknown", extras: {} }
       )
-    ).toBe("[render] section:home");
+    ).toBe("[render] section:home:HomeHotPostList");
   });
 
   it("소켓은 feature 태그용 경로만 name에 넣는다", () => {

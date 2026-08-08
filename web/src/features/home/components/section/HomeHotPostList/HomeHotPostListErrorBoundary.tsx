@@ -9,7 +9,7 @@ import {
 
 import {
   isSectionAuthError,
-  reportAppError,
+  reportSectionAppError,
 } from "@/core/config/report-app-error";
 
 function HomeHotPostListErrorFallback({
@@ -43,7 +43,7 @@ export function HomeHotPostListErrorBoundary({
           onReset={reset}
           shouldCatch={(error) => !isSectionAuthError(error)}
           onError={(error) => {
-            reportAppError(error, { boundary: "section", feature: "home" });
+            reportSectionAppError(error, import.meta.url);
           }}
           fallback={HomeHotPostListErrorFallback}
         >

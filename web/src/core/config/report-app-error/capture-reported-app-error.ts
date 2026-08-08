@@ -26,6 +26,9 @@ export function captureReportedAppError(
     if (ctx.feature) {
       scope.setTag("feature", ctx.feature);
     }
+    if (ctx.component) {
+      scope.setTag("component", ctx.component);
+    }
     if (classified.criticalFlow) {
       scope.setTag("critical_flow", classified.criticalFlow);
     }
@@ -60,6 +63,9 @@ function buildCaptureExtras(
   }
   if (ctx.feature) {
     extras.feature = ctx.feature;
+  }
+  if (ctx.component) {
+    extras.component = ctx.component;
   }
   if (shouldAttachDeviceExtras(ctx, classified)) {
     Object.assign(extras, collectDeviceExtras());

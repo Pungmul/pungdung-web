@@ -42,7 +42,7 @@ function isRenderBoundary(
 }
 
 function formatRenderLocation(ctx: ReportAppErrorContext): string {
-  return [ctx.boundary, ctx.feature]
+  return [ctx.boundary, ctx.feature, ctx.component]
     .filter((part): part is string => Boolean(part))
     .join(":");
 }
