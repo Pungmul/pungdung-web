@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 import { ClientSocketManagerProvider } from "@pungdung/worker-socket-bridge/react";
 
-import { getSocketManager } from "@/core/config/socketManager";
+import { getSocketManager } from "../config/socket/socketManager";
 
 type SocketProviderProps = {
   /** SocketManager가 준비된 뒤 provider 안에서만 마운트되는 lifecycle 슬롯 */

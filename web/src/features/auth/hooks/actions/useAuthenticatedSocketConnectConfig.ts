@@ -6,7 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import type { SocketConfig } from "@pungdung/worker-socket-bridge/protocol";
 
-import { createAuthenticatedSocketConfig } from "@/core/config/socketConnect";
+import { createAuthenticatedSocketConfig } from "@/core/config/socket";
 
 import { authQueries } from "../../queries";
 

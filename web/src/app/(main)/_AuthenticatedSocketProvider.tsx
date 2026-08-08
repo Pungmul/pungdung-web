@@ -16,7 +16,7 @@ import {
   isSocketReconnectReason,
   reportAppError,
 } from "@/core/config/report-app-error";
-import { createAuthenticatedSocketConfig } from "@/core/config/socketConnect";
+import { createAuthenticatedSocketConfig } from "@/core/config/socket";
 
 import { useAuthenticatedSocketConnectConfig } from "@/features/auth/hooks/actions/useAuthenticatedSocketConnectConfig";
 import { useSocketReconnectTokenRefresh } from "@/features/auth/hooks/actions/useSocketReconnectTokenRefresh";

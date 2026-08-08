@@ -7,7 +7,7 @@ import type {
   ReportAppErrorContext,
 } from "./report-app-error.types";
 import { buildClientApiExtras } from "./report-app-error-extras";
-import { ROUTE_REPORTED_CODES } from "./route-failure-code";
+import { ROUTE_REPORTED_CODES } from "../route-failure-code";
 
 // ClientApiError 허용/거부
 // NETWORK_ERROR, status 0, 401/403, 일반 4xx는 drop

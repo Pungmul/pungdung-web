@@ -5,7 +5,7 @@ import type {
   SocketContractError,
   ZodIssueSummary,
 } from "./report-app-error.types";
-import { ROUTE_FAILURE_CODE } from "./route-failure-code";
+import { ROUTE_FAILURE_CODE } from "../route-failure-code";
 
 // Sentry extra
 // status, api_code, payload 바이트, Zod path/code만
