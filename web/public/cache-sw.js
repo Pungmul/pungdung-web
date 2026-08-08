@@ -1,9 +1,13 @@
 /**
  * FCM 서비스 워커에서 importScripts로만 로드됨.
  * 동일 오리진/스코프에 SW를 두 개 등록하면 마지막 등록만 활성화되므로 단독 register 하지 않는다.
+ *
+ * 캐시 이름 버스트: `pungdung-static-v2` — `/offline.html` precache 추가.
+ * 이전 `pungdung-static-*` 는 activate에서 삭제한다.
  */
 
-const CACHE_STATIC = "pungdung-static-v1";
+const CACHE_STATIC = "pungdung-static-v2";
+const OFFLINE_DOCUMENT = "/offline.html";
 
 /** @param {URL} url */
 function isSameOriginAsset(url) {
@@ -30,8 +34,44 @@ function shouldBypassCache(url) {
   );
 }
 
-self.addEventListener("install", () => {
-  self.skipWaiting();
+function cacheFirstStatic(request) {
+  return caches.open(CACHE_STATIC).then((cache) =>
+    cache.match(request).then((cached) => {
+      if (cached) return cached;
+
+      return fetch(request).then((response) => {
+        if (response.ok) {
+          void cache.put(request, response.clone());
+        }
+        return response;
+      });
+    })
+  );
+}
+
+function respondWithOfflineDocument() {
+  return caches.match(OFFLINE_DOCUMENT).then((cached) => {
+    if (cached) return cached;
+    return new Response("인터넷 연결이 끊겼습니다.", {
+      status: 503,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
+  });
+}
+
+// 문서 navigate는 network-first
+// 성공 HTML은 캐시하지 않음
+function handleNavigate(request) {
+  return fetch(request).catch(() => respondWithOfflineDocument());
+}
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches
+      .open(CACHE_STATIC)
+      .then((cache) => cache.add(OFFLINE_DOCUMENT))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", (event) => {
@@ -61,20 +101,12 @@ self.addEventListener("fetch", (event) => {
 
   if (shouldBypassCache(url)) return;
 
+  if (event.request.mode === "navigate") {
+    event.respondWith(handleNavigate(event.request));
+    return;
+  }
+
   if (!isStaticPublicPath(url)) return;
 
-  event.respondWith(
-    caches.open(CACHE_STATIC).then((cache) =>
-      cache.match(event.request).then((cached) => {
-        if (cached) return cached;
-
-        return fetch(event.request).then((response) => {
-          if (response.ok) {
-            void cache.put(event.request, response.clone());
-          }
-          return response;
-        });
-      })
-    )
-  );
+  event.respondWith(cacheFirstStatic(event.request));
 });

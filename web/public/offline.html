@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <title>풍덩 | 오프라인</title>
+    <style>
+      :root {
+        --sat: env(safe-area-inset-top, 0px);
+        --sab: env(safe-area-inset-bottom, 0px);
+        --sal: env(safe-area-inset-left, 0px);
+        --sar: env(safe-area-inset-right, 0px);
+        --background: #ffffff;
+        --grey-100: #f7f7f8;
+        --grey-300: #dfe1e4;
+        --grey-600: #73757a;
+        --grey-700: #43454a;
+        --grey-800: #232424;
+        --red-100: #ffecec;
+        --red-600: #df4444;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: #232424;
+          --grey-100: #343536;
+          --grey-300: #515253;
+          --grey-600: #b0b2b3;
+          --grey-700: #d2d3d4;
+          --grey-800: #f7f7f8;
+          --red-100: #622e2e;
+          --red-600: #d58585;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--background);
+        color: var(--grey-800);
+        font-family: -apple-system, sans-serif;
+      }
+
+      body {
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: calc(24px + var(--sat)) calc(24px + var(--sar))
+          calc(24px + var(--sab)) calc(24px + var(--sal));
+      }
+
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+        text-align: center;
+      }
+
+      .badge {
+        display: flex;
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        background: var(--red-100);
+      }
+
+      .badge svg {
+        width: 32px;
+        height: 32px;
+        color: var(--red-600);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.4;
+      }
+
+      p {
+        margin: 0 0 16px;
+        font-size: 16px;
+        line-height: 1.5;
+        color: var(--grey-600);
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      button {
+        appearance: none;
+        font-size: 16px;
+        line-height: 1.5;
+        padding: 8px 24px;
+        border-radius: 8px;
+      }
+
+      .btn-secondary {
+        border: 1px solid var(--grey-300);
+        background: transparent;
+        color: var(--grey-700);
+      }
+
+      .btn-primary {
+        border: 0;
+        background: var(--grey-800);
+        color: var(--background);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div>
+        <div class="badge" aria-hidden="true">
+          <!-- @heroicons/react/24/outline ExclamationTriangleIcon -->
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+            />
+          </svg>
+        </div>
+        <h1>인터넷 연결이 끊겼습니다</h1>
+        <p>연결을 확인한 뒤 다시 시도해 주세요.</p>
+      </div>
+      <div class="actions">
+        <button
+          type="button"
+          class="btn-secondary"
+          onclick="location.href='/'"
+        >
+          홈으로
+        </button>
+        <button type="button" class="btn-primary" onclick="location.reload()">
+          다시 시도
+        </button>
+      </div>
+    </main>
+  </body>
+</html>

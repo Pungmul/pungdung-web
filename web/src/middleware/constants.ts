@@ -8,6 +8,7 @@ export const BYPASS_PATH_PREFIXES = [
   "/dedicated-worker.js",
   "/pungdung-sw.js",
   "/pungdung-fcm-background.js",
+  "/offline.html",
   "/socket-worker.js",
   "/api/auth/kakao/callback",
   "/kakao/callback",
