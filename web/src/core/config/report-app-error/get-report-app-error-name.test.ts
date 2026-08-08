@@ -19,6 +19,18 @@ describe("getReportAppErrorName", () => {
     ).toBe("[502] GET /api/posts/{id}");
   });
 
+  it("페이지 렌더는 경계와 파일 라우트를 넣는다", () => {
+    expect(
+      getReportAppErrorName(
+        {
+          boundary: "page",
+          feature: "(main)/chats/r/[roomId]",
+        },
+        { action: "report", errorKind: "unknown", extras: {} }
+      )
+    ).toBe("[render] page:(main)/chats/r/[roomId]");
+  });
+
   it("섹션 렌더는 경계, feature, 컴포넌트를 넣는다", () => {
     expect(
       getReportAppErrorName(

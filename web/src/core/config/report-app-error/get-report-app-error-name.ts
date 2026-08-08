@@ -1,3 +1,4 @@
+import { isRenderBoundary } from "./is-render-boundary";
 import { normalizeReportEndpoint } from "./normalize-report-endpoint";
 import type {
   ReportAppErrorContext,
@@ -29,16 +30,6 @@ export function getReportAppErrorName(
     return `[${status}] ${method} ${path ?? "unknown"}`;
   }
   return `[${classified.errorKind}] ${ctx.boundary}`;
-}
-
-function isRenderBoundary(
-  boundary: ReportAppErrorContext["boundary"]
-): boolean {
-  return (
-    boundary === "section" ||
-    boundary === "segment" ||
-    boundary === "global"
-  );
 }
 
 function formatRenderLocation(ctx: ReportAppErrorContext): string {

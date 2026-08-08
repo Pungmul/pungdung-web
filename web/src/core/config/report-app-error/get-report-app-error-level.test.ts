@@ -10,7 +10,10 @@ const reportedHttp: ReportedAppError = {
 };
 
 describe("getReportAppErrorLevel", () => {
-  it("섹션, 세그먼트, 전역 경계는 fatal이다", () => {
+  it("페이지, 섹션, 세그먼트, 전역 경계는 fatal이다", () => {
+    expect(
+      getReportAppErrorLevel({ boundary: "page" }, reportedHttp)
+    ).toBe("fatal");
     expect(
       getReportAppErrorLevel({ boundary: "section" }, reportedHttp)
     ).toBe("fatal");

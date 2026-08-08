@@ -1,3 +1,4 @@
+import { isRenderBoundary } from "./is-render-boundary";
 import { normalizeReportEndpoint } from "./normalize-report-endpoint";
 import type {
   ReportAppErrorContext,
@@ -16,11 +17,7 @@ export function getReportAppErrorFingerprint(
     const method = (ctx.method ?? "GET").toUpperCase();
     return ["failure", classified.errorKind, method, path];
   }
-  if (
-    ctx.boundary === "section" ||
-    ctx.boundary === "segment" ||
-    ctx.boundary === "global"
-  ) {
+  if (isRenderBoundary(ctx.boundary)) {
     return [
       "failure",
       "render",

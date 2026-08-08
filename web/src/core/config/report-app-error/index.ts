@@ -9,4 +9,5 @@ export {
   isSocketReconnectReason,
   reportAppError,
 } from "./report-app-error";
+export { reportPageRouteAppError } from "./report-page-route-app-error";
 export { reportSectionAppError } from "./report-section-app-error";

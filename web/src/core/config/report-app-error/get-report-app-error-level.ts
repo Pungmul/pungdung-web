@@ -1,3 +1,4 @@
+import { isRenderBoundary } from "./is-render-boundary";
 import type {
   ReportAppErrorContext,
   ReportedAppError,
@@ -12,21 +13,11 @@ export function getReportAppErrorLevel(
   ctx: ReportAppErrorContext,
   classified: ReportedAppError
 ): Exclude<ReportAppErrorLevel, "warning"> {
-  if (isFatalRenderBoundary(ctx.boundary)) {
+  if (isRenderBoundary(ctx.boundary)) {
     return "fatal";
   }
   if (classified.criticalFlow !== undefined) {
     return "fatal";
   }
   return "error";
-}
-
-function isFatalRenderBoundary(
-  boundary: ReportAppErrorContext["boundary"]
-): boolean {
-  return (
-    boundary === "section" ||
-    boundary === "segment" ||
-    boundary === "global"
-  );
 }

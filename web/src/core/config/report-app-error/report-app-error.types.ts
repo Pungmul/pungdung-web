@@ -1,10 +1,13 @@
 // api: 브라우저 HTTP 훅 (clientApiRequest)
 // route: App Router route.ts
+// page: app 파일 라우트 로컬 경계
 // section: feature section 로컬 경계
+// segment: (main)/error.tsx 최후 방어
 // rsc: 서버 컴포넌트 fetch
 export type ReportAppErrorBoundary =
   | "api"
   | "route"
+  | "page"
   | "section"
   | "segment"
   | "global"

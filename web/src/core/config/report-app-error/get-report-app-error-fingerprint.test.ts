@@ -24,6 +24,24 @@ describe("getReportAppErrorFingerprint", () => {
     ).toEqual(["failure", "http", "GET", "/api/posts/{id}"]);
   });
 
+  it("페이지 렌더는 경계와 파일 라우트로 묶는다", () => {
+    expect(
+      getReportAppErrorFingerprint(
+        {
+          boundary: "page",
+          feature: "(main)/my-page/change-password",
+        },
+        { action: "report", errorKind: "unknown", extras: {} }
+      )
+    ).toEqual([
+      "failure",
+      "render",
+      "page",
+      "(main)/my-page/change-password",
+      "none",
+    ]);
+  });
+
   it("렌더는 경계와 feature, 컴포넌트로 묶는다", () => {
     expect(
       getReportAppErrorFingerprint(
