@@ -4,8 +4,11 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { getQueryClient } from "@/core";
 
-import { BoardHeader, boardQueries } from "@/features/board";
-import { prefetchBoardInfoList } from "@/features/board";
+import {
+  BoardHeader,
+  boardQueries,
+  loadBoardInfoListResult,
+} from "@/features/board";
 import { UpcomingPerformanceList } from "@/features/promotion";
 
 export const metadata: Metadata = {
@@ -16,12 +19,11 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function UpcomingPerformancePage() {
-
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery({
-    ...boardQueries.list(),
-    queryFn: prefetchBoardInfoList,
-  });
+  const result = await loadBoardInfoListResult();
+  if (result.ok) {
+    queryClient.setQueryData(boardQueries.list().queryKey, result.data);
+  }
 
   const dehydratedState = dehydrate(queryClient);
 
@@ -31,7 +33,10 @@ export default async function UpcomingPerformancePage() {
         <BoardHeader boardID={"upcoming-performance"} />
         <div className="flex flex-col w-full flex-grow relative items-center">
           <div className="w-full max-w-[768px]">
-            <section key="upcoming-performance-list-section" className="relative h-full flex flex-col">
+            <section
+              key="upcoming-performance-list-section"
+              className="relative h-full flex flex-col"
+            >
               <UpcomingPerformanceList />
             </section>
           </div>

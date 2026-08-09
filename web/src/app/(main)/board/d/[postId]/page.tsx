@@ -4,10 +4,7 @@ import { notFound } from "next/navigation";
 
 import { Suspense } from "@suspensive/react";
 
-import { getQueryClient } from "@/core";
-
 import { hasAuthSessionCookie } from "@/features/auth";
-import { boardQueries, prefetchBoardInfoList } from "@/features/board";
 import { PostContentSkeleton, PostDetailComponent } from "@/features/post";
 
 import { Header } from "@/shared";
@@ -23,11 +20,6 @@ export default async function Page({
 }) {
   const { postId } = await params;
   const cookieStore = await cookies();
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery({
-    ...boardQueries.list(),
-    queryFn: prefetchBoardInfoList,
-  });
 
   if (!postId) {
     return notFound();

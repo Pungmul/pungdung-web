@@ -9,8 +9,10 @@ import {
   BoardHeader,
   BoardListNav,
   boardQueries,
+  findBoardSummaryByRouteId,
+  getBoardRscMetadataTitle,
+  loadBoardInfoListResult,
   PostingButton,
-  prefetchBoardInfoList,
 } from "@/features/board";
 
 import { ScrollToTopButton } from "@/shared/components";
@@ -23,12 +25,8 @@ export async function generateMetadata({
   params: Promise<{ boardID: string }>;
 }) {
   const { boardID } = await params;
-  const boardList = await prefetchBoardInfoList();
-  const boardName =
-    boardList.find((board) => board.id === Number(boardID))?.name ||
-    "알 수 없는 게시판";
   return {
-    title: `풍덩 | ${boardName}`,
+    title: await getBoardRscMetadataTitle(boardID),
   };
 }
 
@@ -49,15 +47,14 @@ export default async function BoardPageLayout({
   );
 
   const queryClient = getQueryClient();
+  const result = await loadBoardInfoListResult();
+  if (result.ok) {
+    queryClient.setQueryData(boardQueries.list().queryKey, result.data);
+  }
 
-  const boardList = await queryClient.fetchQuery({
-    ...boardQueries.list(),
-    queryFn: prefetchBoardInfoList,
-  });
-
-  const initialBoardInfo =
-    boardList.find((board) => Number(board.id) === Number(boardIdParam)) ??
-    null;
+  const initialBoardInfo = result.ok
+    ? (findBoardSummaryByRouteId(result.data, boardIdParam) ?? null)
+    : null;
 
   const dehydratedState = dehydrate(queryClient);
 

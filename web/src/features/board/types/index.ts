@@ -7,3 +7,7 @@ export type {
 export type { BoardSummary } from "./board-summary.types";
 export type { HotPostBannerPost } from "./hot-post-banner.types";
 export type { InfinitePostListPages, PostListPage } from "./post-list-page.types";
+export type {
+  BoardRscLoadErrorKind,
+  RscLoadResult,
+} from "./rsc-load-result.types";

@@ -1,13 +1,11 @@
 import { cookies } from "next/headers";
 
-import { getQueryClient } from "@/core";
-
 import { hasAuthSessionCookie } from "@/features/auth";
 import {
   BoardMainPageContent,
-  boardQueries,
+  BoardMainPageLoadError,
   filterBoardsForMainPage,
-  prefetchBoardInfoList,
+  loadBoardInfoListResult,
 } from "@/features/board";
 
 export const metadata = {
@@ -15,31 +13,25 @@ export const metadata = {
   description: "풍덩의 게시판 페이지 입니다.",
 };
 
-// ISR 설정: 15분마다 재생성
 export const dynamic = "force-dynamic";
 
 export default async function BoardMainPage() {
   const cookieStore = await cookies();
-  const queryClient = getQueryClient();
+  const result = await loadBoardInfoListResult();
+  const isGuest = !hasAuthSessionCookie(
+    cookieStore.get("accessToken")?.value,
+    cookieStore.get("refreshToken")?.value
+  );
 
-  const boardList = await queryClient.fetchQuery({
-    ...boardQueries.list(),
-    queryFn: prefetchBoardInfoList,
-  });
-
-  const boardsForMain = filterBoardsForMainPage(boardList);
-  const time = Date.now();
+  if (!result.ok) {
+    return <BoardMainPageLoadError errorKind={result.errorKind} />;
+  }
 
   return (
     <BoardMainPageContent
-      boardList={boardsForMain}
-      time={time}
-      isGuest={
-        !hasAuthSessionCookie(
-          cookieStore.get("accessToken")?.value,
-          cookieStore.get("refreshToken")?.value
-        )
-      }
+      boardList={filterBoardsForMainPage(result.data)}
+      time={Date.now()}
+      isGuest={isGuest}
     />
   );
 }

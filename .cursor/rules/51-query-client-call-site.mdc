@@ -1,0 +1,44 @@
+---
+description: Do not pass QueryClient into helpers. Seed the cache at the page, layout, or hook call site.
+alwaysApply: true
+---
+
+# QueryClient Call Site
+
+`QueryClient` is owned where the request or event runs. Do not thread it into `api`, `lib`, `services`, or other helpers.
+
+## Do
+
+```ts
+const queryClient = getQueryClient();
+const result = await loadBoardInfoListResult();
+if (result.ok) {
+  queryClient.setQueryData(boardQueries.list().queryKey, result.data);
+}
+```
+
+Client hooks use `useQueryClient()` in that hook, then `setQueryData` / `invalidateQueries` there.
+
+## Do Not
+
+```ts
+export async function hydrateBoardInfoListQuery(queryClient: QueryClient) {
+  const result = await loadBoardInfoListResult();
+  if (result.ok) {
+    queryClient.setQueryData(boardQueries.list().queryKey, result.data);
+  }
+  return result;
+}
+```
+
+```ts
+export function recoverOnlineQueries(queryClient: QueryClient) {
+  await queryClient.invalidateQueries();
+}
+```
+
+## Allowed
+
+- `getQueryClient` / `makeQueryClient` factories
+- Test wrappers that take `QueryClient` to build `QueryClientProvider`
+- Direct `queryClient.*` in the same page, layout, hook, or socket handler that created the client

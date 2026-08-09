@@ -8,7 +8,7 @@ import {
   BoardHeader,
   BoardListNav,
   boardQueries,
-  prefetchBoardInfoList,
+  loadBoardInfoListResult,
 } from "@/features/board";
 
 import { ScrollToTopButton } from "@/shared/components";
@@ -24,11 +24,10 @@ export default async function MyCommentLayout({
   children: React.ReactNode;
 }) {
   const queryClient = getQueryClient();
-
-  await queryClient.prefetchQuery({
-    ...boardQueries.list(),
-    queryFn: prefetchBoardInfoList,
-  });
+  const result = await loadBoardInfoListResult();
+  if (result.ok) {
+    queryClient.setQueryData(boardQueries.list().queryKey, result.data);
+  }
 
   const dehydratedState = dehydrate(queryClient);
 
