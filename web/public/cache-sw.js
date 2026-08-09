@@ -2,12 +2,15 @@
  * FCM 서비스 워커에서 importScripts로만 로드됨.
  * 동일 오리진/스코프에 SW를 두 개 등록하면 마지막 등록만 활성화되므로 단독 register 하지 않는다.
  *
- * 캐시 이름 버스트: `pungdung-static-v2` — `/offline.html` precache 추가.
+ * 캐시 이름 버스트: `pungdung-static-v3`
+ * `/offline.html`과 Nanum 폰트 precache
  * 이전 `pungdung-static-*` 는 activate에서 삭제한다.
  */
 
-const CACHE_STATIC = "pungdung-static-v2";
+const CACHE_STATIC = "pungdung-static-v3";
 const OFFLINE_DOCUMENT = "/offline.html";
+const NANUM_FONT = "/fonts/NanumSquareNeo-Variable.woff2";
+const PRECACHE_URLS = [OFFLINE_DOCUMENT, NANUM_FONT];
 
 /** @param {URL} url */
 function isSameOriginAsset(url) {
@@ -69,7 +72,7 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE_STATIC)
-      .then((cache) => cache.add(OFFLINE_DOCUMENT))
+      .then((cache) => cache.addAll(PRECACHE_URLS))
       .then(() => self.skipWaiting())
   );
 });
