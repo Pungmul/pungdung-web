@@ -70,10 +70,15 @@ function createRequestInit({
   const normalizedHeaders = toRecord(headers);
 
   if (body instanceof FormData) {
+    const headersWithoutContentType = Object.fromEntries(
+      Object.entries(normalizedHeaders).filter(
+        ([key]) => key.toLowerCase() !== "content-type"
+      )
+    );
     return {
       method: normalizedMethod,
       body,
-      headers: normalizedHeaders,
+      headers: headersWithoutContentType,
     };
   }
 

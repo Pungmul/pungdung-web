@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { clientApiMultipartUploadRequest, clientApiRequest } from "@/core/api/client";
+import { clientApiRequest } from "@/core/api/client";
 
 import {
   createPromotionResponseSchema,
@@ -162,10 +162,10 @@ export async function uploadPromotionImageToS3(formId: number, blob: Blob) {
   const formData = new FormData();
   formData.append("files", blob);
 
-  const { performanceImageList } = await clientApiMultipartUploadRequest({
+  const { performanceImageList } = await clientApiRequest({
     url: `/api/promotions/forms/${formId}/uploadImage`,
     method: "POST",
-    formData,
+    body: formData,
     responseSchema: uploadPromotionImageResponseSchema,
   });
 
