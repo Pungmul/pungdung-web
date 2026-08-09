@@ -3,10 +3,9 @@ import localFont from "next/font/local";
 
 import { createWebColorStyleText } from "@pungdung/design-tokens";
 
-import { FCMServiceWorkerRegistration } from "@/features/notification";
-
 import {
   AlertModal,
+  AppServiceWorkerRegistration,
   PinchZoomPreventionScript,
   ThemePreferenceBootScript,
   ThemePreferenceInitializer,
@@ -63,7 +62,7 @@ export default async function Layout({
       <body>
         <ThemePreferenceInitializer />
         <PinchZoomPreventionScript />
-        <FCMServiceWorkerRegistration />
+        <AppServiceWorkerRegistration />
         <AlertModal />
         <ViewStoreProvider initialView={initialView}>
           <ViewDetector />

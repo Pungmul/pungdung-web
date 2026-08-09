@@ -1,12 +1,31 @@
 import { getToken } from "firebase/messaging";
 
+import { registerAppServiceWorker } from "@/shared/lib/app-service-worker";
+
 import { supportsPushNotification } from "../lib";
 
 import { getFirebaseMessaging } from "./firebase-client.service";
-import {
-  FCM_SERVICE_WORKER_PATH,
-  getFCMServiceWorkerRegistration,
-} from "./get-fcm-service-worker-registration.service";
+
+async function waitUntilServiceWorkerActive(
+  registration: ServiceWorkerRegistration
+) {
+  if (registration.active) return;
+
+  const worker = registration.installing ?? registration.waiting;
+  if (!worker) return;
+
+  if (worker.state === "activated") return;
+
+  await new Promise<void>((resolve) => {
+    const onStateChange = () => {
+      if (worker.state === "activated" || worker.state === "redundant") {
+        worker.removeEventListener("statechange", onStateChange);
+        resolve();
+      }
+    };
+    worker.addEventListener("statechange", onStateChange);
+  });
+}
 
 export interface RequestFCMTokenResult {
   permission: NotificationPermission;
@@ -17,13 +36,9 @@ async function fetchFCMTokenWithRegistration(): Promise<string | null> {
   const messaging = getFirebaseMessaging();
   if (!messaging) return null;
 
-  await navigator.serviceWorker.ready;
-  let registration = await getFCMServiceWorkerRegistration();
-  if (!registration) {
-    registration = await navigator.serviceWorker.register(
-      FCM_SERVICE_WORKER_PATH
-    );
-  }
+  const registration = await registerAppServiceWorker();
+  if (!registration) return null;
+  await waitUntilServiceWorkerActive(registration);
 
   const token = await getToken(messaging, {
     vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY!,

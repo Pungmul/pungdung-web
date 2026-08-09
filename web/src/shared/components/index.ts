@@ -42,6 +42,7 @@ export {
 } from "./form";
 
 // Utility Components
+export { AppServiceWorkerRegistration } from "./AppServiceWorkerRegistration";
 export { Conditional } from "./Conditional";
 export { default as DragScroll } from "./DragScroll";
 export { Responsive } from "./Responsive";
