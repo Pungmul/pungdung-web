@@ -19,6 +19,22 @@ describe("getReportAppErrorName", () => {
     ).toBe("[502] GET /api/posts/{id}");
   });
 
+  it("클라 타임아웃은 timeout 라벨을 넣는다", () => {
+    expect(
+      getReportAppErrorName(
+        { boundary: "api", endpoint: "/api/chats/1/text", method: "POST" },
+        {
+          action: "report",
+          errorKind: "http",
+          extras: {
+            http_status: 0,
+            api_code: "CLIENT_TIMEOUT",
+          },
+        }
+      )
+    ).toBe("[timeout] POST /api/chats/{id}/text");
+  });
+
   it("페이지 렌더는 경계와 파일 라우트를 넣는다", () => {
     expect(
       getReportAppErrorName(

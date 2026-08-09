@@ -11,6 +11,7 @@ import { ROUTE_REPORTED_CODES } from "../route-failure-code";
 
 // ClientApiError 허용/거부
 // NETWORK_ERROR, status 0, 401/403, 일반 4xx는 drop
+// CLIENT_TIMEOUT은 클라 abort 시한
 // INVALID_REQUEST_BODY는 status 0이어도 리포트
 // Route Handler가 이미 리포트한 UPSTREAM_*/PROXY_FAILURE는
 // route 경계가 아니면 다시 안 보냄
@@ -20,6 +21,13 @@ export function classifyClientApiError(
 ): ClassifiedAppError {
   if (error.code === CLIENT_API_ERROR_CODE.NETWORK_ERROR) {
     return { action: "drop" };
+  }
+  if (error.code === CLIENT_API_ERROR_CODE.CLIENT_TIMEOUT) {
+    return {
+      action: "report",
+      errorKind: "http",
+      extras: buildClientApiExtras(error),
+    };
   }
   if (isAlreadyReportedByRouteHandler(ctx, error.code)) {
     return { action: "drop" };

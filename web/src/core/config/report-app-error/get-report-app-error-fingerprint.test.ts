@@ -24,6 +24,23 @@ describe("getReportAppErrorFingerprint", () => {
     ).toEqual(["failure", "http", "GET", "/api/posts/{id}"]);
   });
 
+  it("클라 타임아웃은 timeout으로 묶는다", () => {
+    expect(
+      getReportAppErrorFingerprint(
+        {
+          boundary: "api",
+          endpoint: "/api/chats/12/text",
+          method: "POST",
+        },
+        {
+          action: "report",
+          errorKind: "http",
+          extras: { api_code: "CLIENT_TIMEOUT" },
+        }
+      )
+    ).toEqual(["failure", "timeout", "POST", "/api/chats/{id}/text"]);
+  });
+
   it("페이지 렌더는 경계와 파일 라우트로 묶는다", () => {
     expect(
       getReportAppErrorFingerprint(

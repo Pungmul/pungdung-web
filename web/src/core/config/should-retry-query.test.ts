@@ -77,6 +77,12 @@ describe("shouldRetryQuery", () => {
       count: 1,
       retry: true,
     },
+    {
+      name: "클라 타임아웃",
+      error: apiError(0, CLIENT_API_ERROR_CODE.CLIENT_TIMEOUT),
+      count: 0,
+      retry: false,
+    },
   ])("$name", ({ error, count, retry, offline }) => {
     if (offline) {
       vi.stubGlobal("navigator", { ...navigator, onLine: false });

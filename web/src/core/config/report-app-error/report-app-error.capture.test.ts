@@ -72,6 +72,39 @@ describe("reportAppError capture", () => {
     expect(lastScope.level).toBe("error");
   });
 
+  it("CLIENT_TIMEOUT은 warning으로 capture한다", () => {
+    reportAppError(
+      new ClientApiError({
+        message: "timeout",
+        status: 0,
+        code: CLIENT_API_ERROR_CODE.CLIENT_TIMEOUT,
+      }),
+      {
+        boundary: "api",
+        endpoint: "/api/chats/550e8400-e29b-41d4-a716-446655440000/text",
+        method: "POST",
+      }
+    );
+    expect(captureException).toHaveBeenCalledTimes(1);
+    expect(lastScope.tags).toMatchObject({
+      report_class: "failure",
+      error_kind: "http",
+    });
+    expect(lastScope.level).toBe("warning");
+    expect(lastScope.extras.api_code).toBe(
+      CLIENT_API_ERROR_CODE.CLIENT_TIMEOUT
+    );
+    expect((captureException.mock.calls[0]?.[0] as Error).name).toBe(
+      "[timeout] POST /api/chats/{id}/text"
+    );
+    expect(lastScope.fingerprint).toEqual([
+      "failure",
+      "timeout",
+      "POST",
+      "/api/chats/{id}/text",
+    ]);
+  });
+
   it("ClientMapperError와 5xx, 렌더 Error를 capture한다", () => {
     reportAppError(
       new ClientMapperError({ message: "map", context: "load-chat-logs" }),

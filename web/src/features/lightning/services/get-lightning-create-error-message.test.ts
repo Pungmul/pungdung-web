@@ -18,6 +18,18 @@ describe("getLightningCreateErrorMessage", () => {
     );
   });
 
+  it("ClientApiError CLIENT_TIMEOUT → 네트워크 안내", () => {
+    const err = new ClientApiError({
+      status: 0,
+      code: CLIENT_API_ERROR_CODE.CLIENT_TIMEOUT,
+      message: "요청 시간이 초과되었습니다.",
+    });
+
+    expect(getLightningCreateErrorMessage(err)).toBe(
+      LIGHTNING_BUILD_MESSAGE.COMPLETE.ERROR_NETWORK
+    );
+  });
+
   it("ClientApiError INVALID_REQUEST_BODY → 요청 형식 안내", () => {
     const err = new ClientApiError({
       status: 0,

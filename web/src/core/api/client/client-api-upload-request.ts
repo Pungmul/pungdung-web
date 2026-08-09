@@ -68,11 +68,7 @@ export function clientApiMultipartUploadRequest<TResponse>({
     /** FormData 업로드 때 Content-Type 생략(브라우저가 boundary 지정). */
     for (const [key, value] of Object.entries(normalizedHeaders)) {
       const lower = key.toLowerCase();
-      if (
-        lower !== "content-type" &&
-        value !== undefined &&
-        value !== null
-      ) {
+      if (lower !== "content-type" && value !== undefined && value !== null) {
         xhr.setRequestHeader(key, value);
       }
     }
@@ -132,9 +128,7 @@ export function clientApiMultipartUploadRequest<TResponse>({
 
       try {
         const httpOk = xhr.status >= 200 && xhr.status < 300;
-        resolve(
-          resolveClientApiBody(raw, httpOk, xhr.status, responseSchema)
-        );
+        resolve(resolveClientApiBody(raw, httpOk, xhr.status, responseSchema));
       } catch (error) {
         rejectReported(error);
       }

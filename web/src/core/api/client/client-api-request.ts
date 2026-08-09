@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { reportAppError } from "@/core/config/report-app-error";
 
+import { getClientFetchFailureCode } from "./classify-client-fetch-failure";
 import { ClientApiError } from "./client-api-error";
 import { CLIENT_API_ERROR_CODE } from "./constant";
 import { resolveClientApiBody } from "./resolve-client-api-body";
@@ -110,10 +111,14 @@ async function safeFetch(
   try {
     return await fetch(input, { credentials: "include", ...init });
   } catch (error) {
+    const code = getClientFetchFailureCode(error, init?.signal ?? undefined);
     throw createClientApiError({
       status: 0,
-      code: CLIENT_API_ERROR_CODE.NETWORK_ERROR,
-      message: "네트워크 요청에 실패했습니다.",
+      code,
+      message:
+        code === CLIENT_API_ERROR_CODE.CLIENT_TIMEOUT
+          ? "요청 시간이 초과되었습니다."
+          : "네트워크 요청에 실패했습니다.",
       details: error,
     });
   }

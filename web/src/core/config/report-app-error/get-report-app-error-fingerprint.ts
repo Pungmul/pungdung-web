@@ -1,3 +1,5 @@
+import { CLIENT_API_ERROR_CODE } from "@/core/api/client/constant";
+
 import { isRenderBoundary } from "./is-render-boundary";
 import { normalizeReportEndpoint } from "./normalize-report-endpoint";
 import type {
@@ -15,6 +17,9 @@ export function getReportAppErrorFingerprint(
   const path = normalizeReportEndpoint(ctx.endpoint);
   if (path) {
     const method = (ctx.method ?? "GET").toUpperCase();
+    if (classified.extras.api_code === CLIENT_API_ERROR_CODE.CLIENT_TIMEOUT) {
+      return ["failure", "timeout", method, path];
+    }
     return ["failure", classified.errorKind, method, path];
   }
   if (isRenderBoundary(ctx.boundary)) {

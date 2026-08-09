@@ -76,7 +76,7 @@ function isOfflineNetworkError(error: unknown): boolean {
   const status = "status" in error ? error.status : undefined;
   const code = "code" in error ? error.code : undefined;
 
-  if (code === "INVALID_REQUEST_BODY") {
+  if (code === "INVALID_REQUEST_BODY" || code === "CLIENT_TIMEOUT") {
     return false;
   }
 

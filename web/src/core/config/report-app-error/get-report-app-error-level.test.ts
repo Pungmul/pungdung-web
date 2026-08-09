@@ -57,4 +57,17 @@ describe("getReportAppErrorLevel", () => {
       getReportAppErrorLevel({ boundary: "rsc" }, reportedHttp)
     ).toBe("error");
   });
+
+  it("CLIENT_TIMEOUT은 warning이다", () => {
+    expect(
+      getReportAppErrorLevel(
+        { boundary: "api", endpoint: "/api/chats/1/text", method: "POST" },
+        {
+          action: "report",
+          errorKind: "http",
+          extras: { api_code: "CLIENT_TIMEOUT" },
+        }
+      )
+    ).toBe("warning");
+  });
 });

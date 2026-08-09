@@ -1,4 +1,7 @@
-import { clientApiRequest } from "@/core/api/client";
+import {
+  CLIENT_FETCH_TIMEOUT_ABORT_REASON,
+  clientApiRequest,
+} from "@/core/api/client";
 
 import { chatMutationVoidResponseSchema } from "./dto.schema";
 
@@ -10,7 +13,7 @@ export const sendImageMessage = (
 ): Promise<void> => {
   const controller = new AbortController();
   const timeout = setTimeout(() => {
-    controller.abort();
+    controller.abort(CLIENT_FETCH_TIMEOUT_ABORT_REASON);
   }, IMAGE_UPLOAD_TIMEOUT_MS);
 
   return clientApiRequest({

@@ -30,6 +30,7 @@ export function getLightningCreateErrorMessage(error: unknown): string {
   if (error instanceof ClientApiError) {
     switch (error.code) {
       case CLIENT_API_ERROR_CODE.NETWORK_ERROR:
+      case CLIENT_API_ERROR_CODE.CLIENT_TIMEOUT:
         return LIGHTNING_BUILD_MESSAGE.COMPLETE.ERROR_NETWORK;
       case CLIENT_API_ERROR_CODE.INVALID_REQUEST_BODY:
         return LIGHTNING_BUILD_MESSAGE.COMPLETE.ERROR_CLIENT_REQUEST_SHAPE;
