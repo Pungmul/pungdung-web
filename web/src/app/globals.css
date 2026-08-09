@@ -36,7 +36,7 @@
 html {
   height: 100%;
   overflow: hidden;
-  font-family: var(--font-nanum-neo);
+  font-family: var(--font-nanum);
   touch-action: pan-y;
   overscroll-behavior: none;
   background-color: var(--background);
@@ -327,28 +327,28 @@ input {
 /* 타이포그래피 클래스 */
 .text-h1 {
   font-size: var(--text-h1);
-  font-family: var(--font-nanum-neo);
+  font-family: var(--font-nanum);
   font-weight: 800;
   /* extra-bold */
 }
 
 .text-h2 {
   font-size: var(--text-h2);
-  font-family: var(--font-nanum-neo);
+  font-family: var(--font-nanum);
   font-weight: 700;
   /* bold */
 }
 
 .text-h3 {
   font-size: var(--text-h3);
-  font-family: var(--font-nanum-neo);
+  font-family: var(--font-nanum);
   font-weight: 700;
   /* bold */
 }
 
 .text-h4 {
   font-size: var(--text-h4);
-  font-family: var(--font-nanum-neo);
+  font-family: var(--font-nanum);
   font-weight: 600;
   /* semi-bold */
 }
@@ -356,7 +356,7 @@ input {
 /* 미디어 텍스트 클래스 (본문용) */
 .text-m1 {
   font-size: var(--text-m1);
-  font-family: var(--font-nanum-neo);
+  font-family: var(--font-nanum);
   font-weight: 400;
   line-height: 1.2;
   /* regular */
@@ -364,7 +364,7 @@ input {
 
 .text-m2 {
   font-size: var(--text-m2);
-  font-family: var(--font-nanum-neo);
+  font-family: var(--font-nanum);
   font-weight: 400;
   line-height: 1.2;
   /* regular */
@@ -372,7 +372,7 @@ input {
 
 .text-m3 {
   font-size: var(--text-m3);
-  font-family: var(--font-nanum-neo);
+  font-family: var(--font-nanum);
   font-weight: 400;
   line-height: 1.2;
   /* regular */
@@ -380,7 +380,7 @@ input {
 
 .text-m4 {
   font-size: var(--text-m4);
-  font-family: var(--font-nanum-neo);
+  font-family: var(--font-nanum);
   font-weight: 300;
   line-height: 1.2;
   /* light */
