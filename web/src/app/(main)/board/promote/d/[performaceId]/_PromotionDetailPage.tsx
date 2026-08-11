@@ -3,11 +3,15 @@
 import { useEffect } from "react";
 import dynamic from "next/dynamic";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import { useLoginRequiredConfirmAction } from "@/features/auth";
-import { PromotionProfile } from "@/features/promotion";
-import { promotionQueries } from "@/features/promotion";
+import {
+  PromotionMenu,
+  PromotionProfile,
+  promotionQueries,
+  PromotionShareButton,
+} from "@/features/promotion";
 
 import { BottomFixedButton, BottomFixedLinkButton, Header, Spinner } from "@/shared";
 
@@ -39,6 +43,14 @@ export function PromotionDetailPage({
   const { data: promotionDetail } = useSuspenseQuery({
     ...promotionQueries.detail(performaceId),
   });
+  const myFormListQuery = useQuery({
+    ...promotionQueries.myFormList(),
+    enabled: !isGuest,
+  });
+  const ownedForm = myFormListQuery.data?.find(
+    (form) => form.publicKey === performaceId
+  );
+  const showKebab = isGuest || myFormListQuery.isSuccess;
 
   useEffect(() => {
     if (promotionDetail) {
@@ -51,7 +63,22 @@ export function PromotionDetailPage({
   return (
     <div className="relative w-full md:max-w-[768px] mx-auto bg-background">
       <article className="relative w-full flex flex-col bg-background min-h-screen">
-        <Header title={promotionDetail.title} />
+        <Header
+          title={promotionDetail.title}
+          rightBtn={
+            <div className="flex items-center gap-0.5">
+              <PromotionShareButton />
+              {showKebab && ownedForm != null ? (
+                <PromotionMenu
+                  isGuest={isGuest}
+                  isWriter={Boolean(ownedForm)}
+                  formId={ownedForm.id}
+                  publicKey={promotionDetail.publicKey}
+                />
+              ) : null}
+            </div>
+          }
+        />
         <section className="flex flex-col gap-[12px] flex-grow h-full">
           <PromotionProfile
             posterUrl={
