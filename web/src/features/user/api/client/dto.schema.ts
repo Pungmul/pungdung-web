@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { User } from "../../types/user.types";
+import type { User } from "../../types";
 
 /** 업스트림 User/DTO와 완전 일치보다 런타임 안전성 우선 (`friends/api/client/dto.schema.ts`와 동일 계열) */
 export const profileImageDtoSchema = z.looseObject({

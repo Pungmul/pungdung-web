@@ -4,7 +4,7 @@ import { chatRoomDtoSchema } from "./dto.schema";
 import {
   mapChatRoomDtoToDomain,
 } from "../../lib/mappers";
-import type { ChatRoom } from "../../types/chat-room.types";
+import type { ChatRoom } from "../../types";
 
 export const loadChatRoomInfo = (roomId: string): Promise<ChatRoom> =>
   withResponseMapper({

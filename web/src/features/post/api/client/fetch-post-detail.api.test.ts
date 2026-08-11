@@ -22,7 +22,7 @@ vi.mock("../../lib/mappers/map-post-detail", () => ({
 
 import { ClientApiError, ClientMapperError } from "@/core/api/client";
 
-import { fetchPostDetail } from "./fetch-post-detail";
+import { fetchPostDetail } from "./fetch-post-detail.api";
 
 import type { PostArticleDetail } from "../../types";
 import { PostDeletedError } from "./post-deleted-error";

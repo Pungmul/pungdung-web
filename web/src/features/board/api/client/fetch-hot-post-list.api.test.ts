@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import type { PostSummaryWithCategory } from "@/features/post";
 
-import type { HotPostListPageDto } from "./fetch-hot-post-list";
-import { mapHotPostListDtoToResponse } from "./fetch-hot-post-list";
+import type { HotPostListPageDto } from "./fetch-hot-post-list.api";
+import { mapHotPostListDtoToResponse } from "./fetch-hot-post-list.api";
 
 const minimalRow: PostSummaryWithCategory = {
   postId: 1,

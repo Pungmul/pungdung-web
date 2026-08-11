@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ClientMapperError } from "@/core/api/client/client-mapper-error";
 import { CLIENT_API_ERROR_CODE } from "@/core/api/client/constant";
 
-import { prefetchBoardInfoList } from "./prefetch-board-info-list";
+import { prefetchBoardInfoList } from "./prefetch-board-info-list.api";
 
 const PROMOTE_BOARD = {
   id: "promote",

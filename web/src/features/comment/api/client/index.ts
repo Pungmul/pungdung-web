@@ -1,7 +1,7 @@
-export { createComment, type CreateCommentParams } from "./create-comment";
-export { createReply, type CreateReplyParams } from "./create-reply";
-export { deleteComment } from "./delete-comment";
-export { deleteReply } from "./delete-reply";
+export { createComment, type CreateCommentParams } from "./create-comment.api";
+export { createReply, type CreateReplyParams } from "./create-reply.api";
+export { deleteComment } from "./delete-comment.api";
+export { deleteReply } from "./delete-reply.api";
 export {
   type CommentDto,
   commentDtoSchema,
@@ -18,5 +18,5 @@ export {
   myCommentListPageDtoSchema,
   reportCommentRequestDtoSchema,
 } from "./dto.schema";
-export { fetchCommentList } from "./fetch-comment-list";
-export { reportComment, type ReportCommentParams } from "./report-comment";
+export { fetchCommentList } from "./fetch-comment-list.api";
+export { reportComment, type ReportCommentParams } from "./report-comment.api";

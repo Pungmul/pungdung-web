@@ -8,7 +8,7 @@ import { sortChatRoomByDate } from "../../lib/chat-room/sort-chat-room-by-date";
 import {
   mapChatRoomListItemDtoToDomain,
 } from "../../lib/mappers";
-import type { ChatRoomListItem } from "../../types/chat-room.types";
+import type { ChatRoomListItem } from "../../types";
 import { chatRoomListResponseEnvelopeSchema } from "../client/dto.schema";
 
 export const fetchRoomListApi = async (): Promise<ChatRoomListItem[]> => {

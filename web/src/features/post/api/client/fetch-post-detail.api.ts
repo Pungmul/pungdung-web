@@ -8,7 +8,7 @@ import { postDetailResponseDtoSchema } from "./dto.schema";
 import { PostDeletedError } from "./post-deleted-error";
 import { mapPostDetailDtoToArticle } from "../../lib/mappers/map-post-detail";
 import { isDeletedPostDetailDto } from "../../services";
-import type { PostArticleDetail } from "../../types/post-article-detail.types";
+import type { PostArticleDetail } from "../../types";
 
 export async function fetchPostDetail(
   postId: number

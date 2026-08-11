@@ -5,7 +5,7 @@ import { CLIENT_API_ERROR_CODE } from "@/core/api/client/constant";
 
 import { loadBoardInfoListResult } from "./load-board-info-list-result";
 
-vi.mock("./prefetch-board-info-list", () => ({
+vi.mock("./prefetch-board-info-list.api", () => ({
   prefetchBoardInfoList: vi.fn(),
 }));
 
@@ -13,7 +13,7 @@ vi.mock("@/core/config/report-app-error", () => ({
   reportAppError: vi.fn(),
 }));
 
-import { prefetchBoardInfoList } from "./prefetch-board-info-list";
+import { prefetchBoardInfoList } from "./prefetch-board-info-list.api";
 import { reportAppError } from "@/core/config/report-app-error";
 
 describe("loadBoardInfoListResult", () => {

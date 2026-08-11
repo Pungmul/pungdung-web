@@ -2,11 +2,11 @@ import { describe, expect, it, vi } from "vitest";
 
 import { getBoardRscMetadataTitle } from "./get-board-rsc-metadata-title";
 
-vi.mock("../api/server/prefetch-board-info-list", () => ({
+vi.mock("../api/server/prefetch-board-info-list.api", () => ({
   prefetchBoardInfoList: vi.fn(),
 }));
 
-import { prefetchBoardInfoList } from "../api/server/prefetch-board-info-list";
+import { prefetchBoardInfoList } from "../api/server/prefetch-board-info-list.api";
 
 describe("getBoardRscMetadataTitle", () => {
   it("실패하면 풍덩 | 게시판이다", async () => {

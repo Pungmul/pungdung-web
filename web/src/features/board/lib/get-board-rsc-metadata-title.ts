@@ -1,5 +1,5 @@
 import { findBoardSummaryByRouteId } from "./find-board-summary-by-route-id";
-import { prefetchBoardInfoList } from "../api/server/prefetch-board-info-list";
+import { prefetchBoardInfoList } from "../api/server/prefetch-board-info-list.api";
 
 const FALLBACK_BOARD_METADATA_TITLE = "풍덩 | 게시판";
 

@@ -14,7 +14,7 @@ vi.mock("@/core/api/client", async (importOriginal) => {
 
 import { ClientApiError, ClientMapperError } from "@/core/api/client";
 
-import { fetchCommentList } from "./fetch-comment-list";
+import { fetchCommentList } from "./fetch-comment-list.api";
 
 describe("fetchCommentList", () => {
   beforeEach(() => {

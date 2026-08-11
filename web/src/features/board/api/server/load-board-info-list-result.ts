@@ -1,6 +1,6 @@
 import { reportAppError } from "@/core/config/report-app-error";
 
-import { prefetchBoardInfoList } from "./prefetch-board-info-list";
+import { prefetchBoardInfoList } from "./prefetch-board-info-list.api";
 import { getBoardRscLoadErrorKind } from "../../lib/get-board-rsc-load-error-kind";
 import type { BoardSummary, RscLoadResult } from "../../types";
 

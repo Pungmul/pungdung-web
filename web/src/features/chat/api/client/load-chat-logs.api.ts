@@ -3,7 +3,7 @@ import { clientApiRequest, withResponseMapper } from "@/core/api/client";
 import { chatLogCursorPageDtoSchema } from "./dto.schema";
 import { CHAT_LOG_PAGE_SIZE } from "../../constants";
 import { mapChatLogCursorPageDtoToDomain } from "../../lib/mappers";
-import type { ChatLogCursorPage } from "../../types/chat-message.types";
+import type { ChatLogCursorPage } from "../../types";
 
 export const loadChatLogs = (
   roomId: string,
