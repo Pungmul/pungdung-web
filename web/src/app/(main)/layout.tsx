@@ -21,7 +21,6 @@ import ReactQueryProviders from "@/shared/lib/useReactQuery";
 
 import { AuthenticatedSocketProvider } from "./_AuthenticatedSocketProvider";
 
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -29,7 +28,7 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const hasAccessToken = hasValidAccessToken(
-    cookieStore.get("accessToken")?.value
+    cookieStore.get("accessToken")?.value,
   );
 
   const shell = (
@@ -53,8 +52,8 @@ export default async function RootLayout({
         className="relative flex-grow flex flex-col-reverse max-w-[100dvw] md:flex-row z-0 h-auto min-h-app"
       >
         <Tabs isAuthenticated={hasAccessToken} />
-        <ToastHost />
         {children}
+        <ToastHost />
       </div>
     </div>
   );

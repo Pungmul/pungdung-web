@@ -20,7 +20,12 @@ import { ToastType } from "@/shared/types/toast";
 const TOAST_MOTION = {
   enterY: 12,
   exitY: 16,
-  transition: { type: "spring" as const, stiffness: 420, damping: 32, mass: 0.8 },
+  transition: {
+    type: "spring" as const,
+    stiffness: 420,
+    damping: 32,
+    mass: 0.8,
+  },
   exitOpacityDuration: 0.2,
 };
 
@@ -96,7 +101,7 @@ export default function Toast({ containerId }: ToastProps) {
                 <span
                   className={cn(
                     "mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center",
-                    icon
+                    icon,
                   )}
                 >
                   <Icon className="h-5 w-5" aria-hidden="true" />
@@ -109,7 +114,7 @@ export default function Toast({ containerId }: ToastProps) {
                 type="button"
                 aria-label="토스트 닫기"
                 onClick={() => hideToast(toast.id)}
-                className="absolute right-3 top-3 rounded-full p-1 text-toast-foreground/55 transition-colors hover:bg-toast-foreground/10 hover:text-toast-foreground"
+                className="absolute right-3 top-3 rounded-full p-1 text-white transition-colors hover:bg-white/10"
               >
                 <XMarkIcon className="h-4 w-4" aria-hidden="true" />
               </button>
@@ -118,6 +123,6 @@ export default function Toast({ containerId }: ToastProps) {
         );
       })}
     </AnimatePresence>,
-    container
+    container,
   );
 }
