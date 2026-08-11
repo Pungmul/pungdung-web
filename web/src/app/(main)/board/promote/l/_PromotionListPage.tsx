@@ -38,7 +38,7 @@ export function PromotionListPage({ isGuest }: { isGuest: boolean }) {
         value={selectedTab.value}
         cases={{
           "my-promotion-form-list": <MyPromotionFormList />,
-          "promotion-list": <PromotionList />,
+          "promotion-list": <PromotionList isGuest={isGuest} />,
         }}
       />
     </div>
