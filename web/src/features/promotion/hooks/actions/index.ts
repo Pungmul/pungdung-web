@@ -1,3 +1,4 @@
+export { useDeletePromotionFormAction } from "./useDeletePromotionFormAction";
 export {
   usePromotionFormResponsesExcelExport,
   type UsePromotionFormResponsesExcelExportParams,

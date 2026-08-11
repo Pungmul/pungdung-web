@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { promotionPerformanceListResponseSchema } from "./dto.schema";
+import {
+  deletePromotionFormResponseSchema,
+  promotionPerformanceListResponseSchema,
+} from "./dto.schema";
 
 describe("promotionPerformanceListResponseSchema", () => {
   it("accepts valid performanceList payload", () => {
@@ -29,5 +32,15 @@ describe("promotionPerformanceListResponseSchema", () => {
   it("rejects when performanceList is missing", () => {
     const parsed = promotionPerformanceListResponseSchema.safeParse({});
     expect(parsed.success).toBe(false);
+  });
+});
+
+describe("deletePromotionFormResponseSchema", () => {
+  it("null payload를 undefined로 변환한다", () => {
+    const parsed = deletePromotionFormResponseSchema.safeParse(null);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data).toBeUndefined();
+    }
   });
 });

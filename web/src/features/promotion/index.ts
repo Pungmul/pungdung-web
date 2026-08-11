@@ -20,6 +20,8 @@ export {
   answerDtoSchema,
   cancelPromotionResponse,
   createPromotionResponseSchema,
+  deletePromotionForm,
+  deletePromotionFormResponseSchema,
   fetchMyPromotionFormList,
   fetchPromotionDetail,
   fetchPromotionFormDraft,
@@ -91,6 +93,7 @@ export {
 export {
   type PublishPromotionFormSuccess,
   type SavePromotionFormDraftParams,
+  useDeletePromotionFormAction,
   usePromotionFormResponsesExcelExport,
   type UsePromotionFormResponsesExcelExportParams,
   usePromotionPosterUploadAction,

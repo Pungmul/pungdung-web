@@ -1,3 +1,4 @@
+export { deletePromotionForm } from "./delete-promotion-form.api";
 export type {
   PromotionApplicantAnswerWire,
   PromotionApplicationDetailWire,
@@ -19,6 +20,7 @@ export type {
 export {
   answerDtoSchema,
   createPromotionResponseSchema,
+  deletePromotionFormResponseSchema,
   formDetailDtoSchema,
   formDtoSchema,
   formSaveResponseSchema,
