@@ -8,6 +8,7 @@ import { Button, Header, Space, Spinner } from "@/shared";
 
 import { usePromotionPostingFormActions } from "../../../../hooks/actions";
 import type { PromotionFormDraft } from "../../../../types";
+import { PromotionDraftDeleteButton } from "../PromotionDraftDeleteButton";
 import { PromotionInfoForm } from "../PromotionInfoForm";
 import { PromotionPosterForm } from "../PromotionPoster";
 import { PromotionTabs } from "../PromotionTabs";
@@ -55,6 +56,8 @@ export function PromotionPostingFormBody({
         <Space h={32} />
 
         <PromotionTabs descriptionEditorRef={descriptionEditorRef} />
+
+        {formId ? <PromotionDraftDeleteButton formId={formId} /> : null}
 
         <Space h={64} />
 
