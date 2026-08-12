@@ -92,6 +92,12 @@ export const myCommentListPageDtoSchema = z.object({
 
 export const commentMutationResponseDtoSchema = z.unknown();
 
+export const commentLikeResponseDtoSchema = z.object({
+  commentId: z.number(),
+  liked: z.boolean(),
+  likeCount: z.number(),
+});
+
 export type CommentDto = z.infer<typeof commentDtoSchema>;
 export type CommentListResponseDto = z.infer<
   typeof commentListResponseDtoSchema
@@ -108,4 +114,7 @@ export type ReportCommentRequestDto = z.infer<
 >;
 export type CommentMutationResponseDto = z.infer<
   typeof commentMutationResponseDtoSchema
+>;
+export type CommentLikeResponseDto = z.infer<
+  typeof commentLikeResponseDtoSchema
 >;

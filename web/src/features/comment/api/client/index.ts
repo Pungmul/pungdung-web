@@ -7,6 +7,8 @@ export {
   commentDtoSchema,
   type CommentImageObjectDto,
   commentImageObjectDtoSchema,
+  type CommentLikeResponseDto,
+  commentLikeResponseDtoSchema,
   type CommentListResponseDto,
   commentListResponseDtoSchema,
   commentMutationResponseDtoSchema,
@@ -19,4 +21,5 @@ export {
   reportCommentRequestDtoSchema,
 } from "./dto.schema";
 export { fetchCommentList } from "./fetch-comment-list.api";
+export { likeComment } from "./like-comment.api";
 export { reportComment, type ReportCommentParams } from "./report-comment.api";

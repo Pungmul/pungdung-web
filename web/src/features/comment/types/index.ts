@@ -17,6 +17,12 @@ export interface Comment {
 
 export type Reply = Omit<Comment, "replies">;
 
+export interface CommentLikeSnapshot {
+  commentId: number;
+  liked: boolean;
+  likedNum: number;
+}
+
 export interface ReportedComment {
   commentId: number;
   content: string;
@@ -59,4 +65,3 @@ export interface MyCommentResponse {
   navigateFirstPage: number;
   navigateLastPage: number;
 }
-

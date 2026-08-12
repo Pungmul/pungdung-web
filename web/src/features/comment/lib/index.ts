@@ -1,6 +1,7 @@
 export { buildCommentTree } from "./build-comment-tree";
 export {
   mapCommentDtoToComment,
+  mapCommentLikeDtoToSnapshot,
   mapMyCommentListPageDtoToResponse,
 } from "./mappers";
 export {

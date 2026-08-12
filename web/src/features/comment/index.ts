@@ -9,6 +9,7 @@ export { mapCommentDtoToComment, mapMyCommentListPageDtoToResponse } from "./lib
 export { commentQueries } from "./queries";
 export type {
   Comment,
+  CommentLikeSnapshot,
   MyComment,
   MyCommentResponse,
   Reply,
