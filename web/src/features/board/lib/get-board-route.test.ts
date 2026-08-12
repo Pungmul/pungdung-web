@@ -13,4 +13,8 @@ describe("getBoardRoute", () => {
     );
     expect(getBoardRoute("promote")).not.toBe("/board/promote");
   });
+
+  it("tabId가 있으면 쿼리를 붙인다", () => {
+    expect(getBoardRoute(10, 201)).toBe("/board/10?tab=201");
+  });
 });

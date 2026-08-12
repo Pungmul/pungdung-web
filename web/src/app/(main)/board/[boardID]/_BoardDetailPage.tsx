@@ -32,7 +32,11 @@ export function BoardDetailPage({
     boardId,
     childCategories: boardData.boardInfo.childCategories,
   });
-  useTrackBoardVisit({ boardId, boardData });
+  useTrackBoardVisit({
+    boardId,
+    boardData,
+    selectedCategory,
+  });
 
   return (
     <section

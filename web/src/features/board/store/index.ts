@@ -1,3 +1,6 @@
 // Board Store Barrel Exports
-export { useFrequentBoard } from "./frequent-board.store";
+export {
+  frequentBoardItemKey,
+  useFrequentBoard,
+} from "./frequent-board.store";
 

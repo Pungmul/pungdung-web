@@ -5,7 +5,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Space, WebViewLink } from "@/shared/components";
 
 import { getBoardRoute } from "../../lib";
-import { useFrequentBoard } from "../../store";
+import { frequentBoardItemKey, useFrequentBoard } from "../../store";
 
 export function FrequentBoards() {
   // 즐겨 방문 게시판 칩 목록 · 제거
@@ -23,7 +23,7 @@ export function FrequentBoards() {
         </li>
         {boardList.map((board) => (
           <li
-            key={board.id}
+            key={frequentBoardItemKey(board)}
             className="flex flex-row items-center gap-2 p-2 flex-shrink-0 rounded-[4px] bg-primary text-background"
           >
             <button
@@ -37,7 +37,7 @@ export function FrequentBoards() {
               <XMarkIcon className="size-full" />
             </button>
             <WebViewLink
-              href={getBoardRoute(board.id)}
+              href={getBoardRoute(board.id, board.tabId)}
               className="text-m1 cursor-pointer leading-normal"
             >
               {board.name}

@@ -1,38 +1,44 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface BoardItem {
+interface FrequentBoardItem {
   id: number;
+  tabId?: number;
   name: string;
 }
 
 interface FrequentBoardStore {
-  boardList: BoardItem[];
-  visitBoard: (board: BoardItem) => void;
-  removeBoard: (board: BoardItem) => void;
+  boardList: FrequentBoardItem[];
+  visitBoard: (board: FrequentBoardItem) => void;
+  removeBoard: (board: FrequentBoardItem) => void;
+}
+
+export function frequentBoardItemKey(board: FrequentBoardItem): string {
+  return `${board.id}:${board.tabId ?? ""}`;
 }
 
 const useFrequentBoard = create<FrequentBoardStore>()(
   persist(
     (set, get) => ({
       boardList: [],
-      visitBoard: (board: BoardItem) => {
-        //맨앞이 최신값
+      visitBoard: (board: FrequentBoardItem) => {
+        // 맨 앞이 최신값
         const currentBoardList = get().boardList;
-
-        const newBoardList = [...currentBoardList].filter(
-          (b) => b.id !== board.id
+        const visitKey = frequentBoardItemKey(board);
+        const nextBoardList = currentBoardList.filter(
+          (item) => frequentBoardItemKey(item) !== visitKey
         );
-        newBoardList.unshift(board);
+        nextBoardList.unshift(board);
 
-        set({ boardList: newBoardList });
+        set({ boardList: nextBoardList });
       },
-      removeBoard: (board: BoardItem) => {
+      removeBoard: (board: FrequentBoardItem) => {
         const currentBoardList = get().boardList;
-        const newBoardList = currentBoardList.filter(
-          (b) => b.id !== board.id
+        const removeKey = frequentBoardItemKey(board);
+        const nextBoardList = currentBoardList.filter(
+          (item) => frequentBoardItemKey(item) !== removeKey
         );
-        set({ boardList: newBoardList });
+        set({ boardList: nextBoardList });
       },
     }),
     {
