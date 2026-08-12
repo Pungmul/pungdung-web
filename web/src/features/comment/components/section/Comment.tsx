@@ -30,8 +30,10 @@ const Comment = ({
     applyComposerFocusRef,
     setReplyTarget,
   });
-  // 추천: 확인 다이얼로그·토스트 (현재 서버 mutation 없음)
+  // 추천: 확인 후 서버 토글
   const handleLikeClick = useCommentLikeAcknowledgement({
+    commentId: comment.commentId,
+    postId: comment.postId,
     content: comment.content,
   });
 
@@ -50,16 +52,21 @@ const Comment = ({
         </div>
         <div className="flex flex-row items-center">
           <div
+            className="flex h-7 items-center cursor-pointer px-1 gap-0.5"
+            onClick={handleLikeClick}
+          >
+            <HandThumbUpIcon className="size-5 text-red-500" />
+            {comment.likedNum > 0 ? (
+              <span className="text-red-300 leading-6 text-[13px]">
+                {comment.likedNum}
+              </span>
+            ) : null}
+          </div>
+          <div
             className="size-7 p-1 cursor-pointer flex items-center justify-center"
             onClick={handleReplyClick}
           >
             <CommentOutline className="size-full text-grey-400" />
-          </div>
-          <div
-            className="size-7 p-1 cursor-pointer flex items-center justify-center"
-            onClick={handleLikeClick}
-          >
-            <HandThumbUpIcon className="size-full text-red-500" />
           </div>
           <div className="size-7 p-1 cursor-pointer">
             <CommentMenu comment={comment} />

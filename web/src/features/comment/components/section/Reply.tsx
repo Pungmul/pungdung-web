@@ -5,8 +5,10 @@ import { useCommentLikeAcknowledgement } from "../../hooks/actions";
 import type { Reply as ReplyType } from "../../types";
 
 const Reply = ({ reply }: { reply: ReplyType }) => {
-  // 추천: 확인 다이얼로그·토스트 (댓글과 동일 UX)
+  // 추천: 확인 후 서버 토글
   const handleLikeClick = useCommentLikeAcknowledgement({
+    commentId: reply.commentId,
+    postId: reply.postId,
     content: reply.content,
     confirmMessage: "이 대댓글을 추천하시겠습니까?",
   });
@@ -19,12 +21,17 @@ const Reply = ({ reply }: { reply: ReplyType }) => {
             {reply.userName}
           </div>
         </div>
-        <div className="flex flex-row items-center cursor-pointer">
+        <div className="flex flex-row items-center">
           <div
-            className="size-7 p-1 cursor-pointer flex items-center justify-center"
+            className="flex h-7 items-center cursor-pointer px-1 gap-0.5"
             onClick={handleLikeClick}
           >
-            <HandThumbUpIcon className="size-full text-red-500" />
+            <HandThumbUpIcon className="size-5 text-red-500" />
+            {reply.likedNum > 0 ? (
+              <span className="text-red-300 leading-6 text-[13px]">
+                {reply.likedNum}
+              </span>
+            ) : null}
           </div>
           <div className="size-7 p-1 cursor-pointer">
             <CommentMenu comment={reply} />
