@@ -6,6 +6,7 @@ import {
   createReply,
   deleteComment,
   deleteReply,
+  likeComment,
   reportComment,
 } from "../api/client";
 
@@ -43,5 +44,12 @@ export const commentMutationOptions = {
     mutationOptions({
       mutationKey: [...mutationRoot, "report"] as const,
       mutationFn: reportComment,
+    }),
+
+  like: () =>
+    mutationOptions({
+      mutationKey: [...mutationRoot, "like"] as const,
+      mutationFn: ({ commentId }: { commentId: number; postId: number }) =>
+        likeComment(commentId),
     }),
 };
