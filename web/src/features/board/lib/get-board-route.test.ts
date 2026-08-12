@@ -7,7 +7,10 @@ describe("getBoardRoute", () => {
     expect(getBoardRoute(42)).toBe("/board/42");
   });
 
-  it("문자열 id를 그대로 넣는다", () => {
-    expect(getBoardRoute("promote")).toBe("/board/promote");
+  it("홍보는 목록 경로로 보낸다", () => {
+    expect(getBoardRoute("promote")).toBe(
+      "/board/promote/l?tab=promotion-list"
+    );
+    expect(getBoardRoute("promote")).not.toBe("/board/promote");
   });
 });

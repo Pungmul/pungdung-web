@@ -2,24 +2,18 @@
 
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
-import { StarIcon as StarIconOutline } from "@heroicons/react/24/outline";
-import { StarIcon as StarIconSolid } from "@heroicons/react/24/solid";
-
-import { useLoginRequiredConfirmAction } from "@/features/auth";
-
-import { WebViewLink } from "@/shared/components";
-
-import { BoardGuestLoginPrompt } from "./BoardGuestLoginPrompt";
-import { boardHrefSegment } from "../../lib";
-import { sortBoardsWithBookmarks } from "../../services";
-import type { BoardSummary } from "../../types";
+import { BoardListItem } from "./BoardListItem";
+import { sortBoardsWithBookmarks } from "../../../services";
+import type { BoardSummary } from "../../../types";
+import { BoardGuestLoginPrompt } from "../BoardGuestLoginPrompt";
 
 interface BoardListProps {
   boardList: BoardSummary[];
   isGuest: boolean;
 }
 
-/** 비로그인 목록에서 자유·악기와 나머지 공개 게시판의 노출 우선순위를 반환한다. */
+// 비로그인 노출 순서
+// 자유 0, 악기 1, 기타 공개 2, 비공개 -1
 function getGuestFeaturedBoardOrder(board: BoardSummary): number {
   if (board.name === "자유게시판" || board.name === "자유 게시판") return 0;
   if (board.name === "악기 게시판") return 1;
@@ -92,27 +86,33 @@ const BoardList = memo(function BoardList({
     [sortedBoardList]
   );
 
-  const renderBoardListItem = (board: BoardSummary) => (
-    <BoardListItem
-      key={board.id}
-      isBookmarked={bookmarkedBoardList.includes(board.id)}
-      board={board}
-      toggleBookmark={toggleBookmark}
-      isGuest={isGuest}
-    />
-  );
-
   return (
     <ul className="py-3 px-2 border-0.5 border-background bg-background rounded-md flex flex-col gap-2 list-none flex-grow">
       {isGuest ? (
         <>
-          {guestFeaturedBoardList.map((board) => renderBoardListItem(board))}
+          {guestFeaturedBoardList.map((board) => (
+            <BoardListItem
+              key={board.id}
+              isBookmarked={bookmarkedBoardList.includes(board.id)}
+              board={board}
+              toggleBookmark={toggleBookmark}
+              isGuest={isGuest}
+            />
+          ))}
           <li className="relative min-h-28 flex-grow">
             <ul
               inert
               className="flex flex-col gap-2 pointer-events-none blur-[2px] opacity-50"
             >
-              {guestRestrictedBoardList.map(renderBoardListItem)}
+              {guestRestrictedBoardList.map((board) => (
+                <BoardListItem
+                  key={board.id}
+                  isBookmarked={bookmarkedBoardList.includes(board.id)}
+                  board={board}
+                  toggleBookmark={toggleBookmark}
+                  isGuest={isGuest}
+                />
+              ))}
             </ul>
             <div className="absolute inset-0 z-10 [background:color-mix(in_srgb,var(--background)_70%,transparent)] backdrop-blur-sm">
               <BoardGuestLoginPrompt
@@ -124,82 +124,18 @@ const BoardList = memo(function BoardList({
           </li>
         </>
       ) : (
-        sortedBoardList.map((board) => renderBoardListItem(board))
+        sortedBoardList.map((board) => (
+          <BoardListItem
+            key={board.id}
+            isBookmarked={bookmarkedBoardList.includes(board.id)}
+            board={board}
+            toggleBookmark={toggleBookmark}
+            isGuest={isGuest}
+          />
+        ))
       )}
     </ul>
   );
 });
 
 export { BoardList };
-
-const BoardListItem = memo(
-  ({
-    isBookmarked,
-    board,
-    toggleBookmark,
-    isGuest,
-  }: {
-    isBookmarked: boolean;
-    board: BoardSummary;
-    toggleBookmark: (board: BoardSummary) => void;
-    isGuest: boolean;
-  }) => {
-    const { requestLogin } = useLoginRequiredConfirmAction();
-    const { isPublic } = board;
-
-    return (
-      <li className="w-full px-[12px] py-[8px] flex flex-row items-center gap-[8px]">
-        <div
-          className="flex size-7 cursor-pointer items-center justify-center p-0.5"
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleBookmark(board);
-          }}
-        >
-          {isBookmarked ? (
-            <span className="flex size-full items-center justify-center">
-              <StarIconSolid className="size-full" color="#ffadad" />
-            </span>
-          ) : (
-            <span className="flex size-full items-center justify-center">
-              <StarIconOutline className="size-full" color="#ffadad" />
-            </span>
-          )}
-        </div>
-        <div
-          className="flex-grow"
-          onClickCapture={(event) => {
-            if (!isGuest || isPublic) return;
-
-            event.preventDefault();
-            event.stopPropagation();
-            requestLogin();
-          }}
-          onKeyDownCapture={(event) => {
-            if (
-              !isGuest ||
-              isPublic ||
-              (event.key !== "Enter" && event.key !== " ")
-            ) {
-              return;
-            }
-
-            event.preventDefault();
-            event.stopPropagation();
-            requestLogin();
-          }}
-        >
-          <WebViewLink
-            href={`/board/${boardHrefSegment(board.id)}`}
-            className="text-[15px] leading-7 text-grey-600"
-            prefetch
-          >
-            {board.name}
-          </WebViewLink>
-        </div>
-      </li>
-    );
-  }
-);
-
-BoardListItem.displayName = "BoardListItem";

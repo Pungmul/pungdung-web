@@ -4,7 +4,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 
 import { Space, WebViewLink } from "@/shared/components";
 
-import { boardHrefSegment } from "../../lib";
+import { getBoardRoute } from "../../lib";
 import { useFrequentBoard } from "../../store";
 
 export function FrequentBoards() {
@@ -37,7 +37,7 @@ export function FrequentBoards() {
               <XMarkIcon className="size-full" />
             </button>
             <WebViewLink
-              href={`/board/${boardHrefSegment(board.id)}`}
+              href={getBoardRoute(board.id)}
               className="text-m1 cursor-pointer leading-normal"
             >
               {board.name}

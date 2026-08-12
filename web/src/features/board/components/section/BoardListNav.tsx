@@ -9,7 +9,7 @@ import { useLoginRequiredConfirmAction } from "@/features/auth";
 
 import { cn } from "@/shared";
 
-import { boardHrefSegment } from "../../lib";
+import { boardHrefSegment, getBoardRoute } from "../../lib";
 import { boardQueries } from "../../queries";
 
 function boardNavLinkClass(isActive: boolean) {
@@ -62,23 +62,24 @@ export function BoardListNav({ isGuest = false }: { isGuest?: boolean }) {
             </Link>
           </li>
           {boardList.map((board) => {
-            const segment = boardHrefSegment(board.id);
+            const activeSegment = boardHrefSegment(board.id);
+            const landingHref = getBoardRoute(board.id);
             const { isPublic } = board;
             return (
               <li key={board.id}>
                 <Link
-                  href={`/board/${segment}`}
+                  href={landingHref}
                   prefetch={false}
                   className={boardNavLinkClass(
-                    isBoardPathActive(pathname, segment)
+                    isBoardPathActive(pathname, activeSegment)
                   )}
                   onMouseEnter={() => {
                     if (isGuest && !isPublic) return;
-                    void router.prefetch(`/board/${segment}`);
+                    void router.prefetch(landingHref);
                   }}
                   onTouchStart={() => {
                     if (isGuest && !isPublic) return;
-                    void router.prefetch(`/board/${segment}`);
+                    void router.prefetch(landingHref);
                   }}
                   onClick={(event) => {
                     if (!isGuest || isPublic) return;
