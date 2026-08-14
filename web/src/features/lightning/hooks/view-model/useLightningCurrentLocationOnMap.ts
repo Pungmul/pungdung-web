@@ -25,6 +25,7 @@ export const useLightningCurrentLocationOnMap = ({
   panToCenter,
 }: UseLightningCurrentLocationOnMapProps) => {
   const currentLocation = locationStore((state) => state.currentLocation);
+  const locationSource = locationStore((state) => state.locationSource);
 
   const [isLocationLoaded, setIsLocationLoaded] = useState(false);
   const GPSmarkerRef = useRef<kakao.maps.Marker | null>(null);
@@ -44,8 +45,8 @@ export const useLightningCurrentLocationOnMap = ({
       locationPoint.longitude
     );
 
-    // 폴백 좌표만 쓸 때는 ‘내 위치’ 마커를 두지 않고 지도 중심만 맞춘다.
-    if (currentLocation == null) {
+    // GPS가 아닐 때는 내 위치 마커를 두지 않고 지도 중심만 맞춘다
+    if (currentLocation == null || locationSource !== "gps") {
       mapRef.current.setCenter(currentLatLon);
       GPSmarkerRef.current?.setMap(null);
       setIsLocationLoaded(true);
@@ -69,7 +70,7 @@ export const useLightningCurrentLocationOnMap = ({
     return () => {
       GPSmarkerRef.current?.setMap(null);
     };
-  }, [currentLocation, isMapReady, mapRef]);
+  }, [currentLocation, isMapReady, locationSource, mapRef]);
 
   useKakaoMapsEffect(syncCurrentLocationMarker);
 
