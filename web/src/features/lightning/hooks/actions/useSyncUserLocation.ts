@@ -4,47 +4,46 @@ import { useEffect } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { locationStore } from "@/features/location";
+import { clubQueries } from "@/features/club";
+import {
+  hydrateResolvedLocation,
+  isFiniteLatLng,
+  locationStore,
+  resolveSchoolNameFromGroupName,
+  syncResolvedLocationToServer,
+} from "@/features/location";
+import { myPageQueries } from "@/features/my-page";
 
-import { useUpdateUserLocation } from "./useUpdateUserLocation";
 import { lightningQueries } from "../../queries";
 
 export const useSyncUserLocation = () => {
   const currentLocation = locationStore((state) => state.currentLocation);
-  const setCurrentLocation = locationStore((state) => state.setCurrentLocation);
-  const getCurrentPosition = locationStore((state) => state.getCurrentPosition);
-
+  const myInfoQuery = useQuery(myPageQueries.info());
+  const clubListQuery = useQuery(clubQueries.list());
   const { data: serverUserLocation } = useQuery(
     lightningQueries.userLocation()
   );
-  const { mutateAsync: updateLocationMutation } = useUpdateUserLocation();
+  const fallbackReady = myInfoQuery.isFetched && clubListQuery.isFetched;
+  const schoolKeyword = resolveSchoolNameFromGroupName(
+    myInfoQuery.data?.groupName,
+    clubListQuery.data ?? []
+  );
 
   useEffect(() => {
-    if (!currentLocation) {
-      getCurrentPosition().then((position) => {
-        if (!position) return;
-        setCurrentLocation(position);
-      });
+    if (!fallbackReady) {
       return;
     }
 
-    const isOutOfSync =
-      serverUserLocation?.latitude !== undefined &&
-      serverUserLocation?.longitude !== undefined &&
-      (serverUserLocation.latitude !== currentLocation.latitude ||
-        serverUserLocation.longitude !== currentLocation.longitude);
+    void hydrateResolvedLocation(schoolKeyword);
+  }, [fallbackReady, schoolKeyword]);
 
-    if (isOutOfSync) {
-      updateLocationMutation({
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
-      });
+  useEffect(() => {
+    if (!currentLocation) {
+      return;
     }
-  }, [
-    currentLocation,
-    getCurrentPosition,
-    serverUserLocation,
-    setCurrentLocation,
-    updateLocationMutation,
-  ]);
+
+    void syncResolvedLocationToServer(
+      isFiniteLatLng(serverUserLocation) ? serverUserLocation : null
+    );
+  }, [currentLocation, serverUserLocation]);
 };

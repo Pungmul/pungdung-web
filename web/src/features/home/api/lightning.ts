@@ -1,28 +1,21 @@
+import { clubListApi } from "@/features/club";
 import {
   fetchNearLightning,
   type NearLightningType,
 } from "@/features/lightning";
+import { getMyPageInfo } from "@/features/my-page";
 
+import { fetchUserLocation } from "@/features/location/api/client";
 import {
-  fetchUserLocation,
-  updateUserLocation,
-} from "@/features/location/api/client";
-import { getGeolocationUserMessage } from "@/features/location/services";
+  isFiniteLatLng,
+  resolveSchoolNameFromGroupName,
+} from "@/features/location/lib";
+import {
+  getGeolocationUserMessage,
+  hydrateResolvedLocation,
+  syncResolvedLocationToServer,
+} from "@/features/location/services";
 import { locationStore } from "@/features/location/store";
-
-function isLocationValid(location: unknown): boolean {
-  if (typeof location !== "object" || location === null) return false;
-  const { latitude, longitude } = location as {
-    latitude?: number | null;
-    longitude?: number | null;
-  };
-  return (
-    typeof latitude === "number" &&
-    typeof longitude === "number" &&
-    Number.isFinite(latitude) &&
-    Number.isFinite(longitude)
-  );
-}
 
 function getThrownMessage(error: unknown): string {
   const geoMsg = getGeolocationUserMessage(error);
@@ -43,17 +36,19 @@ function getThrownMessage(error: unknown): string {
 export async function loadNearLightning(): Promise<NearLightningType[]> {
   try {
     const userLocation = await fetchUserLocation();
+    const store = locationStore.getState();
 
-    if (!isLocationValid(userLocation)) {
-      const newLocation = await locationStore.getState().getCurrentPosition();
-      if (!newLocation) {
-        throw new Error("위치 정보를 가져올 수 없습니다.");
-      }
-      await updateUserLocation({
-        latitude: newLocation.latitude,
-        longitude: newLocation.longitude,
-      });
+    if (store.locationSource == null) {
+      const member = await getMyPageInfo().catch(() => null);
+      const clubList = await clubListApi().catch(() => []);
+      await hydrateResolvedLocation(
+        resolveSchoolNameFromGroupName(member?.groupName, clubList)
+      );
     }
+
+    await syncResolvedLocationToServer(
+      isFiniteLatLng(userLocation) ? userLocation : null
+    );
 
     const { lightningMeetingList } = await fetchNearLightning();
     return lightningMeetingList;
