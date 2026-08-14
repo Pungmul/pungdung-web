@@ -9,6 +9,8 @@ import {
 } from "framer-motion";
 import type { ReactNode, RefObject } from "react";
 
+import { LocationReferenceHint } from "@/features/location";
+
 import { GPSOutline } from "@/shared/components/Icons";
 
 import {
@@ -21,6 +23,7 @@ import {
 import { getElementTranslateY } from "../../../lib/get-element-translate-y";
 import { resolveNearestBottomSheetLevel } from "../../../lib/resolve-nearest-bottom-sheet-level";
 import type { LightningBottomSheetRefType } from "../../../types";
+import { LightningNearbyTitle } from "../../section/nearby/LightningNearbyTitle";
 
 type LightningBottomSheetProps = {
   bottomSheetRef: RefObject<LightningBottomSheetRefType | null>;
@@ -236,7 +239,7 @@ export function LightningBottomSheet({
       </div>
       <div
         ref={sheetRef}
-        className="relative z-10 bottom-0 w-full rounded-tl-[12px] rounded-tr-[12px] shadow-up-md bg-background overflow-hidden flex flex-col lg:h-full lg:w-[640px] lg:py-[32px] lg:gap-[24px]"
+        className="relative z-10 bottom-0 w-full rounded-tl-[12px] rounded-tr-[12px] shadow-up-md bg-background overflow-visible flex flex-col lg:h-full lg:w-[640px] lg:py-[32px] lg:gap-[24px]"
       >
         <div
           className="flex flex-col w-full cursor-grab active:cursor-grabbing touch-none"
@@ -245,9 +248,7 @@ export function LightningBottomSheet({
           <div className="lg:hidden w-full py-[12px]">
             <div className="w-[136px] h-[4px] bg-grey-400 rounded-full mx-auto" />
           </div>
-          <div className="px-[24px] py-[8px] text-lg font-semibold">
-            내 주변에 발생한 <span className="text-secondary">번개</span>
-          </div>
+          <LightningNearbyTitle />
           <div className="flex flex-row gap-2 px-[24px] py-[8px]">
             {targetOptions.map((item) => (
               <div
@@ -265,7 +266,12 @@ export function LightningBottomSheet({
             ))}
           </div>
         </div>
-        <div className="py-[8px]">{children({ expandSheet })}</div>
+        <div className="min-h-0 overflow-y-auto py-[8px]">
+          {children({ expandSheet })}
+        </div>
+        <div className="px-[24px] pb-[12px]">
+          <LocationReferenceHint />
+        </div>
       </div>
     </motion.div>
   );

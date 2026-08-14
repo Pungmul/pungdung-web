@@ -4,7 +4,7 @@ export type {
 } from "./api/client";
 export { fetchUserLocation, updateUserLocation } from "./api/client";
 export { searchSchoolPlaceByKeyword } from "./api/server";
-export { LocationReferenceHint } from "./components";
+export { LocationAllowCta, LocationReferenceHint } from "./components";
 export * from "./constant";
 export * from "./lib";
 export * from "./queries";

@@ -2,7 +2,11 @@
 
 import type { ReactNode } from "react";
 
+import { LocationReferenceHint } from "@/features/location";
+
 import { Space } from "@/shared";
+
+import { LightningNearbyTitle } from "../../section/nearby/LightningNearbyTitle";
 
 type LightningSidebarProps = {
   target: "전체" | "우리학교";
@@ -18,11 +22,9 @@ export function LightningSidebar({
   children,
 }: LightningSidebarProps) {
   return (
-    <div className="relative z-10 rounded-tr-xl rounded-br-xl shadow-up-md bg-background overflow-hidden flex flex-col h-full w-[640px]">
+    <div className="relative z-10 rounded-tr-xl rounded-br-xl shadow-up-md bg-background overflow-visible flex flex-col h-full w-[640px]">
       <Space h={36} />
-      <div className="px-[24px] py-[8px] text-lg font-semibold">
-        내 주변에 발생한 <span className="text-secondary">번개</span>
-      </div>
+      <LightningNearbyTitle />
 
       <div className="flex flex-row gap-2 px-[24px] py-[8px]">
         {targetOptions.map((item) => (
@@ -43,6 +45,9 @@ export function LightningSidebar({
 
       <Space h={24} />
       {children}
+      <div className="mt-auto px-[24px] pb-[16px]">
+        <LocationReferenceHint />
+      </div>
     </div>
   );
 }
