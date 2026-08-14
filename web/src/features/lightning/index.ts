@@ -4,6 +4,7 @@ export {
   LightningMapSection,
   LightningParticipationOverlay,
   LightningSocketReconnectIndicator,
+  NearbyLightningHeading,
   NearLightningContent,
 } from "./components";
 export {

@@ -3,6 +3,7 @@ export { createGPSMarker } from "./create-gps-marker";
 export { createLightningCircle } from "./create-lightning-circle";
 export { getAdjustedCenter } from "./get-adjusted-center";
 export * from "./mappers";
+export { getNearbyLightningTitlePrefix } from "./nearby-lightning-title";
 export { parseDistanceToString } from "./parse-distance-to-string";
 export {
   applyDigitUpdateWithFlash,
