@@ -3,4 +3,4 @@ export type LocationType = {
   longitude: number;
 };
 
-
+export type LocationSource = "gps" | "school" | "seoul_station";
