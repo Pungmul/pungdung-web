@@ -3,6 +3,7 @@ export type {
   UpdateUserLocationRequest,
 } from "./api/client";
 export { fetchUserLocation, updateUserLocation } from "./api/client";
+export { searchSchoolPlaceByKeyword } from "./api/server";
 export * from "./constant";
 export * from "./lib";
 export * from "./queries";
