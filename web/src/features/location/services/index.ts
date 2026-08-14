@@ -1,4 +1,5 @@
 export { getGeolocationUserMessage } from "./get-geolocation-user-message";
+export { hydrateResolvedLocation } from "./hydrate-resolved-location";
 export {
   alignStoreToServerLocation,
   persistCurrentLocationToServer,
