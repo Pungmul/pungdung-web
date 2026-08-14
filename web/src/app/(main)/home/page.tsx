@@ -5,8 +5,13 @@ import { Suspense } from "@suspensive/react";
 
 import { hasAuthSessionCookie, LoginRequiredPage } from "@/features/auth";
 import { FrequentBoards } from "@/features/board";
-import { HomeHeader, HomeHotPostList } from "@/features/home";
-import { NearLightningContent } from "@/features/lightning";
+import {
+  HomeHeader,
+  HomeHotPostList,
+  HomeNearLightningAllowCta,
+} from "@/features/home";
+import { NearbyLightningHeading, NearLightningContent } from "@/features/lightning";
+import { LocationReferenceHint } from "@/features/location";
 import { NotificationPermissionRequestCTA } from "@/features/notification";
 
 import { SkeletonView } from "@/shared";
@@ -41,9 +46,20 @@ export default async function Home() {
           <FrequentBoards />
         </header>
         <main className="relative w-full h-full flex-grow flex flex-col gap-[32px]">
-          <section className="flex flex-col gap-[28px] pb-[16px]">
-            <h2 className="text-h2 px-[24px]">근처에서 생긴 번개</h2>
-            <NearLightningContent />
+          <section className="flex flex-col gap-[12px] pb-[16px]">
+            <NearLightningContent
+              header={
+                <div className="relative z-30 flex flex-row items-center justify-between gap-2 overflow-visible px-[24px]">
+                  <NearbyLightningHeading as="h2" className="min-w-0 text-h2" />
+                  <HomeNearLightningAllowCta />
+                </div>
+              }
+              footer={
+                <div className="px-[24px]">
+                  <LocationReferenceHint />
+                </div>
+              }
+            />
           </section>
           <section className="flex flex-col gap-[28px] pb-[32px]">
             <div className="flex flex-row items-end px-[24px] gap-[8px]">
