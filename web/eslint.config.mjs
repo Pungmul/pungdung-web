@@ -1,5 +1,6 @@
 import { FlatCompat } from "@eslint/eslintrc";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
+import storybook from "eslint-plugin-storybook";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -18,6 +19,7 @@ const eslintConfig = [
       "out/**",
       "dist/**",
       "build/**",
+      "storybook-static/**",
 
       "**/*.test.ts",
       "**/*.test.tsx",
@@ -90,6 +92,7 @@ const eslintConfig = [
     },
   },
 
+  ...storybook.configs["flat/recommended"],
 ];
 
 export default eslintConfig;

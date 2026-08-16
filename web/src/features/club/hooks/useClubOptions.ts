@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-import { SelectorItem } from "@/shared/components/form/Selector";
+import type { SelectorItem } from "@/shared/components/form/Select";
 
 import type { ClubInfo } from "../types";
 

@@ -7,7 +7,7 @@ export { default as Input } from './Input'
 export { NumberStepper } from './NumberStepper'
 export { RangeSlider } from "./RangeSlider"
 export { default as SearchInput } from './SearchInput'
-export { Select } from './Select' 
+export { Select, type SelectorItem } from "./Select"; 
 export { TextArea } from './TextArea'
 export { TimeInput } from './TimeInput'
 export { TimePicker } from './TimePicker'

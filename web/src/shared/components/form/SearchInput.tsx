@@ -35,13 +35,18 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       [value]
     );
 
-    const handleClear = useCallback(() => {
-      onChange?.({
-        target: {
-          value: "",
-        },
-      } as React.ChangeEvent<HTMLInputElement>);
-    }, [onChange]);
+    const handleClear = useCallback(
+      (event: React.MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onChange?.({
+          target: {
+            value: "",
+          },
+        } as React.ChangeEvent<HTMLInputElement>);
+      },
+      [onChange]
+    );
 
     const isMutedBar = variant === "mutedBar";
 
