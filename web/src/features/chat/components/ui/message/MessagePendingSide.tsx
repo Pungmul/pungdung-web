@@ -28,22 +28,26 @@ export function MessagePendingSide({
 
     return (
       <div className="flex flex-row gap-2">
-        <span
-          className="flex size-4 cursor-pointer items-center justify-center"
+        <button
+          type="button"
+          aria-label="메시지 다시 보내기"
+          className="flex size-4 cursor-pointer items-center justify-center border-0 bg-transparent p-0"
           onClick={() => {
             onRetryFailedText(message);
           }}
         >
           <PaperAirplaneIcon className="size-full text-[#ff6767]" />
-        </span>
-        <span
-          className="flex size-4 cursor-pointer items-center justify-center"
+        </button>
+        <button
+          type="button"
+          aria-label="메시지 삭제"
+          className="flex size-4 cursor-pointer items-center justify-center border-0 bg-transparent p-0"
           onClick={() => {
             onDeletePending(message);
           }}
         >
           <XMarkIcon className="size-full text-[#ff6767]" />
-        </span>
+        </button>
       </div>
     );
   }
@@ -61,22 +65,26 @@ export function MessagePendingSide({
 
   return (
     <div className="flex flex-row gap-2">
-      <span
-        className="flex size-4 cursor-pointer items-center justify-center"
+      <button
+        type="button"
+        aria-label="이미지 다시 보내기"
+        className="flex size-4 cursor-pointer items-center justify-center border-0 bg-transparent p-0"
         onClick={() => {
           void onRetryFailedImage(message);
         }}
       >
         <PaperAirplaneIcon className="size-full text-[#ff6767]" />
-      </span>
-      <span
-        className="flex size-4 cursor-pointer items-center justify-center"
+      </button>
+      <button
+        type="button"
+        aria-label="메시지 삭제"
+        className="flex size-4 cursor-pointer items-center justify-center border-0 bg-transparent p-0"
         onClick={() => {
           onDeletePending(message);
         }}
       >
         <XMarkIcon className="size-full text-[#ff6767]" />
-      </span>
+      </button>
     </div>
   );
 }

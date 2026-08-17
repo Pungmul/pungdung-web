@@ -18,7 +18,8 @@ export default function QueryProvider({ children }: QueryProviderProps) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {process.env.NODE_ENV === 'development' && (
+      {process.env.NODE_ENV === 'development' &&
+        process.env.NEXT_PUBLIC_E2E !== '1' && (
         <ReactQueryDevtools 
           initialIsOpen={false}
         />
