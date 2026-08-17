@@ -7,6 +7,7 @@ import { MagnifyingGlassIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import type { LocationType } from "@/features/location";
 import { locationStore, MAP_LOCATION_FALLBACK } from "@/features/location";
 
+import { E2eLocationMapPicker } from "./E2eLocationMapPicker";
 import { Spinner } from "./Spinner";
 import { useKakaoMaps } from "../../hooks";
 
@@ -28,7 +29,15 @@ function isUsableInitialMapLocation(loc: LocationType | null | undefined): loc i
   return true;
 }
 
-export function LocationMapPicker({
+export function LocationMapPicker(props: LocationMapPickerProps) {
+  if (process.env.NEXT_PUBLIC_E2E === "1") {
+    return <E2eLocationMapPicker {...props} />;
+  }
+
+  return <KakaoLocationMapPicker {...props} />;
+}
+
+function KakaoLocationMapPicker({
   initialLocation,
   onLocationChange,
   showSearchBar = true,

@@ -12,6 +12,12 @@
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test -c ./playwright.config.ts",
+    "test:e2e:ui": "playwright test -c ./playwright.config.ts --ui",
+    "test:e2e:mobile-chrome": "playwright test -c ./playwright.config.ts --project=mobile-chrome",
+    "test:e2e:mobile-safari": "playwright test -c ./playwright.config.ts --project=mobile-safari",
+    "test:e2e:desktop-chrome": "playwright test -c ./playwright.config.ts --project=desktop-chrome",
+    "test:e2e:pwa": "playwright test -c ./playwright.config.ts --project=pwa",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -64,6 +70,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.5",
+    "@playwright/test": "1.51.1",
     "@storybook/addon-a11y": "10.5.8",
     "@storybook/addon-docs": "10.5.8",
     "@storybook/nextjs-vite": "10.5.8",

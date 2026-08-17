@@ -48,6 +48,7 @@
   "exclude": [
     "node_modules",
     "vitest.config.mts",
+    "e2e",
     "../packages/worker-socket-bridge/workers",
     "../packages/worker-socket-bridge/stomp"
   ]

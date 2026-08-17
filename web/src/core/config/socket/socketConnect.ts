@@ -1,5 +1,7 @@
 import type { SocketConfig, SocketStompConfig } from "@pungdung/worker-socket-bridge/protocol";
 
+import { isE2ERuntime } from "./e2eRuntime";
+
 export type { CreateSocketConnectConfig } from "@pungdung/worker-socket-bridge/react";
 
 const rawSocketUrl =
@@ -23,7 +25,8 @@ export const defaultSocketUrl = normalizeSocketUrl(rawSocketUrl);
 
 /** STOMP 클라이언트 기본 옵션. 앱/환경별로 이 파일에서 조정한다. */
 export const defaultStompConfig = {
-  reconnectDelay: 5000,
+  // E2E는 close 후 복구 검증을 위해 재연결 대기를 줄임
+  reconnectDelay: isE2ERuntime() ? 200 : 5000,
   /** 탭이 살아 있을 때 idle disconnect를 줄이기 위한 heartbeat */
   heartbeatIncoming: 10_000,
   heartbeatOutgoing: 10_000,
@@ -38,6 +41,10 @@ export function createAuthenticatedSocketConfig(
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
+    // Playwright routeWebSocket은 SockJS XHR fallback을 잡지 못함
+    ...(isE2ERuntime()
+      ? { sockJsOptions: { transports: ["websocket"] } }
+      : {}),
     stomp: defaultStompConfig,
   };
 }

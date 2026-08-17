@@ -18,6 +18,8 @@
     "test:run:web": "pnpm --filter @pungdung/web test:run",
     "test:ui:web": "pnpm --filter @pungdung/web test:ui",
     "test:coverage:web": "pnpm --filter @pungdung/web test:coverage",
+    "test:e2e:web": "pnpm --filter @pungdung/web test:e2e",
+    "test:e2e:web:mobile-chrome": "pnpm --filter @pungdung/web test:e2e:mobile-chrome",
     "storybook:web": "pnpm --filter @pungdung/web storybook",
     "build-storybook:web": "pnpm --filter @pungdung/web build-storybook",
     "prebuild:native": "pnpm --filter @pungdung/native prebuild",
