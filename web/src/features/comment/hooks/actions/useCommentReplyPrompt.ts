@@ -22,7 +22,7 @@ export function useCommentReplyPrompt({
   setReplyTarget,
 }: UseCommentReplyPromptParams) {
   return useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
+    (event: MouseEvent<HTMLElement>) => {
       event.stopPropagation();
       Alert.confirm({
         title: "대댓글 작성",

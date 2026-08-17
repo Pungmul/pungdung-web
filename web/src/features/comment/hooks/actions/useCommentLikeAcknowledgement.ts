@@ -42,7 +42,7 @@ export function useCommentLikeAcknowledgement({
   });
 
   return useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
+    (event: MouseEvent<HTMLElement>) => {
       event.stopPropagation();
       Alert.confirm({
         title: "추천",
