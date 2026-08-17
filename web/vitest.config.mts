@@ -4,33 +4,32 @@ import { transformWithEsbuild } from "vite";
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 
-/** vitest에서 worker-socket-bridge 패키지 대신 패키지 공식 testing subpath 사용 */
-function workerSocketBridgeTestMock(): Plugin {
-  const reactMock = path.resolve(
-    __dirname,
-    "../../packages/worker-socket-bridge/src/react/testing/index.tsx"
-  );
-  const coreMock = path.resolve(
-    __dirname,
-    "../../packages/worker-socket-bridge/src/testing/index.ts"
-  );
+const configDir = import.meta.dirname;
+const workerSocketReactMock = path.resolve(
+  configDir,
+  "../packages/worker-socket-bridge/src/react/testing/index.tsx"
+);
+const workerSocketCoreMock = path.resolve(
+  configDir,
+  "../packages/worker-socket-bridge/src/testing/index.ts"
+);
 
+function workerSocketBridgeTestMock(): Plugin {
   return {
     name: "worker-socket-bridge-test-mock",
     enforce: "pre",
     resolveId(source) {
       if (source === "@pungdung/worker-socket-bridge/react") {
-        return reactMock;
+        return workerSocketReactMock;
       }
       if (source === "@pungdung/worker-socket-bridge") {
-        return coreMock;
+        return workerSocketCoreMock;
       }
       return null;
     },
   };
 }
 
-/** tsconfig `jsx: preserve` 환경에서 vitest import-analysis 실패 방지 */
 function vitestTsxPreTransform(): Plugin {
   const srcRoot = `${path.sep}src${path.sep}`;
   return {
@@ -53,22 +52,24 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
     alias: [
-      { find: "@", replacement: path.resolve(__dirname, "src") },
       {
-        find: "@pungdung/worker-socket-bridge/react",
-        replacement: path.resolve(
-          __dirname,
-          "../../packages/worker-socket-bridge/src/react/testing/index.tsx"
-        ),
+        find: /^@\//,
+        replacement: `${path.resolve(configDir, "src")}/`,
       },
       {
-        find: "@pungdung/worker-socket-bridge",
-        replacement: path.resolve(
-          __dirname,
-          "../../packages/worker-socket-bridge/src/testing/index.ts"
-        ),
+        find: /^@pungdung\/worker-socket-bridge\/react$/,
+        replacement: workerSocketReactMock,
+      },
+      {
+        find: /^@pungdung\/worker-socket-bridge$/,
+        replacement: workerSocketCoreMock,
       },
     ],
+  },
+  server: {
+    fs: {
+      allow: [path.resolve(configDir, ".."), path.resolve(configDir, "../packages")],
+    },
   },
   test: {
     environment: "jsdom",

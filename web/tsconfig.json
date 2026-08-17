@@ -47,7 +47,7 @@
   ],
   "exclude": [
     "node_modules",
-    "vitest.config.ts",
+    "vitest.config.mts",
     "../packages/worker-socket-bridge/workers",
     "../packages/worker-socket-bridge/stomp"
   ]

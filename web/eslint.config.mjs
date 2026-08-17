@@ -31,7 +31,7 @@ const eslintConfig = [
 
       "*.config.js",
       "*.config.ts",
-      "vitest.config.ts",
+      "vitest.config.mts",
       "next.config.mjs",
 
       "public/mockServiceWorker.js",
