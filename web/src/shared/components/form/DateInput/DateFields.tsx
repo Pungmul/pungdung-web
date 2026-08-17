@@ -18,9 +18,9 @@ interface DateFieldsProps {
   onInput: (type: DateFieldType, inputText: string) => string;
   onFocus: (e: React.FocusEvent<HTMLSpanElement>) => void;
   onBeforeInput: (e: React.FormEvent<HTMLSpanElement>) => void;
-  disabled?: boolean;
-  describedBy?: string;
-  isInvalid?: boolean;
+  disabled?: boolean | undefined;
+  describedBy?: string | undefined;
+  isInvalid?: boolean | undefined;
 }
 
 export const DateFields = forwardRef<HTMLDivElement, DateFieldsProps>(

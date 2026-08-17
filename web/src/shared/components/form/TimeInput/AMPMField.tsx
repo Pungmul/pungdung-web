@@ -9,9 +9,9 @@ interface AMPMFieldProps {
   onBeforeInput: (e: React.FormEvent<HTMLSpanElement>) => void;
   placeholder?: string;
   className?: string;
-  describedBy?: string;
-  isInvalid?: boolean;
-  disabled?: boolean;
+  describedBy?: string | undefined;
+  isInvalid?: boolean | undefined;
+  disabled?: boolean | undefined;
 }
 
 export interface AMPMFieldRef {

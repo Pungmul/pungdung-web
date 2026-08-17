@@ -17,10 +17,10 @@ interface BaseTimeFieldsProps {
   onInput: (type: TimeFieldType | "ampm", inputText: string) => string;
   onFocus: (e: React.FocusEvent<HTMLSpanElement>) => void;
   onBeforeInput: (e: React.FormEvent<HTMLSpanElement>) => void;
-  disabled?: boolean;
+  disabled?: boolean | undefined;
   showAmPm?: boolean;
-  describedBy?: string;
-  isInvalid?: boolean;
+  describedBy?: string | undefined;
+  isInvalid?: boolean | undefined;
 }
 
 interface TimeFieldsPropsWithoutSeconds extends BaseTimeFieldsProps {

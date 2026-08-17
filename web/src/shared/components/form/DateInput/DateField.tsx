@@ -10,11 +10,11 @@ interface NumericFieldProps<T extends FieldType> {
   onFocus: (e: React.FocusEvent<HTMLSpanElement>) => void;
   onBeforeInput: (e: React.FormEvent<HTMLSpanElement>) => void;
   className?: string;
-  disabled?: boolean;
+  disabled?: boolean | undefined;
   placeholder?: string;
   accessibleName?: string;
-  describedBy?: string;
-  isInvalid?: boolean;
+  describedBy?: string | undefined;
+  isInvalid?: boolean | undefined;
   ref?: React.RefObject<HTMLSpanElement | null>;
 }
 

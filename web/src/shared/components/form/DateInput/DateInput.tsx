@@ -29,7 +29,7 @@ interface DateInputProps
   > {
   placeholder?: string;
   label?: string;
-  errorMessage?: string;
+  errorMessage?: string | undefined;
   /** RHF field에서 넘겨받는 값 (YYYY-MM-DD) */
   value?: string;
   /** 날짜 선택 시 호출되는 함수 */

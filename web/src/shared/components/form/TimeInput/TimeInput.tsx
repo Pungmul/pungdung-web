@@ -32,7 +32,7 @@ interface TimeInputProps
   > {
   placeholder?: string;
   label?: string;
-  errorMessage?: string;
+  errorMessage?: string | undefined;
   /** RHF field에서 넘겨받는 값 (HH:mm:ss) */
   value?: string | undefined;
   /** 시간 선택 시 호출되는 함수 */
