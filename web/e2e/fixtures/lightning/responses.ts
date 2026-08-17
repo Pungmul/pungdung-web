@@ -120,6 +120,25 @@ export const lightningStatusOrganizing = okEnvelope({
   participantProfiles: [e2eParticipantProfile],
 });
 
+export const e2eCreatedLightningMeeting = {
+  ...e2eLightningMeeting,
+  id: 2001,
+  meetingName: "E2E 생성 번개",
+};
+
+export const lightningSearchWithCreated = okEnvelope({
+  normalLightningMeetings: [e2eCreatedLightningMeeting],
+  schoolLightningMeetings: [] as (typeof e2eLightningMeeting)[],
+});
+
+export const lightningStatusOrganizingCreated = okEnvelope({
+  participant: true,
+  isOrganizer: true,
+  chatRoomUUID: "e2e-created-chat-room",
+  lightningMeeting: e2eCreatedLightningMeeting,
+  participantProfiles: [e2eParticipantProfile],
+});
+
 export const nearbyLightningWithMeeting = okEnvelope({
   lightningMeetingList: [
     {
@@ -171,6 +190,15 @@ export const lightningCreateSuccess = okEnvelope({
   lightningMeetingName: "E2E 생성 번개",
   organizerName: "E2E User",
 });
+
+export function lightningSocketSnapshot(
+  meetings: Array<typeof e2eLightningMeeting>
+) {
+  return {
+    domainType: "LIGHTNING_MEETING" as const,
+    content: meetings,
+  };
+}
 
 export const authToken = okEnvelope({
   accessToken: "e2e-access-token",

@@ -10,11 +10,13 @@ import {
   clubListWithSchool,
   lightningCreateSuccess,
   lightningSearchEmpty,
+  lightningSearchWithCreated,
   lightningSearchWithMeeting,
   lightningSearchWithSchool,
   lightningSearchWithTwoMeetings,
   lightningStatusNotParticipating,
   lightningStatusOrganizing,
+  lightningStatusOrganizingCreated,
   lightningStatusParticipating,
   myPageWithoutSchool,
   myPageWithSchool,
@@ -48,9 +50,14 @@ async function fulfillJson(page: Page, urlGlob: string, body: unknown) {
   });
 }
 
-function statusBody(participation: LightningParticipationState) {
+function statusBody(
+  participation: LightningParticipationState,
+  created = false
+) {
   if (participation === "organizer") {
-    return lightningStatusOrganizing;
+    return created
+      ? lightningStatusOrganizingCreated
+      : lightningStatusOrganizing;
   }
   if (participation === "member") {
     return lightningStatusParticipating;
@@ -168,6 +175,7 @@ export async function mockLightningHttp(
   } = options;
   let participation: LightningParticipationState =
     options.participation ?? "none";
+  let createdMeeting = false;
 
   await mockAppShellHttp(page);
 
@@ -208,7 +216,7 @@ export async function mockLightningHttp(
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify(statusBody(participation)),
+      body: JSON.stringify(statusBody(participation, createdMeeting)),
     });
   });
   await fulfillJson(
@@ -266,6 +274,9 @@ export async function mockLightningHttp(
       });
       return;
     }
+    participation = "organizer";
+    createdMeeting = true;
+    search = lightningSearchWithCreated;
     await route.fulfill({
       status: 200,
       contentType: "application/json",
