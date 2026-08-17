@@ -1,6 +1,6 @@
 "use client";
 
-import { type MouseEvent, useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
@@ -69,39 +69,45 @@ export function PromotionMenu({
     });
   }, [close, formId, publicKey, requestDeleteForm]);
 
-  const handlePanelClick = useCallback((e: MouseEvent) => {
-    e.stopPropagation();
-  }, []);
-
   return (
     <div ref={containerRef} className="relative">
       <button
         type="button"
         className="flex size-8 p-0.5 items-center justify-center"
-        aria-label="더보기"
+        aria-label="공연 메뉴"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
         onClick={toggleOpen}
       >
-        <EllipsisVerticalIcon className="size-full" />
+        <EllipsisVerticalIcon className="size-full" aria-hidden />
       </button>
       {isOpen && (
         <ul
+          role="menu"
           className="absolute right-0 top-full z-10 mt-2 flex flex-col gap-2 rounded-sm border border-grey-300 bg-background px-3 py-2"
-          onClick={handlePanelClick}
         >
           {isWriter && formId != null ? (
-            <li
-              className="w-12 cursor-pointer text-right text-red-400"
-              onClick={handleDeleteClick}
-            >
-              삭제
+            <li role="none">
+              <button
+                type="button"
+                role="menuitem"
+                className="w-12 text-right text-red-400"
+                onClick={handleDeleteClick}
+              >
+                삭제
+              </button>
             </li>
           ) : null}
           {!isWriter ? (
-            <li
-              className="w-12 cursor-pointer text-right"
-              onClick={handleReportClick}
-            >
-              신고
+            <li role="none">
+              <button
+                type="button"
+                role="menuitem"
+                className="w-12 text-right"
+                onClick={handleReportClick}
+              >
+                신고
+              </button>
             </li>
           ) : null}
         </ul>

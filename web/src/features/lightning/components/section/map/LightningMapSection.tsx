@@ -114,14 +114,16 @@ export function LightningMapSection(props: LightningMapSectionProps) {
           </div>
         )}
         {currentLocation && (
-          <div
-            className="hidden md:flex absolute w-[48px] h-[48px] items-center justify-center cursor-pointer shadow-lg z-10 rounded-full bottom-[16px] bg-background right-[16px]"
+          <button
+            type="button"
+            aria-label="내 위치로 이동"
+            className="hidden md:flex absolute w-[48px] h-[48px] items-center justify-center shadow-lg z-10 rounded-full bottom-[16px] bg-background right-[16px]"
             onClick={panToCurrentLocation}
           >
-            <span className="flex size-6 items-center justify-center">
+            <span className="flex size-6 items-center justify-center" aria-hidden>
               <GPSOutline className="size-full text-grey-700" />
             </span>
-          </div>
+          </button>
         )}
       </MapContainer>
       {children}

@@ -2,24 +2,41 @@ import { useState } from "react";
 
 import { EyeIcon, EyeSlashIcon } from "@/shared/components/Icons";
 
-export function usePasswordVisibility() {
-  const [visible, setVisible] = useState(false);
+import { AUTH_UI_MESSAGE } from "../../constants";
 
-  const toggle = () => setVisible((prev) => !prev);
+interface PasswordVisibilityOptions {
+  showLabel?: string;
+  hideLabel?: string;
+}
 
-  const type = visible ? "text" : "password";
+export function usePasswordVisibility(
+  options: PasswordVisibilityOptions = {}
+) {
+  const showLabel = options.showLabel ?? AUTH_UI_MESSAGE.SHOW_PASSWORD;
+  const hideLabel = options.hideLabel ?? AUTH_UI_MESSAGE.HIDE_PASSWORD;
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible((isCurrentlyVisible) => !isCurrentlyVisible);
+  };
+
+  const type = isPasswordVisible ? "text" : "password";
+  const visibilityLabel = isPasswordVisible ? hideLabel : showLabel;
 
   const trailingComponent = (
-    <span
-      className="size-8 p-1 cursor-pointer flex items-center justify-center text-grey-300 hover:text-grey-500"
-      onClick={toggle}
+    <button
+      type="button"
+      aria-label={visibilityLabel}
+      aria-pressed={isPasswordVisible}
+      onClick={togglePasswordVisibility}
+      className="flex size-8 items-center justify-center p-1 text-grey-300 hover:text-grey-500"
     >
-      {visible ? (
-        <EyeIcon className="size-full" />
+      {isPasswordVisible ? (
+        <EyeIcon className="size-full" aria-hidden />
       ) : (
-        <EyeSlashIcon className="size-full" />
+        <EyeSlashIcon className="size-full" aria-hidden />
       )}
-    </span>
+    </button>
   );
 
   return { type, trailingComponent } as const;

@@ -15,34 +15,40 @@ export const PromotionTabNav = <T extends { label: string; value: string }>({
 }: PromotionTabNavProps<T>) => {
   return (
     <nav className="w-full" key="promotion-tabs-nav">
-      <ul className="flex flex-row w-full">
-        {tabs.map((item, index) => (
-          <motion.li
-            key={index}
-            initial={false}
-            animate={{
-              color:
-                item.value === selectedTab.value
+      <div role="tablist" aria-label="공연 작성" className="flex flex-row w-full">
+        {tabs.map((item) => {
+          const isSelected = item.value === selectedTab.value;
+
+          return (
+            <motion.button
+              key={item.value}
+              type="button"
+              role="tab"
+              aria-selected={isSelected}
+              initial={false}
+              animate={{
+                color: isSelected
                   ? "var(--color-grey-800)"
                   : "var(--color-grey-400)",
-            }}
-            className="relative flex-1 border-b border-grey-200 text-center text-[15px] font-semibold py-[12px] cursor-pointer"
-            onClick={() => onTabChange(item)}
-          >
-            {item.label}
-            <motion.div
-              className="absolute bottom-0 left-0 right-0 h-[2px] bg-grey-800"
-              initial={{ opacity: 0 }}
-              animate={{
-                opacity: item.value === selectedTab.value ? 1 : 0,
               }}
-              transition={{
-                duration: 0.25,
-              }}
-            />
-          </motion.li>
-        ))}
-      </ul>
+              className="relative flex-1 border-0 border-b border-grey-200 bg-transparent py-[12px] text-center text-[15px] font-semibold"
+              onClick={() => onTabChange(item)}
+            >
+              {item.label}
+              <motion.span
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-grey-800"
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: isSelected ? 1 : 0,
+                }}
+                transition={{
+                  duration: 0.25,
+                }}
+              />
+            </motion.button>
+          );
+        })}
+      </div>
     </nav>
   );
 };

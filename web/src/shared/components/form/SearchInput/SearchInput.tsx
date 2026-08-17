@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useCallback, useMemo } from "react";
+import React, { forwardRef, useCallback, useId, useMemo } from "react";
 import { InputHTMLAttributes } from "react";
 
 import {
@@ -26,10 +26,16 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       onClose,
       placeholder = "검색",
       variant = "default",
+      id,
+      name,
+      "aria-label": ariaLabel,
       ...rest
     },
     ref
   ) => {
+    const generatedId = useId();
+    const inputId = id ?? (typeof name === "string" ? name : generatedId);
+
     const isSearching = useMemo(
       () => value && typeof value === "string" && value.trim().length > 0,
       [value]
@@ -52,7 +58,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
 
     return (
       <label
-        htmlFor="search"
+        htmlFor={inputId}
         className={cn(
           "flex w-full flex-row items-center justify-between",
           isMutedBar
@@ -72,15 +78,23 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           )}
         >
           {onClose && isSearching ? (
-            <ChevronLeftIcon
-              className={cn(
-                "cursor-pointer text-grey-500",
-                isMutedBar ? "size-[18px]" : "size-[20px]"
-              )}
+            <button
+              type="button"
+              aria-label="검색 닫기"
               onClick={onClose}
-            />
+              className="flex items-center justify-center"
+            >
+              <ChevronLeftIcon
+                aria-hidden
+                className={cn(
+                  "text-grey-500",
+                  isMutedBar ? "size-[18px]" : "size-[20px]"
+                )}
+              />
+            </button>
           ) : (
             <MagnifyingGlassIcon
+              aria-hidden
               className={cn(
                 "text-grey-500",
                 isMutedBar ? "size-[18px]" : "size-[20px]"
@@ -91,10 +105,11 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         <input
           ref={ref}
           type="text"
-          name="search"
-          id="search"
+          name={name}
+          id={inputId}
           value={value}
           onChange={onChange}
+          aria-label={ariaLabel ?? placeholder}
           className={cn(
             "h-full w-full flex-1 min-w-0 border-none bg-transparent outline-none",
             isMutedBar
@@ -105,20 +120,24 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           {...rest}
         />
         {isSearching && (
-          <div
+          <button
+            type="button"
+            aria-label="검색어 지우기"
+            onClick={handleClear}
+            onMouseDown={(event) => event.stopPropagation()}
             className={cn(
-              "flex shrink-0 cursor-pointer items-center justify-center",
+              "flex shrink-0 items-center justify-center",
               isMutedBar ? "pr-2" : "size-[24px] rounded-full bg-grey-100"
             )}
           >
             <XCircleIcon
+              aria-hidden
               className={cn(
                 "fill-grey-500",
                 isMutedBar ? "size-[20px]" : "size-[22px]"
               )}
-              onClick={handleClear}
             />
-          </div>
+          </button>
         )}
       </label>
     );

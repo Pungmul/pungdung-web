@@ -5,6 +5,7 @@ import {
   memo,
   useCallback,
   useEffect,
+  useId,
   useRef,
   useState,
 } from "react";
@@ -16,10 +17,10 @@ import { josa } from "es-hangul";
 import { WarningCircleIcon } from "@/shared/components/Icons";
 import { useClickOutside } from "@/shared/hooks";
 
-import { DateFields } from "./DateInput/DateFields";
-import { useDateFieldNavigation } from "./DateInput/useDateFieldNavigation";
-import { useDateInput } from "./DateInput/useDateInput";
-import { DatePicker } from "./DatePicker";
+import { DateFields } from "./DateFields";
+import { useDateFieldNavigation } from "./useDateFieldNavigation";
+import { useDateInput } from "./useDateInput";
+import { DatePicker } from "../DatePicker";
 
 interface DateInputProps
   extends Omit<
@@ -46,8 +47,18 @@ export const DateInput = memo(function DateInput(props: DateInputProps) {
     value = "",
     // format = "YYYY-MM-DD",
     ref,
+    id,
+    name,
+    disabled = false,
+    className,
     ...rest
   } = props;
+
+  const generatedId = useId();
+  const fieldId = id ?? (typeof name === "string" ? name : generatedId);
+  const labelId = `${fieldId}-label`;
+  const errorId = `${fieldId}-error`;
+  const hasLabel = label.trim().length > 0;
 
   const [isOpen, setIsOpen] = useState(false);
   const [isBelowHalf, setIsBelowHalf] = useState(false);
@@ -58,6 +69,11 @@ export const DateInput = memo(function DateInput(props: DateInputProps) {
     value,
     onChange,
   });
+
+  const errorText =
+    errorMessage ||
+    (!isValidDate && displayDate ? "올바른 날짜를 입력해주세요." : "");
+  const hasError = Boolean(errorText);
 
   const {
     yearRef,
@@ -121,7 +137,7 @@ export const DateInput = memo(function DateInput(props: DateInputProps) {
   }, [isOpen, checkPosition]);
 
   const handleIconClick = () => {
-    if (!rest.disabled) {
+    if (!disabled) {
       setIsOpen((prev) => !prev);
     }
   };
@@ -132,22 +148,30 @@ export const DateInput = memo(function DateInput(props: DateInputProps) {
   };
 
   return (
-    <label className="w-full" htmlFor={label}>
+    <div className={`w-full ${className ?? ""}`}>
       <div className="flex flex-col gap-[4px]">
-        {label.trim().length > 0 && (
-          <div className="text-grey-500 px-[4px] text-[14px]">{label}</div>
+        {hasLabel && (
+          <div
+            id={labelId}
+            className="text-grey-500 px-[4px] text-[14px]"
+          >
+            {label}
+          </div>
         )}
         <div
           ref={targetRef}
-          className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] hover:border-grey-500 ${!!errorMessage
+          role="group"
+          aria-labelledby={hasLabel ? labelId : undefined}
+          aria-describedby={hasError ? errorId : undefined}
+          aria-disabled={disabled || undefined}
+          className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] hover:border-grey-500 ${hasError
               ? "border-red-400"
               : "border-grey-300 focus-within:border-grey-500"
-            } ${rest.disabled
+            } ${disabled
               ? "bg-grey-100 text-grey-400 cursor-not-allowed"
               : "cursor-pointer"
             }`}
         >
-          {/* 날짜 입력 필드들 */}
           <DateFields
             currentDate={currentDate}
             yearRef={yearRef}
@@ -156,42 +180,48 @@ export const DateInput = memo(function DateInput(props: DateInputProps) {
             onInput={handleInput}
             onFocus={handleFieldFocus}
             onBeforeInput={handleBeforeInput}
-            disabled={rest.disabled ?? false}
+            disabled={disabled}
+            describedBy={hasError ? errorId : undefined}
+            isInvalid={hasError}
           />
 
-          {/* 숨겨진 input (form 제출용) */}
           <input
             ref={ref}
-            hidden={true}
+            hidden
+            readOnly
             placeholder={placeholder}
             type="text"
-            id={label}
-            readOnly
+            disabled={disabled}
             {...rest}
+            id={fieldId}
+            name={name}
+            tabIndex={-1}
+            aria-hidden
             value={value}
-            className={`flex-grow w-full outline-none placeholder-grey-300 text-grey-500 bg-transparent border-none h-full cursor-pointer ${rest.disabled
-                ? "placeholder:bg-grey-100 placeholder-grey-500 cursor-not-allowed"
-                : ""
-              } ${rest.className} `}
           />
 
-          {/* 캘린더 아이콘 */}
-          <span
-            className={`size-8 p-1 flex items-center justify-center text-grey-300 ${rest.disabled
+          <button
+            type="button"
+            aria-label={isOpen ? "달력 닫기" : "달력 열기"}
+            aria-expanded={isOpen}
+            aria-haspopup="dialog"
+            disabled={disabled}
+            onClick={handleIconClick}
+            className={`size-8 p-1 flex items-center justify-center text-grey-300 ${disabled
                 ? "cursor-not-allowed"
                 : "cursor-pointer hover:text-grey-500"
               }`}
-            onClick={handleIconClick}
           >
-            <CalendarIcon className="size-full text-grey-300" />
-          </span>
+            <CalendarIcon className="size-full text-grey-300" aria-hidden />
+          </button>
 
-          {/* 드롭다운 달력 */}
           {isOpen && (
             <div
+              role="dialog"
+              aria-label="달력"
               className={`absolute left-0 right-0 bg-background w-[320px] border-2 border-grey-300 rounded-lg shadow-lg z-50 ${isBelowHalf ? "bottom-full mb-2" : "top-full mt-2"
                 }`}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
             >
               <DatePicker
                 key="date-picker"
@@ -201,17 +231,20 @@ export const DateInput = memo(function DateInput(props: DateInputProps) {
             </div>
           )}
         </div>
-        {(!!errorMessage || (!isValidDate && displayDate)) && (
+        {hasError && (
           <div className="flex flex-row items-center gap-[4px]">
-            <span className="flex size-4 shrink-0 items-center justify-center">
+            <span
+              className="flex size-4 shrink-0 items-center justify-center"
+              aria-hidden
+            >
               <WarningCircleIcon className="size-full text-red-400" />
             </span>
-            <div className="text-red-500 max-w-full text-[12px]">
-              {errorMessage || "올바른 날짜를 입력해주세요."}
+            <div id={errorId} className="text-red-500 max-w-full text-[12px]">
+              {errorText}
             </div>
           </div>
         )}
       </div>
-    </label>
+    </div>
   );
 });

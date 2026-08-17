@@ -228,14 +228,16 @@ export function LightningBottomSheet({
       ref={container}
     >
       <div className="absolute bottom-full left-0 flex w-full flex-row items-center justify-end px-[16px] py-[8px]">
-        <div
-          className="flex size-12 cursor-pointer flex-col items-center justify-center rounded-full bg-background shadow-lg"
+        <button
+          type="button"
+          aria-label="내 위치로 이동"
+          className="flex size-12 flex-col items-center justify-center rounded-full bg-background shadow-lg"
           onClick={() => mapPanToCurrentRef.current?.()}
         >
-          <span className="flex size-8 items-center justify-center">
+          <span className="flex size-8 items-center justify-center" aria-hidden>
             <GPSOutline className="size-full text-grey-700 stroke-[2px]" />
           </span>
-        </div>
+        </button>
       </div>
       <div
         ref={sheetRef}
@@ -251,18 +253,21 @@ export function LightningBottomSheet({
           <LightningNearbyTitle />
           <div className="flex flex-row gap-2 px-[24px] py-[8px]">
             {targetOptions.map((item) => (
-              <div
+              <button
                 key={"target-option-" + item}
+                type="button"
+                aria-pressed={target === item}
                 className={
-                  "text-sm border border-grey-700 rounded-lg px-2 py-2 cursor-pointer " +
+                  "text-sm border border-grey-700 rounded-lg px-2 py-2 " +
                   (target === item
                     ? "text-background bg-grey-700"
                     : "text-grey-700")
                 }
+                onPointerDown={(event) => event.stopPropagation()}
                 onClick={() => setTarget(item)}
               >
                 {item}
-              </div>
+              </button>
             ))}
           </div>
         </div>

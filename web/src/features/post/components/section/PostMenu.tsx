@@ -69,26 +69,31 @@ function PostMenuImpl({
   };
 
   return (
-    <>
-      <div
-        ref={containerRef}
-        className="relative select-none cursor-pointer"
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        aria-label="게시글 메뉴"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        className="select-none"
         onClick={() => {
           setOpen((prev) => !prev);
         }}
       >
-        <span className="size-8 flex items-center justify-center">
+        <span className="size-8 flex items-center justify-center" aria-hidden>
           <EllipsisVerticalIcon className="size-full" />
         </span>
-        {isOpen && (
-          <ul
-            className="absolute right-0 top-full px-3 py-2 border border-grey-300 mt-2 bg-background rounded-sm flex flex-col gap-2"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            {isWriter && (
-              <li
+      </button>
+      {isOpen && (
+        <ul
+          role="menu"
+          className="absolute right-0 top-full px-3 py-2 border border-grey-300 mt-2 bg-background rounded-sm flex flex-col gap-2"
+        >
+          {isWriter && (
+            <li role="none">
+              <button
+                type="button"
+                role="menuitem"
                 className="w-12 text-right"
                 onClick={() => {
                   if (!postIdParam) return;
@@ -102,15 +107,26 @@ function PostMenuImpl({
                 }}
               >
                 수정
-              </li>
-            )}
-            {!isWriter && (
-              <li className="w-12 text-right" onClick={handleReportClick}>
+              </button>
+            </li>
+          )}
+          {!isWriter && (
+            <li role="none">
+              <button
+                type="button"
+                role="menuitem"
+                className="w-12 text-right"
+                onClick={handleReportClick}
+              >
                 신고
-              </li>
-            )}
-            {isWriter && (
-              <li
+              </button>
+            </li>
+          )}
+          {isWriter && (
+            <li role="none">
+              <button
+                type="button"
+                role="menuitem"
                 className="w-12 text-right text-red-400"
                 onClick={() => {
                   Alert.confirm({
@@ -122,12 +138,12 @@ function PostMenuImpl({
                 }}
               >
                 삭제
-              </li>
-            )}
-          </ul>
-        )}
-      </div>
-    </>
+              </button>
+            </li>
+          )}
+        </ul>
+      )}
+    </div>
   );
 }
 

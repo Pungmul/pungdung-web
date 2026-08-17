@@ -55,11 +55,7 @@ vi.mock("@tanstack/react-query", async (importOriginal) => {
 
 async function renderOpenMenu(isWriter: boolean) {
   const view = render(<PostMenu isWriter={isWriter} />);
-  const trigger = view.container.querySelector(
-    ".relative.select-none.cursor-pointer"
-  );
-  expect(trigger).not.toBeNull();
-  await userEvent.click(trigger as HTMLElement);
+  await userEvent.click(screen.getByRole("button", { name: "게시글 메뉴" }));
   return view;
 }
 
@@ -98,7 +94,7 @@ describe("PostMenu", () => {
   it("비작성자가 신고를 누르면 모달 열기에 메타가 전달된다", async () => {
     await renderOpenMenu(false);
 
-    await userEvent.click(screen.getByText("신고"));
+    await userEvent.click(screen.getByRole("menuitem", { name: "신고" }));
 
     expect(menuMocks.openModalToReport).toHaveBeenCalledWith({
       postId: 55,
@@ -110,7 +106,7 @@ describe("PostMenu", () => {
   it("작성자 수정 클릭 시 documentId 포함 편집 경로로 이동한다", async () => {
     await renderOpenMenu(true);
 
-    await userEvent.click(screen.getByText("수정"));
+    await userEvent.click(screen.getByRole("menuitem", { name: "수정" }));
 
     expect(menuMocks.routerPush).toHaveBeenCalledWith(
       expect.stringContaining("documentId=55"),
@@ -121,7 +117,7 @@ describe("PostMenu", () => {
   it("삭제 확인에 동의하면 게시글 삭제 mutation이 실행된다", async () => {
     await renderOpenMenu(true);
 
-    await userEvent.click(screen.getByText("삭제"));
+    await userEvent.click(screen.getByRole("menuitem", { name: "삭제" }));
 
     expect(menuMocks.alertConfirm).toHaveBeenCalledTimes(1);
     const payload = menuMocks.alertConfirm.mock.calls[0]?.[0];

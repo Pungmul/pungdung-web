@@ -215,15 +215,16 @@ export default function InviteUserModal({
                 />
               </div>
               <div className="text-sm text-grey-700">{user.name}</div>
-              <span className="size-5 flex items-center justify-center cursor-pointer">
-                <XCircleIcon
-                  className="size-full text-grey-500"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveUser(user);
-                  }}
-                />
-              </span>
+              <button
+                type="button"
+                aria-label={`${user.name} 선택 해제`}
+                className="flex size-5 items-center justify-center"
+                onClick={() => {
+                  handleRemoveUser(user);
+                }}
+              >
+                <XCircleIcon className="size-full text-grey-500" aria-hidden />
+              </button>
             </div>
           ))}
         </div>
@@ -271,20 +272,15 @@ const InviteFriendItem: React.FC<InviteFriendItemProps> = ({
   const user = friend.user;
 
   return (
-    <div
-      className={`flex h-16 py-1 px-4 flex-row items-center justify-between ${isInRoom
+    <button
+      type="button"
+      disabled={isInRoom}
+      aria-pressed={isInRoom ? undefined : isSelected}
+      className={`flex h-16 w-full flex-row items-center justify-between px-4 py-1 text-left ${isInRoom
           ? "cursor-not-allowed opacity-80"
-          : "hover:bg-grey-100 cursor-pointer"
+          : "hover:bg-grey-100"
         }`}
-      onClick={() => !isInRoom && onToggle(user)}
-      role="button"
-      tabIndex={isInRoom ? -1 : 0}
-      onKeyDown={(e) => {
-        if (!isInRoom && (e.key === "Enter" || e.key === " ")) {
-          e.preventDefault();
-          onToggle(user);
-        }
-      }}
+      onClick={() => onToggle(user)}
     >
       <div className="flex flex-row items-center gap-4">
         <div className="w-12 h-12 bg-grey-200 relative rounded-full overflow-hidden">
@@ -321,6 +317,6 @@ const InviteFriendItem: React.FC<InviteFriendItemProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </button>
   );
 };

@@ -1,10 +1,10 @@
 "use client";
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useId, useState } from "react";
 import ReactDOM from "react-dom";
 
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-import { cn } from "../../lib";
+import { cn } from "../../../lib";
 
 interface ModalProps {
   isOpen: boolean;
@@ -34,30 +34,44 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
     ref
   ) => {
     const [isClient, setIsClient] = useState(false);
+    const titleId = useId();
+    const hasTitle = Boolean(title?.trim());
+    const labelledBy = hasHeader && hasTitle ? titleId : undefined;
+    const dialogLabel = labelledBy ? undefined : (hasTitle ? title : "대화 상자");
 
     useEffect(() => {
-      // 클라이언트 측에서만 document 사용 가능
       setIsClient(true);
 
-      // 모달이 열리면 body 스크롤을 잠그고, 모달이 닫히면 해제
       if (isOpen) {
         document.body.style.overflow = "hidden";
       } else {
         document.body.style.overflow = "";
       }
 
-      // 컴포넌트가 언마운트되거나 모달이 닫힐 때 스크롤 잠금을 해제
+      if (!isOpen) {
+        return () => {
+          document.body.style.overflow = "";
+        };
+      }
+
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+          onClose();
+        }
+      };
+
+      document.addEventListener("keydown", handleKeyDown);
+
       return () => {
         document.body.style.overflow = "";
+        document.removeEventListener("keydown", handleKeyDown);
       };
-    }, [isOpen]);
+    }, [isOpen, onClose]);
 
-    if (!isClient || !isOpen) return null; // 서버에서는 렌더링하지 않음
+    if (!isClient || !isOpen) return null;
 
-    // Create a portal for the modal to render in the top-level DOM
     return ReactDOM.createPortal(
       <div
-        ref={ref}
         className="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50"
       >
         <div
@@ -68,6 +82,11 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
           onClick={onClose}
         />
         <div
+          ref={ref}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={labelledBy}
+          aria-label={dialogLabel}
           className={cn(
             "relative flex flex-col bg-background rounded-md shadow-lg p-4 min-w-80",
             className
@@ -85,20 +104,26 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
               }}
             >
               {title ? (
-                <div className="font-medium text-xl">{title}</div>
+                <div id={titleId} className="font-medium text-xl">
+                  {title}
+                </div>
               ) : (
                 <div className="h-8 w-4"></div>
               )}
-              <div
-                className="right-4 self-center text-center absolute font-semibold text-4xl align-top cursor-pointer"
+              <button
+                type="button"
+                aria-label="닫기"
+                className="right-4 self-center text-center absolute font-semibold text-4xl align-top"
                 style={{ lineHeight: "3.5rem" }}
                 onClick={onClose}
-                title={title ? title + " 닫기" : "닫기"}
               >
-                <span className="flex size-6 items-center justify-center">
+                <span
+                  className="flex size-6 items-center justify-center"
+                  aria-hidden
+                >
                   <XMarkIcon className="size-full" />
                 </span>
-              </div>
+              </button>
             </div>
           )}
           <div
@@ -108,7 +133,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
           </div>
         </div>
       </div>,
-      document.body // 클라이언트에서만 `document`를 사용할 수 있음
+      document.body
     );
   }
 );

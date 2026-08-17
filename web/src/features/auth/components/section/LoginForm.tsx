@@ -29,7 +29,7 @@ export function LoginForm({
   isPending,
   requestError,
 }: LoginFormProps) {
-  const password = usePasswordVisibility();
+  const passwordVisibility = usePasswordVisibility();
 
   return (
     <form
@@ -37,16 +37,18 @@ export function LoginForm({
       onSubmit={handleSubmit(onSubmit)}
     >
       <Input
-        label="ID"
+        label={AUTH_UI_MESSAGE.LOGIN.EMAIL_LABEL}
         errorMessage={inputErrors.loginId?.message || ""}
         {...register("loginId")}
+        autoComplete="email"
       />
       <Input
         label={AUTH_UI_MESSAGE.LOGIN.PASSWORD_LABEL}
         errorMessage={inputErrors.password?.message || ""}
-        type={password.type}
-        trailingComponent={password.trailingComponent}
         {...register("password")}
+        autoComplete="current-password"
+        type={passwordVisibility.type}
+        trailingComponent={passwordVisibility.trailingComponent}
       />
 
       {requestError && (
@@ -59,6 +61,8 @@ export function LoginForm({
         className="bg-primary text-background"
         type="submit"
         disabled={isPending}
+        aria-busy={isPending}
+        aria-label={AUTH_UI_MESSAGE.LOGIN.SUBMIT}
       >
         {isPending ? <Spinner /> : AUTH_UI_MESSAGE.LOGIN.SUBMIT}
       </Button>

@@ -121,6 +121,8 @@ export function SelectTimeAndPersonnelStep() {
           {/* Slider */}
           <div className="px-1">
             <RangeSlider
+              minimumName="최소 인원"
+              maximumName="최대 인원"
               minValue={minPersonnel}
               maxValue={maxPersonnel}
               min={4}

@@ -6,7 +6,6 @@ import { NumericField } from "../DateInput/DateField";
 type TimeFieldType = Extract<FieldType, "hour" | "minute" | "second">;
 
 interface BaseTimeFieldsProps {
-  ref: React.RefObject<HTMLDivElement | null>;
   currentTime: {
     hour: string;
     minute: string;
@@ -20,6 +19,8 @@ interface BaseTimeFieldsProps {
   onBeforeInput: (e: React.FormEvent<HTMLSpanElement>) => void;
   disabled?: boolean;
   showAmPm?: boolean;
+  describedBy?: string;
+  isInvalid?: boolean;
 }
 
 interface TimeFieldsPropsWithoutSeconds extends BaseTimeFieldsProps {
@@ -50,22 +51,23 @@ export const TimeFields: React.FC<TimeFieldsProps> = ({
   disabled,
   showSeconds = false,
   showAmPm = false,
-  ref,
-}) => {
+  describedBy,
+  isInvalid,
+}: TimeFieldsProps) => {
   return (
-    <div
-      ref={ref}
-      className="flex flex-grow items-center text-grey-500 bg-transparent border-none h-full"
-    >
+    <div className="flex flex-grow items-center text-grey-500 bg-transparent border-none h-full">
       {showAmPm && (
         <AMPMField
           ref={ampmRef!}
           type="ampm"
           value={currentTime.ampm ?? ""}
-          tabIndex={disabled ? -1 : showSeconds ? 4 : 3}
+          tabIndex={disabled ? -1 : 0}
           onInput={onInput}
           onFocus={onFocus}
           onBeforeInput={onBeforeInput}
+          describedBy={describedBy}
+          isInvalid={isInvalid}
+          disabled={disabled}
           placeholder="오전"
           className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
             }`}
@@ -75,38 +77,48 @@ export const TimeFields: React.FC<TimeFieldsProps> = ({
         ref={hourRef}
         type="hour"
         value={currentTime.hour}
-        tabIndex={disabled ? -1 : 1}
+        tabIndex={disabled ? -1 : 0}
         onInput={onInput}
         onFocus={onFocus}
         onBeforeInput={onBeforeInput}
+        describedBy={describedBy}
+        isInvalid={isInvalid}
         placeholder="HH"
         className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
           }`}
       />
-      <span className="text-grey-400 mx-1">:</span>
+      <span className="text-grey-400 mx-1" aria-hidden>
+        :
+      </span>
       <NumericField
         ref={minuteRef}
         type="minute"
         value={currentTime.minute}
-        tabIndex={disabled ? -1 : 2}
+        tabIndex={disabled ? -1 : 0}
         onInput={onInput}
         onFocus={onFocus}
         onBeforeInput={onBeforeInput}
+        describedBy={describedBy}
+        isInvalid={isInvalid}
         placeholder="MM"
         className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
           }`}
       />
       {showSeconds && (
         <>
-          <span className="text-grey-400 mx-1">:</span>
+          <span className="text-grey-400 mx-1" aria-hidden>
+            :
+          </span>
           <NumericField
             ref={secondRef!}
             type="second"
             value={currentTime.second || ""}
-            tabIndex={disabled ? -1 : 3}
+            tabIndex={disabled ? -1 : 0}
             onInput={onInput}
             onFocus={onFocus}
             onBeforeInput={onBeforeInput}
+            describedBy={describedBy}
+            isInvalid={isInvalid}
             placeholder="SS"
             className={`outline-none px-[4px] py-[2px] rounded text-center focus:bg-grey-100 min-w-[32px] ${disabled ? "cursor-not-allowed opacity-50" : "cursor-text"
               }`}

@@ -34,10 +34,11 @@ export const TermsStep: React.FC<TermsStepProps> = ({ onSubmit }) => {
       <Space h={24} />
       <div className="flex-grow px-6">
         <Checkbox
-          name={TERMS_FIELDS.USING_TERM}
+          id="agree-all"
+          name="agreeAll"
           label={TERMS_FIELDS_LABEL.AGREE_ALL}
           required
-          checked={isAllChecked}
+          value={isAllChecked}
           onChange={handleAllCheck}
           className="bg-grey-100 rounded-[6px]"
         />
@@ -58,10 +59,14 @@ export const TermsStep: React.FC<TermsStepProps> = ({ onSubmit }) => {
               />
             )}
           />
-          <Link href="/terms/서비스 이용약관.html" target="_blank">
-            <span className="size-6 p-1 flex items-center justify-center cursor-pointer">
-              <ChevronRightIcon className="size-full" />
-            </span>
+          <Link
+            href="/terms/서비스 이용약관.html"
+            target="_blank"
+            rel="noreferrer"
+            aria-label={TERMS_FIELDS_LABEL.VIEW_SERVICE_TERMS}
+            className="flex size-6 items-center justify-center p-1"
+          >
+            <ChevronRightIcon className="size-full" aria-hidden />
           </Link>
         </div>
 
@@ -73,6 +78,7 @@ export const TermsStep: React.FC<TermsStepProps> = ({ onSubmit }) => {
             name={TERMS_FIELDS.PERSONAL_INFO}
             render={({ field }) => (
               <Checkbox
+                name={TERMS_FIELDS.PERSONAL_INFO}
                 label={TERMS_FIELDS_LABEL.AGREE_PRIVACY}
                 required
                 checked={field.value}
@@ -80,10 +86,14 @@ export const TermsStep: React.FC<TermsStepProps> = ({ onSubmit }) => {
               />
             )}
           />
-          <Link href="/terms/개인정보 처리방침.html" target="_blank">
-            <span className="size-6 p-1 flex items-center justify-center cursor-pointer">
-              <ChevronRightIcon className="size-full" />
-            </span>
+          <Link
+            href="/terms/개인정보 처리방침.html"
+            target="_blank"
+            rel="noreferrer"
+            aria-label={TERMS_FIELDS_LABEL.VIEW_PRIVACY_POLICY}
+            className="flex size-6 items-center justify-center p-1"
+          >
+            <ChevronRightIcon className="size-full" aria-hidden />
           </Link>
         </div>
       </div>

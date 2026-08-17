@@ -1,6 +1,6 @@
 "use client";
 
-import { InputHTMLAttributes } from "react";
+import { InputHTMLAttributes, useId } from "react";
 import Image from "next/image";
 
 import WarningCircleIcon from "@public/icons/Warning-circle-icon.svg";
@@ -24,18 +24,25 @@ export function TextArea(props: TextAreaProps) {
     placeholder = `${josa(label, "을/를")} 입력해주세요.`,
     onChange,
     noLabel = false,
+    id,
+    name,
     ...rest
   } = props;
+
+  const generatedId = useId();
+  const textareaId = id ?? (typeof name === "string" ? name : generatedId);
+  const errorId = `${textareaId}-error`;
 
   return (
     <div className="w-full flex-grow relative">
       <div className="flex-grow">
         {!noLabel && (
-          <div
+          <label
+            htmlFor={textareaId}
             className="text-grey-500 pl-[4px] text-[14px]"
           >
             {label}
-          </div>
+          </label>
         )}
         <div
           className={`flex flex-row flex-grow border box-border ${bgColor} ${errorMessage ? "border-2 border-red-400" : "border-grey-500"
@@ -47,6 +54,9 @@ export function TextArea(props: TextAreaProps) {
             placeholder={placeholder}
             onChange={onChange}
             {...rest}
+            id={textareaId}
+            name={name}
+            aria-describedby={errorMessage ? errorId : undefined}
           />
         </div>
         {errorMessage && (
@@ -54,8 +64,9 @@ export function TextArea(props: TextAreaProps) {
             className="flex flex-row items-center"
             style={{ gap: 4 }}
           >
-            <Image src={WarningCircleIcon} width={12} alt="" />
+            <Image src={WarningCircleIcon} width={12} alt="" aria-hidden />
             <div
+              id={errorId}
               className="text-red-500 max-w-full"
               style={{ fontSize: 12, lineHeight: "15px" }}
             >

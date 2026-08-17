@@ -27,14 +27,16 @@ export function FrequentBoards() {
             className="flex flex-row items-center gap-2 p-2 flex-shrink-0 rounded-[4px] bg-primary text-background"
           >
             <button
+              type="button"
+              aria-label={`${board.name} 제거`}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 removeBoard(board);
               }}
-              className="size-4 flex items-center justify-center cursor-pointer"
+              className="size-4 flex items-center justify-center"
             >
-              <XMarkIcon className="size-full" />
+              <XMarkIcon className="size-full" aria-hidden />
             </button>
             <WebViewLink
               href={getBoardRoute(board.id, board.tabId)}

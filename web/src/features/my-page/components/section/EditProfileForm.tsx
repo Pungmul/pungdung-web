@@ -112,9 +112,10 @@ export function EditProfileForm() {
       <div className="mx-auto relative">
         <label
           htmlFor="profile-image"
+          aria-label="프로필 사진 변경"
           className="absolute -bottom-1 -right-1 size-8 rounded-full bg-grey-800 flex items-center justify-center z-10 cursor-pointer"
         >
-          <span className="flex size-6 items-center justify-center">
+          <span className="flex size-6 items-center justify-center" aria-hidden>
             <CameraIcon className="size-full text-background" />
           </span>
           <input

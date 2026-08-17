@@ -12,19 +12,22 @@ interface NumericFieldProps<T extends FieldType> {
   className?: string;
   disabled?: boolean;
   placeholder?: string;
+  accessibleName?: string;
+  describedBy?: string;
+  isInvalid?: boolean;
   ref?: React.RefObject<HTMLSpanElement | null>;
 }
 
-const getAriaLabel = <T extends FieldType>(type: T): string => {
-  const labels = {
-    year: "Year",
-    month: "Month",
-    day: "Day",
-    hour: "Hour",
-    minute: "Minute",
-    second: "Second",
+const getAccessibleName = <T extends FieldType>(type: T): string => {
+  const names = {
+    year: "연도",
+    month: "월",
+    day: "일",
+    hour: "시",
+    minute: "분",
+    second: "초",
   };
-  return labels[type];
+  return names[type];
 };
 
 export const NumericField = <T extends FieldType>({
@@ -37,6 +40,9 @@ export const NumericField = <T extends FieldType>({
   className,
   disabled,
   placeholder,
+  accessibleName,
+  describedBy,
+  isInvalid,
   ref,
 }: NumericFieldProps<T> & { ref?: React.RefObject<HTMLSpanElement | null> }) => {
   const handleInput = useCallback(
@@ -84,10 +90,15 @@ export const NumericField = <T extends FieldType>({
     <span
       ref={ref}
       data-type={type}
+      role="textbox"
+      aria-multiline="false"
+      aria-label={accessibleName ?? getAccessibleName(type)}
+      aria-disabled={disabled || undefined}
+      aria-describedby={describedBy}
+      aria-invalid={isInvalid || undefined}
       contentEditable={!disabled}
       tabIndex={disabled ? -1 : tabIndex}
       suppressContentEditableWarning={true}
-      aria-label={getAriaLabel(type)}
       onBeforeInput={handleBeforeInput}
       onInput={handleInput}
       onFocus={handleFocus}

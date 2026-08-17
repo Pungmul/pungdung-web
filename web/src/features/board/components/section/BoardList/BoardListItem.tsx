@@ -30,23 +30,26 @@ export const BoardListItem = memo(function BoardListItem({
 
   return (
     <li className="w-full px-[12px] py-[8px] flex flex-row items-center gap-[8px]">
-      <div
-        className="flex size-7 cursor-pointer items-center justify-center p-0.5"
+      <button
+        type="button"
+        aria-label={`${board.name} 즐겨찾기`}
+        aria-pressed={isBookmarked}
+        className="flex size-7 items-center justify-center p-0.5"
         onClick={(e) => {
           e.stopPropagation();
           toggleBookmark(board);
         }}
       >
         {isBookmarked ? (
-          <span className="flex size-full items-center justify-center">
+          <span className="flex size-full items-center justify-center" aria-hidden>
             <StarIconSolid className="size-full" color="#ffadad" />
           </span>
         ) : (
-          <span className="flex size-full items-center justify-center">
+          <span className="flex size-full items-center justify-center" aria-hidden>
             <StarIconOutline className="size-full" color="#ffadad" />
           </span>
         )}
-      </div>
+      </button>
       <div
         className="flex-grow"
         onClickCapture={(event) => {

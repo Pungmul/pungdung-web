@@ -17,8 +17,7 @@ const FindFriendSearchSection: React.FC = () => {
     isError,
   } = useSearchFriendResultsViewModel();
 
-  const { openProfile, onOpenProfileKeyDown } =
-    useOpenProfileBySearchResultItem();
+  const { openProfile } = useOpenProfileBySearchResultItem();
 
   if (hasResults) {
     return (
@@ -32,7 +31,6 @@ const FindFriendSearchSection: React.FC = () => {
               user={user}
               friendRequestInfo={friendRequestInfo}
               onOpenProfile={openProfile}
-              onKeyDown={onOpenProfileKeyDown}
             />
           </li>
         ))}

@@ -22,18 +22,22 @@ export default function ChatRoomPanelHeader({
         </span>
       </div>
       <div className="flex flex-row gap-1">
-        <span
-          className="size-8 p-1 flex items-center justify-center cursor-pointer"
+        <button
+          type="button"
+          aria-label="채팅 검색"
+          className="size-8 p-1 flex items-center justify-center"
           onClick={onStartSearch}
         >
-          <MagnifyingGlassIcon className="size-full" />
-        </span>
-        <span
-          className="size-8 p-1 flex items-center justify-center cursor-pointer"
+          <MagnifyingGlassIcon className="size-full" aria-hidden />
+        </button>
+        <button
+          type="button"
+          aria-label="채팅방 추가"
+          className="size-8 p-1 flex items-center justify-center"
           onClick={onClickAddChat}
         >
-          <ChatAddIcon className="size-full text-grey-800" />
-        </span>
+          <ChatAddIcon className="size-full text-grey-800" aria-hidden />
+        </button>
       </div>
     </div>
   );

@@ -240,41 +240,46 @@ export function LocationMapPicker({
       {showSearchBar && (
         <div className="relative w-full flex flex-col gap-2">
           <div className="flex flex-row gap-2 p-2 rounded-lg bg-grey-100 border border-grey-100 focus-within:border-grey-400">
-            <span className="flex size-6 shrink-0 items-center justify-center">
+            <span className="flex size-6 shrink-0 items-center justify-center" aria-hidden>
               <MagnifyingGlassIcon className="size-full text-grey-400" />
             </span>
             <input
               type="text"
+              aria-label="주소 검색"
               className="flex-grow bg-transparent outline-none font-light border-none"
               placeholder="주소 검색"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
             />
             {searchValue.trim() !== "" && (
-              <span
-                className="flex size-6 shrink-0 cursor-pointer items-center justify-center"
+              <button
+                type="button"
+                aria-label="검색어 지우기"
+                className="flex size-6 shrink-0 items-center justify-center"
                 onClick={() => setSearchValue("")}
               >
-                <XCircleIcon className="size-full text-grey-400" />
-              </span>
+                <XCircleIcon className="size-full text-grey-400" aria-hidden />
+              </button>
             )}
           </div>
 
           {searchValue.trim() !== "" && searchResults.length > 0 && (
-            <div className="absolute bg-background top-full left-0 w-full z-10 flex flex-col gap-2 overflow-y-auto max-h-[200px] border border-grey-200 rounded-lg shadow-lg">
+            <ul className="absolute bg-background top-full left-0 w-full z-10 flex flex-col gap-2 overflow-y-auto max-h-[200px] border border-grey-200 rounded-lg shadow-lg list-none">
               {searchResults.map((result) => (
-                <div
-                  key={result.id}
-                  className="flex flex-col gap-1 px-3 py-2 cursor-pointer hover:bg-grey-100"
-                  onClick={() => handleSelect(result)}
-                >
-                  <div className="text-sm font-medium text-grey-800">{result.place_name}</div>
-                  <div className="text-xs text-grey-600">
-                    {result.road_address_name || result.address_name}
-                  </div>
-                </div>
+                <li key={result.id}>
+                  <button
+                    type="button"
+                    className="flex w-full flex-col gap-1 px-3 py-2 text-left hover:bg-grey-100"
+                    onClick={() => handleSelect(result)}
+                  >
+                    <span className="text-sm font-medium text-grey-800">{result.place_name}</span>
+                    <span className="text-xs text-grey-600">
+                      {result.road_address_name || result.address_name}
+                    </span>
+                  </button>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
         </div>
       )}

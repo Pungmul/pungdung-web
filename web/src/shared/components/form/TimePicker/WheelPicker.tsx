@@ -10,6 +10,7 @@ interface WheelPickerProps {
   containerHeight?: number;
   itemHeight?: number;
   loop?: boolean;
+  accessibleName: string;
 }
 
 export function WheelPicker({
@@ -20,6 +21,7 @@ export function WheelPicker({
   containerHeight = 210,
   itemHeight = 40,
   loop = false,
+  accessibleName,
 }: WheelPickerProps) {
   const itemsContRef = useRef<HTMLUListElement>(null);
   const isScrolling = useRef<NodeJS.Timeout | null>(null);
@@ -208,12 +210,20 @@ export function WheelPicker({
       <ul
         className="flex-1 flex flex-col gap-[4px] h-full overflow-y-scroll w-full scrollbar-hide overflow-x-hidden"
         ref={itemsContRef}
+        role="listbox"
+        aria-label={accessibleName}
         style={{
           scrollSnapType: 'y mandatory',
           scrollBehavior: 'smooth'
         }}
       >
-        {extendedOptions.map((item, index) => (
+        {extendedOptions.map((item, index) => {
+          const optionValue = loop
+            ? options[getRealIndex(index)]?.value
+            : item.value;
+          const isSelected = optionValue === value;
+
+          return (
           <li
             className="list-none flex flex-col items-center justify-center text-center w-[60px] box-border cursor-pointer"
             style={{
@@ -222,6 +232,8 @@ export function WheelPicker({
               scrollSnapAlign: 'start'
             }}
             key={item.value+index}
+            role="option"
+            aria-selected={isSelected}
             ref={(node) => {
               refs.current[index] = node;
             }}
@@ -238,9 +250,10 @@ export function WheelPicker({
           >
             <div className="font-normal text-grey-700 md:text-[16px] text-[14px]">{item.label}</div>
           </li>
-        ))}
+          );
+        })}
         {/* 마지막 아이템이 선택될 수 있도록 여백 추가 */}
-        <li className="list-none w-full">
+        <li className="list-none w-full" aria-hidden>
           <div
             className="w-full h-full"
             style={{

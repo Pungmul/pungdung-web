@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { FreeMode, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -16,7 +16,6 @@ export function NearLightningContent() {
   useUserLocation();
 
   const { data: nearLightning } = useNearLightningQuery();
-  const router = useRouter();
 
   return (
     <div className="relative w-full px-[16px]">
@@ -40,34 +39,34 @@ export function NearLightningContent() {
             : null}
           <SwiperSlide
             key={"add-card-slide"}
-            className="!w-[280px] !aspect-[16/9] cursor-pointer bg-background rounded-[4px] border-[2px] border-dashed border-grey-400"
-            onClick={() => {
-              router.push(
-                "/lightning" +
-                  (nearLightning && nearLightning.length > 0 ? "" : "/build")
-              );
-            }}
+            className="!w-[280px] !aspect-[16/9]"
           >
-            <div className="cursor-pointer flex flex-col items-center justify-center h-full gap-2">
+            <Link
+              href={
+                "/lightning" +
+                (nearLightning && nearLightning.length > 0 ? "" : "/build")
+              }
+              className="flex h-full flex-col items-center justify-center gap-2 rounded-[4px] border-[2px] border-dashed border-grey-400 bg-background"
+            >
               {nearLightning && nearLightning.length == 0 && (
                 <div className="flex flex-col items-center justify-center gap-1">
-                  <h1 className="text-center text-grey-400 font-normal text-sm">
+                  <p className="text-center text-grey-400 font-normal text-sm">
                     지금 근처에 번개가 없어요.
-                  </h1>
-                  <h1 className="text-center text-grey-400 font-normal text-sm">
+                  </p>
+                  <p className="text-center text-grey-400 font-normal text-sm">
                     번개를 만들어보세요.
-                  </h1>
+                  </p>
                 </div>
               )}
-              <span className="size-12 flex items-center justify-center">
+              <span className="size-12 flex items-center justify-center" aria-hidden>
                 <ThunderIconFilled className="size-full text-grey-800" />
               </span>
-              <h1 className="text-center text-grey-400 font-semibold text-sm">
+              <span className="text-center text-grey-400 font-semibold text-sm">
                 {nearLightning && nearLightning.length > 0
                   ? "번개 더 찾아보기"
                   : "번개 만들기"}
-              </h1>
-            </div>
+              </span>
+            </Link>
           </SwiperSlide>
         </>
       </Swiper>

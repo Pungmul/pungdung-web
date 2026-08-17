@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useId } from "react";
 import { HTMLInputTypeAttribute, InputHTMLAttributes } from "react";
 
 import { josa } from "es-hangul";
 
-import { WarningCircleIcon } from "../Icons";
+import { WarningCircleIcon } from "../../Icons";
 
 import "@/app/globals.css";
 
@@ -29,14 +29,29 @@ function Input(props: InputProps) {
     placeholder = `${josa(label, "을/를")} 입력해주세요.`,
     onChange,
     ref,
+    id,
+    name,
     ...rest
   } = props;
 
+  const generatedId = useId();
+  const inputId = id ?? (typeof name === "string" ? name : generatedId);
+  const errorId = `${inputId}-error`;
+  const hasLabel = label.trim().length > 0;
+
   return (
-    <label className="w-full" htmlFor={label}>
+    <div className="w-full">
       <div className="flex flex-col gap-[4px]">
-        {label.trim().length > 0 && (
-          <span className="text-grey-500 px-[4px] text-[14px]">{label}{rest.required && <span className="text-red-500 ml-[4px]">*</span>}</span>
+        {hasLabel && (
+          <label
+            htmlFor={inputId}
+            className="text-grey-500 px-[4px] text-[14px]"
+          >
+            {label}
+            {rest.required && (
+              <span className="text-red-500 ml-[4px]">*</span>
+            )}
+          </label>
         )}
         <div
           className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] ${!!errorMessage
@@ -53,8 +68,10 @@ function Input(props: InputProps) {
             placeholder={placeholder}
             onChange={onChange}
             type={type}
-            id={label.trim().length > 0 ? label : undefined}
             {...rest}
+            id={inputId}
+            name={name}
+            aria-describedby={errorMessage ? errorId : undefined}
             className={`flex-grow w-full outline-none placeholder-grey-300 text-grey-500 bg-transparent border-none h-full ${rest.disabled
               ? "placeholder:bg-grey-100 placeholder-grey-500"
               : ""
@@ -66,16 +83,22 @@ function Input(props: InputProps) {
         </div>
         {!!errorMessage && (
           <div className="flex flex-row items-center gap-[4px]">
-            <span className="flex size-4 shrink-0 items-center justify-center">
+            <span
+              className="flex size-4 shrink-0 items-center justify-center"
+              aria-hidden
+            >
               <WarningCircleIcon className="size-full text-red-400" />
             </span>
-            <div className="text-red-500 max-w-full text-[12px]">
+            <div
+              id={errorId}
+              className="text-red-500 max-w-full text-[12px]"
+            >
               {errorMessage}
             </div>
           </div>
         )}
       </div>
-    </label>
+    </div>
   );
 }
 

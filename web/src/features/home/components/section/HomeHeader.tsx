@@ -18,9 +18,16 @@ export function HomeHeader() {
         {myInfo?.clubName || myInfo?.name}님 안녕하세요?
       </h1>
       <div className="flex flex-row justify-end">
-        <div className="md:hidden" onClick={() => router.push("/notification")}>
-          <NotificationIcon />
-        </div>
+        <button
+          type="button"
+          className="md:hidden"
+          aria-label="알림"
+          onClick={() => router.push("/notification")}
+        >
+          <span aria-hidden>
+            <NotificationIcon />
+          </span>
+        </button>
       </div>
     </div>
   );

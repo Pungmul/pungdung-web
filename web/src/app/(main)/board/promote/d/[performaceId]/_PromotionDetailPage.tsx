@@ -107,21 +107,15 @@ export function PromotionDetailPage({
 function PromotionTabs({ description }: { description?: string }) {
   return (
     <section className="relative w-full flex-grow h-full flex flex-col">
-      <nav className="w-full" key="promotion-tabs-nav">
-        <div className="flex flex-row w-full border-b border-grey-200 px-[24px]">
-          <div
-            className="relative w-[96px] text-center text-[15px] font-semibold py-[12px] cursor-pointer"
-          >
-            {"공연 소개"}
-            <div
-              className="absolute bottom-0 left-0 right-0 h-[2px] bg-grey-800"
-            />
-          </div>
-        </div>
-      </nav>
-      <main className="w-full flex flex-col gap-[12px] py-[12px] min-h-[320px] px-[16px] flex-grow">
+      <div className="w-full border-b border-grey-200 px-[24px]">
+        <h2 className="relative w-[96px] py-[12px] text-center text-[15px] font-semibold text-grey-800">
+          공연 소개
+          <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-grey-800" />
+        </h2>
+      </div>
+      <div className="w-full flex flex-col gap-[12px] py-[12px] min-h-[320px] px-[16px] flex-grow">
         <PromotionDescription description={description || ""} />
-      </main>
+      </div>
     </section>
   );
 }

@@ -327,6 +327,7 @@ function SelectList<V>({
       {hasSearch && (
         <div className="bg-background p-[8px]">
           <SearchInput
+            id={`${listboxId}-search`}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             placeholder={`${label} 검색`}

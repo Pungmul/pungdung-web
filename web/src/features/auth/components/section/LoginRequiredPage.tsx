@@ -19,12 +19,13 @@ export function LoginRequiredPage({ returnPath }: { returnPath: string }) {
         <p className="text-m1 text-grey-500">카카오로 바로 시작해보세요.</p>
       </div>
       <Button
+        type="button"
         className="flex h-12 w-full max-w-[320px] items-center gap-3 !bg-kakao px-6 text-black"
         onClick={() => {
           window.location.href = `/api/auth/kakao/login?redirectURL=${encodeURIComponent(currentReturnPath)}`;
         }}
       >
-        <KakaoLogo className="size-5" />
+        <KakaoLogo className="size-5" aria-hidden />
         카카오로 시작하기
       </Button>
     </main>

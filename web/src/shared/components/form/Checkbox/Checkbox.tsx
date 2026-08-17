@@ -6,7 +6,6 @@ import { CheckIcon } from "@heroicons/react/24/outline";
 
 interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
-  /** RHF field에서 넘겨받는 값 */
   value?: boolean;
   onChange?: (checked: boolean) => void;
   label: string;
@@ -30,14 +29,20 @@ export function Checkbox({
         type="checkbox"
         checked={!!value}
         onChange={(e) => onChange?.(e.target.checked)}
-        className="hidden peer"
+        className="sr-only peer"
         {...rest}
       />
 
-      <div className="hidden size-4 peer-checked:flex items-center justify-center rounded-sm bg-primary">
+      <div
+        className="hidden size-4 peer-checked:flex items-center justify-center rounded-sm bg-primary"
+        aria-hidden
+      >
         <CheckIcon className="size-[12px] text-white stroke-[4px]" />
       </div>
-      <div className="block border border-grey-400 peer-checked:hidden rounded-sm bg-[#FFFFFF] w-[16px] h-[16px]" />
+      <div
+        className="block border border-grey-400 peer-checked:hidden rounded-sm bg-[#FFFFFF] w-[16px] h-[16px]"
+        aria-hidden
+      />
 
       <div className="flex flex-row items-center text-grey-500 peer-checked:text-grey-800 peer-checked:font-semibold gap-[4px]">
         <div className="text-[14px] leading-[16px]">{label}</div>

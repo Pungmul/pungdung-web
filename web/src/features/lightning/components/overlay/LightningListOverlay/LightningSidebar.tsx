@@ -28,10 +28,12 @@ export function LightningSidebar({
 
       <div className="flex flex-row gap-2 px-[24px] py-[8px]">
         {targetOptions.map((item) => (
-          <div
+          <button
             key={"target-option-" + item}
+            type="button"
+            aria-pressed={target === item}
             className={
-              "text-sm border border-grey-700 rounded-lg px-2 py-2 cursor-pointer " +
+              "text-sm border border-grey-700 rounded-lg px-2 py-2 " +
               (target === item
                 ? "text-background bg-grey-700"
                 : "text-grey-700")
@@ -39,7 +41,7 @@ export function LightningSidebar({
             onClick={() => setTarget(item)}
           >
             {item}
-          </div>
+          </button>
         ))}
       </div>
 

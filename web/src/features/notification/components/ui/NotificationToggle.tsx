@@ -27,7 +27,12 @@ export default function NotificationToggle() {
         className={pending ? "pointer-events-none opacity-70" : undefined}
         aria-busy={pending}
       >
-        <Toggle checked={enabled} toggle={handleToggle} />
+        <Toggle
+          checked={enabled}
+          toggle={handleToggle}
+          label="알림 설정"
+          disabled={pending}
+        />
       </div>
     </div>
   );

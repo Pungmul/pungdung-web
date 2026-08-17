@@ -33,6 +33,7 @@ function FriendMenuImpl({ items }: FriendMenuProps) {
         className="flex cursor-pointer items-center justify-center rounded p-0.5 text-grey-600 hover:bg-grey-100"
         aria-label="친구 메뉴"
         aria-expanded={isOpen}
+        aria-haspopup="menu"
         onClick={(e) => {
           e.stopPropagation();
           setOpen((prev) => !prev);
@@ -44,19 +45,22 @@ function FriendMenuImpl({ items }: FriendMenuProps) {
       </button>
       {isOpen && (
         <ul
+          role="menu"
           className="absolute right-0 top-full z-20 mt-1 flex min-w-[6.5rem] flex-col gap-2 rounded-sm border border-grey-300 bg-background px-3 py-2 shadow-sm"
-          onClick={(e) => e.stopPropagation()}
         >
           {items.map((item) => (
-            <li
-              key={item.label}
-              className={cn("cursor-pointer text-right text-sm text-grey-800", item.className)}
-              onClick={() => {
-                item.handler();
-                setOpen(false);
-              }}
-            >
-              {item.label}
+            <li role="none" key={item.label}>
+              <button
+                type="button"
+                role="menuitem"
+                className={cn("w-full text-right text-sm text-grey-800", item.className)}
+                onClick={() => {
+                  item.handler();
+                  setOpen(false);
+                }}
+              >
+                {item.label}
+              </button>
             </li>
           ))}
         </ul>

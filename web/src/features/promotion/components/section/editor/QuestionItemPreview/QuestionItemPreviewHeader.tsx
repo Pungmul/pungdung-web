@@ -19,19 +19,21 @@ export const QuestionItemPreviewHeader = ({
       <span className="rounded bg-grey-100 px-2 py-1 text-xs font-medium text-grey-500">
         {getQuestionTypeLabel(question.questionType)}
       </span>
-      <div
+      <button
+        type="button"
+        aria-label="질문 수정"
         title="수정"
         data-question-item-edit-button
-        className="ml-auto flex size-7 cursor-pointer items-center justify-center rounded p-1 hover:bg-grey-100"
+        className="ml-auto flex size-7 items-center justify-center rounded p-1 hover:bg-grey-100"
         onClick={(e) => {
           e.stopPropagation();
           onFocus();
         }}
       >
-        <span className="size-full flex items-center justify-center">
+        <span className="size-full flex items-center justify-center" aria-hidden>
           <PencilIcon className="size-full rounded text-grey-500" />
         </span>
-      </div>
+      </button>
     </div>
   );
 };

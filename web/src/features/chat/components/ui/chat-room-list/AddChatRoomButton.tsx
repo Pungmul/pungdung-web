@@ -16,12 +16,13 @@ export default function AddChatRoomButton() {
   
   return (
     <>
-      <div
-        className="text-[16px] px-[12px] py-[8px] rounded-lg bg-primary text-background cursor-pointer"
+      <button
+        type="button"
+        className="text-[16px] px-[12px] py-[8px] rounded-lg bg-primary text-background"
         onClick={clickAddChatRoom}
       >
         채팅방 만들기
-      </div>
+      </button>
       <SelectFriendModal />
     </>
   );

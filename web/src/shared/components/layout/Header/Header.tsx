@@ -67,8 +67,10 @@ export function Header({
 
   const leftButton = useMemo(
     () => (
-      <div
-        className="absolute left-[20px] z-10 flex size-8 cursor-pointer items-center justify-center self-center"
+      <button
+        type="button"
+        aria-label="뒤로 가기"
+        className="absolute left-[20px] z-10 flex size-8 items-center justify-center self-center"
         onClick={() => {
           if (onLeftClick) {
             onLeftClick();
@@ -81,10 +83,10 @@ export function Header({
           }
         }}
       >
-        <span className="flex size-7 items-center justify-center">
+        <span className="flex size-7 items-center justify-center" aria-hidden>
           <XMarkIcon className="size-full" />
         </span>
-      </div>
+      </button>
     ),
     [onLeftClick, view, router]
   );

@@ -61,17 +61,12 @@ describe("CommentMenu", () => {
 
   it("케밥을 열면 신고·삭제를 보여주고 클릭 시 각 핸들러가 호출된다", async () => {
     const user = userEvent.setup({ delay: null });
-    const { container } = render(<CommentMenu comment={commentFixture} />);
+    render(<CommentMenu comment={commentFixture} menuLabel="댓글 메뉴" />);
 
-    const trigger = container.querySelector(
-      ".relative.select-none.cursor-pointer"
-    );
-    expect(trigger).not.toBeNull();
+    await user.click(screen.getByRole("button", { name: "댓글 메뉴" }));
 
-    await user.click(trigger as HTMLElement);
-
-    await user.click(await screen.findByText("신고"));
-    await user.click(screen.getByText("삭제"));
+    await user.click(await screen.findByRole("menuitem", { name: "신고" }));
+    await user.click(screen.getByRole("menuitem", { name: "삭제" }));
 
     expect(deleteSpy).toHaveBeenCalledTimes(1);
     expect(reportSpy).toHaveBeenCalledTimes(1);

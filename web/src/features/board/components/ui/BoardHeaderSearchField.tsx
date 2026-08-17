@@ -31,6 +31,7 @@ export function BoardHeaderSearchField({
     >
       <input
         type="text"
+        aria-label="검색"
         className="flex-grow bg-transparent outline-none peer font-light"
         placeholder="검색"
         value={searchValue}
@@ -40,18 +41,22 @@ export function BoardHeaderSearchField({
       />
       {searchValue.trim() !== "" && (
         <>
-          <span
-            className="flex size-6 items-center justify-center cursor-pointer peer"
+          <button
+            type="button"
+            aria-label="검색어 지우기"
+            className="flex size-6 items-center justify-center peer"
             onClick={onClear}
           >
-            <XCircleIcon className="size-full text-grey-400" />
-          </span>
-          <span
-            className="flex size-6 items-center justify-center cursor-pointer"
+            <XCircleIcon className="size-full text-grey-400" aria-hidden />
+          </button>
+          <button
+            type="button"
+            aria-label="검색 실행"
+            className="flex size-6 items-center justify-center"
             onClick={onSubmitSearch}
           >
-            <ArrowRightIcon className="size-full text-grey-400" />
-          </span>
+            <ArrowRightIcon className="size-full text-grey-400" aria-hidden />
+          </button>
         </>
       )}
     </div>

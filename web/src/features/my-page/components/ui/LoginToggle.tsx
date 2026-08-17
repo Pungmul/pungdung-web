@@ -10,7 +10,7 @@ export function LoginToggle() {
   return (
     <div className="flex flex-row items-center justify-between">
       <h2 className="text-base font-semibold text-grey-800">자동 로그인</h2>
-      <Toggle checked={checked} toggle={setChecked} />
+      <Toggle checked={checked} toggle={setChecked} label="자동 로그인" />
     </div>
   );
 }

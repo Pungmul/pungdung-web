@@ -12,6 +12,8 @@ export const AUTH_UI_MESSAGE = {
     AGREE_ALL: "모든 약관에 동의합니다",
     AGREE_SERVICE: "이용 약관에 동의합니다",
     AGREE_PRIVACY: "개인정보 이용에 동의합니다",
+    VIEW_SERVICE_TERMS: "이용 약관 전문 보기",
+    VIEW_PRIVACY_POLICY: "개인정보 처리방침 전문 보기",
   },
   ACCOUNT_STEP: {
     EMAIL_LABEL: "이메일",
@@ -20,6 +22,8 @@ export const AUTH_UI_MESSAGE = {
     PASSWORD_PLACEHOLDER: "비밀번호를 입력해주세요.",
     CONFIRM_PASSWORD_LABEL: "비밀번호 확인",
     CONFIRM_PASSWORD_PLACEHOLDER: "비밀번호를 다시 입력해주세요.",
+    SHOW_CONFIRM_PASSWORD: "비밀번호 확인 보기",
+    HIDE_CONFIRM_PASSWORD: "비밀번호 확인 숨기기",
   },
   PERSONAL_STEP: {
     NAME_LABEL: "이름",
@@ -54,6 +58,10 @@ export const AUTH_UI_MESSAGE = {
       NEW_PASSWORD_PLACEHOLDER: "새 비밀번호를 입력해주세요.",
       CONFIRM_LABEL: "비밀번호 확인",
       CONFIRM_PLACEHOLDER: "비밀번호를 다시 입력해주세요.",
+      SHOW_NEW_PASSWORD: "새 비밀번호 보기",
+      HIDE_NEW_PASSWORD: "새 비밀번호 숨기기",
+      SHOW_CONFIRM_PASSWORD: "비밀번호 확인 보기",
+      HIDE_CONFIRM_PASSWORD: "비밀번호 확인 숨기기",
       SUBMIT: "비밀번호 재설정",
     },
   },
@@ -74,8 +82,11 @@ export const AUTH_UI_MESSAGE = {
     },
   },
   LOGIN: {
+    EMAIL_LABEL: "이메일",
     PASSWORD_LABEL: "비밀번호",
     SUBMIT: "로그인",
   },
+  SHOW_PASSWORD: "비밀번호 보기",
+  HIDE_PASSWORD: "비밀번호 숨기기",
   GO_TO_LOGIN_PAGE: "로그인 페이지로 이동",
 } as const;

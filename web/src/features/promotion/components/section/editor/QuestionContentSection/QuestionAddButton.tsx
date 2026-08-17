@@ -20,7 +20,7 @@ export const QuestionAddButton = ({ onSelectQuestionType }: QuestionAddButtonPro
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const selectorRef = useRef<HTMLUListElement>(null);
   const selectContainerRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleSelectQuestionType = (type: PromotionQuestionKind) => {
     onSelectQuestionType(type);
@@ -57,63 +57,79 @@ export const QuestionAddButton = ({ onSelectQuestionType }: QuestionAddButtonPro
 
   return (
     <div className="relative w-full px-[12px]">
-      <div
+      <button
+        type="button"
         ref={buttonRef}
-        className="flex flex-row items-center justify-center w-full px-[16px] py-[8px] rounded-lg border border-grey-400 cursor-pointer gap-[4px]"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        className="flex flex-row items-center justify-center w-full px-[16px] py-[8px] rounded-lg border border-grey-400 gap-[4px]"
         onClick={handleOpenDropdown}
       >
-        <div className="text-[14px] font-normal text-grey-400">
+        <span className="text-[14px] font-normal text-grey-400">
           설문 추가하기
-        </div>
-        <span className="flex size-4 items-center justify-center">
+        </span>
+        <span className="flex size-4 items-center justify-center" aria-hidden>
           <PlusCircleIcon
             className="size-full text-grey-400"
             strokeWidth={1.5}
           />
         </span>
-      </div>
+      </button>
       <div
         className={`absolute w-full px-[12px] left-0`}
         ref={selectContainerRef}
       >
         <ul
+          role="menu"
           className={`w-full py-[8px] gap-[4px] bg-background rounded-lg border border-grey-400 h-fit z-10 shadow-xs ${
             isOpen ? "block" : "hidden"
           }`}
           ref={selectorRef}
         >
-          <li
-            className="flex flex-row items-center justify-start w-full px-[16px] py-[8px] cursor-pointer gap-[16px] hover:bg-grey-100"
-            onClick={() => handleSelectQuestionType("TEXT")}
-          >
-            <span className="flex size-4 items-center justify-center">
-              <ShortAnswerOutline className="size-full text-grey-400" />
-            </span>
-            <span className="text-[14px] font-medium text-grey-400">
-              단답형
-            </span>
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
+              className="flex flex-row items-center justify-start w-full px-[16px] py-[8px] gap-[16px] hover:bg-grey-100"
+              onClick={() => handleSelectQuestionType("TEXT")}
+            >
+              <span className="flex size-4 items-center justify-center" aria-hidden>
+                <ShortAnswerOutline className="size-full text-grey-400" />
+              </span>
+              <span className="text-[14px] font-medium text-grey-400">
+                단답형
+              </span>
+            </button>
           </li>
-          <li
-            className="flex flex-row items-center justify-start w-full px-[16px] py-[8px] cursor-pointer gap-[16px] hover:bg-grey-100"
-            onClick={() => handleSelectQuestionType("CHOICE")}
-          >
-            <span className="flex size-4 items-center justify-center">
-              <RadioSelectSolid className="size-full text-grey-400" />
-            </span>
-            <span className="text-[14px] font-medium text-grey-400">
-              객관식
-            </span>
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
+              className="flex flex-row items-center justify-start w-full px-[16px] py-[8px] gap-[16px] hover:bg-grey-100"
+              onClick={() => handleSelectQuestionType("CHOICE")}
+            >
+              <span className="flex size-4 items-center justify-center" aria-hidden>
+                <RadioSelectSolid className="size-full text-grey-400" />
+              </span>
+              <span className="text-[14px] font-medium text-grey-400">
+                객관식
+              </span>
+            </button>
           </li>
-          <li
-            className="flex flex-row items-center justify-start w-full px-[16px] py-[8px] cursor-pointer gap-[16px] hover:bg-grey-100"
-            onClick={() => handleSelectQuestionType("CHECKBOX")}
-          >
-            <span className="flex size-4 items-center justify-center">
-              <CheckBoxOutline className="size-full text-grey-400" />
-            </span>
-            <span className="text-[14px] font-medium text-grey-400">
-              체크 리스트
-            </span>
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
+              className="flex flex-row items-center justify-start w-full px-[16px] py-[8px] gap-[16px] hover:bg-grey-100"
+              onClick={() => handleSelectQuestionType("CHECKBOX")}
+            >
+              <span className="flex size-4 items-center justify-center" aria-hidden>
+                <CheckBoxOutline className="size-full text-grey-400" />
+              </span>
+              <span className="text-[14px] font-medium text-grey-400">
+                체크 리스트
+              </span>
+            </button>
           </li>
         </ul>
       </div>

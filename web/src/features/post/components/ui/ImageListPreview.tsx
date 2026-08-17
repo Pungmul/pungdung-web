@@ -41,14 +41,15 @@ export function ImageListPreview({
               fill
               style={{ objectFit: "cover" }}
             ></Image>
-            <div
+            <button
+              type="button"
+              aria-label={`첨부 이미지 ${index + 1} 삭제`}
               className={cn(
-                "absolute cursor-pointer -top-2 -right-2 w-6 h-6 bg-black rounded-full text-white items-center justify-center flex",
+                "absolute -top-2 -right-2 w-6 h-6 bg-black rounded-full text-white items-center justify-center flex",
                 interactionsDisabled && "opacity-40 pointer-events-none"
               )}
-              role="presentation"
+              disabled={interactionsDisabled}
               onClick={() => {
-                if (interactionsDisabled) return;
                 const next = imageFiles.filter((_, i) => i !== index);
                 setValue("imageFiles", next, {
                   shouldDirty: true,
@@ -57,7 +58,7 @@ export function ImageListPreview({
               }}
             >
               x
-            </div>
+            </button>
           </div>
         );
       })}

@@ -26,8 +26,11 @@ export const AccountStep: React.FC<AccountStepProps> = ({
     passwordRegisterOptions,
   } = useAccountStepForm();
 
-  const password = usePasswordVisibility();
-  const confirmPassword = usePasswordVisibility();
+  const passwordVisibility = usePasswordVisibility();
+  const confirmPasswordVisibility = usePasswordVisibility({
+    showLabel: ACCOUNT_FIELDS_LABEL.SHOW_CONFIRM_PASSWORD,
+    hideLabel: ACCOUNT_FIELDS_LABEL.HIDE_CONFIRM_PASSWORD,
+  });
 
   return (
     <form
@@ -43,6 +46,7 @@ export const AccountStep: React.FC<AccountStepProps> = ({
           label={ACCOUNT_FIELDS_LABEL.EMAIL_LABEL}
           placeholder={ACCOUNT_FIELDS_LABEL.EMAIL_PLACEHOLDER}
           {...register(ACCOUNT_FIELDS.EMAIL, emailRegisterOptions)}
+          autoComplete="email"
           errorMessage={inputErrors.email?.message || ""}
         />
 
@@ -50,9 +54,10 @@ export const AccountStep: React.FC<AccountStepProps> = ({
         <Input
           label={ACCOUNT_FIELDS_LABEL.PASSWORD_LABEL}
           placeholder={ACCOUNT_FIELDS_LABEL.PASSWORD_PLACEHOLDER}
-          type={password.type}
-          trailingComponent={password.trailingComponent}
           {...register(ACCOUNT_FIELDS.PASSWORD, passwordRegisterOptions)}
+          autoComplete="new-password"
+          type={passwordVisibility.type}
+          trailingComponent={passwordVisibility.trailingComponent}
           errorMessage={inputErrors.password?.message || ""}
         />
 
@@ -60,9 +65,10 @@ export const AccountStep: React.FC<AccountStepProps> = ({
         <Input
           label={ACCOUNT_FIELDS_LABEL.CONFIRM_PASSWORD_LABEL}
           placeholder={ACCOUNT_FIELDS_LABEL.CONFIRM_PASSWORD_PLACEHOLDER}
-          type={confirmPassword.type}
-          trailingComponent={confirmPassword.trailingComponent}
           {...register(ACCOUNT_FIELDS.CONFIRM_PASSWORD)}
+          autoComplete="new-password"
+          type={confirmPasswordVisibility.type}
+          trailingComponent={confirmPasswordVisibility.trailingComponent}
           errorMessage={inputErrors.confirmPassword?.message || ""}
         />
       </div>

@@ -127,9 +127,10 @@ export function ChatRoomSettingScreen({
             <div className="relative">
               <label
                 htmlFor="chat-room-profile-image"
+                aria-label="채팅방 프로필 사진 변경"
                 className="absolute -bottom-1 -right-1 z-10 flex size-8 cursor-pointer items-center justify-center rounded-full bg-grey-800"
               >
-                <span className="flex size-6 items-center justify-center">
+                <span className="flex size-6 items-center justify-center" aria-hidden>
                   <CameraIcon className="size-full text-background" />
                 </span>
                 <input
@@ -164,10 +165,15 @@ export function ChatRoomSettingScreen({
           </section>
 
           <section className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-grey-700">
+            <label
+              htmlFor="chat-room-name"
+              className="text-sm font-medium text-grey-700"
+            >
               채팅방 이름
             </label>
             <Input
+              id="chat-room-name"
+              name="chat-room-name"
               value={roomNameDraft}
               placeholder={defaultRoomName}
               onChange={handleRoomNameChange}
@@ -211,6 +217,8 @@ export function ChatRoomSettingScreen({
               <Toggle
                 checked={!isMuted}
                 toggle={handleToggleNotification}
+                label="채팅방 알림"
+                disabled={isUpdatingRoomNotification}
               />
             </div>
           </section>

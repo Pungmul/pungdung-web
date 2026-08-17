@@ -59,12 +59,14 @@ export function BoardHeaderMobile({
         {...(searchable
           ? {
             rightBtn: (
-              <span
-                className="flex size-6 items-center justify-center cursor-pointer"
+              <button
+                type="button"
+                aria-label="검색"
+                className="flex size-6 items-center justify-center"
                 onClick={openMobileSearch}
               >
-                <MagnifyingGlassIcon className="size-full" color="#CCC" />
-              </span>
+                <MagnifyingGlassIcon className="size-full" color="#CCC" aria-hidden />
+              </button>
             ),
           }
           : {})}

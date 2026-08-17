@@ -23,8 +23,7 @@ const FindFriendHistoryList: React.FC<FindFriendHistoryListProps> = ({
 }) => {
   const { handleHistorySelect } = useApplySearchHistoryAction();
   const { handleHistoryDelete } = useDeleteSearchHistoryAction();
-  const { openProfile, onOpenProfileKeyDown } =
-    useOpenProfileBySearchResultItem();
+  const { openProfile } = useOpenProfileBySearchResultItem();
 
   if (items.length === 0) {
     return (
@@ -43,7 +42,6 @@ const FindFriendHistoryList: React.FC<FindFriendHistoryListProps> = ({
           onHistorySelect={handleHistorySelect}
           onHistoryDelete={handleHistoryDelete}
           onOpenProfile={openProfile}
-          onKeyDown={onOpenProfileKeyDown}
         />
       ))}
     </ul>

@@ -51,25 +51,29 @@ const Comment = ({
           </div>
         </div>
         <div className="flex flex-row items-center">
-          <div
-            className="flex h-7 items-center cursor-pointer px-1 gap-0.5"
+          <button
+            type="button"
+            aria-label={`댓글 추천 ${comment.likedNum}`}
+            className="flex h-7 items-center px-1 gap-0.5"
             onClick={handleLikeClick}
           >
-            <HandThumbUpIcon className="size-5 text-red-500" />
+            <HandThumbUpIcon className="size-5 text-red-500" aria-hidden />
             {comment.likedNum > 0 ? (
               <span className="text-red-300 leading-6 text-[13px]">
                 {comment.likedNum}
               </span>
             ) : null}
-          </div>
-          <div
-            className="size-7 p-1 cursor-pointer flex items-center justify-center"
+          </button>
+          <button
+            type="button"
+            aria-label="답글 달기"
+            className="size-7 p-1 flex items-center justify-center"
             onClick={handleReplyClick}
           >
-            <CommentOutline className="size-full text-grey-400" />
-          </div>
-          <div className="size-7 p-1 cursor-pointer">
-            <CommentMenu comment={comment} />
+            <CommentOutline className="size-full text-grey-400" aria-hidden />
+          </button>
+          <div className="size-7 p-1">
+            <CommentMenu comment={comment} menuLabel="댓글 메뉴" />
           </div>
         </div>
       </div>

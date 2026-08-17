@@ -121,6 +121,7 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
         <div className="flex flex-row items-end rounded-full bg-grey-100 px-0.5 py-0.5">
           <label
             htmlFor="image-upload"
+            aria-label="사진 첨부"
             aria-disabled={!canSend}
             className={`flex h-9 flex-col justify-center rounded-full bg-primary px-4 text-background ${
               canSend ? "" : "pointer-events-none opacity-50"
@@ -135,7 +136,7 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
               disabled={!canSend}
               onChange={onImageChange}
             />
-            <span className="flex size-4 items-center justify-center">
+            <span className="flex size-4 items-center justify-center" aria-hidden>
               <PhotoIcon className="size-full text-white" />
             </span>
           </label>
@@ -144,6 +145,7 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
             <textarea
               ref={messageRef}
               name="comment"
+              aria-label="메시지"
               disabled={!canSend}
               onTouchStart={applyIosKeyboardOpacityFixFocus}
               onBlur={handleTextareaBlur}
@@ -162,11 +164,12 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
 
           <button
             type="submit"
+            aria-label="보내기"
             disabled={!canSend}
             onPointerDown={(e) => e.preventDefault()}
             className="size-9 p-2.5 rounded-full bg-primary flex items-center justify-center disabled:opacity-50"
           >
-            <ArrowUpIcon className="size-full text-white" />
+            <ArrowUpIcon className="size-full text-white" aria-hidden />
           </button>
         </div>
       </div>

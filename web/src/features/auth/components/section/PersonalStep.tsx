@@ -45,6 +45,7 @@ export const PersonalStep: React.FC<PersonalStepProps> = ({
           placeholder={PERSONAL_FIELDS_LABEL.NAME_PLACEHOLDER}
           className="w-full"
           {...register(PERSONAL_FIELDS.NAME)}
+          autoComplete="name"
         />
 
         <Space h={24} />
@@ -54,6 +55,7 @@ export const PersonalStep: React.FC<PersonalStepProps> = ({
           placeholder={PERSONAL_FIELDS_LABEL.NICKNAME_PLACEHOLDER}
           className="w-full"
           {...register(PERSONAL_FIELDS.NICKNAME)}
+          autoComplete="nickname"
         />
 
         <Space h={24} />
@@ -103,8 +105,9 @@ export const PersonalStep: React.FC<PersonalStepProps> = ({
               className="w-full"
               type="tel"
               {...field}
-              onChange={(e) => {
-                const formattedValue = formatPhoneNumber(e.target.value);
+              autoComplete="tel"
+              onChange={(event) => {
+                const formattedValue = formatPhoneNumber(event.target.value);
                 field.onChange(formattedValue);
               }}
             />
@@ -119,6 +122,7 @@ export const PersonalStep: React.FC<PersonalStepProps> = ({
           className="w-full"
           type="number"
           {...register(PERSONAL_FIELDS.INVITE_CODE)}
+          autoComplete="off"
         />
       </div>
 

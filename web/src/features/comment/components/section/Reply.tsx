@@ -22,19 +22,21 @@ const Reply = ({ reply }: { reply: ReplyType }) => {
           </div>
         </div>
         <div className="flex flex-row items-center">
-          <div
-            className="flex h-7 items-center cursor-pointer px-1 gap-0.5"
+          <button
+            type="button"
+            aria-label={`대댓글 추천 ${reply.likedNum}`}
+            className="flex h-7 items-center px-1 gap-0.5"
             onClick={handleLikeClick}
           >
-            <HandThumbUpIcon className="size-5 text-red-500" />
+            <HandThumbUpIcon className="size-5 text-red-500" aria-hidden />
             {reply.likedNum > 0 ? (
               <span className="text-red-300 leading-6 text-[13px]">
                 {reply.likedNum}
               </span>
             ) : null}
-          </div>
-          <div className="size-7 p-1 cursor-pointer">
-            <CommentMenu comment={reply} />
+          </button>
+          <div className="size-7 p-1">
+            <CommentMenu comment={reply} menuLabel="대댓글 메뉴" />
           </div>
         </div>
       </div>

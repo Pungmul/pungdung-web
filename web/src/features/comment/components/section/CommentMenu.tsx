@@ -21,9 +21,10 @@ const COMMENT_MENU_PANEL_OFFSET_PX = 112;
 
 interface CommentMenuProps {
   comment: CommentType | ReplyType;
+  menuLabel: string;
 }
 
-export function CommentMenu({ comment }: CommentMenuProps) {
+export function CommentMenu({ comment, menuLabel }: CommentMenuProps) {
   const targetRef = useRef<HTMLDivElement>(null);
 
   // 케밥 메뉴 열림 + 토글
@@ -52,41 +53,48 @@ export function CommentMenu({ comment }: CommentMenuProps) {
   });
 
   return (
-    <>
-      <div
-        ref={targetRef}
-        className={
-          "relative select-none cursor-pointer w-full h-full flex justify-center items-center"
-        }
+    <div ref={targetRef} className="relative h-full w-full">
+      <button
+        type="button"
+        aria-label={menuLabel}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        className="flex size-full items-center justify-center"
         onClick={toggle}
       >
-        <EllipsisVerticalIcon className="size-full text-grey-800" />
-        {isOpen && (
-          <ul
-            className={`absolute right-0 px-3 py-2 border border-grey-200 bg-background rounded-sm flex flex-col gap-2 z-10 ${openUpward ? "mb-1" : "top-full mt-1"
-              }`}
-            style={
-              openUpward ? { top: -COMMENT_MENU_PANEL_OFFSET_PX } : undefined
-            }
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <li
+        <EllipsisVerticalIcon className="size-full text-grey-800" aria-hidden />
+      </button>
+      {isOpen && (
+        <ul
+          role="menu"
+          className={`absolute right-0 px-3 py-2 border border-grey-200 bg-background rounded-sm flex flex-col gap-2 z-10 ${openUpward ? "mb-1" : "top-full mt-1"
+            }`}
+          style={
+            openUpward ? { top: -COMMENT_MENU_PANEL_OFFSET_PX } : undefined
+          }
+        >
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
               className="w-12 text-right text-grey-800"
               onClick={handleReportClick}
             >
               신고
-            </li>
-            <li
+            </button>
+          </li>
+          <li role="none">
+            <button
+              type="button"
+              role="menuitem"
               className="w-12 text-right text-red-400"
               onClick={handleDeleteClick}
             >
               삭제
-            </li>
-          </ul>
-        )}
-      </div>
-    </>
+            </button>
+          </li>
+        </ul>
+      )}
+    </div>
   );
 }

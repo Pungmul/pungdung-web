@@ -50,18 +50,21 @@ export function PostLikeButton({
   }, [isGuest, postId, isLikedState, requestLogin, requestToggle]);
 
   return (
-    <div
-      className="flex items-center flex-row cursor-pointer"
+    <button
+      type="button"
+      aria-label={`게시글 추천 ${likedNum}`}
+      aria-pressed={isLikedState}
+      className="flex items-center flex-row"
       onClick={handleLikeClick}
     >
-      <div className="flex size-7 p-1 items-center justify-center">
+      <span className="flex size-7 p-1 items-center justify-center" aria-hidden>
         {isLikedState ? (
           <HandThumbUpIconSolid className="size-full text-[#FF7B7B]" />
         ) : (
           <HandThumbUpIconOutline className="size-full text-[#FF7B7B]" />
         )}
-      </div>
-      <div className="text-red-300 leading-6 text-[13px]">{likedNum}</div>
-    </div>
+      </span>
+      <span className="text-red-300 leading-6 text-[13px]">{likedNum}</span>
+    </button>
   );
 }

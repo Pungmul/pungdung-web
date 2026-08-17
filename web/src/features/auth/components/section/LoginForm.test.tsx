@@ -2,7 +2,7 @@ import React from "react";
 
 import { UseFormRegister } from "react-hook-form";
 
-import { cleanup,fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { FormEvent } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -15,13 +15,14 @@ const validCredentials = {
   password: "Password12",
 } as const;
 
-/** RHF `handleSubmit`과 동일하게: submit 이벤트에서 검증된 payload로 `fn` 호출 */
+// RHF handleSubmit과 동일
+// submit에서 검증된 payload로 onValidSubmit 호출
 function mockHandleSubmit(
-  fn: (data: typeof validCredentials) => void
-): (e: FormEvent<HTMLFormElement>) => void {
-  return (e) => {
-    e.preventDefault();
-    fn({ ...validCredentials });
+  onValidSubmit: (data: typeof validCredentials) => void
+): (submitEvent: FormEvent<HTMLFormElement>) => void {
+  return (submitEvent) => {
+    submitEvent.preventDefault();
+    onValidSubmit({ ...validCredentials });
   };
 }
 
@@ -33,8 +34,8 @@ function baseProps(overrides: Partial<LoginFormProps> = {}): LoginFormProps {
     }>,
     inputErrors: {},
     isValid: true,
-    handleSubmit: (fn: (data: typeof validCredentials) => void) =>
-      mockHandleSubmit(fn),
+    handleSubmit: (onValidSubmit: (data: typeof validCredentials) => void) =>
+      mockHandleSubmit(onValidSubmit),
     onSubmit: vi.fn(),
     isPending: false,
     requestError: null,
@@ -70,10 +71,10 @@ describe("LoginForm", () => {
   });
 
   it("requestError.message가 비어 있으면 기본 실패 문구를 쓴다", () => {
-    const err = new Error("");
-    err.message = "";
+    const errorWithEmptyMessage = new Error("");
+    errorWithEmptyMessage.message = "";
 
-    render(<LoginForm {...baseProps({ requestError: err })} />);
+    render(<LoginForm {...baseProps({ requestError: errorWithEmptyMessage })} />);
 
     expect(
       screen.getByText("로그인에 실패했습니다.")
@@ -98,17 +99,27 @@ describe("LoginForm", () => {
   });
 
   it("isPending이면 type=submit 버튼을 비활성화하고 스피너를 표시한다", () => {
-    const { container } = render(
-      <LoginForm {...baseProps({ isPending: true })} />
-    );
+    render(<LoginForm {...baseProps({ isPending: true })} />);
 
-    const submitBtn = container.querySelector(
-      'form button[type="submit"]'
-    ) as HTMLButtonElement | null;
+    const submitButton = screen.getByRole("button", { name: "로그인" });
 
-    expect(submitBtn).not.toBeNull();
-    expect(submitBtn).toBeDisabled();
-    expect(submitBtn?.querySelector(".animate-spin")).not.toBeNull();
-    expect(submitBtn).not.toHaveTextContent("로그인");
+    expect(submitButton).toBeDisabled();
+    expect(submitButton).toHaveAttribute("aria-busy", "true");
+    expect(submitButton.querySelector(".animate-spin")).not.toBeNull();
+    expect(submitButton).not.toHaveTextContent("로그인");
+  });
+
+  it("비밀번호 보기 버튼이 있고 누르면 비밀번호 숨기기로 이름이 바뀐다", () => {
+    render(<LoginForm {...baseProps()} />);
+
+    const passwordInput = screen.getByLabelText("비밀번호");
+    expect(passwordInput).toHaveAttribute("type", "password");
+
+    fireEvent.click(screen.getByRole("button", { name: "비밀번호 보기" }));
+
+    expect(passwordInput).toHaveAttribute("type", "text");
+    expect(
+      screen.getByRole("button", { name: "비밀번호 숨기기" })
+    ).toBeInTheDocument();
   });
 });

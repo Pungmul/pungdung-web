@@ -42,34 +42,44 @@ export function StatisticsTabs({
   return (
     <section className="relative w-full">
       <nav className="w-full">
-        <ul className="flex flex-row w-full border-b border-grey-200">
-          {STATISTICS_TABS.map((item) => (
-            <motion.li
-              key={item.value}
-              initial={false}
-              animate={{
-                color:
-                  item.value === selectedTab
+        <div
+          role="tablist"
+          aria-label="신청 답변"
+          className="flex flex-row w-full border-b border-grey-200"
+        >
+          {STATISTICS_TABS.map((item) => {
+            const isSelected = item.value === selectedTab;
+
+            return (
+              <motion.button
+                key={item.value}
+                type="button"
+                role="tab"
+                aria-selected={isSelected}
+                initial={false}
+                animate={{
+                  color: isSelected
                     ? "var(--color-grey-800)"
                     : "var(--color-grey-400)",
-              }}
-              className="relative flex-1 text-center text-[15px] font-semibold py-[12px] cursor-pointer"
-              onClick={() => handleTabChange(item)}
-            >
-              {item.label}
-              <motion.div
-                className="absolute bottom-0 left-0 right-0 h-[2px] bg-grey-800"
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: item.value === selectedTab ? 1 : 0,
                 }}
-                transition={{
-                  duration: 0.25,
-                }}
-              />
-            </motion.li>
-          ))}
-        </ul>
+                className="relative flex-1 border-0 bg-transparent py-[12px] text-center text-[15px] font-semibold"
+                onClick={() => handleTabChange(item)}
+              >
+                {item.label}
+                <motion.span
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-grey-800"
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: isSelected ? 1 : 0,
+                  }}
+                  transition={{
+                    duration: 0.25,
+                  }}
+                />
+              </motion.button>
+            );
+          })}
+        </div>
       </nav>
       <main className="w-full flex flex-col py-[12px] min-h-[320px]">
         <Conditional

@@ -28,7 +28,7 @@ describe("PostLikeButton", () => {
     expect(screen.getByText("12")).toBeInTheDocument();
 
     await userEvent.click(
-      screen.getByText("12").closest(".cursor-pointer") as HTMLElement
+      screen.getByRole("button", { name: "게시글 추천 12" })
     );
 
     expect(requestToggleMock).toHaveBeenCalledWith({

@@ -33,58 +33,67 @@ export const QuestionItemEditTypeDropdown = ({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div
-        className="flex cursor-pointer flex-row items-center rounded bg-grey-200 p-1 text-grey-500 hover:bg-grey-300"
+      <button
+        type="button"
+        aria-expanded={isTypeDropdownOpen}
+        aria-haspopup="menu"
+        className="flex flex-row items-center rounded bg-grey-200 p-1 text-grey-500 hover:bg-grey-300"
         onClick={(e) => {
           e.stopPropagation();
           setIsTypeDropdownOpen((prev) => !prev);
         }}
-        title="질문 타입 변경"
       >
-        <div className="size-7 p-1">
+        <span className="size-7 p-1" aria-hidden>
           <QuestionTypeIcon type={questionType} className="size-full" />
-        </div>
-        <div className="px-2 py-1 text-[13px] font-medium text-grey-700">
+        </span>
+        <span className="px-2 py-1 text-[13px] font-medium text-grey-700">
           {getQuestionTypeLabel(questionType)}
-        </div>
-        <span className="size-4 flex items-center justify-center">
+        </span>
+        <span className="size-4 flex items-center justify-center" aria-hidden>
           <ChevronDownIcon className={`size-full ${isTypeDropdownOpen ? "-scale-y-100" : ""}`} />
         </span>
-      </div>
+      </button>
 
       {isTypeDropdownOpen && (
-        <div className="absolute left-0 top-full z-20 mt-1 w-40 rounded-lg border border-grey-300 bg-background shadow-lg">
+        <ul
+          role="menu"
+          className="absolute left-0 top-full z-20 mt-1 w-40 overflow-hidden rounded-lg border border-grey-300 bg-background shadow-lg"
+        >
           {questionTypes.map((typeOption) => (
-            <div
-              key={typeOption}
-              className={`flex cursor-pointer items-center gap-2 px-3 py-2 first:rounded-t-lg last:rounded-b-lg ${
-                typeOption === questionType
-                  ? "bg-blue-50 text-blue-500"
-                  : "text-grey-600 hover:bg-grey-100"
-              }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsTypeDropdownOpen(false);
-                onTypeChange(typeOption);
-              }}
-            >
-              <div
-                className={
-                  cn("size-7 p-1",
+            <li role="none" key={typeOption}>
+              <button
+                type="button"
+                role="menuitem"
+                className={`flex w-full items-center gap-2 px-3 py-2 text-left ${
                   typeOption === questionType
-                    ? "fill-blue-600 text-blue-600"
-                    : "fill-grey-500 text-grey-500"
-                  )
-                }
+                    ? "bg-blue-50 text-blue-500"
+                    : "text-grey-600 hover:bg-grey-100"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsTypeDropdownOpen(false);
+                  onTypeChange(typeOption);
+                }}
               >
-                <QuestionTypeIcon type={typeOption} className="size-full" />
-              </div>
-              <span className="text-[13px] font-medium">
-                {getQuestionTypeLabel(typeOption)}
-              </span>
-            </div>
+                <span
+                  className={
+                    cn("size-7 p-1",
+                    typeOption === questionType
+                      ? "fill-blue-600 text-blue-600"
+                      : "fill-grey-500 text-grey-500"
+                    )
+                  }
+                  aria-hidden
+                >
+                  <QuestionTypeIcon type={typeOption} className="size-full" />
+                </span>
+                <span className="text-[13px] font-medium">
+                  {getQuestionTypeLabel(typeOption)}
+                </span>
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

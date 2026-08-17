@@ -42,12 +42,14 @@ export default function NotificationPanelOverlay({
               title="알림"
               isBackBtn={false}
               rightBtn={
-                <div
-                  className="flex size-9 cursor-pointer items-center justify-center"
+                <button
+                  type="button"
+                  aria-label="알림 닫기"
+                  className="flex size-9 items-center justify-center"
                   onClick={onClose}
                 >
-                  <XMarkIcon className="size-full" />
-                </div>
+                  <XMarkIcon className="size-full" aria-hidden />
+                </button>
               }
             />
             <NotificationList />

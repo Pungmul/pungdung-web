@@ -4,8 +4,8 @@ import { useCallback, useMemo, useState } from "react";
 
 import dayjs from "dayjs";
 
-import { formatIntervalValue } from "./TimeInput/formatIntervalValue";
 import { WheelPicker } from "./WheelPicker";
+import { formatIntervalValue } from "../TimeInput/formatIntervalValue";
 
 interface TimePickerProps {
   /** 현재 선택된 시간 (HH:mm:ss) */
@@ -252,11 +252,11 @@ export function TimePicker({
 
         {showAmPm && (
           <div className="flex flex-col items-center">
-            {/* <div className="text-xs text-grey-500 mb-2">시</div> */}
             <WheelPicker
               options={amPmOptions}
               value={AmPmValue}
               onChange={handleAmPmChange}
+              accessibleName="오전 오후"
               containerHeight={210}
               itemHeight={40}
             />
@@ -264,36 +264,34 @@ export function TimePicker({
         )}
 
         <div className="flex flex-col items-center">
-          {/* <div className="text-xs text-grey-500 mb-2">시</div> */}
           <WheelPicker
             options={hourOptions}
             value={currentTime.hour}
             onChange={handleHourChange}
+            accessibleName="시"
             containerHeight={210}
             itemHeight={40}
           />
         </div>
 
-        {/* Minute Wheel */}
         <div className="flex flex-col items-center">
-          {/* <div className="text-xs text-grey-500 mb-2">분</div> */}
           <WheelPicker
             options={minuteOptions}
             value={currentTime.minute}
             onChange={handleMinuteChange}
+            accessibleName="분"
             containerHeight={210}
             itemHeight={40}
           />
         </div>
 
-        {/* Second Wheel (conditional) */}
         {showSeconds && (
           <div className="flex flex-col items-center">
-            {/* <div className="text-xs text-grey-500 mb-2">초</div> */}
             <WheelPicker
               options={secondOptions}
               value={currentTime.second || "00"}
               onChange={handleSecondChange}
+              accessibleName="초"
               containerHeight={210}
               itemHeight={32}
             />

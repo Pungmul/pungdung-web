@@ -27,8 +27,14 @@ export function ResetPasswordForm({
   onSubmit,
   onNavigateToLogin,
 }: ResetPasswordFormProps) {
-  const newPassword = usePasswordVisibility();
-  const confirmPassword = usePasswordVisibility();
+  const newPassword = usePasswordVisibility({
+    showLabel: AUTH_UI_MESSAGE.RESET_PASSWORD.FORM.SHOW_NEW_PASSWORD,
+    hideLabel: AUTH_UI_MESSAGE.RESET_PASSWORD.FORM.HIDE_NEW_PASSWORD,
+  });
+  const confirmPassword = usePasswordVisibility({
+    showLabel: AUTH_UI_MESSAGE.RESET_PASSWORD.FORM.SHOW_CONFIRM_PASSWORD,
+    hideLabel: AUTH_UI_MESSAGE.RESET_PASSWORD.FORM.HIDE_CONFIRM_PASSWORD,
+  });
 
   if (invalidToken) {
     return (

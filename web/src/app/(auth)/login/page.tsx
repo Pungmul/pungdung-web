@@ -11,6 +11,7 @@ import { Alert, Button, LinkButton, Space } from "@/shared";
 import { KakaoLogo } from "@/shared/components/Icons";
 
 import { LoginForm } from "@/features/auth/components";
+import { AUTH_UI_MESSAGE } from "@/features/auth/constants";
 import { useLoginForm } from "@/features/auth/hooks/form";
 
 export default function LoginPage() {
@@ -48,7 +49,7 @@ export default function LoginPage() {
           <div className="relative w-[320px] self-center aspect-[2/1]">
             <Image
               src={"/logos/pungdeong_logo.png"}
-              alt="logo"
+              alt="풍덩 로고"
               className="object-contain"
               fill
             />
@@ -60,7 +61,7 @@ export default function LoginPage() {
           <div className="relative w-[320px] self-center aspect-[2/1]">
             <Image
               src={"/logos/pungdeong_logo.png"}
-              alt="logo"
+              alt="풍덩 로고"
               className="object-contain"
               fill
             />
@@ -78,10 +79,11 @@ export default function LoginPage() {
 
           <div className="text-[16px] font-normal text-grey-500 text-center flex flex-row justify-between items-center gap-[4px]">
             <p>비밀번호를 잊으셨다면?</p>
-            <Link href="/reset-password/email-check">
-              <p className="text-[16px] underline font-normal text-grey-500 text-center cursor-pointer">
-                비밀번호 재설정
-              </p>
+            <Link
+              href="/reset-password/email-check"
+              className="text-[16px] underline font-normal text-grey-500 text-center"
+            >
+              {AUTH_UI_MESSAGE.RESET_PASSWORD.TITLE}
             </Link>
           </div>
 
@@ -97,15 +99,18 @@ export default function LoginPage() {
 
           <Space h={24} />
           <Button
+            type="button"
             className="flex flex-row items-center justify-center gap-[16px] px-[24px] !bg-kakao "
             onClick={() => {
               window.location.href = `/api/auth/kakao/login?redirectURL=${encodeURIComponent(returnPath)}`;
             }}
           >
             <span className="flex size-5 items-center justify-center">
-              <KakaoLogo className="size-full" />
+              <KakaoLogo className="size-full" aria-hidden />
             </span>
-            <div className="text-[16px] font-semibold text-black ">카카오로 시작하기</div>
+            <span className="text-[16px] font-semibold text-black">
+              카카오로 시작하기
+            </span>
           </Button>
         </div>
       </div>

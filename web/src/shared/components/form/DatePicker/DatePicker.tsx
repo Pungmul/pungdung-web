@@ -104,8 +104,21 @@ export function DatePicker({
   //   onChange(dayjs().format("YYYY-MM-DD"));
   // };
 
-  const handleApply = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const previousControlLabel =
+    viewMode === "date"
+      ? "이전 달"
+      : viewMode === "year"
+        ? "이전 연도 목록"
+        : "이전 연도";
+  const nextControlLabel =
+    viewMode === "date"
+      ? "다음 달"
+      : viewMode === "year"
+        ? "다음 연도 목록"
+        : "다음 연도";
+
+  const handleApply = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     console.log("handleApply", innerValue);
     onChange(innerValue);
   };
@@ -113,50 +126,51 @@ export function DatePicker({
   return (
     <div
       className={`flex flex-col p-4 cursor-default ${className}`}
-      onClick={(e) => {
-        e.preventDefault();
+      onClick={(event) => {
+        event.preventDefault();
       }}
     >
-      {/* 헤더: 월/년 선택 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex flex-row items-center flex-grow">
           {viewMode !== "year" && (
-            <div
+            <button
+              type="button"
               className="text-lg font-semibold p-[4px] hover:bg-grey-100 rounded-md"
-              onClick={(e) => {
-                e.preventDefault();
+              onClick={() => {
                 setViewMode("year");
               }}
             >
               {currentMonth.format("YYYY년")}
-            </div>
+            </button>
           )}
           {viewMode === "date" && (
-            <div
+            <button
+              type="button"
               className="text-lg font-semibold p-[4px] hover:bg-grey-100 rounded-md"
-              onClick={(e) => {
-                e.preventDefault();
+              onClick={() => {
                 setViewMode("month");
               }}
             >
               {currentMonth.format("MM월")}
-            </div>
+            </button>
           )}
         </div>
         <div className="flex flex-row gap-2 items-center">
           <button
+            type="button"
+            aria-label={previousControlLabel}
             onClick={prevAction}
             className="flex size-8 items-center justify-center rounded-md hover:bg-grey-100"
-            type="button"
           >
-            <ChevronLeftIcon className="size-full" />
+            <ChevronLeftIcon className="size-full" aria-hidden />
           </button>
           <button
+            type="button"
+            aria-label={nextControlLabel}
             onClick={nextAction}
             className="flex size-8 items-center justify-center rounded-md hover:bg-grey-100"
-            type="button"
           >
-            <ChevronRightIcon className="size-full" />
+            <ChevronRightIcon className="size-full" aria-hidden />
           </button>
         </div>
       </div>
@@ -233,21 +247,22 @@ const MonthGrid = ({
           dayjs(innerValue).isSame(month, "month") &&
           month.isSame(currentMonth, "month");
         return (
-          <div
+          <button
             key={i}
+            type="button"
+            aria-pressed={Boolean(isSelected)}
             className={
-              "text-center text-sm font-medium h-[36px] py-2 rounded-md cursor-pointer " +
+              "text-center text-sm font-medium h-[36px] py-2 rounded-md w-full " +
               (isSelected
                 ? "bg-primary text-background"
                 : "hover:bg-grey-100 text-grey-600")
             }
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={() => {
               setInnerValue(month.format("YYYY-MM-DD"));
             }}
           >
             {month.format("M월")}
-          </div>
+          </button>
         );
       })}
     </div>
@@ -275,21 +290,22 @@ const YearGrid = ({
       {years.map((year) => {
         const isSelected = year.isSame(dayjs(innerValue), "year");
         return (
-          <div
+          <button
             key={year.year()}
+            type="button"
+            aria-pressed={isSelected}
             className={
-              "text-center text-sm font-medium h-[36px] py-2 rounded-md cursor-pointer " +
+              "text-center text-sm font-medium h-[36px] py-2 rounded-md w-full " +
               (isSelected
                 ? "bg-primary text-background"
                 : "hover:bg-grey-100 text-grey-600")
             }
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={() => {
               setInnerValue(year.format("YYYY-MM-DD"));
             }}
           >
             {year.year()}
-          </div>
+          </button>
         );
       })}
     </div>
@@ -341,12 +357,12 @@ const DateGrid = ({
               return (
                 <button
                   key={weekIdx.toString() + day}
-                  onClick={(e) => {
-                    e.preventDefault();
+                  onClick={() => {
                     setInnerValue(day.format("YYYY-MM-DD"));
                   }}
                   disabled={!isCurrentMonth}
                   type="button"
+                  aria-current={isSelected ? "date" : undefined}
                   className={`
             aspect-square p-[8px] rounded-full text-sm size-[36px]
             ${!isCurrentMonth ? "text-grey-200 cursor-not-allowed" : ""}
