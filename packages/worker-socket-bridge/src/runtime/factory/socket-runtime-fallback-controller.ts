@@ -8,7 +8,6 @@ import {
 } from "./create-socket-runtime";
 
 export type SocketRuntimeFallbackControllerOptions = CreateSocketRuntimeOptions & {
-  fallbackChain?: SocketRuntimeMode[];
   onRuntimeChange?: (mode: SocketRuntimeMode) => void;
 };
 

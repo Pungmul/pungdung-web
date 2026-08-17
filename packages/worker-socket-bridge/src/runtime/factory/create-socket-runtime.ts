@@ -14,6 +14,7 @@ import type { SocketRuntime, SocketRuntimeMode } from "../types";
 
 export type CreateSocketRuntimeOptions = ResolveWorkerUrlsOptions & {
   sharedWorkerName?: string;
+  fallbackChain?: SocketRuntimeMode[];
 };
 
 /** 테스트용: 브라우저에서는 dedicated worker만 사용. SSR/prerender는 Worker API가 없어 main-thread로 대체. */
