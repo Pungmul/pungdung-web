@@ -1,8 +1,7 @@
-import { HandThumbUpIcon } from "@heroicons/react/24/outline";
-
 import { CommentMenu } from "./CommentMenu";
 import { useCommentLikeAcknowledgement } from "../../hooks/actions";
 import type { Reply as ReplyType } from "../../types";
+import { CommentLikeButton } from "../ui/CommentLikeButton";
 
 const Reply = ({ reply }: { reply: ReplyType }) => {
   // 추천: 확인 후 서버 토글
@@ -10,7 +9,10 @@ const Reply = ({ reply }: { reply: ReplyType }) => {
     commentId: reply.commentId,
     postId: reply.postId,
     content: reply.content,
-    confirmMessage: "이 대댓글을 추천하시겠습니까?",
+    isLiked: reply.isLiked,
+    confirmMessage: reply.isLiked
+      ? "추천을 취소하시겠습니까?"
+      : "이 대댓글을 추천하시겠습니까?",
   });
 
   return (
@@ -22,19 +24,12 @@ const Reply = ({ reply }: { reply: ReplyType }) => {
           </div>
         </div>
         <div className="flex flex-row items-center">
-          <button
-            type="button"
-            aria-label={`대댓글 추천 ${reply.likedNum}`}
-            className="flex h-7 items-center px-1 gap-0.5"
+          <CommentLikeButton
+            likedNum={reply.likedNum}
+            isLiked={reply.isLiked}
+            ariaLabel={`대댓글 추천 ${reply.likedNum}`}
             onClick={handleLikeClick}
-          >
-            <HandThumbUpIcon className="size-5 text-red-500" aria-hidden />
-            {reply.likedNum > 0 ? (
-              <span className="text-red-300 leading-6 text-[13px]">
-                {reply.likedNum}
-              </span>
-            ) : null}
-          </button>
+          />
           <div className="size-7 p-1">
             <CommentMenu comment={reply} menuLabel="대댓글 메뉴" />
           </div>

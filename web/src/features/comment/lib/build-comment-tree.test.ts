@@ -22,6 +22,7 @@ function createComment(overrides: Partial<Comment>): Comment {
     content: "댓글",
     anonymity: false,
     likedNum: 0,
+    isLiked: false,
     userName: "작성자",
     profile: profileStub,
     createdAt: "2026-01-01",

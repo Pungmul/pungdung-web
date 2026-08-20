@@ -20,6 +20,7 @@ describe("comment dto.schema", () => {
         hide: false,
         anonymity: false,
         likedNum: 0,
+        isLiked: true,
         userName: "작성자",
         createdAt: "2026-01-01",
       },
@@ -32,6 +33,7 @@ describe("comment dto.schema", () => {
         hide: false,
         anonymity: true,
         likedNum: null,
+        isLiked: false,
         userName: "답글 작성자",
         createdAt: "2026-01-02",
       },
@@ -52,6 +54,7 @@ describe("comment dto.schema", () => {
         hide: false,
         anonymity: true,
         likedNum: null,
+        isLiked: false,
         createdAt: "07/21 14:09",
       },
     ]);

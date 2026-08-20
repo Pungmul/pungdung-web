@@ -29,6 +29,7 @@ function makeComment(overrides: Partial<Comment> = {}): Comment {
     content: "parent",
     anonymity: false,
     likedNum: 0,
+    isLiked: false,
     userName: "u",
     profile,
     createdAt: "",

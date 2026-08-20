@@ -25,6 +25,7 @@ const commentFixture: Comment = {
   content: "c",
   anonymity: false,
   likedNum: 0,
+  isLiked: false,
   userName: "u",
   profile,
   createdAt: "",

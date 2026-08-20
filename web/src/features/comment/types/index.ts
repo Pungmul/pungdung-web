@@ -9,6 +9,7 @@ export interface Comment {
   content: string;
   anonymity: boolean;
   likedNum: number;
+  isLiked: boolean;
   userName: string;
   profile: ImageObject;
   createdAt: string;

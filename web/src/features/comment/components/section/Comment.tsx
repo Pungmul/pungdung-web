@@ -1,5 +1,3 @@
-import { HandThumbUpIcon } from "@heroicons/react/24/outline";
-
 import { cn } from "@/shared";
 import { CommentOutline } from "@/shared/components/Icons";
 
@@ -9,6 +7,7 @@ import {
   useCommentReplyPrompt,
 } from "../../hooks/actions";
 import type { Comment as CommentType } from "../../types";
+import { CommentLikeButton } from "../ui/CommentLikeButton";
 
 const Comment = ({
   comment,
@@ -35,6 +34,7 @@ const Comment = ({
     commentId: comment.commentId,
     postId: comment.postId,
     content: comment.content,
+    isLiked: comment.isLiked,
   });
 
   return (
@@ -51,19 +51,12 @@ const Comment = ({
           </div>
         </div>
         <div className="flex flex-row items-center">
-          <button
-            type="button"
-            aria-label={`댓글 추천 ${comment.likedNum}`}
-            className="flex h-7 items-center px-1 gap-0.5"
+          <CommentLikeButton
+            likedNum={comment.likedNum}
+            isLiked={comment.isLiked}
+            ariaLabel={`댓글 추천 ${comment.likedNum}`}
             onClick={handleLikeClick}
-          >
-            <HandThumbUpIcon className="size-5 text-red-500" aria-hidden />
-            {comment.likedNum > 0 ? (
-              <span className="text-red-300 leading-6 text-[13px]">
-                {comment.likedNum}
-              </span>
-            ) : null}
-          </button>
+          />
           <button
             type="button"
             aria-label="답글 달기"

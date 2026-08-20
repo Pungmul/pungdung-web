@@ -23,6 +23,7 @@ describe("mapCommentDtoToComment", () => {
       hide: false,
       anonymity: false,
       likedNum: 2,
+      isLiked: true,
       userName: "작성자",
       profile: profileDto,
       createdAt: "2026-01-01",
@@ -36,6 +37,7 @@ describe("mapCommentDtoToComment", () => {
           hide: false,
           anonymity: true,
           likedNum: 1,
+          isLiked: false,
           userName: "답글 작성자",
           profile: profileDto,
           createdAt: "2026-01-02",
@@ -47,6 +49,8 @@ describe("mapCommentDtoToComment", () => {
     expect(comment.commentId).toBe(1);
     expect(comment.anonymity).toBe(false);
     expect(comment.likedNum).toBe(2);
+    expect(comment.isLiked).toBe(true);
+    expect(comment.replies[0]?.isLiked).toBe(false);
     expect(comment.profile.fullFilePath).toBe(profileDto.fullFilePath);
     expect(comment.replies[0]?.commentId).toBe(2);
   });
@@ -68,6 +72,7 @@ describe("mapCommentDtoToComment", () => {
 
     expect(comment.userName).toBe("탈퇴한 회원");
     expect(comment.likedNum).toBe(0);
+    expect(comment.isLiked).toBe(false);
   });
 
   it("필수 댓글 필드가 없으면 실패한다", () => {

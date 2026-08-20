@@ -16,6 +16,7 @@ interface UseCommentLikeAcknowledgementParams {
   commentId: number;
   postId: number;
   content: string;
+  isLiked: boolean;
   confirmMessage?: string;
 }
 
@@ -23,8 +24,14 @@ export function useCommentLikeAcknowledgement({
   commentId,
   postId,
   content,
-  confirmMessage = "이 댓글을 추천하시겠습니까?",
+  isLiked,
+  confirmMessage,
 }: UseCommentLikeAcknowledgementParams) {
+  const resolvedConfirmMessage =
+    confirmMessage ??
+    (isLiked
+      ? "추천을 취소하시겠습니까?"
+      : "이 댓글을 추천하시겠습니까?");
   const queryClient = useQueryClient();
   const { mutate: likeComment } = useMutation({
     ...commentMutationOptions.like(),
@@ -46,14 +53,16 @@ export function useCommentLikeAcknowledgement({
       event.stopPropagation();
       Alert.confirm({
         title: "추천",
-        message: confirmMessage,
+        message: resolvedConfirmMessage,
         onConfirm: () => {
           likeComment(
             { commentId, postId },
             {
-              onSuccess: () => {
+              onSuccess: (data) => {
                 Toast.show({
-                  message: josa(content.substring(0, 10), "을/를") + "추천했어요",
+                  message: data.liked
+                    ? josa(content.substring(0, 10), "을/를") + "추천했어요"
+                    : "추천이 취소 되었습니다.",
                   type: "success",
                 });
               },
@@ -62,6 +71,6 @@ export function useCommentLikeAcknowledgement({
         },
       });
     },
-    [commentId, confirmMessage, content, likeComment, postId]
+    [commentId, content, likeComment, postId, resolvedConfirmMessage]
   );
 }
