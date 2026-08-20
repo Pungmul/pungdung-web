@@ -3,6 +3,10 @@
 import { Spinner } from "@/shared";
 
 import { AUTH_DOMAIN_MESSAGE } from "../../constants";
+import {
+  getSignUpCompleteErrorMessage,
+  isDeletedAccountSignUpError,
+} from "../../lib/get-sign-up-complete-error-message";
 
 export interface CompleteStepProps {
   isPending: boolean;
@@ -33,6 +37,8 @@ export const CompleteStep = ({
   }
 
   if (error) {
+    const canRetry = !isDeletedAccountSignUpError(error);
+
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-6 flex-grow">
         <div className="text-center">
@@ -55,7 +61,7 @@ export const CompleteStep = ({
             {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.FAILURE_TITLE}
           </h2>
           <p className="text-grey-600 mb-4">
-            {error.message || AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.GENERIC_ERROR}
+            {getSignUpCompleteErrorMessage(error)}
           </p>
         </div>
 
@@ -69,13 +75,23 @@ export const CompleteStep = ({
               {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.BACK_TO_EDIT}
             </button>
           )}
-          <button
-            type="button"
-            onClick={onRetry}
-            className="px-6 py-2 bg-grey-800 text-background rounded-lg hover:bg-grey-700 transition-colors"
-          >
-            {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.RETRY}
-          </button>
+          {canRetry ? (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="px-6 py-2 bg-grey-800 text-background rounded-lg hover:bg-grey-700 transition-colors"
+            >
+              {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.RETRY}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onNavigateToLogin}
+              className="px-6 py-2 bg-grey-800 text-background rounded-lg hover:bg-grey-700 transition-colors"
+            >
+              {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.GO_TO_LOGIN}
+            </button>
+          )}
         </div>
       </div>
     );

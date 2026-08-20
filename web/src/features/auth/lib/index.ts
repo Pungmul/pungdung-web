@@ -6,6 +6,10 @@ export {
 } from "./change-password-access";
 export { decodeAccessTokenUsername } from "./decode-access-token-username";
 export { formatPhoneNumber } from "./format-phone-number";
+export {
+  getSignUpCompleteErrorMessage,
+  isDeletedAccountSignUpError,
+} from "./get-sign-up-complete-error-message";
 export { hasAuthSessionCookie } from "./has-auth-session-cookie";
 export { hasValidAccessToken } from "./has-valid-access-token";
 export { isAccessTokenExpired } from "./is-access-token-expired";

@@ -1,11 +1,16 @@
 import { z } from "zod";
 
-export const upstreamEnvelopeSchema = z.object({
-  code: z.string(),
-  message: z.string(),
-  response: z.unknown(),
-  isSuccess: z.boolean(),
-});
+import { normalizeEnvelopeInput } from "../normalize-envelope-input";
+
+export const upstreamEnvelopeSchema = z.preprocess(
+  normalizeEnvelopeInput,
+  z.object({
+    code: z.string(),
+    message: z.string(),
+    response: z.unknown(),
+    isSuccess: z.boolean(),
+  })
+);
 
 export type UpstreamEnvelope = z.infer<typeof upstreamEnvelopeSchema>;
 

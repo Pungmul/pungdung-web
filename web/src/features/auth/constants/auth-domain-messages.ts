@@ -26,6 +26,7 @@ export const AUTH_DOMAIN_MESSAGE = {
     PENDING_TITLE: "회원가입 신청서 보내는 중...",
     FAILURE_TITLE: "회원가입 실패",
     GENERIC_ERROR: "회원가입 중 오류가 발생했습니다.",
+    DELETED_ACCOUNT: "탈퇴한 계정은 재가입할 수 없습니다",
     BACK_TO_EDIT: "뒤로 가서 다시 입력",
     RETRY: "다시 시도",
     SUCCESS_TITLE: "회원가입이 완료되었어요!",

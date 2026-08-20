@@ -31,4 +31,25 @@ describe("validateUpstreamJsonResponse", () => {
     expect(parsed.error.status).toBe(502);
     expect(parsed.error.body.code).toBe("UPSTREAM_INVALID_RESPONSE");
   });
+
+  it("responseCode만 있는 실패 envelope도 통과시킨다", async () => {
+    const response = new Response(
+      JSON.stringify({
+        isSuccess: false,
+        responseCode: "MEMBER_004",
+        message: "삭제된 계정입니다.",
+        response: null,
+      }),
+      { status: 403, headers: { "Content-Type": "application/json" } }
+    );
+    const parsed = await validateUpstreamJsonResponse(response);
+
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      return;
+    }
+
+    expect(parsed.data.code).toBe("MEMBER_004");
+    expect(parsed.data.message).toBe("삭제된 계정입니다.");
+  });
 });
