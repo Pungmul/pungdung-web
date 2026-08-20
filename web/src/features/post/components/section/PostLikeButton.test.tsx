@@ -14,6 +14,12 @@ vi.mock("../../hooks/actions/usePostLikeWithConfirmAction", () => ({
   }),
 }));
 
+vi.mock("@/features/auth", () => ({
+  useLoginRequiredConfirmAction: () => ({
+    requestLogin: vi.fn(),
+  }),
+}));
+
 describe("PostLikeButton", () => {
   afterEach(() => {
     cleanup();
@@ -36,5 +42,11 @@ describe("PostLikeButton", () => {
       isLikedBeforeToggle: false,
       onApplied: expect.any(Function),
     });
+  });
+
+  it("추천 수가 0이면 추천 문구를 표시한다", () => {
+    render(<PostLikeButton postId={7} isLiked={false} likedNum={0} />);
+
+    expect(screen.getByText("추천")).toBeInTheDocument();
   });
 });

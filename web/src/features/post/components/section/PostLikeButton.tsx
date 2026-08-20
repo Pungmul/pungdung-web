@@ -64,7 +64,13 @@ export function PostLikeButton({
           <HandThumbUpIconOutline className="size-full text-[#FF7B7B]" />
         )}
       </span>
-      <span className="text-red-300 leading-6 text-[13px]">{likedNum}</span>
+      <span
+        className={`text-red-300 leading-6 ${
+          likedNum > 0 ? "text-[13px]" : "text-[11px]"
+        }`}
+      >
+        {likedNum > 0 ? likedNum : "추천"}
+      </span>
     </button>
   );
 }
