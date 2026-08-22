@@ -19,6 +19,9 @@ describe("getGuestRoutePolicy", () => {
     expect(getGuestRoutePolicy("/board/1")).toBe("member-only");
     expect(getGuestRoutePolicy("/board/d/10")).toBe("member-only");
     expect(getGuestRoutePolicy("/board/1/search")).toBe("member-only");
+    expect(getGuestRoutePolicy("/reset-password")).toBe("public");
+    expect(getGuestRoutePolicy("/reset-password/email-check")).toBe("public");
+    expect(getGuestRoutePolicy("/login")).toBe("public");
   });
 
   it("홈·번개·채팅·마이페이지·알림을 로그인 유도 화면으로 분류한다", () => {
