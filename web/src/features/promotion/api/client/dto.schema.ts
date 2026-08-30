@@ -62,6 +62,25 @@ export type PromotionPerformanceListWirePayload = z.infer<
   typeof promotionPerformanceListResponseSchema
 >;
 
+const promotionJoinedFriendWireSchema = z.object({
+  userId: z.number(),
+  username: z.string(),
+  name: z.string(),
+  clubName: z.string().nullable(),
+  profileImage: z.object({
+    id: z.number(),
+    originalFilename: z.string(),
+    convertedFileName: z.string(),
+    fullFilePath: z.string(),
+    fileType: z.string(),
+    fileSize: z.number(),
+    createdAt: z.string(),
+  }),
+});
+export type PromotionJoinedFriendWire = z.infer<
+  typeof promotionJoinedFriendWireSchema
+>;
+
 export const promotionDetailSchema = z.object({
   performanceId: z.number(),
   title: z.string(),
@@ -72,6 +91,7 @@ export const promotionDetailSchema = z.object({
   performanceImageInfoList: z.array(promotionPosterWireSchema),
   address: addressWireSchema,
   questions: z.array(promotionPublishedQuestionWireSchema),
+  joinedFriendList: z.array(promotionJoinedFriendWireSchema),
 });
 export type PromotionDetailWire = z.infer<typeof promotionDetailSchema>;
 

@@ -1,6 +1,7 @@
 export type {
   Promotion,
   PromotionDetail,
+  PromotionJoinedFriend,
   PromotionPoster,
 } from "./promotion.types";
 export type {

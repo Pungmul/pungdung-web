@@ -36,6 +36,19 @@ test("PROMO-004 | 공개 공연을 신청하고 상세로 돌아온다", async (
     );
   });
 
+  await test.step("하단 친구 안내에서 관람 신청한 친구를 확인", async () => {
+    await page
+      .getByRole("button", {
+        name: "1명의 친구들이 이 공연 관람을 신청했어요",
+      })
+      .click();
+    await expect(
+      page.getByRole("region", { name: "공연 관람 신청 친구 목록" })
+    ).toBeVisible();
+    await expect(page.getByText("공연 친구", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "친구 목록 닫기" }).click();
+  });
+
   await test.step("필수 응답을 제출하면 상세로 돌아옴", async () => {
     await page.getByPlaceholder("관람 이유를 입력해주세요.").fill("공연을 관람합니다.");
     const dialogPromise = page.waitForEvent("dialog");

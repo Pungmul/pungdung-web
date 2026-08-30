@@ -44,6 +44,23 @@ export const e2ePromotionDetail = {
   publicKey: E2E_PROMOTION_PUBLIC_KEY,
   performanceImageInfoList: [e2ePromotionPoster],
   address: e2ePromotionAddress,
+  joinedFriendList: [
+    {
+      userId: 77,
+      username: "friend@example.com",
+      name: "공연 친구",
+      clubName: "풍덩대",
+      profileImage: {
+        id: 2,
+        originalFilename: "friend.png",
+        convertedFileName: "friend.png",
+        fullFilePath: "/logos/pungdeong_logo_192.png",
+        fileType: "image/png",
+        fileSize: 1,
+        createdAt: now,
+      },
+    },
+  ],
   questions: [
     {
       id: E2E_PROMOTION_QUESTION_ID,

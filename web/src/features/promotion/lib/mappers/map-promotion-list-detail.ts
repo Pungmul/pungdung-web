@@ -45,5 +45,12 @@ export function mapPromotionDetailWireToClient(
     ),
     address: wire.address as Address | null,
     questions: wire.questions.map(mapPromotionPublishedQuestionWireToClient),
+    joinedFriendList: wire.joinedFriendList.map((friend) => ({
+      userId: friend.userId,
+      username: friend.username,
+      name: friend.name,
+      clubName: friend.clubName,
+      profileImage: friend.profileImage,
+    })),
   };
 }

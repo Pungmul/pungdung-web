@@ -57,6 +57,7 @@ export function PromotionSurveyRoutePage({
         <Space h={24} />
         <PromotionSurveyForm
           questions={promotionDetail.questions || []}
+          joinedFriends={promotionDetail.joinedFriendList}
           onSubmit={(answers) => {
             const answerList: PromotionSurveySubmitAnswer[] =
               Object.entries(answers).map(([questionId, answer]) => ({

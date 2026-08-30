@@ -4,14 +4,16 @@ import { Controller, FormProvider, useFormContext } from "react-hook-form";
 
 import type { FieldPath } from "react-hook-form";
 
-import { BottomFixedButton, Spinner } from "@/shared";
+import { Button, Spinner } from "@/shared";
 
+import { JoinedFriendsSheet } from "./JoinedFriendsSheet";
 import { QuestionAnswer } from "./QuestionAnswer";
 import {
   type PromotionSurveySubmitState,
   usePromotionSurveyForm,
 } from "../../../hooks/form";
 import type {
+  PromotionJoinedFriend,
   PromotionPublishedQuestion,
   PromotionSurveyFieldValue,
   PromotionSurveyFormValues,
@@ -20,6 +22,7 @@ import type {
 
 interface PromotionSurveyFormProps {
   questions: PromotionPublishedQuestion[];
+  joinedFriends?: PromotionJoinedFriend[];
   onSubmit?: (answers: Record<string, PromotionSurveyFieldValue>) => void;
 }
 
@@ -83,8 +86,10 @@ function PromotionSurveyQuestionList({
 
 function PromotionSurveySubmitButton({
   submit,
+  joinedFriends,
 }: {
   submit: PromotionSurveySubmitState;
+  joinedFriends: PromotionJoinedFriend[];
 }) {
   const isDisabled = submit.isSubmitting || !submit.canContinue;
 
@@ -100,30 +105,37 @@ function PromotionSurveySubmitButton({
   })();
 
   return (
-    <BottomFixedButton
-      type="submit"
-      disabled={isDisabled}
-      className={`w-full py-[12px] rounded-md font-semibold ${isDisabled
-        ? "!bg-grey-300 !text-grey-500 cursor-not-allowed"
-        : "!bg-blue-600 hover:!bg-blue-700 !text-white"
-        }`}
-    >
-      {invalidHint ? (
-        invalidHint
-      ) : submit.isSubmitting ? (
-        <>
-          <Spinner />
-          <span className="ml-[8px]">제출 중...</span>
-        </>
-      ) : (
-        "설문 제출하기"
-      )}
-    </BottomFixedButton>
+    <div className="sticky bottom-0 left-0 right-0 z-50 w-full">
+      <JoinedFriendsSheet friends={joinedFriends}>
+        <div className="bg-gradient-to-t from-background via-background via-80% to-transparent px-[24px] pb-[32px] pt-[24px]">
+          <Button
+            type="submit"
+            disabled={isDisabled}
+            className={`w-full py-[12px] rounded-md font-semibold ${isDisabled
+              ? "!bg-grey-300 !text-grey-500 cursor-not-allowed"
+              : "!bg-blue-600 hover:!bg-blue-700 !text-white"
+              }`}
+          >
+            {invalidHint ? (
+              invalidHint
+            ) : submit.isSubmitting ? (
+              <>
+                <Spinner />
+                <span className="ml-[8px]">제출 중...</span>
+              </>
+            ) : (
+              "설문 제출하기"
+            )}
+          </Button>
+        </div>
+      </JoinedFriendsSheet>
+    </div>
   );
 }
 
 export const PromotionSurveyForm = ({
   questions,
+  joinedFriends = [],
   onSubmit = noop,
 }: PromotionSurveyFormProps) => {
   const { form, normalizedQuestions, isInvalid, showErrors, submit } =
@@ -154,7 +166,10 @@ export const PromotionSurveyForm = ({
             showErrors={showErrors}
           />
         </div>
-        <PromotionSurveySubmitButton submit={submit} />
+        <PromotionSurveySubmitButton
+          submit={submit}
+          joinedFriends={joinedFriends}
+        />
       </form>
     </FormProvider>
   );

@@ -1,3 +1,5 @@
+import type { User } from "@/features/user";
+
 import type { Address } from "@/shared/types";
 
 import type { PromotionPublishedQuestion } from "./promotion-question.types";
@@ -6,6 +8,8 @@ export interface PromotionPoster {
   id: number;
   imageUrl: string;
 }
+
+export type PromotionJoinedFriend = User;
 
 export interface PromotionDetail {
   performanceId: number;
@@ -17,6 +21,7 @@ export interface PromotionDetail {
   performanceImageInfoList: PromotionPoster[];
   address: Address | null;
   questions: PromotionPublishedQuestion[];
+  joinedFriendList: PromotionJoinedFriend[];
 }
 
 export interface Promotion {

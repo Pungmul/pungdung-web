@@ -12,6 +12,7 @@ export type {
   PromotionFormListItemWire,
   PromotionFormSaveAckWire,
   PromotionFormSaveBodyWire,
+  PromotionJoinedFriendWire,
   PromotionListItemWire,
   PromotionPerformanceListWirePayload,
   PromotionPosterWire,
