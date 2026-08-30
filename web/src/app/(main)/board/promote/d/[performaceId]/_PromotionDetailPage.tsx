@@ -2,18 +2,20 @@
 
 import { useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import { useLoginRequiredConfirmAction } from "@/features/auth";
 import {
+  JoinedFriendsSheet,
   PromotionMenu,
   PromotionProfile,
   promotionQueries,
   PromotionShareButton,
 } from "@/features/promotion";
 
-import { BottomFixedButton, BottomFixedLinkButton, Header, Spinner } from "@/shared";
+import { Button, Header, Spinner } from "@/shared";
 
 const Viewer = dynamic(
   () =>
@@ -39,6 +41,7 @@ export function PromotionDetailPage({
   performaceId: string;
   isGuest: boolean;
 }) {
+  const router = useRouter();
   const { requestLogin } = useLoginRequiredConfirmAction();
   const { data: promotionDetail } = useSuspenseQuery({
     ...promotionQueries.detail(performaceId),
@@ -90,15 +93,23 @@ export function PromotionDetailPage({
           />
           <PromotionTabs description={promotionDetail.description} />
         </section>
-        {isGuest ? (
-          <BottomFixedButton type="button" onClick={requestLogin}>
-            참가 신청하기
-          </BottomFixedButton>
-        ) : (
-          <BottomFixedLinkButton href={`/board/promote/d/${performaceId}/survey`}>
-            참가 신청하기
-          </BottomFixedLinkButton>
-        )}
+        <div className="sticky bottom-0 left-0 right-0 z-50 w-full">
+          <JoinedFriendsSheet friends={promotionDetail.joinedFriendList}>
+            <div className="bg-gradient-to-t from-background via-background via-80% to-transparent px-[24px] pb-[32px] pt-[24px]">
+              <Button
+                type="button"
+                className="bg-blue-600 text-white"
+                onClick={
+                  isGuest
+                    ? requestLogin
+                    : () => router.push(`/board/promote/d/${performaceId}/survey`)
+                }
+              >
+                참가 신청하기
+              </Button>
+            </div>
+          </JoinedFriendsSheet>
+        </div>
       </article>
     </div>
   );

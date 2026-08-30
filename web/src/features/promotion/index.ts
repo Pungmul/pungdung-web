@@ -59,6 +59,7 @@ export {
 export {
   AddNewPromotionPostBox,
   IndividualResponsesTab,
+  JoinedFriendsSheet,
   MyPromotionFormList,
   MyPromotionPostBox,
   OptionsQuestionPreview,
@@ -113,7 +114,6 @@ export type {
   PromotionApplicationDetail,
   PromotionBookingSummary,
   PromotionDetail,
-  PromotionJoinedFriend,
   PromotionDraftQuestion,
   PromotionDraftQuestionOption,
   PromotionFormDraft,
@@ -121,6 +121,7 @@ export type {
   PromotionFormListItem,
   PromotionFormSaveAck,
   PromotionFormSavePayload,
+  PromotionJoinedFriend,
   PromotionPoster,
   PromotionPostingFormValues,
   PromotionPostingPosterValue,

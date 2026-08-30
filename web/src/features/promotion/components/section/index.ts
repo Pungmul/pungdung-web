@@ -18,5 +18,6 @@ export { PromotionMenu } from "./manage/PromotionMenu";
 export { PromotionProfile } from "./manage/PromotionProfile";
 export { PromotionShareButton } from "./manage/PromotionShareButton";
 export { UpcomingPerformanceList } from "./manage/UpcomingPerformanceList";
+export { JoinedFriendsSheet } from "./survey/JoinedFriendsSheet";
 export { PromotionSurveyForm } from "./survey/PromotionSurveyForm";
 export { QuestionAnswer } from "./survey/QuestionAnswer";

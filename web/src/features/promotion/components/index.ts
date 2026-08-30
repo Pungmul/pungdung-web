@@ -1,5 +1,6 @@
 export {
   IndividualResponsesTab,
+  JoinedFriendsSheet,
   MyPromotionFormList,
   PromotionInfoForm,
   PromotionList,

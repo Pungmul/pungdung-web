@@ -19,24 +19,6 @@ test("PROMO-004 | 공개 공연을 신청하고 상세로 돌아온다", async (
       new RegExp(`/board/promote/d/${E2E_PROMOTION_PUBLIC_KEY}`),
       { timeout: 45_000 }
     );
-    const applicationLink = page.getByRole("link", {
-      name: "참가 신청하기",
-      exact: true,
-    });
-    await expect(applicationLink).toHaveAttribute(
-      "href",
-      `/board/promote/d/${E2E_PROMOTION_PUBLIC_KEY}/survey`
-    );
-    await page.goto(`/board/promote/d/${E2E_PROMOTION_PUBLIC_KEY}/survey`, {
-      waitUntil: "domcontentloaded",
-    });
-    await expect(page).toHaveURL(
-      new RegExp(`/board/promote/d/${E2E_PROMOTION_PUBLIC_KEY}/survey`),
-      { timeout: 45_000 }
-    );
-  });
-
-  await test.step("하단 친구 안내에서 관람 신청한 친구를 확인", async () => {
     await page
       .getByRole("button", {
         name: "1명의 친구들이 이 공연 관람을 신청했어요",
@@ -46,7 +28,17 @@ test("PROMO-004 | 공개 공연을 신청하고 상세로 돌아온다", async (
       page.getByRole("region", { name: "공연 관람 신청 친구 목록" })
     ).toBeVisible();
     await expect(page.getByText("공연 친구", { exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "친구 목록 닫기" }).click();
+
+    const applicationButton = page.getByRole("button", {
+      name: "참가 신청하기",
+      exact: true,
+    });
+    await expect(applicationButton).toBeVisible();
+    await applicationButton.click();
+    await expect(page).toHaveURL(
+      new RegExp(`/board/promote/d/${E2E_PROMOTION_PUBLIC_KEY}/survey`),
+      { timeout: 45_000 }
+    );
   });
 
   await test.step("필수 응답을 제출하면 상세로 돌아옴", async () => {
