@@ -2,10 +2,7 @@
 
 import { useEffect, useId, useState } from "react";
 
-import {
-  ChevronDownIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ReactNode } from "react";
 
@@ -78,22 +75,19 @@ export function JoinedFriendsSheet({
           className="flex w-full items-center justify-between px-[24px] py-3 text-left text-[15px] text-grey-600"
           onClick={() => setIsExpanded((prev) => !prev)}
         >
-          <span className="text-grey-400 text-sm">{friendCount}명의 친구들이 이 공연 관람을 신청했어요</span>
-          <AnimatePresence initial={false} mode="wait">
-            <motion.span
-              key={isExpanded ? "expanded" : "collapsed"}
-              initial={{ opacity: 0, y: -2 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 2 }}
-              transition={{ duration: 0.16, ease: "easeOut" }}
-            >
-              {isExpanded ? (
-                <ChevronDownIcon aria-hidden className="size-5 text-grey-400" />
-              ) : (
-                <ChevronRightIcon aria-hidden className="size-5 text-grey-400" />
-              )}
-            </motion.span>
-          </AnimatePresence>
+          <span
+            className={`text-sm transition-colors duration-200 ease-out ${
+              isExpanded ? "text-grey-400" : "text-primary"
+            }`}
+          >
+            {friendCount}명의 친구들이 이 공연 관람을 신청했어요
+          </span>
+          <ChevronRightIcon
+            aria-hidden
+            className={`size-5 text-grey-400 transition-transform duration-200 ease-out ${
+              isExpanded ? "rotate-90" : ""
+            }`}
+          />
         </button>
         <AnimatePresence initial={false}>
           {isExpanded ? (
