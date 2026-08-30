@@ -12,7 +12,7 @@ import {
 import { Toast } from "@/shared/store";
 
 import { JoinedFriendMenu } from "./JoinedFriendMenu";
-import type { PromotionJoinedFriend } from "../../../types";
+import type { PromotionJoinedFriend } from "../../../../types";
 
 interface JoinedFriendsListProps {
   friends: PromotionJoinedFriend[];

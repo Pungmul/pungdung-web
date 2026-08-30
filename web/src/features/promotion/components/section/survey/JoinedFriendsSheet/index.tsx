@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { ReactNode } from "react";
 
 import { JoinedFriendsList } from "./JoinedFriendsList";
-import type { PromotionJoinedFriend } from "../../../types";
+import type { PromotionJoinedFriend } from "../../../../types";
 
 interface JoinedFriendsSheetProps {
   friends: PromotionJoinedFriend[];

@@ -6,17 +6,17 @@ import type { FieldPath } from "react-hook-form";
 
 import { BottomFixedButton, Spinner } from "@/shared";
 
-import { QuestionAnswer } from "./QuestionAnswer";
 import {
   type PromotionSurveySubmitState,
   usePromotionSurveyForm,
-} from "../../../hooks/form";
+} from "../../../../hooks/form";
 import type {
   PromotionPublishedQuestion,
   PromotionSurveyFieldValue,
   PromotionSurveyFormValues,
   PromotionSurveyQuestion,
-} from "../../../types";
+} from "../../../../types";
+import { QuestionAnswer } from "../QuestionAnswer";
 
 interface PromotionSurveyFormProps {
   questions: PromotionPublishedQuestion[];

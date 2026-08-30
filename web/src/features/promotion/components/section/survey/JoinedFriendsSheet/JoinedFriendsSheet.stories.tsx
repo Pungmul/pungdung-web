@@ -4,9 +4,9 @@ import { FriendBox, FriendMessageButton } from "@/features/friends";
 
 import { Button } from "@/shared";
 
-import { JoinedFriendsSheet } from "./JoinedFriendsSheet";
+import { JoinedFriendsSheet } from "./index";
 import { JoinedFriendMenu } from "./JoinedFriendMenu";
-import type { PromotionJoinedFriend } from "../../../types";
+import type { PromotionJoinedFriend } from "../../../../types";
 
 const friends: PromotionJoinedFriend[] = [
   {

@@ -1,36 +1,32 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { PromotionSurveyForm } from "./PromotionSurveyForm";
-import type { PromotionPublishedQuestion } from "../../../types";
+import { PromotionSurveyForm } from "./index";
+import type { PromotionPublishedQuestion } from "../../../../types";
 
-const requiredChoiceQuestion: PromotionPublishedQuestion = {
-  id: 21,
-  questionType: "CHOICE",
-  label: "선호 좌석",
+const requiredTextQuestion: PromotionPublishedQuestion = {
+  id: 11,
+  questionType: "TEXT",
+  label: "관람 이유",
   required: true,
   orderNo: 1,
   settingsJson: "{}",
-  options: [
-    { id: 1, label: "A열", orderNo: 1 },
-    { id: 2, label: "B열", orderNo: 2 },
-  ],
+  options: [],
 };
 
-describe("PROMO-037 | 관람 신청 - 객관식 필수 미응답", () => {
+describe("PROMO-010 | 관람 신청 - 필수 응답 누락", () => {
   afterEach(() => {
     cleanup();
   });
 
-  it("필수 객관식 질문을 미응답 상태로 둠", async () => {
+  it("필수 질문을 미응답 상태로 둠", async () => {
     // 1. 관람 신청 화면 진입
-    // 2. 필수 CHOICE 질문을 고르지 않음
+    // 2. 필수 질문을 미응답 상태로 둠
     // 3. 하단 제출 영역 확인
-    // PROMO-010은 TEXT 필수. 이 파일은 CHOICE 필수만 본다
     const onSubmit = vi.fn();
     const { container } = render(
       <PromotionSurveyForm
-        questions={[requiredChoiceQuestion]}
+        questions={[requiredTextQuestion]}
         onSubmit={onSubmit}
       />
     );
@@ -40,6 +36,8 @@ describe("PROMO-037 | 관람 신청 - 객관식 필수 미응답", () => {
     });
     expect(submitButton).toBeDisabled();
 
+    // disabled 제출 버튼은 userEvent 클릭이 먹지 않음
+    // form submit으로 invalid 콜백과 필드 에러를 연다
     const form = container.querySelector("form");
     expect(form).not.toBeNull();
     fireEvent.submit(form!);
