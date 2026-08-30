@@ -5,13 +5,13 @@ import { useCallback } from "react";
 import { useOpenPersonalChatNavigation } from "@/features/chat";
 import {
   FriendBox,
-  FriendMenu,
   FriendMessageButton,
   openFriendsPageUserProfile,
 } from "@/features/friends";
 
 import { Toast } from "@/shared/store";
 
+import { JoinedFriendMenu } from "./JoinedFriendMenu";
 import type { PromotionJoinedFriend } from "../../../types";
 
 interface JoinedFriendsListProps {
@@ -48,7 +48,7 @@ export function JoinedFriendsList({ friends }: JoinedFriendsListProps) {
       {friends.map((friend) => (
         <FriendBox
           key={friend.userId}
-          className="hover:bg-grey-100 max-md:px-1"
+          className="px-2.5 hover:bg-grey-100"
           friend={friend}
           onOpen={() =>
             openFriendsPageUserProfile("friends", {
@@ -65,7 +65,7 @@ export function JoinedFriendsList({ friends }: JoinedFriendsListProps) {
                   void openPersonalChat(friend.username);
                 }}
               />
-              <FriendMenu
+              <JoinedFriendMenu
                 items={[
                   {
                     label: "친구 삭제",

@@ -24,10 +24,29 @@ test("PROMO-004 | 공개 공연을 신청하고 상세로 돌아온다", async (
         name: "1명의 친구들이 이 공연 관람을 신청했어요",
       })
       .click();
-    await expect(
-      page.getByRole("region", { name: "공연 관람 신청 친구 목록" })
-    ).toBeVisible();
+    const joinedFriendsList = page.getByRole("region", {
+      name: "공연 관람 신청 친구 목록",
+    });
+    await expect(joinedFriendsList).toBeVisible();
     await expect(page.getByText("공연 친구", { exact: true })).toBeVisible();
+    const listHeight = (await joinedFriendsList.boundingBox())?.height;
+
+    await page.getByRole("button", { name: "친구 메뉴" }).click();
+    const friendMenu = page.getByRole("menu");
+    await expect(friendMenu).toBeVisible();
+    expect((await joinedFriendsList.boundingBox())?.height).toBe(listHeight);
+    expect(
+      await friendMenu.evaluate((menu) => menu.parentElement === document.body)
+    ).toBe(true);
+
+    const menuBox = await friendMenu.boundingBox();
+    const viewport = page.viewportSize();
+    if (!menuBox || !viewport) {
+      throw new Error("친구 메뉴 또는 뷰포트 크기를 확인할 수 없습니다.");
+    }
+
+    expect(menuBox?.y).toBeGreaterThanOrEqual(0);
+    expect(menuBox.y + menuBox.height).toBeLessThanOrEqual(viewport.height);
 
     const applicationButton = page.getByRole("button", {
       name: "참가 신청하기",

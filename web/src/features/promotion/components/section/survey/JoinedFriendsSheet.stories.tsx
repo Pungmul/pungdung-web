@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { FriendBox, FriendMenu, FriendMessageButton } from "@/features/friends";
+import { FriendBox, FriendMessageButton } from "@/features/friends";
 
 import { Button } from "@/shared";
 
 import { JoinedFriendsSheet } from "./JoinedFriendsSheet";
+import { JoinedFriendMenu } from "./JoinedFriendMenu";
 import type { PromotionJoinedFriend } from "../../../types";
 
 const friends: PromotionJoinedFriend[] = [
@@ -50,17 +51,17 @@ function StoryJoinedFriendsList({
       {friends.map((friend) => (
         <FriendBox
           key={friend.userId}
-          className="hover:bg-grey-100 max-md:px-1"
+          className="px-2.5 hover:bg-grey-100"
           friend={friend}
-          onOpen={() => {}}
+          onOpen={() => { }}
           buttons={
             <>
-              <FriendMessageButton onClick={() => {}} />
-              <FriendMenu
+              <FriendMessageButton onClick={() => { }} />
+              <JoinedFriendMenu
                 items={[
-                  { label: "친구 삭제", handler: () => {} },
-                  { label: "차단", handler: () => {} },
-                  { label: "신고", handler: () => {} },
+                  { label: "친구 삭제", handler: () => { } },
+                  { label: "차단", handler: () => { } },
+                  { label: "신고", handler: () => { } },
                 ]}
               />
             </>
@@ -89,7 +90,7 @@ const meta = {
   render: renderStory,
   decorators: [
     (Story) => (
-      <div className="w-[342px] bg-background px-[24px] py-[16px]">
+      <div className="w-[360px] bg-background">
         <Story />
       </div>
     ),
@@ -110,15 +111,18 @@ export const ManyFriends: Story = {
 
 export const WithSubmitButton: Story = {
   render: (args) => (
-    <JoinedFriendsSheet
-      {...args}
-      friendList={<StoryJoinedFriendsList friends={args.friends} />}
-    >
-      <div className="bg-gradient-to-t from-background via-background via-80% to-transparent px-[24px] pb-[32px] pt-[24px]">
-        <Button type="button" className="bg-blue-600 text-white">
-          설문 제출하기
-        </Button>
-      </div>
-    </JoinedFriendsSheet>
+    <div className="left-0 w-[360px] bg-background">
+
+      <JoinedFriendsSheet
+        {...args}
+        friendList={<StoryJoinedFriendsList friends={args.friends} />}
+      >
+        <div className="bg-gradient-to-t from-background via-background via-80% to-transparent px-[24px] pb-[32px] pt-[24px]">
+          <Button type="button" className="bg-blue-600 text-white">
+            설문 제출하기
+          </Button>
+        </div>
+      </JoinedFriendsSheet>
+    </div>
   ),
 };
