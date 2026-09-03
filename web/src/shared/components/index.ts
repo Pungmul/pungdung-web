@@ -8,6 +8,7 @@ export { default as Tabs } from "./layout/Tabs";
 export { ToastHost } from "./layout/ToastHost";
 
 // UI Components
+export { AlertDialog } from "./ui/AlertDialog";
 export { AlertModal } from "./ui/AlertModal";
 export { FloatingButton } from "./ui/FloatingButton";
 export { ListEmptyView } from "./ui/ListEmptyView";

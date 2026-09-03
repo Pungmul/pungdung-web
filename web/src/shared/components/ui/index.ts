@@ -1,4 +1,5 @@
 // UI Components Barrel Exports
+export { AlertDialog } from "./AlertDialog";
 export { FloatingButton } from "./FloatingButton";
 export type { ImageViewerImages, ImageViewerItem, ImageViewerProps } from "./ImageViewer";
 export { ImageViewer } from "./ImageViewer";
