@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
 
 import type { PromotionSurveySubmitAnswer } from "@/features/promotion";
 import {
@@ -13,7 +13,7 @@ import {
   submitPromotionSurvey,
 } from "@/features/promotion";
 
-import { Header, Space } from "@/shared";
+import { AlertDialog, Header, Space } from "@/shared";
 
 export function PromotionSurveyRoutePage({
   performaceId,
@@ -21,10 +21,19 @@ export function PromotionSurveyRoutePage({
   performaceId: string;
 }) {
   const router = useRouter();
-
-  const { data: promotionDetail } = useSuspenseQuery({
-    ...promotionQueries.detail(performaceId),
+  const queryClient = useQueryClient();
+  const [{ data: promotionDetail }, { data: appliedList }] = useSuspenseQueries({
+    queries: [
+      promotionQueries.detail(performaceId),
+      promotionQueries.upcomingList(),
+    ],
   });
+  const hasApplied = appliedList.some(
+    (booking) => booking.publicKey === performaceId
+  );
+  const leaveToPromotionList = () => {
+    router.replace("/board/promote/l");
+  };
 
   const { mutate: submitAnswerMutation } = useMutation({
     mutationFn: (answerList: PromotionSurveySubmitAnswer[]) =>
@@ -34,6 +43,18 @@ export function PromotionSurveyRoutePage({
   useEffect(() => {
     document.title = `풍덩 | ${promotionDetail.title} 설문`;
   }, [promotionDetail.title]);
+
+  if (hasApplied) {
+    return (
+      <AlertDialog
+        isOpen
+        title="알림"
+        message="이미 신청한 공연입니다."
+        onConfirm={leaveToPromotionList}
+        onClose={leaveToPromotionList}
+      />
+    );
+  }
 
   return (
     <div className="w-full flex flex-col gap-[12px] md:max-w-[768px] mx-auto min-h-screen bg-background">
@@ -65,7 +86,10 @@ export function PromotionSurveyRoutePage({
                 answerText: answer.answerText || null,
               }));
             submitAnswerMutation(answerList, {
-              onSuccess: () => {
+              onSuccess: async () => {
+                await queryClient.invalidateQueries({
+                  queryKey: promotionQueries.upcomingList().queryKey,
+                });
                 alert("설문이 성공적으로 제출되었습니다!");
                 router.replace(`/board/promote/d/${performaceId}`);
               },
