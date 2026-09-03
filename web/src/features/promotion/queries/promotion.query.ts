@@ -10,6 +10,8 @@ import {
   fetchUpcomingPerformanceList,
 } from "../api/client";
 
+const UPCOMING_PERFORMANCE_LIST_STALE_MS = 3 * 60 * 1000;
+
 export const promotionQueries = {
   all: () => ["promotion"] as const,
 
@@ -45,6 +47,7 @@ export const promotionQueries = {
     queryOptions({
       queryKey: ["upcomingPerformanceList"] as const,
       queryFn: fetchUpcomingPerformanceList,
+      staleTime: UPCOMING_PERFORMANCE_LIST_STALE_MS,
     }),
 
   formDraft: (formId: string) =>

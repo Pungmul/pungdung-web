@@ -53,6 +53,13 @@ export function PromotionDetailPage({
   const ownedForm = myFormListQuery.data?.find(
     (form) => form.publicKey === performaceId
   );
+  const { data: appliedList, isPending: isAppliedListPending } = useQuery({
+    ...promotionQueries.upcomingList(),
+    enabled: !isGuest,
+  });
+  const hasApplied =
+    appliedList?.some((booking) => booking.publicKey === performaceId) ?? false;
+  const applyDisabled = hasApplied || (!isGuest && isAppliedListPending);
   const showKebab = isGuest || myFormListQuery.isSuccess;
 
   useEffect(() => {
@@ -98,14 +105,15 @@ export function PromotionDetailPage({
             <div className="bg-gradient-to-t from-background via-background via-80% to-transparent px-[24px] pb-[32px] pt-[24px]">
               <Button
                 type="button"
-                className="bg-blue-600 text-white"
+                className="bg-blue-600 text-white disabled:!bg-grey-300 disabled:!text-grey-500 disabled:cursor-not-allowed"
+                disabled={applyDisabled}
                 onClick={
                   isGuest
                     ? requestLogin
                     : () => router.push(`/board/promote/d/${performaceId}/survey`)
                 }
               >
-                참가 신청하기
+                {hasApplied ? "이미 신청한 공연" : "참가 신청하기"}
               </Button>
             </div>
           </JoinedFriendsSheet>
