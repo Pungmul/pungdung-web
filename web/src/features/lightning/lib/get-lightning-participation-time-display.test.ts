@@ -50,24 +50,58 @@ describe("getLightningParticipationTimeDisplay", () => {
     expect(result.detailRemainingText).toBe("30분 0초 뒤 마감");
   });
 
-  it("모집 마감 후 시작 전이면 준비완료와 시작까지 남은 시간을 반환한다", () => {
+  it("모집 마감 시각이 지나도 status가 OPEN이면 모집중을 유지한다", () => {
     vi.setSystemTime(new Date("2026-04-28T12:30:00Z"));
 
     const result = getLightningParticipationTimeDisplay(baseMeeting);
 
-    expect(result.statusLabel).toBe("준비완료");
+    expect(result.statusLabel).toBe("모집중");
     expect(result.subText).toBe("30분 뒤 시작");
     expect(result.detailRemainingText).toBe("30분 뒤 시작");
   });
 
-  it("시작 후에는 진행중과 종료까지 남은 시간을 반환한다", () => {
+  it("READY면 시각과 무관하게 준비완료이고 모집 남은 시간을 보여준다", () => {
+    const result = getLightningParticipationTimeDisplay({
+      ...baseMeeting,
+      status: LIGHTNING_STATUS.READY,
+    });
+
+    expect(result.statusLabel).toBe("준비완료");
+    expect(result.subText).toBe("30분 남음");
+    expect(result.detailRemainingText).toBe("30분 0초 뒤 마감");
+  });
+
+  it("SUCCESS면 모집완료이고 시작까지 남은 시간을 보여준다", () => {
+    const result = getLightningParticipationTimeDisplay({
+      ...baseMeeting,
+      status: LIGHTNING_STATUS.SUCCESS,
+    });
+
+    expect(result.statusLabel).toBe("모집완료");
+    expect(result.subText).toBe("90분 뒤 시작");
+    expect(result.detailRemainingText).toBe("90분 뒤 시작");
+  });
+
+  it("시작 후에는 status 라벨을 유지하고 종료까지 남은 시간을 반환한다", () => {
     vi.setSystemTime(new Date("2026-04-28T13:30:00Z"));
 
-    const result = getLightningParticipationTimeDisplay(baseMeeting);
+    const result = getLightningParticipationTimeDisplay({
+      ...baseMeeting,
+      status: LIGHTNING_STATUS.SUCCESS,
+    });
 
-    expect(result.statusLabel).toBe("진행중");
+    expect(result.statusLabel).toBe("모집완료");
     expect(result.subText).toBe("90분 뒤 종료");
     expect(result.detailRemainingText).toBe("90분 뒤 종료");
+  });
+
+  it("END면 종료 배지를 반환한다", () => {
+    const result = getLightningParticipationTimeDisplay({
+      ...baseMeeting,
+      status: LIGHTNING_STATUS.END,
+    });
+
+    expect(result.statusLabel).toBe("종료");
   });
 
   it("now 인자를 넘기면 해당 시각 기준으로 계산한다", () => {

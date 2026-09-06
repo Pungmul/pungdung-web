@@ -125,12 +125,12 @@ describe("patchLightningListDataMeetings", () => {
     expect(next.normalLightningMeetings[0]?.meetingName).toBe("after");
   });
 
-  it("CLOSED 상태 delta는 normal 목록에서 제거한다", () => {
+  it("END 상태 delta는 normal 목록에서 제거한다", () => {
     const next = patchLightningListDataMeetings(
       listData({
         normalLightningMeetings: [meeting({ id: 1, meetingName: "before" })],
       }),
-      [meeting({ id: 1, status: "CLOSED" })]
+      [meeting({ id: 1, status: "END" })]
     );
 
     expect(next.normalLightningMeetings).toEqual([]);

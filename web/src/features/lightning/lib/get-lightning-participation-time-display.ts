@@ -5,7 +5,12 @@ import { LIGHTNING_STATUS } from "../constants";
 
 import type { LightningMeeting } from "../types";
 
-export type LightningParticipationBadgeStatus = "모집중" | "준비완료" | "진행중";
+export type LightningParticipationBadgeStatus =
+  | "모집중"
+  | "준비완료"
+  | "모집완료"
+  | "종료"
+  | "취소";
 
 export interface LightningParticipationTimeDisplay {
   statusLabel: LightningParticipationBadgeStatus;
@@ -18,7 +23,7 @@ export function getLightningParticipationTimeDisplay(
   now: Dayjs = dayjs()
 ): LightningParticipationTimeDisplay {
   return {
-    statusLabel: getParticipationBadgeStatus(meeting, now),
+    statusLabel: getParticipationBadgeStatus(meeting),
     subText: getParticipationSubText(meeting, now),
     detailRemainingText: getDetailRemainingText(meeting, now),
   };
@@ -28,7 +33,7 @@ function getDetailRemainingText(meeting: LightningMeeting, now: Dayjs) {
   const recruitmentEndTime = dayjs(meeting.recruitmentEndTime);
 
   if (
-    meeting.status !== LIGHTNING_STATUS.OPEN ||
+    !isRecruitingStatus(meeting.status) ||
     now.isAfter(recruitmentEndTime)
   ) {
     return getParticipationSubText(meeting, now);
@@ -42,21 +47,20 @@ function getDetailRemainingText(meeting: LightningMeeting, now: Dayjs) {
 }
 
 function getParticipationBadgeStatus(
-  meeting: LightningMeeting,
-  now: Dayjs
+  meeting: LightningMeeting
 ): LightningParticipationBadgeStatus {
-  if (now.isAfter(dayjs(meeting.startTime))) {
-    return "진행중";
+  switch (meeting.status) {
+    case LIGHTNING_STATUS.READY:
+      return "준비완료";
+    case LIGHTNING_STATUS.SUCCESS:
+      return "모집완료";
+    case LIGHTNING_STATUS.END:
+      return "종료";
+    case LIGHTNING_STATUS.CANCELLED:
+      return "취소";
+    case LIGHTNING_STATUS.OPEN:
+      return "모집중";
   }
-
-  if (
-    meeting.status !== LIGHTNING_STATUS.OPEN ||
-    now.isAfter(dayjs(meeting.recruitmentEndTime))
-  ) {
-    return "준비완료";
-  }
-
-  return "모집중";
 }
 
 function getParticipationSubText(meeting: LightningMeeting, now: Dayjs) {
@@ -70,7 +74,7 @@ function getParticipationSubText(meeting: LightningMeeting, now: Dayjs) {
   }
 
   if (
-    meeting.status !== LIGHTNING_STATUS.OPEN ||
+    !isRecruitingStatus(meeting.status) ||
     now.isAfter(recruitmentEndTime)
   ) {
     const minutesToStart = startTime.diff(now, "minute");
@@ -81,4 +85,8 @@ function getParticipationSubText(meeting: LightningMeeting, now: Dayjs) {
   return minutesToRecruitmentEnd > 0
     ? `${minutesToRecruitmentEnd}분 남음`
     : "곧 모집이 마감돼요";
+}
+
+function isRecruitingStatus(status: LightningMeeting["status"]) {
+  return status === LIGHTNING_STATUS.OPEN || status === LIGHTNING_STATUS.READY;
 }

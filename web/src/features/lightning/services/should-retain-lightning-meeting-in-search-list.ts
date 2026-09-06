@@ -2,17 +2,10 @@ import { LIGHTNING_STATUS } from "../constants";
 
 import type { LightningMeeting } from "../types";
 
-const NON_RETAINED_SEARCH_LIST_STATUSES = new Set<
-  (typeof LIGHTNING_STATUS)[keyof typeof LIGHTNING_STATUS]
->([
-  LIGHTNING_STATUS.CLOSED,
-  LIGHTNING_STATUS.CANCELLED,
-  LIGHTNING_STATUS.SUCCESS,
-]);
-
-/** search 목록 캐시에 유지할 번개 상태인지 판별 */
+// 검색 목록에는 모집중(OPEN)과 최소 인원 충족(READY)만 남김
+// SUCCESS는 모임 성사, END는 모임 종료, CANCELLED는 성사 실패 취소
 export function shouldRetainLightningMeetingInSearchList(
   status: LightningMeeting["status"]
 ): boolean {
-  return !NON_RETAINED_SEARCH_LIST_STATUSES.has(status);
+  return status === LIGHTNING_STATUS.OPEN || status === LIGHTNING_STATUS.READY;
 }
