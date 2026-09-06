@@ -53,6 +53,7 @@ export const lightningMeetingSchema = z.object({
   lightningMeetingParticipantList: z.array(z.unknown()),
   instrumentAssignmentList: z.array(z.unknown()),
   status: z.enum(Object.values(LIGHTNING_STATUS)),
+  chatRoomUUID: z.string().nullable().optional(),
   notificationSent: z.boolean(),
   visibilityScope: z.enum(Object.values(VISIBILITY_SCOPE)),
   createdAt: z.string(),

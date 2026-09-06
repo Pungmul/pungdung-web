@@ -33,6 +33,7 @@ export function mapLightningMeeting(
     lightningMeetingParticipantList: dto.lightningMeetingParticipantList,
     instrumentAssignmentList: dto.instrumentAssignmentList,
     status: dto.status,
+    chatRoomUUID: dto.chatRoomUUID ?? null,
     notificationSent: dto.notificationSent,
     visibilityScope: dto.visibilityScope,
     createdAt: dto.createdAt,

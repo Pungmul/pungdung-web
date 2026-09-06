@@ -95,6 +95,17 @@ describe("lightningMeetingSchema", () => {
     expect(parsed.success).toBe(true);
   });
 
+  it("lightningMeeting.chatRoomUUID를 유지한다", () => {
+    const parsed = lightningMeetingSchema.safeParse({
+      ...validMeeting,
+      chatRoomUUID: "chat-room-uuid",
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.chatRoomUUID).toBe("chat-room-uuid");
+    }
+  });
+
   it("visibilityScope가 허용 목록이 아니면 실패한다", () => {
     const parsed = lightningMeetingSchema.safeParse({
       ...validMeeting,

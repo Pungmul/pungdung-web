@@ -14,6 +14,7 @@ import { BottomFixedButton, Header } from "@/shared";
 import {
   GESTURE_THRESHOLD,
   GESTURE_VELOCITY_THRESHOLD,
+  LIGHTNING_STATUS,
 } from "../../../constants";
 import {
   useLightningDeleteAction,
@@ -46,7 +47,9 @@ export function ParticipationDetailOverlay({
   };
   const meetingId = meeting.id;
   const isOrganizer = participationData.isOrganizer === true;
-  const hasChatRoom = Boolean(participationData.chatRoomUUID);
+  const isRecruitmentSuccess = meeting.status === LIGHTNING_STATUS.SUCCESS;
+  const chatRoomUUID = meeting.chatRoomUUID ?? participationData.chatRoomUUID;
+  const hasChatRoom = Boolean(chatRoomUUID);
   const { handleLeaveLightningMeeting } = useLightningExitAction(meetingId);
   const { handleDeleteLightningMeeting } = useLightningDeleteAction(meetingId);
   const handleLeaveAction = isOrganizer
@@ -54,9 +57,9 @@ export function ParticipationDetailOverlay({
     : handleLeaveLightningMeeting;
 
   const handleMoveToChat = useCallback(() => {
-    if (!participationData.chatRoomUUID) return;
-    router.push(`/chats/r/${participationData.chatRoomUUID}`);
-  }, [router, participationData.chatRoomUUID]);
+    if (!chatRoomUUID) return;
+    router.push(`/chats/r/${chatRoomUUID}`);
+  }, [router, chatRoomUUID]);
 
   const handleDragEnd = (
     _: MouseEvent | TouchEvent | PointerEvent,
@@ -119,13 +122,24 @@ export function ParticipationDetailOverlay({
           />
         </div>
 
-        <BottomFixedButton
-          type="button"
-          className="bg-primary text-background"
-          onClick={handleLeaveAction}
-        >
-          {isOrganizer ? "번개 삭제" : "번개 나가기"}
-        </BottomFixedButton>
+        {isRecruitmentSuccess ? (
+          <BottomFixedButton
+            type="button"
+            className="bg-primary text-background"
+            onClick={handleMoveToChat}
+            disabled={!chatRoomUUID}
+          >
+            채팅방 바로가기
+          </BottomFixedButton>
+        ) : (
+          <BottomFixedButton
+            type="button"
+            className="bg-primary text-background"
+            onClick={handleLeaveAction}
+          >
+            {isOrganizer ? "번개 삭제" : "번개 나가기"}
+          </BottomFixedButton>
+        )}
       </motion.section>
     </motion.div>
   );

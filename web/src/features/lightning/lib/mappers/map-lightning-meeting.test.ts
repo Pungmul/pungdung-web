@@ -42,6 +42,19 @@ describe("mapLightningMeeting", () => {
     expect(result.tags).toEqual(["a", "b"]);
   });
 
+  it("chatRoomUUID가 없으면 null로 정규화한다", () => {
+    const result = mapLightningMeeting(baseDto);
+    expect(result.chatRoomUUID).toBeNull();
+  });
+
+  it("chatRoomUUID가 있으면 그대로 옮긴다", () => {
+    const result = mapLightningMeeting({
+      ...baseDto,
+      chatRoomUUID: "chat-room-uuid",
+    });
+    expect(result.chatRoomUUID).toBe("chat-room-uuid");
+  });
+
   it("나머지 필드는 DTO와 동일하게 옮긴다", () => {
     const dto: LightningMeetingDto = baseDto;
     const result = mapLightningMeeting(dto);

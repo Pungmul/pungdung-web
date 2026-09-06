@@ -26,6 +26,7 @@ export interface LightningMeeting {
   lightningMeetingParticipantList: unknown[];
   instrumentAssignmentList: unknown[];
   status: (typeof LIGHTNING_STATUS)[keyof typeof LIGHTNING_STATUS];
+  chatRoomUUID?: string | null;
   notificationSent: boolean;
   visibilityScope: (typeof VISIBILITY_SCOPE)[keyof typeof VISIBILITY_SCOPE];
   createdAt: string;
