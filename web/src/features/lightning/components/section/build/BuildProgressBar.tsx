@@ -1,17 +1,11 @@
 "use client";
 
-import { BUILD_STEPS } from "../../../constants";
+import { resolveBuildProgressPercent } from "../../../lib";
 import { useLightningBuildStore } from "../../../providers";
-
-const PROGRESS_STEPS = BUILD_STEPS.slice(0, 4);
 
 export function BuildProgressBar() {
   const buildStep = useLightningBuildStore((state) => state.buildStep);
-  const currentStepIndex = PROGRESS_STEPS.indexOf(buildStep);
-  const progress =
-    currentStepIndex === -1
-      ? 100
-      : ((currentStepIndex + 1) / PROGRESS_STEPS.length) * 100;
+  const progress = resolveBuildProgressPercent(buildStep);
 
   return (
     <div className="w-full h-1 bg-grey-200">
