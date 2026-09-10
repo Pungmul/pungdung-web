@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { LIGHTNING_PARTICIPATION_TIME_MESSAGE } from "../../constants";
 import {
   getLightningParticipationTimeDisplay,
   type LightningParticipationTimeDisplay,
@@ -11,7 +12,7 @@ import type { LightningMeeting } from "../../types";
 const TICK_MS = 1000;
 
 const EMPTY_DISPLAY: LightningParticipationTimeDisplay = {
-  statusLabel: "모집중",
+  statusLabel: LIGHTNING_PARTICIPATION_TIME_MESSAGE.BADGE.RECRUITING,
   subText: "",
   detailRemainingText: "",
 };
