@@ -34,8 +34,8 @@ export const lightningMeetingSchema = z.object({
   id: z.number(),
   meetingName: z.string(),
   recruitmentEndTime: z.string(),
-  startTime: z.string(),
-  endTime: z.string(),
+  startTime: z.string().nullable(),
+  endTime: z.string().nullable(),
   minPersonNum: z.number(),
   maxPersonNum: z.number(),
   organizerId: z.number(),
@@ -98,38 +98,28 @@ export type FetchNearLightningResponse = z.infer<
   typeof fetchNearLightningResponseSchema
 >;
 
+const createLightningRequestFieldsSchema = z.object({
+  meetingName: z.string(),
+  recruitmentEndTime: z.string(),
+  startTime: z.string().nullable(),
+  minPersonNum: z.number(),
+  maxPersonNum: z.number(),
+  latitude: z.number(),
+  longitude: z.number(),
+  buildingName: z.string(),
+  locationDetail: z.string(),
+  visibilityScope: z.enum(["ALL", "SCHOOL_ONLY"]),
+  tags: z.array(z.string()),
+});
+
 export const createLightningRequestSchema = z.discriminatedUnion(
   "meetingType",
   [
-    z.object({
-      meetingName: z.string(),
-      recruitmentEndTime: z.string(),
-      startTime: z.string(),
-      endTime: z.string(),
-      minPersonNum: z.number(),
-      maxPersonNum: z.number(),
+    createLightningRequestFieldsSchema.extend({
       meetingType: z.literal("FREE"),
-      latitude: z.number(),
-      longitude: z.number(),
-      buildingName: z.string(),
-      locationDetail: z.string(),
-      visibilityScope: z.enum(["ALL", "SCHOOL_ONLY"]),
-      tags: z.array(z.string()),
     }),
-    z.object({
-      meetingName: z.string(),
-      recruitmentEndTime: z.string(),
-      startTime: z.string(),
-      endTime: z.string(),
-      minPersonNum: z.number(),
-      maxPersonNum: z.number(),
+    createLightningRequestFieldsSchema.extend({
       meetingType: z.literal("PAN"),
-      latitude: z.number(),
-      longitude: z.number(),
-      buildingName: z.string(),
-      locationDetail: z.string(),
-      visibilityScope: z.enum(["ALL", "SCHOOL_ONLY"]),
-      tags: z.array(z.string()),
     }),
   ]
 );

@@ -6,6 +6,7 @@ import { BottomFixedButton } from "@/shared";
 import { NumberStepper, RangeSlider, TimeInput } from "@/shared/components";
 import { WarningCircleIcon } from "@/shared/components/Icons";
 
+import { LightningStartTimeField } from "./LightningStartTimeField";
 import { LIGHTNING_CREATE_FORM_FIELD } from "../../../constants";
 import { useSelectTimeAndPersonnelStepForm } from "../../../hooks/form";
 
@@ -15,13 +16,18 @@ export function SelectTimeAndPersonnelStep() {
   const {
     fieldErrors,
     isNextDisabled,
+    isStartTimeUndecided,
     maxPersonnel,
     minPersonnel,
     minRecruitEndTime,
+    minStartTime,
     recruitEndTime,
+    startTime,
     submitSelectTimeAndPersonnelStep,
     updatePersonnelRange,
     updateRecruitEndTime,
+    updateStartTime,
+    updateStartTimeUndecided,
   } = useSelectTimeAndPersonnelStepForm();
 
   const handleMinPersonnelChange = useCallback((min: number, max: number) => {
@@ -44,6 +50,15 @@ export function SelectTimeAndPersonnelStep() {
               : {})}
           />
         </div>
+
+        <LightningStartTimeField
+          value={startTime}
+          isUndecided={isStartTimeUndecided}
+          minTime={minStartTime}
+          onChange={updateStartTime}
+          onUndecidedChange={updateStartTimeUndecided}
+          errorMessage={fieldErrors[F.START_TIME]}
+        />
 
         {/* 인원 선택 */}
         <div className="space-y-8">

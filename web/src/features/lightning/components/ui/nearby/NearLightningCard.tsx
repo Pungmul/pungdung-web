@@ -37,7 +37,6 @@ export const NearLightningCard = memo(function NearLightningCard({
           buildingName={lightningMeeting.buildingName}
           locationDetail={lightningMeeting.locationDetail}
           startTime={lightningMeeting.startTime}
-          endTime={lightningMeeting.endTime}
         />
       </div>
     </div>

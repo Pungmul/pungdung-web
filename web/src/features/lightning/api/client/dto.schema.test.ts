@@ -46,7 +46,6 @@ const createRequestBase = {
   meetingName: "제목",
   recruitmentEndTime: "2026-04-28T11:00:00Z",
   startTime: "2026-04-28T12:00:00Z",
-  endTime: "2026-04-28T14:00:00Z",
   minPersonNum: 2,
   maxPersonNum: 5,
   latitude: 1,
@@ -184,6 +183,24 @@ describe("createLightningRequestSchema", () => {
       meetingType: "OTHER",
     });
     expect(parsed.success).toBe(false);
+  });
+
+  it("startTime이 null이면 통과시킨다", () => {
+    const parsed = createLightningRequestSchema.safeParse({
+      ...createRequestBase,
+      meetingType: "FREE",
+      startTime: null,
+    });
+    expect(parsed.success).toBe(true);
+  });
+
+  it("startTime과 endTime이 null인 모임 응답을 통과시킨다", () => {
+    const parsed = lightningMeetingSchema.safeParse({
+      ...validMeeting,
+      startTime: null,
+      endTime: null,
+    });
+    expect(parsed.success).toBe(true);
   });
 
   it("FREE 분기에서 meetingName이 없으면 실패한다", () => {

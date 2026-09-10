@@ -58,7 +58,6 @@ export const LightningCard = memo(function LightningCard({
           currentPersonNum={currentPersonNum}
           maxPersonNum={lightningMeeting.maxPersonNum}
           startTime={lightningMeeting.startTime}
-          endTime={lightningMeeting.endTime}
         />
         <div className="flex flex-row items-center justify-between px-[12px]">
           <LightningParticipantAvatarStack

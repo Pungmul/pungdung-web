@@ -2,26 +2,26 @@
 
 import { memo } from "react";
 
-import dayjs from "dayjs";
 import { ClockIcon, MapPinIcon } from "@heroicons/react/24/outline";
+
+import { formatLightningStartTimeLabel } from "../../../lib";
+import { LIGHTNING_CARD_UNDECIDED_TIME_LABEL } from "../../../lib/format-lightning-start-time";
 
 interface NearLightningCardInfoProps {
   buildingName: string;
   locationDetail: string;
-  startTime: string;
-  endTime: string;
+  startTime: string | null;
 }
 
 export const NearLightningCardInfo = memo(function NearLightningCardInfo({
   buildingName,
   locationDetail,
   startTime,
-  endTime,
 }: NearLightningCardInfoProps) {
   return (
     <div className="flex flex-col items-start px-[12px] gap-[8px]">
       <NearLightningLocation buildingName={buildingName} locationDetail={locationDetail} />
-      <NearLightningTime startTime={startTime} endTime={endTime} />
+      <NearLightningTime startTime={startTime} />
     </div>
   );
 });
@@ -63,13 +63,18 @@ function NearLightningLocation({ buildingName, locationDetail }: { buildingName:
   );
 }
 
-function NearLightningTime({ startTime, endTime }: { startTime: string, endTime: string }) {
+function NearLightningTime({ startTime }: { startTime: string | null }) {
   return (
     <div className="flex flex-row items-end justify-between gap-[4px]">
       <span className="size-5 flex items-center justify-center">
         <ClockIcon className="size-full text-primary" />
       </span>
-      <h3 className="text-m1 font-normal text-grey-500">{dayjs(startTime).format("HH:mm")}~{dayjs(endTime).format("HH:mm")}</h3>
+      <h3 className="text-m1 font-normal text-grey-500">
+        {formatLightningStartTimeLabel(
+          startTime,
+          LIGHTNING_CARD_UNDECIDED_TIME_LABEL
+        )}
+      </h3>
     </div>
   );
 }

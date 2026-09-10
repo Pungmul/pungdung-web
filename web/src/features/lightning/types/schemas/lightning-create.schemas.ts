@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { LIGHTNING_CREATE_FORM_FIELD } from "../../constants/lightning-create-form-fields";
+import { addLightningMeetingTimeIssues } from "../../lib/add-lightning-meeting-time-issues";
 
 const FIELDS = LIGHTNING_CREATE_FORM_FIELD;
 
@@ -22,6 +23,8 @@ export const lightningCreateFieldsSchema = z.object({
     .max(100, "최대 인원은 최대 100명까지 가능합니다"),
   [FIELDS.LIGHTNING_TYPE]: z.enum(["일반 모임", "풍물 모임"]),
   [FIELDS.RECRUIT_END_TIME]: z.string().min(1, "모집 종료 시간을 선택해주세요"),
+  [FIELDS.START_TIME]: z.string(),
+  [FIELDS.IS_START_TIME_UNDECIDED]: z.boolean(),
   [FIELDS.ADDRESS]: z.string().min(1, "주소를 선택해주세요"),
   [FIELDS.DETAIL_ADDRESS]: z.string().optional(),
   [FIELDS.LOCATION_POINT]: lightningLocationPointSchema
@@ -50,12 +53,17 @@ export const lightningSelectTimeAndPersonnelStepSchema =
   lightningCreateFieldsSchema
     .pick({
       [FIELDS.RECRUIT_END_TIME]: true,
+      [FIELDS.START_TIME]: true,
+      [FIELDS.IS_START_TIME_UNDECIDED]: true,
       [FIELDS.MIN_PERSONNEL]: true,
       [FIELDS.MAX_PERSONNEL]: true,
     })
     .refine((data) => data.minPersonnel < data.maxPersonnel, {
       message: "최소 인원은 최대 인원보다 작아야 합니다",
       path: [FIELDS.MIN_PERSONNEL],
+    })
+    .superRefine((data, ctx) => {
+      addLightningMeetingTimeIssues(data, ctx);
     });
 
 export const lightningSelectTargetStepSchema = lightningCreateFieldsSchema.pick(
@@ -65,20 +73,19 @@ export const lightningSelectTargetStepSchema = lightningCreateFieldsSchema.pick(
 );
 
 export const lightningSummaryTitleStepSchema = z.object({
-  [FIELDS.TITLE]: z
-    .string()
-    .refine((t) => t === "" || t.trim().length > 0, {
-      message: "공백만으로는 입력할 수 없습니다",
-    }),
+  [FIELDS.TITLE]: z.string().refine((t) => t === "" || t.trim().length > 0, {
+    message: "공백만으로는 입력할 수 없습니다",
+  }),
 });
 
-export const lightningBuildSchema = lightningCreateFieldsSchema.refine(
-  (data) => data.minPersonnel < data.maxPersonnel,
-  {
+export const lightningBuildSchema = lightningCreateFieldsSchema
+  .refine((data) => data.minPersonnel < data.maxPersonnel, {
     message: "최소 인원은 최대 인원보다 작아야 합니다",
     path: [FIELDS.MIN_PERSONNEL],
-  }
-);
+  })
+  .superRefine((data, ctx) => {
+    addLightningMeetingTimeIssues(data, ctx);
+  });
 
 export const lightningCreateSchema = lightningBuildSchema;
 

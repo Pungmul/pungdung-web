@@ -6,6 +6,8 @@ import { ChevronDownIcon, UserGroupIcon } from "@heroicons/react/24/solid";
 import { useLightningBuildSummaryForm } from "../../../hooks/form";
 import { SummaryToken } from "../../ui";
 
+import { UNDECIDED_START_TIME_LABEL } from "@/features/lightning/lib/format-lightning-start-time";
+
 export function TargetSummary() {
   const {
     lightningType,
@@ -13,9 +15,10 @@ export function TargetSummary() {
     maxPersonnel,
     minPersonnel,
     setBuildStep,
+    startTime,
     time,
   } = useLightningBuildSummaryForm();
-
+  const isStartUndecided = startTime === UNDECIDED_START_TIME_LABEL;
   return (
     <div className="space-y-2">
       <h2 className="text-lg flex flex-col gap-1 text-grey-600">
@@ -33,6 +36,17 @@ export function TargetSummary() {
             {location}
           </SummaryToken>
           <span className="text-grey-600 shrink-0">{"에서"}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="text-grey-600 shrink-0">만나는 시간은</span>
+          <SummaryToken
+            icon={<span className="flex size-4 items-center justify-center"><ClockIcon className="size-full stroke-[1.5px] stroke-grey-500" /></span>}
+            onClick={() => setBuildStep("SelectTimeAndPersonnel")}
+            className="tracking-widest"
+          >
+            {isStartUndecided ? "미정" : startTime}
+          </SummaryToken>
+          <span>으로</span>
         </div>
         <div className="flex items-center gap-1">
           <SummaryToken onClick={() => setBuildStep("SelectType")}>

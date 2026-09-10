@@ -4,6 +4,7 @@ import { ClockIcon, MapPinIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon, UserGroupIcon } from "@heroicons/react/24/solid";
 
 import { useLightningBuildSummaryForm } from "../../../hooks/form";
+import { UNDECIDED_START_TIME_LABEL } from "../../../lib/format-lightning-start-time";
 import { SummaryToken } from "../../ui";
 
 export function FinalSummary() {
@@ -13,9 +14,11 @@ export function FinalSummary() {
     maxPersonnel,
     minPersonnel,
     setBuildStep,
+    startTime,
     target,
     time,
   } = useLightningBuildSummaryForm();
+  const isStartUndecided = startTime === UNDECIDED_START_TIME_LABEL;
 
   return (
     <div className="space-y-2">
@@ -27,6 +30,7 @@ export function FinalSummary() {
           </SummaryToken>
           <span>에게</span>
         </div>
+
         <div className="flex items-center gap-1">
           <SummaryToken
             icon={<span className="flex size-4 items-center justify-center"><MapPinIcon className="size-full stroke-[1.5px] stroke-grey-500" /></span>}
@@ -36,6 +40,17 @@ export function FinalSummary() {
             {location}
           </SummaryToken>
           <span className="text-grey-600 shrink-0">{"에서"}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="text-grey-600 shrink-0">만나는 시간은</span>
+          <SummaryToken
+            icon={<span className="flex size-4 items-center justify-center"><ClockIcon className="size-full stroke-[1.5px] stroke-grey-500" /></span>}
+            onClick={() => setBuildStep("SelectTimeAndPersonnel")}
+            className="tracking-widest"
+          >
+            {isStartUndecided ? "미정" : startTime}
+          </SummaryToken>
+          <span>으로</span>
         </div>
         <div className="flex items-center gap-1">
           <SummaryToken onClick={() => setBuildStep("SelectType")}>

@@ -21,7 +21,7 @@ export function buildCreatedLightningMeetingPreview(
     meetingName: created.lightningMeetingName,
     recruitmentEndTime: req.recruitmentEndTime,
     startTime: req.startTime,
-    endTime: req.endTime,
+    endTime: null,
     minPersonNum: req.minPersonNum,
     maxPersonNum: req.maxPersonNum,
     organizerId: 0,

@@ -15,7 +15,8 @@ export function TimeAndPersonnelSummary() {
       <h2 className="text-lg font-medium text-grey-600 flex flex-col gap-1">
         <div className="flex flex-wrap items-center gap-1">
           어느 <span className="text-grey-700 font-bold">시간</span>까지{" "}
-          <span className="text-grey-700 font-bold">몇 명</span>을
+          <span className="text-grey-700 font-bold">몇 명</span>에게
+          <span className="text-grey-700 font-bold">몇 시</span>부터
         </div>
         <div className="flex items-center gap-1">
           <SummaryToken

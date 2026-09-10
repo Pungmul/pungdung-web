@@ -1,6 +1,7 @@
 export { buildLightningSummaryDisplay } from "./build-lightning-summary-display";
 export { createGPSMarker } from "./create-gps-marker";
 export { createLightningCircle } from "./create-lightning-circle";
+export { formatLightningStartTimeLabel } from "./format-lightning-start-time";
 export { getAdjustedCenter } from "./get-adjusted-center";
 export * from "./mappers";
 export { getNearbyLightningTitlePrefix } from "./nearby-lightning-title";

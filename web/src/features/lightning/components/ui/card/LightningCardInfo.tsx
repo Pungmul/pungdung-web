@@ -2,20 +2,21 @@
 
 import { memo } from "react";
 
-import dayjs from "dayjs";
 import {
   ClockIcon,
   MapPinIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
 
+import { formatLightningStartTimeLabel } from "../../../lib";
+import { LIGHTNING_CARD_UNDECIDED_TIME_LABEL } from "../../../lib/format-lightning-start-time";
+
 interface LightningCardInfoProps {
   buildingName?: string;
   locationDetail?: string;
   currentPersonNum: number;
   maxPersonNum: number;
-  startTime: string;
-  endTime: string;
+  startTime: string | null;
 }
 
 export const LightningCardInfo = memo(function LightningCardInfo({
@@ -24,11 +25,10 @@ export const LightningCardInfo = memo(function LightningCardInfo({
   currentPersonNum,
   maxPersonNum,
   startTime,
-  endTime,
 }: LightningCardInfoProps) {
   return (
     <div className="flex flex-col items-start gap-[8px] px-[12px] py-[4px]">
-      <LightningCardTime startTime={startTime} endTime={endTime} />
+      <LightningCardTime startTime={startTime} />
       <LightningCardLocation
         buildingName={buildingName ?? ""}
         locationDetail={locationDetail ?? ""}
@@ -84,14 +84,17 @@ function LightningCardLocation({ buildingName, locationDetail }: { buildingName?
   );
 }
 
-function LightningCardTime({ startTime, endTime }: { startTime: string, endTime: string }) {
+function LightningCardTime({ startTime }: { startTime: string | null }) {
   return (
     <div className="flex w-full min-w-0 flex-row items-center gap-[4px]">
       <span className="flex size-4 shrink-0 items-center justify-center">
         <ClockIcon className="size-full text-primary stroke-[2px]" />
       </span>
       <h3 className="truncate text-[14px] font-normal tracking-[0.5px] text-grey-600">
-        {dayjs(startTime).format("HH:mm")}~{dayjs(endTime).format("HH:mm")}
+        {formatLightningStartTimeLabel(
+          startTime,
+          LIGHTNING_CARD_UNDECIDED_TIME_LABEL
+        )}
       </h3>
     </div>
   );

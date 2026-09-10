@@ -10,6 +10,8 @@ const baseForm = {
   maxPersonnel: 5,
   lightningType: "일반 모임",
   recruitEndTime: "14:30",
+  startTime: "19:00",
+  isStartTimeUndecided: false,
   address: "본관",
   detailAddress: "101호",
   locationPoint: { latitude: 37.5, longitude: 127.0 },
@@ -41,6 +43,17 @@ describe("buildLightningRequest", () => {
     expect(result.latitude).toBe(37.5);
     expect(result.longitude).toBe(127);
     expect(result.tags).toEqual(["태그1"]);
+    expect(result.startTime).toMatch(/T19:00:00$/);
+    expect(result).not.toHaveProperty("endTime");
+  });
+
+  it("시작 시간 미정이면 startTime을 null로 보낸다", () => {
+    const result = buildLightningRequest({
+      ...baseForm,
+      isStartTimeUndecided: true,
+      startTime: "",
+    });
+    expect(result.startTime).toBeNull();
   });
 
   it("풍물 모임이면 meetingType PAN으로 변환한다", () => {

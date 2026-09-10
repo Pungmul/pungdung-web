@@ -9,6 +9,8 @@ const emptyWatched: Watched = {
   lightningType: undefined,
   address: undefined,
   recruitEndTime: undefined,
+  startTime: undefined,
+  isStartTimeUndecided: undefined,
   target: undefined,
 };
 
@@ -60,6 +62,26 @@ describe("buildLightningSummaryDisplay", () => {
     const watched: Watched = { ...emptyWatched, recruitEndTime: "14:30" };
     const result = buildLightningSummaryDisplay(watched);
     expect(result.time).toBe("14:30");
+  });
+
+  it("시작 시간이 없거나 미정이면 startTime은 미정이다", () => {
+    expect(buildLightningSummaryDisplay(emptyWatched).startTime).toBe("미정");
+    expect(
+      buildLightningSummaryDisplay({
+        ...emptyWatched,
+        startTime: "19:00",
+        isStartTimeUndecided: true,
+      }).startTime
+    ).toBe("미정");
+  });
+
+  it("시작 시간이 있으면 HH:mm을 그대로 쓴다", () => {
+    const result = buildLightningSummaryDisplay({
+      ...emptyWatched,
+      startTime: "19:00",
+      isStartTimeUndecided: false,
+    });
+    expect(result.startTime).toBe("19:00");
   });
 
   it("target이 없으면 '전체'이다", () => {

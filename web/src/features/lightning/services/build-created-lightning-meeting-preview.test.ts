@@ -10,6 +10,8 @@ describe("buildCreatedLightningMeetingPreview", () => {
     minPersonnel: 4,
     maxPersonnel: 12,
     recruitEndTime: "16:00",
+    startTime: "18:00",
+    isStartTimeUndecided: false,
     address: "도로명 주소",
     detailAddress: "건물 동·호",
     locationPoint: { latitude: 35.1, longitude: 129.05 },
@@ -36,7 +38,7 @@ describe("buildCreatedLightningMeetingPreview", () => {
     expect(preview.meetingName).toBe(created.lightningMeetingName);
     expect(preview.recruitmentEndTime).toBe(req.recruitmentEndTime);
     expect(preview.startTime).toBe(req.startTime);
-    expect(preview.endTime).toBe(req.endTime);
+    expect(preview.endTime).toBeNull();
     expect(preview.minPersonNum).toBe(req.minPersonNum);
     expect(preview.maxPersonNum).toBe(req.maxPersonNum);
     expect(preview.meetingType).toBe(req.meetingType);

@@ -13,6 +13,8 @@ const SUMMARY_WATCH = [
   FIELDS.LIGHTNING_TYPE,
   FIELDS.ADDRESS,
   FIELDS.RECRUIT_END_TIME,
+  FIELDS.START_TIME,
+  FIELDS.IS_START_TIME_UNDECIDED,
   FIELDS.TARGET,
   FIELDS.MAX_PERSONNEL,
   FIELDS.MIN_PERSONNEL,
@@ -26,6 +28,8 @@ export const useLightningBuildSummaryForm = () => {
     lightningTypeValue,
     address,
     recruitEndTime,
+    startTimeValue,
+    isStartTimeUndecided,
     targetValue,
     maxPersonnel,
     minPersonnel,
@@ -34,13 +38,15 @@ export const useLightningBuildSummaryForm = () => {
     name: [...SUMMARY_WATCH],
   });
 
-  const { lightningType, location, time, target } =
+  const { lightningType, location, startTime, time, target } =
     buildLightningSummaryDisplay({
       lightningType: lightningTypeValue as
         | LightningCreateFormData[typeof FIELDS.LIGHTNING_TYPE]
         | undefined,
       address,
       recruitEndTime,
+      startTime: startTimeValue,
+      isStartTimeUndecided,
       target: targetValue as
         | LightningCreateFormData[typeof FIELDS.TARGET]
         | undefined,
@@ -52,6 +58,7 @@ export const useLightningBuildSummaryForm = () => {
     maxPersonnel,
     minPersonnel,
     setBuildStep,
+    startTime,
     target,
     time,
   };

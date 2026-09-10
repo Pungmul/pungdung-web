@@ -21,12 +21,10 @@ export const buildLightningRequest = (
 
   const baseRequest = {
     meetingName: formData.title,
-    startTime: dayjs(today + "T" + formData.recruitEndTime)
-      .add(5, "minute")
-      .format("YYYY-MM-DDTHH:mm:ss"),
-    endTime: dayjs(today + "T" + formData.recruitEndTime)
-      .add(30, "minute")
-      .format("YYYY-MM-DDTHH:mm:ss"),
+    // 미정 체크 시 폼의 시각은 유지, 요청 startTime만 null
+    startTime: formData.isStartTimeUndecided
+      ? null
+      : dayjs(`${today}T${formData.startTime}`).format("YYYY-MM-DDTHH:mm:ss"),
     recruitmentEndTime: dayjs(today + "T" + formData.recruitEndTime).format(
       "YYYY-MM-DDTHH:mm:ss"
     ),

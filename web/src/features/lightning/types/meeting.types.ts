@@ -10,8 +10,8 @@ export interface LightningMeeting {
   id: number;
   meetingName: string;
   recruitmentEndTime: string;
-  startTime: string;
-  endTime: string;
+  startTime: string | null;
+  endTime: string | null;
   minPersonNum: number;
   maxPersonNum: number;
   organizerId: number;

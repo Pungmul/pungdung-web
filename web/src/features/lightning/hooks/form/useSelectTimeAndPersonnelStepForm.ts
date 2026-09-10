@@ -28,17 +28,35 @@ export const useSelectTimeAndPersonnelStepForm = () => {
   const form = useFormContext<LightningCreateFormData>();
   const { setBuildStep } = useLightningBuildContext();
   const [showValidationErrors, setShowValidationErrors] = useState(false);
-  const [watchedRecruitEndTime, minPersonnel, maxPersonnel] = useWatch({
+  const [
+    watchedRecruitEndTime,
+    watchedStartTime,
+    watchedStartTimeUndecided,
+    minPersonnel,
+    maxPersonnel,
+  ] = useWatch({
     control: form.control,
-    name: [FIELDS.RECRUIT_END_TIME, FIELDS.MIN_PERSONNEL, FIELDS.MAX_PERSONNEL],
+    name: [
+      FIELDS.RECRUIT_END_TIME,
+      FIELDS.START_TIME,
+      FIELDS.IS_START_TIME_UNDECIDED,
+      FIELDS.MIN_PERSONNEL,
+      FIELDS.MAX_PERSONNEL,
+    ],
   });
 
   const recruitEndTime = watchedRecruitEndTime ?? "";
+  const startTime = watchedStartTime ?? "";
+  const isStartTimeUndecided = watchedStartTimeUndecided ?? false;
   const minRecruitEndTime = dayjs().format("HH:mm");
+  const minStartTime =
+    recruitEndTime > minRecruitEndTime ? recruitEndTime : minRecruitEndTime;
 
   const parsedStep = useMemo(() => {
     const result = lightningSelectTimeAndPersonnelStepSchema.safeParse({
       [FIELDS.RECRUIT_END_TIME]: recruitEndTime,
+      [FIELDS.START_TIME]: startTime,
+      [FIELDS.IS_START_TIME_UNDECIDED]: isStartTimeUndecided,
       [FIELDS.MIN_PERSONNEL]: minPersonnel,
       [FIELDS.MAX_PERSONNEL]: maxPersonnel,
     });
@@ -54,7 +72,7 @@ export const useSelectTimeAndPersonnelStepForm = () => {
       fieldErrors: zodIssuesToStepFieldMessages(result.error, [...STEP_FIELDS]),
       isStepValueValid: false,
     };
-  }, [recruitEndTime, minPersonnel, maxPersonnel]);
+  }, [recruitEndTime, startTime, isStartTimeUndecided, minPersonnel, maxPersonnel]);
 
   const fieldErrors = showValidationErrors ? parsedStep.fieldErrors : {};
   const isNextDisabled =
@@ -62,6 +80,20 @@ export const useSelectTimeAndPersonnelStepForm = () => {
 
   const updateRecruitEndTime = (nextRecruitEndTime: string) => {
     form.setValue(FIELDS.RECRUIT_END_TIME, nextRecruitEndTime, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
+  const updateStartTime = (nextStartTime: string) => {
+    form.setValue(FIELDS.START_TIME, nextStartTime, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
+  const updateStartTimeUndecided = (nextUndecided: boolean) => {
+    form.setValue(FIELDS.IS_START_TIME_UNDECIDED, nextUndecided, {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -93,12 +125,17 @@ export const useSelectTimeAndPersonnelStepForm = () => {
   return {
     fieldErrors,
     isNextDisabled,
+    isStartTimeUndecided,
     maxPersonnel,
     minPersonnel,
     minRecruitEndTime,
+    minStartTime,
     recruitEndTime,
+    startTime,
     submitSelectTimeAndPersonnelStep,
     updatePersonnelRange,
     updateRecruitEndTime,
+    updateStartTime,
+    updateStartTimeUndecided,
   };
 };
