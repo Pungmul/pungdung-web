@@ -22,7 +22,7 @@ export function LightningSidebar({
   children,
 }: LightningSidebarProps) {
   return (
-    <div className="relative z-10 rounded-tr-xl rounded-br-xl shadow-up-md bg-background overflow-visible flex flex-col h-full w-[640px]">
+    <div className="relative z-10 flex h-full w-[420px] max-w-[420px] min-w-0 shrink-0 flex-col overflow-x-hidden rounded-tr-xl rounded-br-xl bg-background shadow-up-md">
       <Space h={36} />
       <LightningNearbyTitle />
 
@@ -46,7 +46,7 @@ export function LightningSidebar({
       </div>
 
       <Space h={24} />
-      {children}
+      <div className="min-h-0 min-w-0 w-full overflow-hidden">{children}</div>
       <div className="mt-auto px-[24px] pb-[16px]">
         <LocationReferenceHint />
       </div>
