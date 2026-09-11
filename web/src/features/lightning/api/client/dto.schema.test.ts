@@ -105,6 +105,21 @@ describe("lightningMeetingSchema", () => {
     }
   });
 
+  it("buildingName과 locationDetail이 null이어도 통과시킨다", () => {
+    const parsed = lightningMeetingSchema.safeParse({
+      ...validMeeting,
+      startTime: null,
+      endTime: null,
+      buildingName: null,
+      locationDetail: null,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.buildingName).toBeNull();
+      expect(parsed.data.locationDetail).toBeNull();
+    }
+  });
+
   it("visibilityScope가 허용 목록이 아니면 실패한다", () => {
     const parsed = lightningMeetingSchema.safeParse({
       ...validMeeting,

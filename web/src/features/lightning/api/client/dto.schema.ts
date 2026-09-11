@@ -42,8 +42,8 @@ export const lightningMeetingSchema = z.object({
   meetingType: z.enum(Object.values(LIGHTNING_MEETING_TYPE)),
   latitude: z.number(),
   longitude: z.number(),
-  buildingName: z.string(),
-  locationDetail: z.string(),
+  buildingName: z.string().nullable(),
+  locationDetail: z.string().nullable(),
   tags: z.array(z.string()).nullable(),
   currentPersonNum: z.number().optional(),
   participantProfiles: z

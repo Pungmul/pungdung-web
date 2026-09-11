@@ -30,6 +30,16 @@ const baseDto = {
 } satisfies LightningMeetingDto;
 
 describe("mapLightningMeeting", () => {
+  it("장소가 null이면 빈 문자열로 정규화한다", () => {
+    const result = mapLightningMeeting({
+      ...baseDto,
+      buildingName: null,
+      locationDetail: null,
+    });
+    expect(result.buildingName).toBe("");
+    expect(result.locationDetail).toBe("");
+  });
+
   it("tags가 null이면 빈 배열로 정규화한다", () => {
     const dto: LightningMeetingDto = { ...baseDto, tags: null };
     const result = mapLightningMeeting(dto);
