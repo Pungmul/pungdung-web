@@ -29,6 +29,10 @@ export function LightningCardList({
   const { data: userPartinLightning } = useQuery(
     lightningQueries.participationStatus()
   );
+  const isParticipating = Boolean(userPartinLightning?.participant);
+  const joinedMeetingId = isParticipating
+    ? userPartinLightning?.lightningMeeting?.id
+    : undefined;
   const { handleJoinLightningMeeting } = useLightningJoinAction();
 
   const cardRefs = useRef<Map<string, LightningCardRefType>>(new Map());
@@ -121,9 +125,12 @@ export function LightningCardList({
             >
               <LightningCard
                 {...lightningMeeting}
+                isJoinBlocked={
+                  isParticipating && lightningMeeting.id !== joinedMeetingId
+                }
                 isParticipated={
-                  lightningMeeting.id ===
-                  userPartinLightning?.lightningMeeting?.id
+                  joinedMeetingId !== undefined &&
+                  lightningMeeting.id === joinedMeetingId
                 }
                 onJoinLightning={handleJoinLightningMeeting}
                 onRefSet={(cardRef) => setCardRef(meetingId, cardRef)}

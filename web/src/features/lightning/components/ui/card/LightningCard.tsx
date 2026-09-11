@@ -13,6 +13,7 @@ import { useLightningCardState } from "../../../hooks/state";
 import type { LightningCardRefType, LightningMeeting } from "../../../types";
 
 interface LightningCardProps extends LightningMeeting {
+  isJoinBlocked?: boolean;
   isParticipated?: boolean;
   organizerName?: string;
   /** 생성 완료 등 목록 밖 미리보기에서 참여 버튼을 숨길 때 */
@@ -23,6 +24,7 @@ interface LightningCardProps extends LightningMeeting {
 
 export const LightningCard = memo(function LightningCard({
   hideJoinButton = false,
+  isJoinBlocked = false,
   isParticipated = false,
   onJoinLightning,
   onRefSet,
@@ -71,6 +73,7 @@ export const LightningCard = memo(function LightningCard({
       </div>
       {!hideJoinButton && (
         <LightningCardButton
+          isJoinBlocked={isJoinBlocked}
           isParticipated={isParticipated}
           meetingId={lightningMeeting.id}
           {...(onJoinLightning && { onJoinLightning })}
