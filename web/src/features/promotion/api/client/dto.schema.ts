@@ -259,6 +259,10 @@ export const deletePromotionFormResponseSchema = z
   .unknown()
   .transform(() => undefined);
 
+export const closePromotionFormResponseSchema = z
+  .unknown()
+  .transform(() => undefined);
+
 /** 요청 본문 형태(스키마 미검증) */
 export type PromotionSurveySubmitBodyWire = {
   answers: Array<{

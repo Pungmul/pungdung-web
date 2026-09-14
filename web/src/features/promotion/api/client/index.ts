@@ -1,4 +1,5 @@
 export { cancelPromotionResponse } from "./cancel-promotion-response.api";
+export { closePromotionForm } from "./close-promotion-form.api";
 export { requestCreatePromotion } from "./create-promotion.api";
 export { deletePromotionForm } from "./delete-promotion-form.api";
 export type {
@@ -22,6 +23,7 @@ export type {
 } from "./dto.schema";
 export {
   answerDtoSchema,
+  closePromotionFormResponseSchema,
   createPromotionResponseSchema,
   deletePromotionFormResponseSchema,
   formDetailDtoSchema,

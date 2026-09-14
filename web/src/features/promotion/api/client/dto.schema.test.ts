@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  closePromotionFormResponseSchema,
   deletePromotionFormResponseSchema,
   promotionDetailSchema,
   promotionPerformanceListResponseSchema,
@@ -70,6 +71,18 @@ describe("promotionDetailSchema", () => {
     });
 
     expect(parsed.success).toBe(true);
+  });
+});
+
+describe("closePromotionFormResponseSchema", () => {
+  it("payload 내용과 관계없이 undefined로 버린다", () => {
+    for (const payload of [null, "ok", { message: "ok" }]) {
+      const parsed = closePromotionFormResponseSchema.safeParse(payload);
+      expect(parsed.success).toBe(true);
+      if (parsed.success) {
+        expect(parsed.data).toBeUndefined();
+      }
+    }
   });
 });
 
