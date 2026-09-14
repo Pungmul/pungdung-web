@@ -25,7 +25,7 @@ export type PromotionTabsProps = {
 export const PromotionTabs = ({
   descriptionEditorRef,
 }: PromotionTabsProps) => {
-  const { setValue } = useFormContext<PromotionPostingFormValues>();
+  const { getValues, setValue } = useFormContext<PromotionPostingFormValues>();
   // 소개·설문 탭 전환 + 탭 헤더로 스크롤
   const {
     tabDefinitions,
@@ -42,14 +42,15 @@ export const PromotionTabs = ({
       ) {
         const inst = descriptionEditorRef.current?.getInstance();
         if (inst) {
-          setValue("descriptionSeed", inst.getMarkdown(), {
-            shouldDirty: true,
-          });
+          const markdown = inst.getMarkdown();
+          if (markdown !== getValues("descriptionSeed")) {
+            setValue("descriptionSeed", markdown, { shouldDirty: true });
+          }
         }
       }
       selectTabAndScroll(tab);
     },
-    [descriptionEditorRef, selectTabAndScroll, selectedTab.value, setValue]
+    [descriptionEditorRef, getValues, selectTabAndScroll, selectedTab.value, setValue]
   );
 
   return (

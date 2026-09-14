@@ -79,10 +79,11 @@ export function PromotionDescriptionEditor({
     }
 
     const nextDescription = editorRef.current.getInstance().getMarkdown();
+    if (nextDescription === descriptionSeed) return;
     setValue("descriptionSeed", nextDescription, {
       shouldDirty: true,
     });
-  }, [editorRef, setValue]);
+  }, [descriptionSeed, editorRef, setValue]);
 
   return (
     <Editor
