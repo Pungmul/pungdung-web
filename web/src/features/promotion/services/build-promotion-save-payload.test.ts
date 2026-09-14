@@ -9,8 +9,9 @@ function baseValues(
   return {
     title: "공연",
     address: null,
-    date: "2025-06-01",
+    date: "2027-06-01",
     time: "19:30",
+    closeAt: "2027-05-25T00:00:00",
     limitPersonnel: 10,
     isUnlimitedPersonnel: false,
     poster: null,
@@ -28,7 +29,8 @@ describe("buildPromotionSavePayload", () => {
       descriptionMarkdown: "## 본문",
     });
     expect(payload.expectedVersion).toBe(3);
-    expect(payload.snapshot.startAt).toBe("2025-06-01T19:30:00");
+    expect(payload.snapshot.startAt).toBe("2027-06-01T19:30:00");
+    expect(payload.snapshot.closeAt).toBe("2027-05-25T00:00:00");
     expect(payload.snapshot.description).toBe("## 본문");
     expect(payload.snapshot.formType).toBe("PERFORMANCE");
   });
@@ -54,6 +56,24 @@ describe("buildPromotionSavePayload", () => {
       descriptionMarkdown: "x",
     });
     expect(payload.snapshot.performanceImageIdList).toEqual([42]);
+  });
+
+  it("defaults closeAt to a week before the performance date at midnight", () => {
+    const payload = buildPromotionSavePayload({
+      values: baseValues({ closeAt: "" }),
+      expectedVersion: 0,
+      descriptionMarkdown: "",
+    });
+    expect(payload.snapshot.closeAt).toBe("2027-05-25T00:00:00");
+  });
+
+  it("sets closeAt null when performance date is empty", () => {
+    const payload = buildPromotionSavePayload({
+      values: baseValues({ date: "", closeAt: "" }),
+      expectedVersion: 0,
+      descriptionMarkdown: "",
+    });
+    expect(payload.snapshot.closeAt).toBeNull();
   });
 
   it("sets performanceImageIdList null when no poster", () => {

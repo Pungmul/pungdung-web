@@ -8,6 +8,7 @@ export interface PromotionFormDraftSnapshot {
   description: string | null;
   questions: PromotionDraftQuestion[] | null;
   formType: string | null;
+  closeAt: string | null;
   startAt: string | null;
   limitNum: number | null;
   address: Address | null;
@@ -42,6 +43,7 @@ export interface PromotionFormSavePayload {
     description: string | null;
     questions: PromotionDraftQuestion[] | null;
     formType: string | null;
+    closeAt: string | null;
     startAt: string | null;
     limitNum: number | null;
     address: Address | null;

@@ -14,6 +14,9 @@ export interface PromotionPostingFormValues {
   address: Address | null;
   date: string;
   time: string;
+  // 공연 날짜 입력 전 빈 문자열
+  // 저장 시 snapshot.closeAt
+  closeAt: string;
   limitPersonnel: number;
   isUnlimitedPersonnel: boolean;
   poster: PromotionPostingPosterValue | null;

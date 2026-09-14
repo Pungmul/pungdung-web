@@ -44,6 +44,8 @@ describe("promotionDetailSchema", () => {
       description: "공연 소개",
       limitNum: null,
       startAt: "2026-09-23T20:50:00",
+      closeAt: "2026-09-22T00:00:00",
+      status: "OPEN",
       publicKey: "performance-key",
       performanceImageInfoList: [],
       address: null,

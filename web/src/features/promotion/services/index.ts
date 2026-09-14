@@ -1,5 +1,6 @@
 export { buildPromotionSavePayload } from "./build-promotion-save-payload";
 export { calculateStatistics } from "./calculate-statistics";
+export { resolvePromotionCloseAt } from "./default-promotion-close-at";
 export {
   exportToExcel,
   type PromotionExcelWorkbookMeta,

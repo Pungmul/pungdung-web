@@ -25,6 +25,7 @@ function mapPromotionFormDraftSnapshotWireToClient(
     questions:
       snap.questions?.map(mapPromotionDraftQuestionWireToClient) ?? null,
     formType: snap.formType,
+    closeAt: snap.closeAt,
     startAt: snap.startAt,
     limitNum: snap.limitNum,
     address: snap.address as Address | null,
@@ -87,6 +88,7 @@ export function mapPromotionFormSavePayloadToWire(
         payload.snapshot.questions?.map(mapPromotionDraftQuestionToWire) ??
         null,
       formType: payload.snapshot.formType,
+      closeAt: payload.snapshot.closeAt,
       startAt: payload.snapshot.startAt,
       limitNum: payload.snapshot.limitNum,
       address: payload.snapshot.address,

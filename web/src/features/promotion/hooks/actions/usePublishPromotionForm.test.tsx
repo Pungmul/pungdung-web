@@ -15,6 +15,7 @@ const minimalForm = (): PromotionFormSavePayload => ({
     description: "",
     questions: [],
     formType: "PERFORMANCE",
+    closeAt: "2024-12-25T00:00:00",
     startAt: "2025-01-01T00:00:00",
     limitNum: null,
     address: null,

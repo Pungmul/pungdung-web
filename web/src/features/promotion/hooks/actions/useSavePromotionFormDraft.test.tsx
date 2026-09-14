@@ -18,6 +18,7 @@ const minimalForm = (): PromotionFormSavePayload => ({
     description: "",
     questions: [],
     formType: "PERFORMANCE",
+    closeAt: null,
     startAt: null,
     limitNum: null,
     address: null,

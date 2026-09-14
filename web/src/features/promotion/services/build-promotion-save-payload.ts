@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 
+import { resolvePromotionCloseAt } from "./default-promotion-close-at";
 import type { PromotionFormSavePayload } from "../types/promotion-form.types";
 import type { PromotionPostingFormValues } from "../types/promotion-posting-form.types";
 
@@ -21,6 +22,12 @@ export function buildPromotionSavePayload({
       title: values.title,
       description: descriptionMarkdown,
       formType: "PERFORMANCE",
+      closeAt: values.date
+        ? resolvePromotionCloseAt({
+            performanceDate: values.date,
+            closeAt: values.closeAt,
+          }) || null
+        : null,
       startAt: dayjs(`${values.date}T${values.time}`).format(
         "YYYY-MM-DDTHH:mm:ss"
       ),
