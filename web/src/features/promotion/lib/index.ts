@@ -20,6 +20,7 @@ export {
   mapPromotionSurveySubmitAnswersToWire,
 } from "./mappers";
 export { normalizeQuestionForList } from "./normalize-quertion-for-list";
+export { resolvePromotionApplyLabel } from "./promotion-apply-label";
 export {
   buildQuestionTypeChangeUpdates,
   getDefaultSettingsByQuestionType,

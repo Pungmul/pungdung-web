@@ -4,6 +4,7 @@ export {
   OptionsQuestionPreview,
   type OptionsQuestionPreviewMarkerVariant,
 } from "./OptionsQuestionPreview";
+export { PromotionApplyButton } from "./PromotionApplyButton";
 export { PromotionPostBox } from "./PromotionPostBox";
 export { PromotionPostBoxSkeleton } from "./PromotionPostBoxSkeleton";
 export { PromotionSummaryCard } from "./PromotionSummaryCard";

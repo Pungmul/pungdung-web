@@ -27,6 +27,7 @@ export {
   MyPromotionPostBox,
   OptionsQuestionPreview,
   type OptionsQuestionPreviewMarkerVariant,
+  PromotionApplyButton,
   PromotionPostBox,
   PromotionPostBoxSkeleton,
   PromotionSummaryCard,

@@ -39,6 +39,8 @@ export function mapPromotionDetailWireToClient(
     description: wire.description,
     limitNum: wire.limitNum,
     startAt: wire.startAt,
+    closeAt: wire.closeAt,
+    status: wire.status,
     publicKey: wire.publicKey,
     performanceImageInfoList: wire.performanceImageInfoList.map(
       mapPromotionPosterWireToClient

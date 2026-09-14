@@ -4,6 +4,7 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import { UsersIcon } from "@heroicons/react/24/solid";
 
+import { PromotionPosterFrame } from "./PromotionPosterFrame";
 import { addressToString } from "../../lib";
 import { Promotion } from "../../types";
 
@@ -16,19 +17,18 @@ export function PromotionPostBox({ promotion }: { promotion: Promotion }) {
         className="w-full flex flex-col gap-[12px]"
       >
         <div className="relative w-full aspect-[240/340] bg-grey-200 rounded-[4px] overflow-hidden border border-grey-200 transition-all duration-200 group-hover:scale-105">
-          <div className="absolute top-[8px] right-[8px] bg-grey-400 text-white text-[11px] font-normal px-[4px] py-[2px] rounded-[4px] z-10">
-            {promotion.status === "OPEN" ? "진행중" : "종료"}
-          </div>
-          <Image
-            src={
-              promotion.performanceImageInfoList?.[0]
-                ? promotion.performanceImageInfoList[0].imageUrl
-                : "/example/poster.jpg"
-            }
-            alt={promotion.title}
-            fill
-            className="object-cover object-center h-full"
-          />
+          <PromotionPosterFrame status={promotion.status}>
+            <Image
+              src={
+                promotion.performanceImageInfoList?.[0]
+                  ? promotion.performanceImageInfoList[0].imageUrl
+                  : "/example/poster.jpg"
+              }
+              alt={promotion.title}
+              fill
+              className="object-cover object-center h-full"
+            />
+          </PromotionPosterFrame>
         </div>
         <div className="flex-grow w-full flex justify-between flex-col items-start gap-[8px]">
           <div className="line-clamp-2 font-semibold text-[17px] leading-[24px] text-grey-800">

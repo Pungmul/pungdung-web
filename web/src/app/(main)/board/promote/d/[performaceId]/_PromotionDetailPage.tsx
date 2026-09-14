@@ -9,13 +9,14 @@ import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useLoginRequiredConfirmAction } from "@/features/auth";
 import {
   JoinedFriendsSheet,
+  PromotionApplyButton,
   PromotionMenu,
   PromotionProfile,
   promotionQueries,
   PromotionShareButton,
 } from "@/features/promotion";
 
-import { Button, Header, Spinner } from "@/shared";
+import { Header, Spinner } from "@/shared";
 
 const Viewer = dynamic(
   () =>
@@ -59,7 +60,6 @@ export function PromotionDetailPage({
   });
   const hasApplied =
     appliedList?.some((booking) => booking.publicKey === performaceId) ?? false;
-  const applyDisabled = hasApplied || (!isGuest && isAppliedListPending);
   const showKebab = isGuest || myFormListQuery.isSuccess;
 
   useEffect(() => {
@@ -103,18 +103,17 @@ export function PromotionDetailPage({
         <div className="sticky bottom-0 left-0 right-0 z-50 w-full">
           <JoinedFriendsSheet friends={promotionDetail.joinedFriendList}>
             <div className="bg-gradient-to-t from-background via-background via-80% to-transparent px-[24px] pb-[32px] pt-[24px]">
-              <Button
-                type="button"
-                className="bg-blue-600 text-white disabled:!bg-grey-300 disabled:!text-grey-500 disabled:cursor-not-allowed"
-                disabled={applyDisabled}
-                onClick={
+              <PromotionApplyButton
+                status={promotionDetail.status}
+                closeAt={promotionDetail.closeAt}
+                hasApplied={hasApplied}
+                pending={!isGuest && isAppliedListPending}
+                onApply={
                   isGuest
                     ? requestLogin
                     : () => router.push(`/board/promote/d/${performaceId}/survey`)
                 }
-              >
-                {hasApplied ? "이미 신청한 공연" : "참가 신청하기"}
-              </Button>
+              />
             </div>
           </JoinedFriendsSheet>
         </div>

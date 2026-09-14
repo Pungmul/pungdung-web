@@ -64,6 +64,7 @@ export {
   MyPromotionPostBox,
   OptionsQuestionPreview,
   type OptionsQuestionPreviewMarkerVariant,
+  PromotionApplyButton,
   PromotionInfoForm,
   PromotionList,
   PromotionMainTabs,
@@ -106,6 +107,7 @@ export {
   usePublishPromotionForm,
   useSavePromotionFormDraft,
 } from "./hooks/actions";
+export { resolvePromotionApplyLabel } from "./lib/promotion-apply-label";
 export { promotionMutationOptions, promotionQueries } from "./queries";
 export { usePromotionQuestionDraftStore } from "./store";
 export type {

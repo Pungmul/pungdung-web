@@ -5,11 +5,14 @@ import { useRouter } from "next/navigation";
 
 import { useMutation, useQueryClient, useSuspenseQueries } from "@tanstack/react-query";
 
+import dayjs from "dayjs";
+
 import type { PromotionSurveySubmitAnswer } from "@/features/promotion";
 import {
   promotionQueries,
   PromotionSummaryCard,
   PromotionSurveyForm,
+  resolvePromotionApplyLabel,
   submitPromotionSurvey,
 } from "@/features/promotion";
 
@@ -44,12 +47,34 @@ export function PromotionSurveyRoutePage({
     document.title = `풍덩 | ${promotionDetail.title} 설문`;
   }, [promotionDetail.title]);
 
+  const applyLabel = resolvePromotionApplyLabel({
+    status: promotionDetail.status,
+    closeAt: promotionDetail.closeAt,
+    now: dayjs(),
+  });
+
   if (hasApplied) {
     return (
       <AlertDialog
         isOpen
         title="알림"
         message="이미 신청한 공연입니다."
+        onConfirm={leaveToPromotionList}
+        onClose={leaveToPromotionList}
+      />
+    );
+  }
+
+  if (applyLabel.kind !== "dday" && applyLabel.kind !== "countdown") {
+    return (
+      <AlertDialog
+        isOpen
+        title="알림"
+        message={
+          applyLabel.kind === "closed"
+            ? applyLabel.label
+            : "신청할 수 없는 공연이에요"
+        }
         onConfirm={leaveToPromotionList}
         onClose={leaveToPromotionList}
       />
@@ -79,6 +104,22 @@ export function PromotionSurveyRoutePage({
         <PromotionSurveyForm
           questions={promotionDetail.questions || []}
           onSubmit={(answers) => {
+            const latestApplyLabel = resolvePromotionApplyLabel({
+              status: promotionDetail.status,
+              closeAt: promotionDetail.closeAt,
+              now: dayjs(),
+            });
+            if (
+              latestApplyLabel.kind !== "dday" &&
+              latestApplyLabel.kind !== "countdown"
+            ) {
+              alert(
+                latestApplyLabel.kind === "closed"
+                  ? latestApplyLabel.label
+                  : "신청할 수 없는 공연이에요"
+              );
+              return;
+            }
             const answerList: PromotionSurveySubmitAnswer[] =
               Object.entries(answers).map(([questionId, answer]) => ({
                 questionId: Number(questionId),

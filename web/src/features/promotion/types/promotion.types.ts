@@ -17,6 +17,8 @@ export interface PromotionDetail {
   description: string;
   limitNum: number | null;
   startAt: string;
+  closeAt: string | null;
+  status: string;
   publicKey: string;
   performanceImageInfoList: PromotionPoster[];
   address: Address | null;
