@@ -1,3 +1,7 @@
+export {
+  type RequestClosePromotionFormParams,
+  useClosePromotionFormAction,
+} from "./useClosePromotionFormAction";
 export { useDeletePromotionFormAction } from "./useDeletePromotionFormAction";
 export {
   usePromotionFormResponsesExcelExport,

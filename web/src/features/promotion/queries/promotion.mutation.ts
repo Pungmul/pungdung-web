@@ -2,6 +2,7 @@ import { mutationOptions } from "@tanstack/react-query";
 
 import {
   cancelPromotionResponse,
+  closePromotionForm,
   deletePromotionForm,
   requestCreatePromotion,
   savePromotionForm,
@@ -45,5 +46,12 @@ export const promotionMutationOptions = {
       mutationKey: ["promotion", "deleteForm"] as const,
       mutationFn: ({ formId }: { formId: number }) =>
         deletePromotionForm(formId),
+    }),
+
+  closeForm: () =>
+    mutationOptions({
+      mutationKey: ["promotion", "closeForm"] as const,
+      mutationFn: ({ formId }: { formId: number }) =>
+        closePromotionForm(formId),
     }),
 };

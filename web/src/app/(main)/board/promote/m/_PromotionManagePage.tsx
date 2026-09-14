@@ -4,14 +4,21 @@ import { useSearchParams } from "next/navigation";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { PromotionProfile,promotionQueries, StatisticsTabs } from "@/features/promotion";
+import {
+  PromotionProfile,
+  promotionQueries,
+  StatisticsTabs,
+  useClosePromotionFormAction,
+} from "@/features/promotion";
 
-import { Header, Space, Spinner } from "@/shared";
+import { BottomFixedButton, Header, Space, Spinner } from "@/shared";
 
 export function PromotionManagePage() {
   const searchParams = useSearchParams();
   const formId = searchParams.get("formId");
   const performanceId = searchParams.get("performanceId");
+  const { requestCloseForm, isPending: isClosePending } =
+    useClosePromotionFormAction();
 
   const { data: promotionDetail, isLoading: isPromotionDetailLoading } =
     useQuery({
@@ -44,8 +51,12 @@ export function PromotionManagePage() {
         폼을 찾을 수 없습니다.
       </div>
     );
+  const formIdNumber = Number(formId);
+  const showCloseRecruitment =
+    promotionDetail.status !== "CLOSED" && Number.isInteger(formIdNumber);
+
   return (
-    <div className="w-full bg-grey-100">
+    <div className="flex min-h-app w-full flex-col bg-background">
       <Header title="공연 관리" />
       <PromotionProfile
         posterUrl={
@@ -55,13 +66,27 @@ export function PromotionManagePage() {
         address={promotionDetail.address}
         startAt={promotionDetail.startAt}
       />
-      <Space h={32} />
+      <Space h={32} className="bg-grey-100" />
       <section
-        className="w-full flex flex-col flex-grow bg-background"
+        className="flex w-full flex-1 flex-col bg-background"
         id="response-list"
       >
         <StatisticsTabs responses={form} promotionDetail={promotionDetail} />
       </section>
+      {showCloseRecruitment ? (
+        <BottomFixedButton
+          type="button"
+          disabled={isClosePending}
+          onClick={() =>
+            requestCloseForm({
+              formId: formIdNumber,
+              publicKey: promotionDetail.publicKey,
+            })
+          }
+        >
+          모집 중단
+        </BottomFixedButton>
+      ) : null}
     </div>
   );
 }

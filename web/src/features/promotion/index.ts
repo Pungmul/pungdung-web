@@ -97,7 +97,9 @@ export {
 } from "./components";
 export {
   type PublishPromotionFormSuccess,
+  type RequestClosePromotionFormParams,
   type SavePromotionFormDraftParams,
+  useClosePromotionFormAction,
   useDeletePromotionFormAction,
   usePromotionFormResponsesExcelExport,
   type UsePromotionFormResponsesExcelExportParams,
