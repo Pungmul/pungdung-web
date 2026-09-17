@@ -4,24 +4,8 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as PromotionApi from "../../api/client";
-import type { PromotionFormSavePayload } from "../../types";
 
 import { usePublishPromotionForm } from "./usePublishPromotionForm";
-
-const minimalForm = (): PromotionFormSavePayload => ({
-  expectedVersion: 1,
-  snapshot: {
-    title: "t",
-    description: "",
-    questions: [],
-    formType: "PERFORMANCE",
-    closeAt: "2024-12-25T00:00:00",
-    startAt: "2025-01-01T00:00:00",
-    limitNum: null,
-    address: null,
-    performanceImageIdList: null,
-  },
-});
 
 describe("usePublishPromotionForm", () => {
   let queryClient: QueryClient;
@@ -34,11 +18,7 @@ describe("usePublishPromotionForm", () => {
       },
     });
 
-    vi.spyOn(PromotionApi, "savePromotionForm").mockResolvedValue({
-      formId: 9,
-      version: 4,
-      autosavedAt: "2025-01-01T00:00:00Z",
-    });
+    vi.spyOn(PromotionApi, "savePromotionForm");
     vi.spyOn(PromotionApi, "publishPromotionForm").mockResolvedValue({
       formId: 9,
       publicKey: "abc123",
@@ -54,7 +34,7 @@ describe("usePublishPromotionForm", () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 
-  it("저장 후 게시를 호출하고 성공 시 formDraft·내 폼 목록 무효화한다", async () => {
+  it("저장 없이 받은 버전으로 게시하고 성공 시 formDraft는 재조회 없이, 내 폼 목록은 무효화한다", async () => {
     const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
 
     const { result } = renderHook(() => usePublishPromotionForm(), {
@@ -62,21 +42,16 @@ describe("usePublishPromotionForm", () => {
     });
 
     await act(async () => {
-      await result.current.mutateAsync({
-        formId: 9,
-        form: minimalForm(),
-      });
+      await result.current.mutateAsync({ formId: 9, expectedVersion: 4 });
     });
 
-    expect(PromotionApi.savePromotionForm).toHaveBeenCalledWith(
-      9,
-      expect.objectContaining({ expectedVersion: 1 })
-    );
+    expect(PromotionApi.savePromotionForm).not.toHaveBeenCalled();
     expect(PromotionApi.publishPromotionForm).toHaveBeenCalledWith(9, 4);
 
     await waitFor(() => {
       expect(invalidateSpy).toHaveBeenCalledWith({
         queryKey: ["promotion", "formDraft", "9"],
+        refetchType: "none",
       });
       expect(invalidateSpy).toHaveBeenCalledWith({
         queryKey: ["myPromotionFormList"],

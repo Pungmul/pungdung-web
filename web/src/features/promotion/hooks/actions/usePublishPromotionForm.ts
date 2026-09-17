@@ -2,11 +2,8 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import {
-  publishPromotionForm,
-  savePromotionForm,
-} from "../../api/client";
-import type { PromotionFormSavePayload } from "../../types";
+import { publishPromotionForm } from "../../api/client";
+import { promotionQueries } from "../../queries";
 
 export type PublishPromotionFormSuccess = {
   formId: number;
@@ -21,24 +18,24 @@ export function usePublishPromotionForm() {
     mutationKey: ["promotion", "publishForm"] as const,
     mutationFn: async ({
       formId,
-      form,
+      expectedVersion,
     }: {
       formId: number;
-      form: PromotionFormSavePayload;
-    }) => {
-      const saveRes = await savePromotionForm(formId, form);
-      const submitData = (await publishPromotionForm(
+      expectedVersion: number;
+    }) =>
+      (await publishPromotionForm(
         formId,
-        saveRes.version
-      )) as PublishPromotionFormSuccess;
-      return submitData;
-    },
+        expectedVersion
+      )) as PublishPromotionFormSuccess,
     onSuccess: (_data, { formId }) => {
+      // 게시 후 떠나는 편집 화면에서 초안을 다시 조회하지 않음
+      // 다음 진입 때 새로 조회
       void queryClient.invalidateQueries({
-        queryKey: ["promotion", "formDraft", String(formId)],
+        queryKey: promotionQueries.formDraft(String(formId)).queryKey,
+        refetchType: "none",
       });
       void queryClient.invalidateQueries({
-        queryKey: ["myPromotionFormList"],
+        queryKey: promotionQueries.myFormList().queryKey,
       });
     },
     onError: (error: unknown) => {

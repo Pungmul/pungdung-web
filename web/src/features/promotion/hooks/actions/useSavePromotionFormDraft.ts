@@ -67,20 +67,12 @@ export function useSavePromotionFormDraft() {
       try {
         const ack = await mutation.mutateAsync({ formId: id, form });
         if (showToast) {
-          Toast.show({
-            message: "임시 저장 완료",
-            type: "success",
-            duration: 3000,
-          });
+          Toast.show({ message: "임시 저장 완료", type: "success" });
         }
         onSuccess?.(ack);
       } catch (error) {
         if (showToast) {
-          Toast.show({
-            message: "임시 저장 실패",
-            type: "error",
-            duration: 3000,
-          });
+          Toast.show({ message: "임시 저장 실패", type: "error" });
         }
         onError?.(error);
       }

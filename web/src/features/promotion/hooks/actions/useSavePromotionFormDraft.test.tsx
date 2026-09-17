@@ -99,7 +99,6 @@ describe("useSavePromotionFormDraft", () => {
     expect(Toast.show).toHaveBeenCalledWith({
       message: "임시 저장 완료",
       type: "success",
-      duration: 3000,
     });
   });
 
@@ -124,7 +123,6 @@ describe("useSavePromotionFormDraft", () => {
     expect(Toast.show).toHaveBeenCalledWith({
       message: "임시 저장 실패",
       type: "error",
-      duration: 3000,
     });
     expect(onError).toHaveBeenCalled();
   });
