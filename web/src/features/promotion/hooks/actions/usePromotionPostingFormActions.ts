@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { useFormContext } from "react-hook-form";
 
 import type { Editor as EditorType } from "@toast-ui/react-editor";
@@ -24,7 +23,6 @@ export function usePromotionPostingFormActions(
   descriptionEditorRef: React.RefObject<EditorType | null>
 ) {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { getValues } = useFormContext<PromotionPostingFormValues>();
 
   const {
@@ -35,15 +33,9 @@ export function usePromotionPostingFormActions(
   const { mutateAsync: publishMutateAsync, isPending: isPublishPending } =
     usePublishPromotionForm();
 
-  const getExpectedVersion = useCallback(() => {
-    if (!formId) return formDetail.version;
-    const cached = queryClient.getQueryData<PromotionFormDraft>([
-      "promotion",
-      "formDraft",
-      formId,
-    ]);
-    return cached?.version ?? formDetail.version;
-  }, [formDetail.version, formId, queryClient]);
+  // 편집 중인 값이 기반한 버전
+  // 재조회된 캐시 버전을 쓰면 다른 기기 저장을 덮어쓸 수 있음
+  const baseVersionRef = useRef(formDetail.version);
 
   const buildPayload = useCallback(() => {
     const editor = descriptionEditorRef.current?.getInstance();
@@ -51,16 +43,19 @@ export function usePromotionPostingFormActions(
       editor != null ? editor.getMarkdown() : (getValues().descriptionSeed ?? "");
     return buildPromotionSavePayload({
       values: getValues(),
-      expectedVersion: getExpectedVersion(),
+      expectedVersion: baseVersionRef.current,
       descriptionMarkdown: markdown,
     });
-  }, [descriptionEditorRef, getExpectedVersion, getValues]);
+  }, [descriptionEditorRef, getValues]);
 
   const handleSaveDraft = useCallback(() => {
     if (!formId) return;
     void requestSaveDraft({
       formId,
       form: buildPayload(),
+      onSuccess: (ack) => {
+        baseVersionRef.current = ack.version;
+      },
     });
   }, [buildPayload, formId, requestSaveDraft]);
 

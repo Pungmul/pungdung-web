@@ -8,15 +8,18 @@ import { getQueryClient } from "@/core";
 
 import { Toast } from "@/shared";
 
-import { promotionMutationOptions } from "../../queries";
-import type { PromotionFormSavePayload } from "../../types";
+import { promotionMutationOptions, promotionQueries } from "../../queries";
+import type {
+  PromotionFormSaveAck,
+  PromotionFormSavePayload,
+} from "../../types";
 
 export type SavePromotionFormDraftParams = {
   formId: number | string | null | undefined;
   form: PromotionFormSavePayload;
   /** 기본값 true — Save Draft 성공/실패 토스트 */
   showToast?: boolean;
-  onSuccess?: () => void;
+  onSuccess?: (ack: PromotionFormSaveAck) => void;
   onError?: (error: unknown) => void;
 };
 
@@ -37,10 +40,10 @@ export function useSavePromotionFormDraft() {
     ...promotionMutationOptions.saveForm(),
     onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({
-        queryKey: ["promotion", "formDraft", String(variables.formId)],
+        queryKey: promotionQueries.formDraft(String(variables.formId)).queryKey,
       });
       void queryClient.invalidateQueries({
-        queryKey: ["myPromotionFormList"],
+        queryKey: promotionQueries.myFormList().queryKey,
       });
     },
     onError: (error) => {
@@ -62,7 +65,7 @@ export function useSavePromotionFormDraft() {
       }
 
       try {
-        await mutation.mutateAsync({ formId: id, form });
+        const ack = await mutation.mutateAsync({ formId: id, form });
         if (showToast) {
           Toast.show({
             message: "임시 저장 완료",
@@ -70,7 +73,7 @@ export function useSavePromotionFormDraft() {
             duration: 3000,
           });
         }
-        onSuccess?.();
+        onSuccess?.(ack);
       } catch (error) {
         if (showToast) {
           Toast.show({

@@ -29,5 +29,5 @@ export function PromotionPostingPage() {
         폼을 찾을 수 없습니다.
       </div>
     );
-  return <PromotionPostingForm form={form} />;
+  return <PromotionPostingForm key={formId} form={form} />;
 }

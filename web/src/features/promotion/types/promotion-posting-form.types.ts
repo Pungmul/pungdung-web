@@ -8,7 +8,7 @@ export type PromotionPostingPosterValue = {
   imageUrl: string;
 };
 
-/** 프로모션 등록 화면 상위 RHF 값 (`expectedVersion`은 쿼리 캐시가 truth) */
+/** 프로모션 등록 화면 상위 RHF 값 (`expectedVersion`은 편집 세션 기준 버전 ref가 truth) */
 export interface PromotionPostingFormValues {
   title: string;
   address: Address | null;
