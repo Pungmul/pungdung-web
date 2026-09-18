@@ -21,7 +21,10 @@ export function AlertModal() {
       confirmColor={data.confirmColor}
       onConfirm={data.onConfirm}
       onCancel={data.onCancel}
-      onClose={closeAlert}
+      onClose={() => {
+        data.onCancel?.();
+        closeAlert();
+      }}
     />
   );
 }
