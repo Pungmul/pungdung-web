@@ -13,6 +13,7 @@ import {
 } from "@/shared/components";
 import { getInitialViewFromCookie } from "@/shared/lib/getInitialViewFromCookie";
 import { getThemePreferenceFromCookie } from "@/shared/lib/getThemePreferenceFromCookie";
+import { NavigationGuardRoot } from "@/shared/lib/navigation-guard-root";
 import { ViewStoreProvider } from "@/shared/lib/view/view-store-provider";
 
 import "@/app/globals.css";
@@ -68,7 +69,7 @@ export default async function Layout({
           <ViewDetector />
           {/* children은 페이지 컴포넌트 */}
           {/* 페이지 컴포넌트가 서버 컴포넌트라도 오류 없이 렌더링 됨 */}
-          {children}
+          <NavigationGuardRoot>{children}</NavigationGuardRoot>
         </ViewStoreProvider>
       </body>
     </html>

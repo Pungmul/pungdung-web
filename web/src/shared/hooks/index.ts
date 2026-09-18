@@ -1,6 +1,10 @@
 export { useAnchorDropdownPlacement } from "./useAnchorDropdownPlacement";
 export { useBodyScrollLock } from "./useBodyScrollLock";
 export { useClickOutside } from "./useClickOutside";
+export {
+  type ConfirmPageLeaveAlert,
+  useConfirmPageLeave,
+} from "./useConfirmPageLeave";
 export { useIOSKeyboardOpacityFix } from "./useIOSKeyboardOpacityFix";
 export { useKakaoMaps, useKakaoMapsEffect } from "./useKakaoMaps";
 export { useOnlineStatus } from "./useOnlineStatus";
