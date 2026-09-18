@@ -9,6 +9,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 import type { Editor as EditorType } from "@toast-ui/react-editor";
 
 import { uploadPromotionImageToS3 } from "../../../../api/client";
+import { PROMOTION_DESCRIPTION_EXAMPLE } from "../../../../constants/promotion-description";
 import type { PromotionPostingFormValues } from "../../../../types/promotion-posting-form.types";
 
 const Editor = dynamic(
@@ -25,10 +26,6 @@ const Editor = dynamic(
     ),
   }
 );
-
-const EXAMPLE_DESCRIPTION = `### 공연 소개
----
-여기에 공연 설명을 작성해주세요`;
 
 export type PromotionDescriptionEditorProps = {
   editorRef: React.RefObject<EditorType | null>;
@@ -89,7 +86,7 @@ export function PromotionDescriptionEditor({
     <Editor
       ref={editorRef}
       class="text-grey-800"
-      initialValue={descriptionSeed || EXAMPLE_DESCRIPTION}
+      initialValue={descriptionSeed || PROMOTION_DESCRIPTION_EXAMPLE}
       width="100%"
       height="100%"
       placeholder="공연 소개를 입력해주세요."

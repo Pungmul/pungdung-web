@@ -8,6 +8,7 @@ import { ClientApiError } from "@/core/api/client";
 import { Toast } from "@/shared";
 
 import * as PromotionApi from "../../api/client";
+import type { PromotionPublishValidation } from "../../services";
 import type { PromotionFormSavePayload } from "../../types";
 
 import { usePromotionPublishFlow } from "./usePromotionPublishFlow";
@@ -60,11 +61,18 @@ describe("usePromotionPublishFlow", () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 
-  const renderFlow = ({ formId = "9" }: { formId?: string } = {}) =>
+  const renderFlow = ({
+    formId = "9",
+    validate = () => ({ ok: true }),
+  }: {
+    formId?: string;
+    validate?: () => PromotionPublishValidation;
+  } = {}) =>
     renderHook(
       () =>
         usePromotionPublishFlow({
           formId,
+          validate,
           buildPayload,
           onSaved: (version) => {
             baseVersionRef.current = version;
@@ -80,6 +88,24 @@ describe("usePromotionPublishFlow", () => {
       "프로모션 formId가 올바르지 않음"
     );
     expect(PromotionApi.savePromotionForm).not.toHaveBeenCalled();
+  });
+
+  it("검증에 실패하면 저장하지 않고 사유를 보여준다", async () => {
+    const { result } = renderFlow({
+      validate: () => ({
+        ok: false,
+        field: "questions",
+        message: "질문을 1개 이상 추가해주세요.",
+      }),
+    });
+
+    await act(() => result.current.handlePublish(submitEvent()));
+
+    expect(PromotionApi.savePromotionForm).not.toHaveBeenCalled();
+    expect(result.current.isPublishing).toBe(false);
+    expect(Toast.show).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "질문을 1개 이상 추가해주세요.", type: "error" })
+    );
   });
 
   it("게시가 실패해도 저장 버전을 반영해 재시도 때 새 버전으로 저장한다", async () => {

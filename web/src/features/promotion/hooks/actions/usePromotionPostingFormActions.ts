@@ -8,7 +8,11 @@ import type { Editor as EditorType } from "@toast-ui/react-editor";
 
 import { usePromotionPublishFlow } from "./usePromotionPublishFlow";
 import { useSavePromotionFormDraft } from "./useSavePromotionFormDraft";
-import { buildPromotionSavePayload } from "../../services";
+import {
+  buildPromotionSavePayload,
+  validatePromotionPublish,
+} from "../../services";
+import { usePromotionQuestionDraftStore } from "../../store";
 import type {
   PromotionFormDraft,
   PromotionPostingFormValues,
@@ -30,16 +34,33 @@ export function usePromotionPostingFormActions(
   // 재조회된 캐시 버전을 쓰면 다른 기기 저장을 덮어쓸 수 있음
   const baseVersionRef = useRef(formDetail.version);
 
-  const buildPayload = useCallback(() => {
+  const getDescriptionMarkdown = useCallback(() => {
     const editor = descriptionEditorRef.current?.getInstance();
-    const markdown =
-      editor != null ? editor.getMarkdown() : (getValues().descriptionSeed ?? "");
-    return buildPromotionSavePayload({
-      values: getValues(),
-      expectedVersion: baseVersionRef.current,
-      descriptionMarkdown: markdown,
-    });
+    return editor != null
+      ? editor.getMarkdown()
+      : (getValues().descriptionSeed ?? "");
   }, [descriptionEditorRef, getValues]);
+
+  const buildPayload = useCallback(
+    () =>
+      buildPromotionSavePayload({
+        values: getValues(),
+        expectedVersion: baseVersionRef.current,
+        descriptionMarkdown: getDescriptionMarkdown(),
+      }),
+    [getDescriptionMarkdown, getValues]
+  );
+
+  const validate = useCallback(
+    () =>
+      validatePromotionPublish({
+        values: getValues(),
+        descriptionMarkdown: getDescriptionMarkdown(),
+        hasQuestionDraft:
+          usePromotionQuestionDraftStore.getState().questionDraft !== null,
+      }),
+    [getDescriptionMarkdown, getValues]
+  );
 
   const commitSavedVersion = useCallback((version: number) => {
     baseVersionRef.current = version;
@@ -56,6 +77,7 @@ export function usePromotionPostingFormActions(
 
   const { handlePublish, isPublishing } = usePromotionPublishFlow({
     formId,
+    validate,
     buildPayload,
     onSaved: commitSavedVersion,
   });

@@ -7,3 +7,7 @@ export {
 } from "./export-to-excel";
 export { mapFormDetailToDefaultValues } from "./map-promotion-form-detail";
 export { normalizePromotionSurveyQuestions } from "./normalize-promotion-survey-questions";
+export {
+  type PromotionPublishValidation,
+  validatePromotionPublish,
+} from "./validate-promotion-publish";
