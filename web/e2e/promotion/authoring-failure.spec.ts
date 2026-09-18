@@ -21,7 +21,7 @@ test("PROMO-014 | 임시 저장 실패 후 작성값을 유지하고 재시도�
   await expect(page.getByText("공연이 게시되었습니다!")).toHaveCount(0);
 });
 
-test("PROMO-009 | 게시 실패 후 중복 생성 없이 재시도한다", async ({ page }) => {
+test("PROMO-009 | 게시 실패 후 버전 충돌 없이 재시도한다", async ({ page }) => {
   await mockPromotionHttp(page, { publishFailsOnce: true });
   let saveCount = 0;
   page.on("request", (request) => {
@@ -31,13 +31,22 @@ test("PROMO-009 | 게시 실패 후 중복 생성 없이 재시도한다", async
   });
 
   await page.goto(`/board/promote/f?formId=${E2E_PROMOTION_DRAFT_ID}`);
-  await page.getByRole("button", { name: "등록하기", exact: true }).click();
-  await expect(page.getByText("게시에 실패했습니다.")).toBeVisible();
-  await expect(page).toHaveURL(new RegExp(`formId=${E2E_PROMOTION_DRAFT_ID}`));
 
-  await page.getByRole("button", { name: "등록하기", exact: true }).click();
-  await expect(page.getByText("공연이 게시되었습니다!")).toBeVisible();
-  expect(saveCount).toBeGreaterThanOrEqual(1);
+  await test.step("게시만 실패하면 저장 완료와 실패 사유를 함께 안내", async () => {
+    await page.getByRole("button", { name: "등록하기", exact: true }).click();
+    await expect(
+      page.getByText("임시 저장은 완료됐지만 게시하지 못했어요. 게시에 실패했습니다.")
+    ).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`formId=${E2E_PROMOTION_DRAFT_ID}`));
+    await expect(page.getByRole("button", { name: "등록하기", exact: true })).toBeEnabled();
+  });
+
+  await test.step("다시 게시하면 새 버전으로 저장 후 게시", async () => {
+    await page.getByRole("button", { name: "등록하기", exact: true }).click();
+    await expect(page.getByText("공연이 게시되었습니다!")).toBeVisible();
+    await expect(page.getByText("다른 곳에서 먼저 저장된 초안입니다.")).toHaveCount(0);
+    expect(saveCount).toBe(2);
+  });
 });
 
 test("PROMO-022 | 포스터 업로드 실패 후 기존 화면을 유지한다", async ({

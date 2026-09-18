@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import type { Page, Route } from "@playwright/test";
 
 import { mockAppShellHttp } from "./route-mocks";
 import { failEnvelope, okEnvelope } from "../fixtures/envelope";
@@ -14,6 +14,7 @@ import {
   promotionDraftResponse,
   promotionListResponse,
   promotionManageResponses,
+  promotionVersionConflictResponse,
   publishPromotionResponse,
   savePromotionAckResponse,
   upcomingPromotionListResponse,
@@ -22,16 +23,34 @@ import {
 
 export type PromotionRouteMockOptions = {
   emptyList?: boolean;
+  // 공개 설문 제출 /api/promotions/submit/:publicKey 1회 실패
   submitFailsOnce?: boolean;
   skipAppShell?: boolean;
   withUpcoming?: boolean;
   manageForbidden?: boolean;
   draftLimitNum?: number | null;
   saveFailsOnce?: boolean;
+  // 작성 폼 게시 /api/promotions/forms/:formId/submit 1회 실패
   publishFailsOnce?: boolean;
   createFailsOnce?: boolean;
   uploadFails?: boolean;
 };
+
+function readJsonBody<T>(raw: string | null): T | null {
+  try {
+    return JSON.parse(raw ?? "") as T;
+  } catch {
+    return null;
+  }
+}
+
+async function fulfillVersionConflict(route: Route): Promise<void> {
+  await route.fulfill({
+    status: 409,
+    contentType: "application/json",
+    body: JSON.stringify(promotionVersionConflictResponse),
+  });
+}
 
 export async function mockPromotionHttp(
   page: Page,
@@ -43,6 +62,8 @@ export async function mockPromotionHttp(
   let createFailRemaining = options.createFailsOnce ? 1 : 0;
   let upcomingCancelled = false;
   let draftTitle: string | undefined;
+  // 서버 낙관적 잠금과 같게 expectedVersion 불일치는 409
+  let draftVersion = 1;
 
   if (!options.skipAppShell) {
     await mockAppShellHttp(page);
@@ -83,26 +104,34 @@ export async function mockPromotionHttp(
       });
       return;
     }
-    const raw = route.request().postData() ?? "";
-    try {
-      const body = JSON.parse(raw) as {
-        snapshot?: { title?: string | null };
-      };
-      if (typeof body.snapshot?.title === "string") {
-        draftTitle = body.snapshot.title;
-      }
-    } catch {
-      // 저장 본문을 읽지 못하면 기존 초안 제목을 유지
+    const body = readJsonBody<{
+      expectedVersion?: number;
+      snapshot?: { title?: string | null };
+    }>(route.request().postData());
+    if (body?.expectedVersion !== draftVersion) {
+      await fulfillVersionConflict(route);
+      return;
     }
+    if (typeof body.snapshot?.title === "string") {
+      draftTitle = body.snapshot.title;
+    }
+    draftVersion += 1;
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify(savePromotionAckResponse),
+      body: JSON.stringify(savePromotionAckResponse(draftVersion)),
     });
   });
   await page.route(
     "**/api/promotions/forms/*/submit",
     async (route) => {
+      const body = readJsonBody<{ expectedVersion?: number }>(
+        route.request().postData()
+      );
+      if (body?.expectedVersion !== draftVersion) {
+        await fulfillVersionConflict(route);
+        return;
+      }
       if (publishFailRemaining > 0) {
         publishFailRemaining -= 1;
         await route.fulfill({
@@ -157,7 +186,8 @@ export async function mockPromotionHttp(
         body: JSON.stringify(
           promotionDraftResponse(
             options.draftLimitNum ?? 50,
-            draftTitle ?? "임시저장 공연"
+            draftTitle ?? "임시저장 공연",
+            draftVersion
           )
         ),
       });

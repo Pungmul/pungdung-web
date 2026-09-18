@@ -1,4 +1,4 @@
-import { okEnvelope } from "../envelope";
+import { failEnvelope, okEnvelope } from "../envelope";
 
 export const E2E_PROMOTION_FORM_ID = 901;
 export const E2E_PROMOTION_PUBLIC_KEY = "e2e-promotion";
@@ -168,10 +168,11 @@ export const promotionDraftSnapshot = {
 
 export function promotionDraftResponse(
   limitNum: number | null = 50,
-  title = promotionDraftSnapshot.title
+  title = promotionDraftSnapshot.title,
+  version = 1
 ) {
   return okEnvelope({
-    version: 1,
+    version,
     snapshotDto: {
       ...promotionDraftSnapshot,
       title,
@@ -201,11 +202,18 @@ export const createPromotionResponse = okEnvelope({
   formId: E2E_PROMOTION_DRAFT_ID,
 });
 
-export const savePromotionAckResponse = okEnvelope({
-  formId: E2E_PROMOTION_DRAFT_ID,
-  version: 2,
-  autosavedAt: now,
-});
+export function savePromotionAckResponse(version: number) {
+  return okEnvelope({
+    formId: E2E_PROMOTION_DRAFT_ID,
+    version,
+    autosavedAt: now,
+  });
+}
+
+export const promotionVersionConflictResponse = failEnvelope(
+  "다른 곳에서 먼저 저장된 초안입니다.",
+  "VERSION_CONFLICT"
+);
 
 export const publishPromotionResponse = okEnvelope({
   formId: E2E_PROMOTION_DRAFT_ID,
