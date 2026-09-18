@@ -29,7 +29,7 @@ export function LightningBuildCompleteStep() {
   const view = useView();
   const hasSubmittedRef = useRef(false);
   const form = useFormContext<LightningCreateFormData>();
-  const { setBuildStep } = useLightningBuildContext();
+  const { setBuildStep, allowLeave } = useLightningBuildContext();
   const {
     data: createResult,
     mutateAsync: createLightning,
@@ -65,6 +65,7 @@ export function LightningBuildCompleteStep() {
 
   /** 인터셉트 모달은 `push`로 부모 경로만 바꿔도 슬롯이 안 비는 경우가 있어, 헤더 닫기와 동일하게 `back` 처리 */
   const exitAfterSuccess = useCallback(() => {
+    allowLeave();
     if (view === "webview") {
       window.ReactNativeWebView?.postMessage(
         JSON.stringify({ action: "pop" })
@@ -72,7 +73,7 @@ export function LightningBuildCompleteStep() {
       return;
     }
     router.back();
-  }, [router, view]);
+  }, [allowLeave, router, view]);
 
   const errorMessage = useMemo(
     () => (mutationError ? getLightningCreateErrorMessage(mutationError) : null),
@@ -85,6 +86,11 @@ export function LightningBuildCompleteStep() {
     }
     return buildCreatedLightningMeetingPreview(form.getValues(), createResult);
   }, [createResult, form]);
+
+  useEffect(() => {
+    if (!isSuccess) return;
+    allowLeave();
+  }, [allowLeave, isSuccess]);
 
   useEffect(() => {
     if (hasSubmittedRef.current) {

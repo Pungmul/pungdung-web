@@ -7,6 +7,7 @@ import type { BuildStep } from "../types";
 export interface LightningBuildState {
   buildStep: BuildStep;
   setBuildStep: (step: BuildStep) => void;
+  allowLeave: () => void;
 }
 
 export const LightningBuildContext = createContext<LightningBuildState | null>(

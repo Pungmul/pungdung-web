@@ -79,6 +79,7 @@ function LightningFormShell({
             setBuildStep(step);
             onBuildStepChange?.(step);
           },
+          allowLeave: () => {},
         }}
       >
         {children}

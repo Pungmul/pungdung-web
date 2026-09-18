@@ -7,7 +7,7 @@ import { FormProvider, useForm } from "react-hook-form";
 
 import { match } from "ts-pattern";
 
-import { Header } from "@/shared";
+import { Header, useConfirmPageLeave } from "@/shared";
 
 import {
   LightningBuildCompleteStep,
@@ -42,6 +42,15 @@ export function LightningBuildPage() {
   });
   const { reset } = formMethods;
   const [buildStep, setBuildStep] = useState<BuildStep>(BUILD_STEPS[0]);
+  const { allowLeave } = useConfirmPageLeave({
+    enabled: formMethods.formState.isDirty,
+    alert: {
+      title: "확인",
+      message: "이 화면을 벗어나면 작성중인 내용이 사라져요.",
+      confirmText: "나가기",
+      cancelText: "머무르기",
+    },
+  });
 
   useEffect(() => {
     reset({
@@ -55,8 +64,8 @@ export function LightningBuildPage() {
   );
 
   const contextValue = useMemo<LightningBuildState>(
-    () => ({ buildStep, setBuildStep }),
-    [buildStep],
+    () => ({ buildStep, setBuildStep, allowLeave }),
+    [allowLeave, buildStep],
   );
 
   return (
