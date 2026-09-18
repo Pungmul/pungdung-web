@@ -8,6 +8,7 @@ import { ClientApiError } from "@/core/api/client";
 import { Alert, Toast } from "@/shared";
 
 import * as PromotionApi from "../../api/client";
+import { UNKNOWN_PROMOTION_ACTION_MESSAGE } from "../../constants/promotion-action-error-copy";
 import type { PromotionPublishValidation } from "../../services";
 import type { PromotionFormSavePayload } from "../../types";
 
@@ -126,7 +127,7 @@ describe("usePromotionPublishFlow", () => {
     expect(result.current.isPublishing).toBe(false);
     expect(Toast.show).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        message: "임시 저장은 완료됐지만 게시하지 못했어요. 질문이 없습니다.",
+        message: UNKNOWN_PROMOTION_ACTION_MESSAGE,
         type: "error",
       })
     );
@@ -155,7 +156,7 @@ describe("usePromotionPublishFlow", () => {
     expect(baseVersionRef.current).toBe(1);
     expect(Toast.show).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: "임시 저장에 실패해 게시하지 못했어요.",
+        message: UNKNOWN_PROMOTION_ACTION_MESSAGE,
         type: "error",
       })
     );

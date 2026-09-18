@@ -7,7 +7,10 @@ import { Alert, Toast } from "@/shared";
 
 import { usePublishPromotionForm } from "./usePublishPromotionForm";
 import { useSavePromotionFormDraft } from "./useSavePromotionFormDraft";
-import { formatPromotionActionError } from "../../lib/promotion-action-error-message";
+import {
+  type PromotionActionErrorPhase,
+  resolvePromotionActionError,
+} from "../../lib/promotion-action-error-message";
 import type { PromotionPublishValidation } from "../../services";
 import type { PromotionFormSaveAck, PromotionFormSavePayload } from "../../types";
 
@@ -31,12 +34,13 @@ export function usePromotionPublishFlow({
   const { mutateAsync: saveAsync } = useSavePromotionFormDraft();
   const { mutateAsync: publishAsync } = usePublishPromotionForm();
 
-  const showErrorToast = useCallback((title: string, error: unknown) => {
-    Toast.show({
-      message: formatPromotionActionError(title, error),
-      type: "error",
-    });
-  }, []);
+  const reportActionError = useCallback(
+    (phase: PromotionActionErrorPhase, error: unknown) => {
+      const copy = resolvePromotionActionError(error, phase);
+      Toast.show({ message: copy.message, type: "error" });
+    },
+    []
+  );
 
   const saveAndPublish = useCallback(
     async (id: number) => {
@@ -46,7 +50,7 @@ export function usePromotionPublishFlow({
         ack = await saveAsync({ formId: id, form: buildPayload() });
       } catch (error) {
         setIsPublishing(false);
-        showErrorToast("임시 저장에 실패해 게시하지 못했어요.", error);
+        reportActionError("save", error);
         return;
       }
       onSaved(ack.version);
@@ -62,10 +66,17 @@ export function usePromotionPublishFlow({
         router.replace(`/board/promote/d/${data.publicKey}`);
       } catch (error) {
         setIsPublishing(false);
-        showErrorToast("임시 저장은 완료됐지만 게시하지 못했어요.", error);
+        reportActionError("publish", error);
       }
     },
-    [buildPayload, onSaved, publishAsync, router, saveAsync, showErrorToast]
+    [
+      buildPayload,
+      onSaved,
+      publishAsync,
+      reportActionError,
+      router,
+      saveAsync,
+    ]
   );
 
   const handlePublish = useCallback(
