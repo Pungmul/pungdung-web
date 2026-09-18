@@ -49,6 +49,7 @@
     "global": "4.4.0",
     "lodash": "4.17.21",
     "next": "15.5.18",
+    "next-navigation-guard": "^0.2.0",
     "node-fetch": "3.3.2",
     "nprogress": "0.2.0",
     "react": "19.2.6",
