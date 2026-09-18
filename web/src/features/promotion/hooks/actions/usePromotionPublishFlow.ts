@@ -22,12 +22,14 @@ export function usePromotionPublishFlow({
   hasPoster,
   buildPayload,
   onSaved,
+  onVersionConflict,
 }: {
   formId: string | null;
   validate: () => PromotionPublishValidation;
   hasPoster: () => boolean;
   buildPayload: () => PromotionFormSavePayload;
   onSaved: (version: number) => void;
+  onVersionConflict?: () => Promise<void> | void;
 }) {
   const router = useRouter();
   const [isPublishing, setIsPublishing] = useState(false);
@@ -35,11 +37,17 @@ export function usePromotionPublishFlow({
   const { mutateAsync: publishAsync } = usePublishPromotionForm();
 
   const reportActionError = useCallback(
-    (phase: PromotionActionErrorPhase, error: unknown) => {
+    async (phase: PromotionActionErrorPhase, error: unknown) => {
       const copy = resolvePromotionActionError(error, phase);
       Toast.show({ message: copy.message, type: "error" });
+      if (!copy.shouldReloadDraft) return;
+      try {
+        await onVersionConflict?.();
+      } catch {
+        // 재조회 실패는 이미 보여 준 안내를 바꾸지 않음
+      }
     },
-    []
+    [onVersionConflict]
   );
 
   const saveAndPublish = useCallback(
@@ -49,8 +57,11 @@ export function usePromotionPublishFlow({
       try {
         ack = await saveAsync({ formId: id, form: buildPayload() });
       } catch (error) {
-        setIsPublishing(false);
-        reportActionError("save", error);
+        try {
+          await reportActionError("save", error);
+        } finally {
+          setIsPublishing(false);
+        }
         return;
       }
       onSaved(ack.version);
@@ -65,8 +76,11 @@ export function usePromotionPublishFlow({
         // 화면을 떠나며 사라질 상태라 성공 시 isPublishing을 되돌리지 않음
         router.replace(`/board/promote/d/${data.publicKey}`);
       } catch (error) {
-        setIsPublishing(false);
-        reportActionError("publish", error);
+        try {
+          await reportActionError("publish", error);
+        } finally {
+          setIsPublishing(false);
+        }
       }
     },
     [

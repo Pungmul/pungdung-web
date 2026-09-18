@@ -6,10 +6,15 @@ import { useFormContext } from "react-hook-form";
 
 import type { Editor as EditorType } from "@toast-ui/react-editor";
 
+import { getQueryClient } from "@/core";
+
 import { usePromotionPublishFlow } from "./usePromotionPublishFlow";
 import { useSavePromotionFormDraft } from "./useSavePromotionFormDraft";
+import { fetchPromotionFormDraft } from "../../api/client";
+import { promotionQueries } from "../../queries";
 import {
   buildPromotionSavePayload,
+  mapFormDetailToDefaultValues,
   validatePromotionPublish,
 } from "../../services";
 import { usePromotionQuestionDraftStore } from "../../store";
@@ -23,7 +28,8 @@ export function usePromotionPostingFormActions(
   formDetail: PromotionFormDraft,
   descriptionEditorRef: React.RefObject<EditorType | null>
 ) {
-  const { getValues } = useFormContext<PromotionPostingFormValues>();
+  const { getValues, reset } = useFormContext<PromotionPostingFormValues>();
+  const queryClient = getQueryClient();
 
   const {
     handleSaveDraft: requestSaveDraft,
@@ -71,6 +77,20 @@ export function usePromotionPostingFormActions(
     baseVersionRef.current = version;
   }, []);
 
+  const reloadLatestDraft = useCallback(async () => {
+    if (!formId) return;
+    const id = Number(formId);
+    if (!Number.isInteger(id) || id <= 0) return;
+    const draft = await fetchPromotionFormDraft(id);
+    queryClient.setQueryData(
+      promotionQueries.formDraft(formId).queryKey,
+      draft
+    );
+    baseVersionRef.current = draft.version;
+    reset(mapFormDetailToDefaultValues(draft));
+    usePromotionQuestionDraftStore.getState().reset();
+  }, [formId, queryClient, reset]);
+
   const handleSaveDraft = useCallback(() => {
     if (!formId) return;
     void requestSaveDraft({
@@ -86,6 +106,7 @@ export function usePromotionPostingFormActions(
     hasPoster,
     buildPayload,
     onSaved: commitSavedVersion,
+    onVersionConflict: reloadLatestDraft,
   });
 
   return {

@@ -66,10 +66,12 @@ describe("usePromotionPublishFlow", () => {
     formId = "9",
     validate = () => ({ ok: true }),
     hasPoster = () => true,
+    onVersionConflict,
   }: {
     formId?: string;
     validate?: () => PromotionPublishValidation;
     hasPoster?: () => boolean;
+    onVersionConflict?: () => Promise<void> | void;
   } = {}) =>
     renderHook(
       () =>
@@ -81,6 +83,7 @@ describe("usePromotionPublishFlow", () => {
           onSaved: (version) => {
             baseVersionRef.current = version;
           },
+          ...(onVersionConflict ? { onVersionConflict } : {}),
         }),
       { wrapper }
     );
@@ -160,6 +163,52 @@ describe("usePromotionPublishFlow", () => {
         type: "error",
       })
     );
+  });
+
+  it("게시 버전 충돌이면 최신 초안을 다시 불러온다", async () => {
+    vi.spyOn(PromotionApi, "publishPromotionForm").mockRejectedValueOnce(
+      new ClientApiError({
+        status: 400,
+        code: "POST_010",
+        message: "폼 업데이트 버전 충돌입니다.",
+        payload: JSON.stringify({
+          code: "POST_010",
+          message: "폼 업데이트 버전 충돌입니다.",
+          response: null,
+          isSuccess: false,
+        }),
+      })
+    );
+    let releaseConflict: () => void = () => {};
+    const onVersionConflict = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          releaseConflict = resolve;
+        })
+    );
+    const { result } = renderFlow({ onVersionConflict });
+
+    let finished: Promise<unknown> = Promise.resolve();
+    await act(async () => {
+      finished = result.current.handlePublish(submitEvent());
+      await vi.waitUntil(() => onVersionConflict.mock.calls.length > 0);
+    });
+
+    expect(result.current.isPublishing).toBe(true);
+
+    await act(async () => {
+      releaseConflict();
+      await finished;
+    });
+
+    expect(onVersionConflict).toHaveBeenCalledTimes(1);
+    expect(Toast.show).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        message: "다른 곳에서 먼저 수정되어 게시하지 못했어요.",
+        type: "error",
+      })
+    );
+    expect(result.current.isPublishing).toBe(false);
   });
 
   it("포스터가 없으면 확인 후에만 저장하고 게시한다", async () => {
