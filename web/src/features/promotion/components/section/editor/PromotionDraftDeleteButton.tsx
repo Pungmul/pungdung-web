@@ -8,10 +8,12 @@ import { useDeletePromotionFormAction } from "../../../hooks/actions";
 
 type PromotionDraftDeleteButtonProps = {
   formId: string;
+  onBeforeLeave: () => void;
 };
 
 export function PromotionDraftDeleteButton({
   formId,
+  onBeforeLeave,
 }: PromotionDraftDeleteButtonProps) {
   const { requestDeleteForm, isPending } = useDeletePromotionFormAction();
 
@@ -20,8 +22,9 @@ export function PromotionDraftDeleteButton({
       formId: Number(formId),
       confirmTitle: "공연 삭제",
       confirmMessage: "작성 중인 공연을 삭제할까요?",
+      beforeNavigate: onBeforeLeave,
     });
-  }, [formId, requestDeleteForm]);
+  }, [formId, onBeforeLeave, requestDeleteForm]);
 
   return (
     <div className="pt-[24px] relative w-full max-w-[640px] min-w-[320px] mx-auto">

@@ -17,6 +17,7 @@ export type RequestDeletePromotionFormParams = {
   publicKey?: string | null;
   confirmTitle: string;
   confirmMessage: string;
+  beforeNavigate?: () => void;
 };
 
 export function useDeletePromotionFormAction() {
@@ -32,6 +33,7 @@ export function useDeletePromotionFormAction() {
       publicKey,
       confirmTitle,
       confirmMessage,
+      beforeNavigate,
     }: RequestDeletePromotionFormParams) => {
       Alert.confirm({
         title: confirmTitle,
@@ -48,6 +50,7 @@ export function useDeletePromotionFormAction() {
               await queryClient.invalidateQueries({
                 queryKey: promotionQueries.list().queryKey,
               });
+              beforeNavigate?.();
               router.replace(MY_PROMOTION_FORM_LIST_HREF);
               Toast.show({
                 message: "공연이 삭제되었습니다.",

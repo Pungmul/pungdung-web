@@ -26,7 +26,8 @@ import type {
 export function usePromotionPostingFormActions(
   formId: string | null,
   formDetail: PromotionFormDraft,
-  descriptionEditorRef: React.RefObject<EditorType | null>
+  descriptionEditorRef: React.RefObject<EditorType | null>,
+  onBeforeLeave: () => void
 ) {
   const { getValues, reset } = useFormContext<PromotionPostingFormValues>();
   const queryClient = getQueryClient();
@@ -73,9 +74,13 @@ export function usePromotionPostingFormActions(
     [getValues]
   );
 
-  const commitSavedVersion = useCallback((version: number) => {
-    baseVersionRef.current = version;
-  }, []);
+  const commitSavedVersion = useCallback(
+    (version: number) => {
+      baseVersionRef.current = version;
+      reset(getValues());
+    },
+    [getValues, reset]
+  );
 
   const reloadLatestDraft = useCallback(async () => {
     if (!formId) return;
@@ -106,6 +111,7 @@ export function usePromotionPostingFormActions(
     hasPoster,
     buildPayload,
     onSaved: commitSavedVersion,
+    onBeforeLeave,
     onVersionConflict: reloadLatestDraft,
   });
 

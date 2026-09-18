@@ -22,6 +22,7 @@ export function usePromotionPublishFlow({
   hasPoster,
   buildPayload,
   onSaved,
+  onBeforeLeave,
   onVersionConflict,
 }: {
   formId: string | null;
@@ -29,6 +30,7 @@ export function usePromotionPublishFlow({
   hasPoster: () => boolean;
   buildPayload: () => PromotionFormSavePayload;
   onSaved: (version: number) => void;
+  onBeforeLeave?: () => void;
   onVersionConflict?: () => Promise<void> | void;
 }) {
   const router = useRouter();
@@ -74,6 +76,7 @@ export function usePromotionPublishFlow({
         Toast.show({ message: "공연이 게시되었습니다!", type: "success" });
         // 이동 중 버튼이 다시 활성화되면 이미 게시된 폼을 또 제출할 수 있음
         // 화면을 떠나며 사라질 상태라 성공 시 isPublishing을 되돌리지 않음
+        onBeforeLeave?.();
         router.replace(`/board/promote/d/${data.publicKey}`);
       } catch (error) {
         try {
@@ -85,6 +88,7 @@ export function usePromotionPublishFlow({
     },
     [
       buildPayload,
+      onBeforeLeave,
       onSaved,
       publishAsync,
       reportActionError,

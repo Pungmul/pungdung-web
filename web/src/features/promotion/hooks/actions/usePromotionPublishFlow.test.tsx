@@ -66,11 +66,13 @@ describe("usePromotionPublishFlow", () => {
     formId = "9",
     validate = () => ({ ok: true }),
     hasPoster = () => true,
+    onBeforeLeave,
     onVersionConflict,
   }: {
     formId?: string;
     validate?: () => PromotionPublishValidation;
     hasPoster?: () => boolean;
+    onBeforeLeave?: () => void;
     onVersionConflict?: () => Promise<void> | void;
   } = {}) =>
     renderHook(
@@ -83,6 +85,7 @@ describe("usePromotionPublishFlow", () => {
           onSaved: (version) => {
             baseVersionRef.current = version;
           },
+          ...(onBeforeLeave ? { onBeforeLeave } : {}),
           ...(onVersionConflict ? { onVersionConflict } : {}),
         }),
       { wrapper }
@@ -121,10 +124,12 @@ describe("usePromotionPublishFlow", () => {
         new ClientApiError({ status: 400, code: "FORM_INVALID", message: "질문이 없습니다." })
       )
       .mockResolvedValueOnce({ formId: 9, publicKey: "pk", publicUrl: "/x" } as never);
-    const { result } = renderFlow();
+    const onBeforeLeave = vi.fn();
+    const { result } = renderFlow({ onBeforeLeave });
 
     await act(() => result.current.handlePublish(submitEvent()));
 
+    expect(onBeforeLeave).not.toHaveBeenCalled();
     expect(PromotionApi.publishPromotionForm).toHaveBeenLastCalledWith(9, 2);
     expect(baseVersionRef.current).toBe(2);
     expect(result.current.isPublishing).toBe(false);
@@ -142,6 +147,7 @@ describe("usePromotionPublishFlow", () => {
       expect.objectContaining({ expectedVersion: 2 })
     );
     expect(PromotionApi.publishPromotionForm).toHaveBeenLastCalledWith(9, 3);
+    expect(onBeforeLeave).toHaveBeenCalledTimes(1);
     expect(replace).toHaveBeenCalledWith("/board/promote/d/pk");
     expect(result.current.isPublishing).toBe(true);
   });

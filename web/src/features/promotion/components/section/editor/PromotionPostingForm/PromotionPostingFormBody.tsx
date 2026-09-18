@@ -2,12 +2,15 @@
 
 import { useRef } from "react";
 
+import { useFormContext } from "react-hook-form";
+
 import type { Editor as EditorType } from "@toast-ui/react-editor";
 
-import { Button, Header, Space, Spinner } from "@/shared";
+import { Button, Header, Space, Spinner, useConfirmPageLeave } from "@/shared";
 
 import { usePromotionPostingFormActions } from "../../../../hooks/actions";
 import type { PromotionFormDraft } from "../../../../types";
+import type { PromotionPostingFormValues } from "../../../../types/promotion-posting-form.types";
 import { PromotionDraftDeleteButton } from "../PromotionDraftDeleteButton";
 import { PromotionInfoForm } from "../PromotionInfoForm";
 import { PromotionPosterForm } from "../PromotionPoster";
@@ -21,8 +24,23 @@ export function PromotionPostingFormBody({
   form: PromotionFormDraft;
 }) {
   const descriptionEditorRef = useRef<EditorType | null>(null);
+  const { formState } = useFormContext<PromotionPostingFormValues>();
+  const { allowLeave } = useConfirmPageLeave({
+    enabled: formState.isDirty,
+    alert: {
+      title: "확인",
+      message: "이 화면을 벗어나면 저장하지 않은 내용이 사라져요.",
+      confirmText: "나가기",
+      cancelText: "머무르기",
+    },
+  });
   const { handleSaveDraft, handlePublish, isPending } =
-    usePromotionPostingFormActions(formId, form, descriptionEditorRef);
+    usePromotionPostingFormActions(
+      formId,
+      form,
+      descriptionEditorRef,
+      allowLeave
+    );
 
   return (
     <>
@@ -57,7 +75,12 @@ export function PromotionPostingFormBody({
 
         <PromotionTabs descriptionEditorRef={descriptionEditorRef} />
 
-        {formId ? <PromotionDraftDeleteButton formId={formId} /> : null}
+        {formId ? (
+          <PromotionDraftDeleteButton
+            formId={formId}
+            onBeforeLeave={allowLeave}
+          />
+        ) : null}
 
         <Space h={64} />
 
