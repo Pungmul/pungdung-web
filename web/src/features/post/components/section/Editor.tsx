@@ -9,6 +9,7 @@ import { throttle } from "lodash";
 import { Editor as DraftJsEditor, EditorState } from "draft-js";
 
 import { Header, Spinner } from "@/shared/components";
+import { useConfirmPageLeave } from "@/shared/hooks";
 
 import { useCreatePostEditorAction } from "../../hooks/actions";
 import { useResetPostEditorFormFromDetail } from "../../hooks/form";
@@ -58,6 +59,16 @@ export function Editor({ boardID }: { boardID: number }) {
     postImageList: detailImageList,
   });
 
+  const { allowLeave } = useConfirmPageLeave({
+    enabled: methods.formState.isDirty,
+    alert: {
+      title: "확인",
+      message: "이 화면을 벗어나면 저장하지 않은 내용이 사라져요.",
+      confirmText: "나가기",
+      cancelText: "머무르기",
+    },
+  });
+
   // 제출 성공 후 폼·Draft 본문 초기화
   const resetAfterSubmit = useCallback(() => {
     methods.reset(emptyPostEditorFormValues);
@@ -68,6 +79,7 @@ export function Editor({ boardID }: { boardID: number }) {
   const { submitPost, isSubmittingPost, submitUploadUi, setSubmitUploadUi } =
     useCreatePostEditorAction({
       reset: resetAfterSubmit,
+      onBeforeLeave: allowLeave,
     });
 
   // Draft 본문 + 스크롤 영역 패딩

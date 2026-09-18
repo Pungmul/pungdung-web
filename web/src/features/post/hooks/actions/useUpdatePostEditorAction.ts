@@ -18,7 +18,13 @@ export type SubmitUpdatePostArgs = Pick<
   hasImageUpload: boolean;
 };
 
-export function useUpdatePostEditorAction({ reset }: { reset: () => void }) {
+export function useUpdatePostEditorAction({
+  reset,
+  onBeforeLeave,
+}: {
+  reset: () => void;
+  onBeforeLeave?: () => void;
+}) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -55,6 +61,7 @@ export function useUpdatePostEditorAction({ reset }: { reset: () => void }) {
         });
 
         reset();
+        onBeforeLeave?.();
         router.back();
       } catch {
         alert("게시물 수정에 실패했습니다.");
@@ -62,7 +69,7 @@ export function useUpdatePostEditorAction({ reset }: { reset: () => void }) {
         setSubmitUploadUi({ phase: "idle" });
       }
     },
-    [queryClient, reset, router, updatePost]
+    [onBeforeLeave, queryClient, reset, router, updatePost]
   );
 
   return {

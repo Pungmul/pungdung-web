@@ -18,7 +18,13 @@ export type SubmitCreatePostArgs = Pick<
   hasImageUpload: boolean;
 };
 
-export function useCreatePostEditorAction({ reset }: { reset: () => void }) {
+export function useCreatePostEditorAction({
+  reset,
+  onBeforeLeave,
+}: {
+  reset: () => void;
+  onBeforeLeave?: () => void;
+}) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -58,6 +64,7 @@ export function useCreatePostEditorAction({ reset }: { reset: () => void }) {
         });
 
         reset();
+        onBeforeLeave?.();
         router.replace(`/board/d/${data.postId}`);
       } catch {
         alert("게시물 작성에 실패했습니다.");
@@ -65,7 +72,7 @@ export function useCreatePostEditorAction({ reset }: { reset: () => void }) {
         setSubmitUploadUi({ phase: "idle" });
       }
     },
-    [createPost, queryClient, reset, router]
+    [createPost, onBeforeLeave, queryClient, reset, router]
   );
 
   return { submitPost, isSubmittingPost, submitUploadUi, setSubmitUploadUi };
