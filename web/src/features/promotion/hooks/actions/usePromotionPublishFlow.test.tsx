@@ -1,11 +1,11 @@
 import type { FormEvent, PropsWithChildren } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as Core from "@/core";
 import { ClientApiError } from "@/core/api/client";
-import { Toast } from "@/shared";
+import { Alert, Toast } from "@/shared";
 
 import * as PromotionApi from "../../api/client";
 import type { PromotionPublishValidation } from "../../services";
@@ -64,15 +64,18 @@ describe("usePromotionPublishFlow", () => {
   const renderFlow = ({
     formId = "9",
     validate = () => ({ ok: true }),
+    hasPoster = () => true,
   }: {
     formId?: string;
     validate?: () => PromotionPublishValidation;
+    hasPoster?: () => boolean;
   } = {}) =>
     renderHook(
       () =>
         usePromotionPublishFlow({
           formId,
           validate,
+          hasPoster,
           buildPayload,
           onSaved: (version) => {
             baseVersionRef.current = version;
@@ -156,5 +159,28 @@ describe("usePromotionPublishFlow", () => {
         type: "error",
       })
     );
+  });
+
+  it("포스터가 없으면 확인 후에만 저장하고 게시한다", async () => {
+    const confirmSpy = vi.spyOn(Alert, "confirm").mockImplementation(() => {});
+    vi.spyOn(PromotionApi, "publishPromotionForm").mockResolvedValue({
+      formId: 9,
+      publicKey: "pk",
+      publicUrl: "/x",
+    } as never);
+    const { result } = renderFlow({ hasPoster: () => false });
+
+    await act(() => result.current.handlePublish(submitEvent()));
+
+    expect(PromotionApi.savePromotionForm).not.toHaveBeenCalled();
+    expect(result.current.isPublishing).toBe(false);
+
+    await act(async () => {
+      confirmSpy.mock.calls[0]![0].onConfirm?.();
+    });
+
+    await waitFor(() => {
+      expect(PromotionApi.publishPromotionForm).toHaveBeenCalledWith(9, 2);
+    });
   });
 });

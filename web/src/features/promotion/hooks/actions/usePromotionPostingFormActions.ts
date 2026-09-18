@@ -62,6 +62,11 @@ export function usePromotionPostingFormActions(
     [getDescriptionMarkdown, getValues]
   );
 
+  const hasPoster = useCallback(
+    () => getValues().poster !== null,
+    [getValues]
+  );
+
   const commitSavedVersion = useCallback((version: number) => {
     baseVersionRef.current = version;
   }, []);
@@ -78,6 +83,7 @@ export function usePromotionPostingFormActions(
   const { handlePublish, isPublishing } = usePromotionPublishFlow({
     formId,
     validate,
+    hasPoster,
     buildPayload,
     onSaved: commitSavedVersion,
   });

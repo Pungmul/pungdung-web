@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Toast } from "@/shared";
+import { Alert, Toast } from "@/shared";
 
 import { usePublishPromotionForm } from "./usePublishPromotionForm";
 import { useSavePromotionFormDraft } from "./useSavePromotionFormDraft";
@@ -11,16 +11,18 @@ import { formatPromotionActionError } from "../../lib/promotion-action-error-mes
 import type { PromotionPublishValidation } from "../../services";
 import type { PromotionFormSaveAck, PromotionFormSavePayload } from "../../types";
 
-// 검증 후 저장, 저장 후 게시
+// 검증, 포스터 확인 후 저장, 저장 후 게시
 // 게시가 실패해도 저장 결과 버전은 onSaved로 편집 세션에 반영
 export function usePromotionPublishFlow({
   formId,
   validate,
+  hasPoster,
   buildPayload,
   onSaved,
 }: {
   formId: string | null;
   validate: () => PromotionPublishValidation;
+  hasPoster: () => boolean;
   buildPayload: () => PromotionFormSavePayload;
   onSaved: (version: number) => void;
 }) {
@@ -36,21 +38,8 @@ export function usePromotionPublishFlow({
     });
   }, []);
 
-  const handlePublish = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!formId) return;
-      const id = Number(formId);
-      if (!Number.isInteger(id) || id <= 0) {
-        throw new Error(`프로모션 formId가 올바르지 않음: ${formId}`);
-      }
-
-      const validation = validate();
-      if (!validation.ok) {
-        Toast.show({ message: validation.message, type: "error" });
-        return;
-      }
-
+  const saveAndPublish = useCallback(
+    async (id: number) => {
       setIsPublishing(true);
       let ack: PromotionFormSaveAck;
       try {
@@ -76,7 +65,39 @@ export function usePromotionPublishFlow({
         showErrorToast("임시 저장은 완료됐지만 게시하지 못했어요.", error);
       }
     },
-    [buildPayload, formId, onSaved, publishAsync, router, saveAsync, showErrorToast, validate]
+    [buildPayload, onSaved, publishAsync, router, saveAsync, showErrorToast]
+  );
+
+  const handlePublish = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!formId) return;
+      const id = Number(formId);
+      if (!Number.isInteger(id) || id <= 0) {
+        throw new Error(`프로모션 formId가 올바르지 않음: ${formId}`);
+      }
+
+      const validation = validate();
+      if (!validation.ok) {
+        Toast.show({ message: validation.message, type: "error" });
+        return;
+      }
+
+      // 포스터는 필수가 아니라 권장
+      // 바깥 영역으로 닫으면 onCancel 없이 닫히므로 콜백으로만 진행
+      if (!hasPoster()) {
+        Alert.confirm({
+          title: "포스터 없이 게시할까요?",
+          message: "포스터가 있으면 공연 목록에서 더 잘 보여요.",
+          confirmText: "게시",
+          onConfirm: () => void saveAndPublish(id),
+        });
+        return;
+      }
+
+      await saveAndPublish(id);
+    },
+    [formId, hasPoster, saveAndPublish, validate]
   );
 
   return { handlePublish, isPublishing };
