@@ -77,6 +77,14 @@ export function PromotionDescriptionEditor({
 
     const nextDescription = editorRef.current.getInstance().getMarkdown();
     if (nextDescription === descriptionSeed) return;
+    // 빈 소개에 깔리는 예시 문구
+    // 사용자 수정으로 보지 않음
+    if (
+      descriptionSeed === "" &&
+      nextDescription === PROMOTION_DESCRIPTION_EXAMPLE
+    ) {
+      return;
+    }
     setValue("descriptionSeed", nextDescription, {
       shouldDirty: true,
     });
