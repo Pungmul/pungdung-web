@@ -25,11 +25,12 @@ export default defineConfig({
   },
   use: sharedUse,
   webServer: {
+    // 테스트마다 프로덕션 빌드 후 실행. dev 서버의 첫 컴파일 대기를 피한다
     command:
-      "pnpm exec cross-env NEXT_PUBLIC_E2E=1 next dev -p 3100 -H 127.0.0.1",
+      "pnpm exec next build && pnpm exec next start -p 3100 -H 127.0.0.1",
     url: "http://127.0.0.1:3100",
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
+    reuseExistingServer: false,
+    timeout: 600_000,
     cwd: webRoot,
     env: {
       ...process.env,
