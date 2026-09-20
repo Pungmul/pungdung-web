@@ -2,7 +2,7 @@
 
 import {
   Children,
-  type FocusEventHandler,
+  type FocusEvent,
   isValidElement,
   ReactNode,
   useCallback,
@@ -21,6 +21,7 @@ import { josa } from "es-hangul";
 import { useClickOutside } from "@/shared/hooks";
 
 import type { SelectorItem } from "./type";
+import { useSelectContainedBlur } from "./useSelectContainedBlur";
 import SearchInput from "../SearchInput";
 
 interface SelectProps<V>
@@ -38,7 +39,7 @@ interface SelectProps<V>
   children: ReactNode;
   value: V | null;
   disabled?: boolean | undefined;
-  onBlur?: FocusEventHandler<HTMLElement> | undefined;
+  onBlur?: ((event?: FocusEvent<HTMLElement>) => void) | undefined;
 }
 
 interface SelectOptionProps<V> {
@@ -87,20 +88,29 @@ export function Select<V>({
   const [searchText, setSearchText] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const items = extractSelectItems<V>(children);
-
-  const handleCloseList = useCallback(() => {
+  const closeList = useCallback(() => {
     setIsListOpen(false);
     setSearchText("");
   }, []);
 
+  const handleFocusLeave = useCallback(
+    (event: FocusEvent<HTMLElement>) => {
+      closeList();
+      onBlur?.(event);
+    },
+    [closeList, onBlur]
+  );
+  const { rootRef, handleBlur, handleFocus } =
+    useSelectContainedBlur(handleFocusLeave);
+  const items = extractSelectItems<V>(children);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Escape") {
-        handleCloseList();
+        closeList();
       }
     },
-    [handleCloseList]
+    [closeList]
   );
 
   const selectedItem = items.find((item) => item.value === value);
@@ -115,11 +125,16 @@ export function Select<V>({
 
   const handleSelect = (item: SelectorItem<V>) => {
     onChange?.(item.value as V);
-    handleCloseList();
+    closeList();
   };
 
   return (
-    <div className="w-full relative flex flex-col gap-[4px]">
+    <div
+      ref={rootRef}
+      className="w-full relative flex flex-col gap-[4px]"
+      onBlur={handleBlur}
+      onFocus={handleFocus}
+    >
       {label.trim().length > 0 && (
         <label
           id={labelId}
@@ -184,7 +199,6 @@ export function Select<V>({
           }
         }}
         onKeyDown={handleKeyDown}
-        onBlur={onBlur}
       >
         <span
           id={valueId}
@@ -220,7 +234,8 @@ export function Select<V>({
 
       {isListOpen && (
         <SelectList
-          onClose={handleCloseList}
+          onClose={closeList}
+          rootRef={rootRef}
           items={items}
           selectedValue={value ?? null}
           onSelect={handleSelect}
@@ -253,6 +268,10 @@ function SelectItem<V>({
       role="option"
       aria-selected={isSelected}
       className="group w-full cursor-pointer px-2 py-1 text-[14px] leading-5"
+      onMouseDown={(event) => {
+        // 옵션 클릭의 포커스 이동이 선택보다 먼저 blur를 내지 않게 함
+        event.preventDefault();
+      }}
       onClick={() => onSelect(item)}
     >
       <div
@@ -277,6 +296,7 @@ function SelectList<V>({
   setSearchText,
   buttonRef,
   listRef,
+  rootRef,
 }: {
   items: SelectorItem<V>[];
   selectedValue: V | null;
@@ -289,6 +309,7 @@ function SelectList<V>({
   setSearchText: (text: string) => void;
   buttonRef: React.RefObject<HTMLButtonElement | null>;
   listRef: React.RefObject<HTMLDivElement | null>;
+  rootRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const filteredItems =
     searchText.trim() !== ""
@@ -299,7 +320,14 @@ function SelectList<V>({
 
   useClickOutside({
     refs: [listRef, buttonRef],
-    onOutsideClick: onClose,
+    // mousedown에서 닫으면 검색 인풋이 먼저 사라져 blur를 놓침
+    eventType: "click",
+    onOutsideClick: () => {
+      const active = document.activeElement;
+      if (active instanceof Node && rootRef.current?.contains(active)) {
+        onClose();
+      }
+    },
   });
 
   useEffect(() => {
