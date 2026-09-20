@@ -68,6 +68,58 @@ describe("Select 검색 포커스", () => {
     expect(document.querySelector("select[name='club']")).toBeDisabled();
   });
 
+  it("숨김 native field 변경은 선택값과 form 제출값에 반영된다", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <form>
+        <ClubSelect onBlur={vi.fn()} />
+      </form>
+    );
+    const nativeField = container.querySelector("select[name='club']");
+
+    if (!(nativeField instanceof HTMLSelectElement)) {
+      throw new Error("club native field를 찾을 수 없습니다.");
+    }
+
+    await user.selectOptions(nativeField, "hongpung");
+
+    expect(screen.getByRole("button", { name: /홍풍/ })).toBeInTheDocument();
+    expect(new FormData(container.querySelector("form")!).get("club")).toBe(
+      "hongpung"
+    );
+  });
+
+  it("선택형 트리거는 열린 목록과 활성 옵션을 ARIA로 연결한다", async () => {
+    const user = userEvent.setup();
+
+    render(<ClubSelect hasSearch={false} onBlur={vi.fn()} />);
+
+    const trigger = screen.getByRole("combobox", { name: /소속패/ });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    expect(trigger).not.toHaveAttribute("aria-controls");
+
+    await user.click(trigger);
+
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(trigger).toHaveAttribute("aria-controls", "club-listbox");
+    expect(trigger).toHaveAttribute(
+      "aria-activedescendant",
+      "club-listbox-option-0"
+    );
+  });
+
+  it("검색형은 검색 입력이 목록을 제어하는 combobox가 된다", async () => {
+    const user = userEvent.setup();
+
+    render(<ClubSelect onBlur={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: /소속패/ }));
+    const searchInput = screen.getByRole("combobox", { name: "소속패 검색" });
+
+    expect(searchInput).toHaveAttribute("aria-controls", "club-listbox");
+    expect(searchInput).toHaveAttribute("aria-expanded", "true");
+  });
+
   it("검색 후 옵션을 고르면 선택값이 반영된다", async () => {
     const user = userEvent.setup();
     const onBlur = vi.fn();

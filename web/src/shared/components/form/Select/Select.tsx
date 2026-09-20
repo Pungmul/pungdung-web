@@ -1,25 +1,17 @@
 "use client";
 
-import {
-  Children,
-  type FocusEvent,
-  isValidElement,
-  ReactNode,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import { type FocusEvent, ReactNode, useCallback, useMemo, useRef } from "react";
 import { InputHTMLAttributes } from "react";
 
-import {
-  ChevronDownIcon,
-  ExclamationCircleIcon,
-} from "@heroicons/react/24/outline";
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { josa } from "es-hangul";
 
 import { useClickOutside } from "@/shared/hooks";
 
+import { extractSelectItems } from "./extractSelectItems";
 import { SelectList } from "./SelectList";
+import { SelectNativeField } from "./SelectNativeField";
+import { SelectTrigger } from "./SelectTrigger";
 import type { SelectorItem } from "./type";
 import { useSelectContainedBlur } from "./useSelectContainedBlur";
 import { useSelectKeyboardNavigation } from "./useSelectKeyboardNavigation";
@@ -51,26 +43,6 @@ function SelectOption<V>({ children }: SelectOptionProps<V>) {
   return <>{children}</>;
 }
 
-function extractSelectItems<V>(children: ReactNode): SelectorItem<V>[] {
-  const items: SelectorItem<V>[] = [];
-
-  Children.forEach(children, (child) => {
-    if (!isValidElement(child) || child.type !== SelectOption) {
-      return;
-    }
-
-    const { value, children: optionChildren } =
-      child.props as SelectOptionProps<V>;
-
-    items.push({
-      label: String(optionChildren),
-      value: value as V,
-    });
-  });
-
-  return items;
-}
-
 // 메인 Select 컴포넌트
 export function Select<V>({
   hasSearch = false,
@@ -85,7 +57,10 @@ export function Select<V>({
   onBlur,
 }: SelectProps<V>) {
   const listRef = useRef<HTMLDivElement>(null);
-  const items = useMemo(() => extractSelectItems<V>(children), [children]);
+  const items = useMemo(
+    () => extractSelectItems<V>(children, SelectOption),
+    [children]
+  );
   const {
     activeIndex,
     buttonRef,
@@ -134,6 +109,8 @@ export function Select<V>({
   const errorId = `${name}-error`;
   const activeOptionId =
     activeIndex === null ? undefined : `${listboxId}-option-${activeIndex}`;
+  const labelledBy =
+    label.trim().length > 0 ? `${labelId} ${valueId}` : valueId;
 
   const handleSelect = (item: SelectorItem<V>) => {
     onChange?.(item.value as V);
@@ -163,85 +140,37 @@ export function Select<V>({
         </label>
       )}
 
-      <select
-        id={name}
+      <SelectNativeField
         name={name}
-        tabIndex={-1}
+        value={value}
+        items={items}
+        placeholderText={placeholderText}
         disabled={disabled}
-        value={
-          value === undefined || value === null || value === ""
-            ? "placeholder"
-            : String(value)
-        }
-        onChange={(e) => {
-          const selectedValue = e.target.value;
-          const item = items.find(
-            (item) => String(item.value) === selectedValue
-          );
-          onChange?.(item?.value as V | null);
-        }}
-        className="sr-only"
-        aria-hidden="true"
-      >
-        <option value="placeholder" disabled>
-          {placeholderText}
-        </option>
-        {items.map((item, index) => (
-          <option key={index} value={String(item.value)}>
-            {item.label}
-          </option>
-        ))}
-      </select>
+        onChange={onChange}
+      />
 
-      <button
-        ref={buttonRef}
-        id={triggerId}
-        type="button"
-        role={hasSearch ? undefined : "combobox"}
-        aria-expanded={isListOpen}
-        aria-haspopup="listbox"
-        aria-controls={isListOpen ? listboxId : undefined}
-        aria-activedescendant={!hasSearch ? activeOptionId : undefined}
-        aria-labelledby={
-          label.trim().length > 0 ? `${labelId} ${valueId}` : valueId
-        }
-        aria-describedby={errorMessage ? errorId : undefined}
+      <SelectTrigger
+        triggerRef={buttonRef}
+        triggerId={triggerId}
+        valueId={valueId}
+        valueText={displayValue}
+        placeholderText={placeholderText}
+        labelledBy={labelledBy}
+        listboxId={listboxId}
+        activeOptionId={activeOptionId}
+        errorId={errorMessage ? errorId : undefined}
         disabled={disabled}
-        className={`relative flex flex-row items-center border-[2px] box-border gap-[8px] px-[8px] h-[48px] rounded-[5px] w-full text-left ${errorMessage
-          ? "border-red-400"
-          : "border-grey-300 focus:border-grey-500"
-          } ${disabled
-            ? "bg-grey-100 text-grey-400 cursor-not-allowed"
-            : "cursor-pointer hover:border-grey-400"
-          }`}
-        onClick={() => {
-          if (!disabled) {
-            if (isListOpen) {
-              closeList();
-            } else {
-              openList();
-            }
+        hasSearch={hasSearch}
+        isListOpen={isListOpen}
+        onToggle={() => {
+          if (isListOpen) {
+            closeList();
+          } else {
+            openList();
           }
         }}
         onKeyDown={handleTriggerKeyDown}
-      >
-        <span
-          id={valueId}
-          className={`flex-grow w-full px-0.5 ${!displayValue ? "text-grey-300" : "text-grey-500"
-            }`}
-        >
-          {displayValue !== undefined && displayValue.trim().length > 0
-            ? displayValue
-            : placeholderText}
-        </span>
-        <span
-          className={`flex size-5 shrink-0 items-center justify-center ${isListOpen ? "rotate-180" : ""
-            } transition-transform duration-200`}
-          aria-hidden
-        >
-          <ChevronDownIcon className="size-full stroke-[1.5px] text-grey-400" />
-        </span>
-      </button>
+      />
 
       {errorMessage && (
         <div className="flex flex-row items-center gap-[4px]">
