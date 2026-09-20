@@ -16,6 +16,23 @@ export type SearchInputVariant = "default" | "mutedBar";
 interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
   onClose?: () => void;
   variant?: SearchInputVariant;
+  /**
+   * 검색 필드 텍스트 크기
+   */
+  textSize?: "large" | "base" | "small";
+}
+
+function getTextSizeClassName(textSize: SearchInputProps["textSize"]) {
+  switch (textSize) {
+    case "large":
+      return "text-[16px]";
+    case "base":
+      return "text-[14px]";
+    case "small":
+      return "text-[11px]";
+    default:
+      return "text-[14px]";
+  }
 }
 
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
@@ -26,6 +43,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       onClose,
       placeholder = "검색",
       variant = "default",
+      textSize = "base",
       id,
       name,
       "aria-label": ariaLabel,
@@ -114,7 +132,8 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             "h-full w-full flex-1 min-w-0 border-none bg-transparent outline-none",
             isMutedBar
               ? "py-0 text-base text-grey-800 placeholder:text-grey-500"
-              : "rounded-[8px] px-[4px] py-[12px]"
+              : "rounded-[8px] px-[4px] py-[12px]",
+            getTextSizeClassName(textSize)
           )}
           placeholder={placeholder}
           {...rest}
