@@ -13,7 +13,13 @@ function flushBlurFrame() {
   });
 }
 
-function ClubSelect({ onBlur }: { onBlur: () => void }) {
+function ClubSelect({
+  onBlur,
+  hasSearch = true,
+}: {
+  onBlur: () => void;
+  hasSearch?: boolean;
+}) {
   const [value, setValue] = useState<string | null>(null);
 
   return (
@@ -21,7 +27,7 @@ function ClubSelect({ onBlur }: { onBlur: () => void }) {
       <Select
         name="club"
         label="소속패"
-        hasSearch
+        hasSearch={hasSearch}
         value={value}
         onChange={setValue}
         onBlur={onBlur}
@@ -83,6 +89,107 @@ describe("Select 검색 포커스", () => {
     await flushBlurFrame();
 
     expect(onBlur).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("검색 없는 셀렉트는 방향키와 Enter로 옵션을 선택한다", async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+
+    render(<ClubSelect hasSearch={false} onBlur={onBlur} />);
+
+    const trigger = screen.getByRole("combobox", { name: /소속패/ });
+    await user.click(trigger);
+    await user.keyboard("{ArrowDown}{Enter}");
+
+    expect(screen.getByRole("combobox", { name: /홍풍/ })).toBeInTheDocument();
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("검색 결과를 방향키와 Enter로 선택한다", async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+
+    render(<ClubSelect onBlur={onBlur} />);
+
+    await user.click(screen.getByRole("button", { name: /소속패/ }));
+    const searchInput = screen.getByPlaceholderText("소속패 검색");
+    await user.type(searchInput, "홍");
+    await user.keyboard("{ArrowDown}{Enter}");
+
+    expect(screen.getByRole("button", { name: /홍풍/ })).toBeInTheDocument();
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("검색형 셀렉트는 Enter로 열고 검색창으로 포커스를 옮긴다", async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+
+    render(<ClubSelect onBlur={onBlur} />);
+
+    const trigger = screen.getByRole("button", { name: /소속패/ });
+    trigger.focus();
+    await user.keyboard("{Enter}");
+
+    expect(screen.getByPlaceholderText("소속패 검색")).toHaveFocus();
+  });
+
+  it("검색 결과가 없을 때 Enter를 눌러도 검색창에 포커스를 유지한다", async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+
+    render(<ClubSelect onBlur={onBlur} />);
+
+    await user.click(screen.getByRole("button", { name: /소속패/ }));
+    const searchInput = screen.getByPlaceholderText("소속패 검색");
+    await user.type(searchInput, "없는 동아리");
+    await user.keyboard("{Enter}");
+
+    expect(searchInput).toHaveFocus();
+    expect(screen.getByRole("status")).toHaveTextContent("검색 결과가 없습니다");
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+  });
+
+  it("검색형 옵션을 마우스로 선택해도 트리거로 포커스를 돌린다", async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+
+    render(<ClubSelect onBlur={onBlur} />);
+
+    await user.click(screen.getByRole("button", { name: /소속패/ }));
+    await user.click(screen.getByRole("option", { name: "홍풍" }));
+
+    expect(screen.getByRole("button", { name: /홍풍/ })).toHaveFocus();
+  });
+
+  it("검색어 지우기 버튼에서 Escape를 누르면 트리거로 포커스를 돌린다", async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+
+    render(<ClubSelect onBlur={onBlur} />);
+
+    await user.click(screen.getByRole("button", { name: /소속패/ }));
+    await user.type(screen.getByPlaceholderText("소속패 검색"), "홍");
+    const clearButton = screen.getByRole("button", { name: "검색어 지우기" });
+    clearButton.focus();
+    await user.keyboard("{Escape}");
+
+    expect(screen.getByRole("button", { name: /소속패/ })).toHaveFocus();
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+  });
+
+  it("Escape는 선택값을 바꾸지 않고 목록을 닫아 트리거로 포커스를 돌린다", async () => {
+    const user = userEvent.setup();
+    const onBlur = vi.fn();
+
+    render(<ClubSelect hasSearch={false} onBlur={onBlur} />);
+
+    const trigger = screen.getByRole("combobox", { name: /소속패/ });
+    await user.click(trigger);
+    await user.keyboard("{ArrowDown}{Escape}");
+
+    expect(trigger).toHaveFocus();
+    expect(screen.getByRole("combobox", { name: /소속패/ })).toBeInTheDocument();
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 });
