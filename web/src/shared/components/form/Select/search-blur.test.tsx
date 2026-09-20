@@ -15,9 +15,11 @@ function flushBlurFrame() {
 
 function ClubSelect({
   onBlur,
+  disabled = false,
   hasSearch = true,
 }: {
   onBlur: () => void;
+  disabled?: boolean;
   hasSearch?: boolean;
 }) {
   const [value, setValue] = useState<string | null>(null);
@@ -28,6 +30,7 @@ function ClubSelect({
         name="club"
         label="소속패"
         hasSearch={hasSearch}
+        disabled={disabled}
         value={value}
         onChange={setValue}
         onBlur={onBlur}
@@ -57,6 +60,12 @@ describe("Select 검색 포커스", () => {
 
     expect(onBlur).not.toHaveBeenCalled();
     expect(screen.getByPlaceholderText("소속패 검색")).toHaveFocus();
+  });
+
+  it("비활성 Select는 숨김 form 필드도 비활성화한다", () => {
+    render(<ClubSelect disabled onBlur={vi.fn()} />);
+
+    expect(document.querySelector("select[name='club']")).toBeDisabled();
   });
 
   it("검색 후 옵션을 고르면 선택값이 반영된다", async () => {

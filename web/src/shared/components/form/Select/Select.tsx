@@ -6,7 +6,6 @@ import {
   isValidElement,
   ReactNode,
   useCallback,
-  useEffect,
   useMemo,
   useRef,
 } from "react";
@@ -20,10 +19,10 @@ import { josa } from "es-hangul";
 
 import { useClickOutside } from "@/shared/hooks";
 
+import { SelectList } from "./SelectList";
 import type { SelectorItem } from "./type";
 import { useSelectContainedBlur } from "./useSelectContainedBlur";
 import { useSelectKeyboardNavigation } from "./useSelectKeyboardNavigation";
-import SearchInput from "../SearchInput";
 
 interface SelectProps<V>
   extends Omit<
@@ -112,6 +111,18 @@ export function Select<V>({
   const { rootRef, handleBlur, handleFocus } =
     useSelectContainedBlur(handleFocusLeave);
 
+  useClickOutside({
+    refs: [listRef, buttonRef],
+    enabled: isListOpen,
+    eventType: "click",
+    onOutsideClick: () => {
+      const active = document.activeElement;
+      if (active instanceof Node && rootRef.current?.contains(active)) {
+        closeList();
+      }
+    },
+  });
+
   const selectedItem = items.find((item) => item.value === value);
   const displayValue = selectedItem ? selectedItem.label : "";
   const placeholderText =
@@ -156,6 +167,7 @@ export function Select<V>({
         id={name}
         name={name}
         tabIndex={-1}
+        disabled={disabled}
         value={
           value === undefined || value === null || value === ""
             ? "placeholder"
@@ -247,9 +259,7 @@ export function Select<V>({
 
       {isListOpen && (
         <SelectList
-          onClose={closeList}
           onDismiss={handleDismissList}
-          rootRef={rootRef}
           items={filteredItems}
           selectedValue={value ?? null}
           onSelect={handleSelect}
@@ -259,169 +269,10 @@ export function Select<V>({
           searchText={searchText}
           onSearchChange={handleSearchChange}
           searchInputRef={searchInputRef}
-          buttonRef={buttonRef}
           listRef={listRef}
           activeIndex={activeIndex}
           onSearchKeyDown={handleSearchKeyDown}
         />
-      )}
-    </div>
-  );
-}
-
-function SelectItem<V>({
-  id,
-  item,
-  selectedValue,
-  isActive,
-  onSelect,
-}: {
-  id: string;
-  item: SelectorItem<V>;
-  selectedValue: V | null | undefined;
-  isActive: boolean;
-  onSelect: (item: SelectorItem<V>) => void;
-}) {
-  const isSelected = item.value === selectedValue;
-
-  return (
-    <li
-      id={id}
-      role="option"
-      aria-selected={isSelected}
-      className={`group w-full cursor-pointer px-2 py-1 text-[14px] leading-5 ${isActive ? "bg-grey-100" : ""}`}
-      onMouseDown={(event) => {
-        // 옵션 클릭의 포커스 이동이 선택보다 먼저 blur를 내지 않게 함
-        event.preventDefault();
-      }}
-      onClick={() => onSelect(item)}
-    >
-      <div
-        className={`w-full cursor-pointer rounded-sm px-2 py-2.5 text-[14px] leading-5 group-hover:bg-grey-100 ${isSelected ? "bg-grey-100 font-semibold text-grey-800" : "text-grey-500"
-          }`}
-      >
-        {item.label}
-      </div>
-    </li>
-  );
-}
-
-function SelectList<V>({
-  items,
-  selectedValue,
-  onSelect,
-  onClose,
-  onDismiss,
-  hasSearch = false,
-  label,
-  listboxId,
-  searchText,
-  onSearchChange,
-  searchInputRef,
-  buttonRef,
-  listRef,
-  rootRef,
-  activeIndex,
-  onSearchKeyDown,
-}: {
-  items: SelectorItem<V>[];
-  selectedValue: V | null;
-  onSelect: (item: SelectorItem<V>) => void;
-  onClose: () => void;
-  onDismiss: () => void;
-  hasSearch?: boolean;
-  label: string;
-  listboxId: string;
-  searchText: string;
-  onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  searchInputRef: React.RefObject<HTMLInputElement | null>;
-  buttonRef: React.RefObject<HTMLButtonElement | null>;
-  listRef: React.RefObject<HTMLDivElement | null>;
-  rootRef: React.RefObject<HTMLDivElement | null>;
-  activeIndex: number | null;
-  onSearchKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
-}) {
-  useClickOutside({
-    refs: [listRef, buttonRef],
-    // mousedown에서 닫으면 검색 인풋이 먼저 사라져 blur를 놓침
-    eventType: "click",
-    onOutsideClick: () => {
-      const active = document.activeElement;
-      if (active instanceof Node && rootRef.current?.contains(active)) {
-        onClose();
-      }
-    },
-  });
-
-  useEffect(() => {
-    if (activeIndex === null) {
-      return;
-    }
-
-    const activeOption = document.getElementById(
-      `${listboxId}-option-${activeIndex}`
-    );
-    activeOption?.scrollIntoView?.({ block: "nearest" });
-  }, [activeIndex, listboxId]);
-
-  return (
-    <div
-      className="absolute top-full left-0 z-10 mt-[4px] w-full overflow-hidden rounded border border-grey-300 bg-background shadow-lg"
-      ref={listRef}
-      onKeyDown={(event) => {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          event.stopPropagation();
-          onDismiss();
-        }
-      }}
-    >
-      {hasSearch && (
-        <div className="bg-background p-[8px]">
-          <SearchInput
-            ref={searchInputRef}
-            id={`${listboxId}-search`}
-            value={searchText}
-            onChange={onSearchChange}
-            onKeyDown={onSearchKeyDown}
-            role="combobox"
-            aria-expanded
-            aria-controls={listboxId}
-            aria-activedescendant={
-              activeIndex === null
-                ? undefined
-                : `${listboxId}-option-${activeIndex}`
-            }
-            aria-autocomplete="list"
-            placeholder={`${label} 검색`}
-          />
-        </div>
-      )}
-
-      <ul
-        id={listboxId}
-        role="listbox"
-        aria-label={`${label} 선택`}
-        className="flex max-h-[144px] list-none flex-col overflow-y-auto"
-      >
-        {items.map((item, idx) => (
-            <SelectItem
-              key={`select-item-${idx}-${item.label}`}
-              id={`${listboxId}-option-${idx}`}
-              item={item}
-              selectedValue={selectedValue}
-              isActive={idx === activeIndex}
-              onSelect={onSelect}
-            />
-          ))}
-      </ul>
-      {items.length === 0 && searchText && (
-        <div
-          role="status"
-          className="w-full text-grey-500 text-center p-[16px] text-[14px]"
-        >
-          검색 결과가 없습니다
-        </div>
       )}
     </div>
   );
