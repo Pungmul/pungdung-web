@@ -90,7 +90,7 @@ export function SelectList<V>({
         id={listboxId}
         role="listbox"
         aria-label={`${label} 선택`}
-        className="flex max-h-[144px] list-none flex-col overflow-y-auto"
+        className="flex max-h-[144px] list-none flex-col overflow-y-auto py-1"
       >
         {items.map((item, index) => (
           <SelectItem

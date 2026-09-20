@@ -1,3 +1,5 @@
+import { cn } from "@/shared/lib";
+
 import type { SelectorItem } from "./type";
 
 interface SelectItemProps<V> {
@@ -22,14 +24,21 @@ export function SelectItem<V>({
       id={id}
       role="option"
       aria-selected={isSelected}
-      className={`group w-full cursor-pointer px-2 py-1 text-[14px] leading-5 ${isActive ? "bg-grey-100" : ""}`}
+      className={`group w-full cursor-pointer px-1.5 py-0.5 text-[14px] leading-5 rounded-sm`}
       onMouseDown={(event) => {
         event.preventDefault();
       }}
       onClick={() => onSelect(item)}
     >
       <div
-        className={`w-full cursor-pointer rounded-sm px-2 py-2.5 text-[14px] leading-5 group-hover:bg-grey-100 ${isSelected ? "bg-grey-100 font-semibold text-grey-800" : "text-grey-500"}`}
+        className={
+          cn(
+            "w-full cursor-pointer rounded-sm px-2 py-2.5 text-[14px] leading-5",
+            isSelected ? "font-bold text-primary" : "text-grey-500",
+            isActive && "bg-grey-100",
+            "group-hover:bg-grey-100"
+          )
+        }
       >
         {item.label}
       </div>
