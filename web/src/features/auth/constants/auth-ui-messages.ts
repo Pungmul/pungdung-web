@@ -5,6 +5,7 @@ export const AUTH_UI_MESSAGE = {
   FLOW: {
     NEXT: "다음",
     BACK: "뒤로가기",
+    SUBMIT_SIGN_UP: "가입하기",
     FILL_ALL_FIELDS: "모든 필드를 입력해주세요",
     AGREE_TERMS_TO_CONTINUE: "약관에 동의해주세요",
   },

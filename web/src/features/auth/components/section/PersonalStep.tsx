@@ -131,7 +131,7 @@ export const PersonalStep: React.FC<PersonalStepProps> = ({
           {AUTH_UI_MESSAGE.FLOW.BACK}
         </Button>
         <Button className={"bg-red-500 disabled:bg-red-200 text-background"} disabled={!canSubmit} type="submit">
-          {canSubmit ? AUTH_UI_MESSAGE.FLOW.NEXT : AUTH_UI_MESSAGE.FLOW.FILL_ALL_FIELDS}
+          {canSubmit ? AUTH_UI_MESSAGE.FLOW.SUBMIT_SIGN_UP : AUTH_UI_MESSAGE.FLOW.FILL_ALL_FIELDS}
         </Button>
       </div>
     </form>
