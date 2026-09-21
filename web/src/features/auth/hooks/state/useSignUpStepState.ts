@@ -32,6 +32,7 @@ export function useSignUpStepCursor<TStep extends string>({
 
   return {
     currentStep,
+    setCurrentStep,
     onNextStep,
     onPrevStep,
   };
