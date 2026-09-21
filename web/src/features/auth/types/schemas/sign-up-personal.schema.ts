@@ -5,7 +5,7 @@ import { clubListApi } from "@/features/club";
 import { createClubFieldSchema } from "./club-field.schema";
 import { AUTH_VALIDATION } from "../../constants";
 
-const inviteCode = z
+export const invitationCodeSchema = z
   .string()
   .min(1, AUTH_VALIDATION.PERSONAL.INVITE_CODE_REQUIRED)
   .regex(/^\d{6}$/, {
@@ -68,7 +68,7 @@ export function buildPersonalSchema(clubIds: number[]) {
     club: createClubFieldSchema(clubIds),
     clubAge: clubAgeField,
     tellNumber: tellNumberField,
-    inviteCode,
+    inviteCode: invitationCodeSchema,
   });
   return appendPersonalRefines(base);
 }
