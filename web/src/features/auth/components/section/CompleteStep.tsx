@@ -8,20 +8,28 @@ import {
   isDeletedAccountSignUpError,
 } from "../../lib/get-sign-up-complete-error-message";
 
-export interface CompleteStepProps {
+type CompleteStepProps = {
   isPending: boolean;
+  isError: boolean;
+  isSuccess: boolean;
   error: Error | null;
   onRetry: () => void;
-  onBackToInput?: () => void;
-  onNavigateToLogin: () => void;
-}
+  onEdit: () => void;
+  onGoToLogin: () => void;
+  onFinish: () => void;
+  finishLabel: string;
+};
 
 export const CompleteStep = ({
   isPending,
+  isError,
+  isSuccess,
   error,
   onRetry,
-  onBackToInput,
-  onNavigateToLogin,
+  onEdit,
+  onGoToLogin,
+  onFinish,
+  finishLabel,
 }: CompleteStepProps) => {
   if (isPending) {
     return (
@@ -36,8 +44,9 @@ export const CompleteStep = ({
     );
   }
 
-  if (error) {
-    const canRetry = !isDeletedAccountSignUpError(error);
+  if (isError) {
+    const failure = error ?? new Error("");
+    const canRetry = !isDeletedAccountSignUpError(failure);
 
     return (
       <div className="flex flex-col items-center justify-center h-full space-y-6 flex-grow">
@@ -61,20 +70,18 @@ export const CompleteStep = ({
             {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.FAILURE_TITLE}
           </h2>
           <p className="text-grey-600 mb-4">
-            {getSignUpCompleteErrorMessage(error)}
+            {getSignUpCompleteErrorMessage(failure)}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          {onBackToInput && (
-            <button
-              type="button"
-              onClick={onBackToInput}
-              className="px-6 py-2 border border-grey-300 text-grey-700 rounded-lg hover:bg-grey-100 transition-colors"
-            >
-              {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.BACK_TO_EDIT}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onEdit}
+            className="px-6 py-2 border border-grey-300 text-grey-700 rounded-lg hover:bg-grey-100 transition-colors"
+          >
+            {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.BACK_TO_EDIT}
+          </button>
           {canRetry ? (
             <button
               type="button"
@@ -86,7 +93,7 @@ export const CompleteStep = ({
           ) : (
             <button
               type="button"
-              onClick={onNavigateToLogin}
+              onClick={onGoToLogin}
               className="px-6 py-2 bg-grey-800 text-background rounded-lg hover:bg-grey-700 transition-colors"
             >
               {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.GO_TO_LOGIN}
@@ -95,6 +102,10 @@ export const CompleteStep = ({
         </div>
       </div>
     );
+  }
+
+  if (!isSuccess) {
+    return null;
   }
 
   return (
@@ -125,10 +136,10 @@ export const CompleteStep = ({
 
       <button
         type="button"
-        onClick={onNavigateToLogin}
+        onClick={onFinish}
         className="px-6 py-2 bg-primary text-background rounded-lg hover:bg-primary-light transition-colors"
       >
-        {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.GO_TO_LOGIN}
+        {finishLabel}
       </button>
     </div>
   );
