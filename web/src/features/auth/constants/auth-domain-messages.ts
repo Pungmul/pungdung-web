@@ -32,6 +32,7 @@ export const AUTH_DOMAIN_MESSAGE = {
     SUCCESS_TITLE: "회원가입이 완료되었어요!",
     SUCCESS_SUBTITLE: "즐거운 풍물 생활을 시작해봐요",
     GO_TO_LOGIN: "로그인 하러가기",
+    GO_TO_HOME: "홈으로 가기",
   },
   CHANGE_PASSWORD: {
     FAILURE_PREFIX: "비밀번호 변경 실패: ",
