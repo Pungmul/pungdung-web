@@ -29,7 +29,7 @@ const initialKakaoSignUpData: IKakaoSignUpFormData = {
   inviteCode: "",
 };
 
-export function useKakaoSignUpStepForm() {
+export function useKakaoSignUpStepForm(initialInviteCode = "") {
   const { data: clubList } = useSuspenseQuery(clubQueries.list());
 
   /**
@@ -47,6 +47,7 @@ export function useKakaoSignUpStepForm() {
     reValidateMode: "onChange",
     defaultValues: {
       ...initialKakaoSignUpData,
+      inviteCode: initialInviteCode,
       usingTermAgree: false,
       personalInfoAgree: false,
     },

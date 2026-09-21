@@ -33,7 +33,7 @@ const initialEmailSignUpData: IEmailSignUpFormData = {
   inviteCode: "",
 };
 
-export function useEmailSignUpStepForm() {
+export function useEmailSignUpStepForm(initialInviteCode = "") {
   const { data: clubList } = useSuspenseQuery(clubQueries.list());
 
   /**
@@ -57,6 +57,7 @@ export function useEmailSignUpStepForm() {
     reValidateMode: "onChange",
     defaultValues: {
       ...initialEmailSignUpData,
+      inviteCode: initialInviteCode,
       usingTermAgree: false,
       personalInfoAgree: false,
     },
