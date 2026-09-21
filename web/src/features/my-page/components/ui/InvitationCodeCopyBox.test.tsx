@@ -23,16 +23,18 @@ describe("InvitationCodeCopyBox", () => {
     vi.restoreAllMocks();
   });
 
-  it("초대코드를 클릭하면 클립보드에 복사하고 성공 토스트를 띄운다", async () => {
+  it("초대코드를 클릭하면 초대 링크를 클립보드에 복사하고 성공 토스트를 띄운다", async () => {
     writeText.mockResolvedValue(undefined);
 
     render(<InvitationCodeCopyBox code="123456" />);
 
-    await userEvent.click(screen.getByRole("button", { name: "초대코드 123456 복사" }));
+    await userEvent.click(screen.getByRole("button", { name: "초대 링크 복사 (123456)" }));
 
-    expect(writeText).toHaveBeenCalledWith("123456");
+    expect(writeText).toHaveBeenCalledWith(
+      "http://localhost:3000/invite?inviteCode=123456"
+    );
     expect(Toast.show).toHaveBeenCalledWith({
-      message: "초대코드가 복사되었습니다.",
+      message: "초대 링크가 복사되었습니다.",
     });
   });
 
@@ -41,10 +43,10 @@ describe("InvitationCodeCopyBox", () => {
 
     render(<InvitationCodeCopyBox code="123456" />);
 
-    await userEvent.click(screen.getByRole("button", { name: "초대코드 123456 복사" }));
+    await userEvent.click(screen.getByRole("button", { name: "초대 링크 복사 (123456)" }));
 
     expect(Toast.show).toHaveBeenCalledWith({
-      message: "초대코드 복사에 실패했습니다.",
+      message: "초대 링크 복사에 실패했습니다.",
       type: "error",
     });
   });
