@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+
 import {
   createValidatedUpstreamResponse,
   proxyFailureError,
@@ -20,7 +22,12 @@ export async function POST(req: Request) {
       method: "POST",
       body: formData,
     });
-    return createValidatedUpstreamResponse(response);
+    const proxyResponse = await createValidatedUpstreamResponse(response);
+    const body = await proxyResponse.clone().json().catch(() => null);
+    if (body?.isSuccess === true) {
+      (await cookies()).delete("pendingInvitation");
+    }
+    return proxyResponse;
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);
     return proxyFailureError(error);

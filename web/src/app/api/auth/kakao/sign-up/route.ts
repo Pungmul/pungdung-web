@@ -74,6 +74,7 @@ export async function POST(req: Request) {
       maxAge: refreshTokenExpiresIn,
     });
     cookieStore.delete("signUpToken");
+    cookieStore.delete("pendingInvitation");
 
     return Response.json(
       {
