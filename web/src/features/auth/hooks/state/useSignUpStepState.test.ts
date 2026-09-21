@@ -76,4 +76,25 @@ describe("useSignUpStepState", () => {
     });
     expect(result.current.data).toEqual({ count: 3, label: "y" });
   });
+
+  it("returns merged data for the current submit", () => {
+    const { result } = renderHook(() =>
+      useSignUpStepState<TestStep, TestData>({
+        stepOrder: STEP_ORDER,
+        initialStep: "stepB",
+        initialData: { count: 0, label: "x" },
+      })
+    );
+
+    let nextData: TestData = { count: 0, label: "x" };
+
+    act(() => {
+      nextData = result.current.onSubmit({ count: 4 });
+      result.current.onNextStep();
+    });
+
+    expect(nextData).toEqual({ count: 4, label: "x" });
+    expect(result.current.currentStep).toBe("stepC");
+    expect(result.current.data).toEqual({ count: 4, label: "x" });
+  });
 });

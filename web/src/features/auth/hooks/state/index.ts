@@ -1,1 +1,1 @@
-export { useSignUpStepState } from "./useSignUpStepState";
+export { useSignUpStepCursor, useSignUpStepState } from "./useSignUpStepState";

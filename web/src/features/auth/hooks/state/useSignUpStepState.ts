@@ -16,40 +16,47 @@ type CreateSignUpStateParams<
   initialData: TData;
 };
 
+export function useSignUpStepCursor<TStep extends string>({
+  stepOrder,
+  initialStep,
+}: CreateSignUpStepStateParams<TStep>) {
+  const [currentStep, setCurrentStep] = useState<TStep>(initialStep);
+
+  const onNextStep = useCallback(() => {
+    setCurrentStep((step) => getNextStepInOrder(stepOrder, step) ?? step);
+  }, [stepOrder]);
+
+  const onPrevStep = useCallback(() => {
+    setCurrentStep((step) => getPreviousStepInOrder(stepOrder, step) ?? step);
+  }, [stepOrder]);
+
+  return {
+    currentStep,
+    onNextStep,
+    onPrevStep,
+  };
+}
+
 export function useSignUpStepState<TStep extends string, TData extends object>({
   stepOrder,
   initialStep,
   initialData,
 }: CreateSignUpStateParams<TStep, TData>) {
-  const [currentStep, setCurrentStep] = useState<TStep>(initialStep);
+  const step = useSignUpStepCursor({ stepOrder, initialStep });
   const [data, setData] = useState<TData>(initialData);
 
-  const onNextStep = useCallback(() => {
-    setCurrentStep((step) => {
-      const next = getNextStepInOrder(stepOrder, step);
-      return next ?? step;
-    });
-  }, [stepOrder]);
-
-  const onPrevStep = useCallback(() => {
-    setCurrentStep((step) => {
-      const prev = getPreviousStepInOrder(stepOrder, step);
-      return prev ?? step;
-    });
-  }, [stepOrder]);
-
   const onSubmit = useCallback((patch: Partial<TData>) => {
-    setData((prev) => ({
-      ...prev,
+    const next = {
+      ...data,
       ...patch,
-    }));
-  }, []);
+    };
+    setData(next);
+    return next;
+  }, [data]);
 
   return {
-    currentStep,
+    ...step,
     data,
     onSubmit,
-    onNextStep,
-    onPrevStep,
   };
 }
