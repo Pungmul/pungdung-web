@@ -18,7 +18,7 @@ function UserProfileCardModalImpl() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+    <div className="fixed inset-0 z-modal flex items-center justify-center">
       <div
         className="absolute inset-0 cursor-pointer bg-black/40"
         onClick={screen.close}

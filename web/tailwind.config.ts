@@ -8,6 +8,10 @@ const config: Config = {
   darkMode: "media", // 시스템 설정에 따라 자동 전환
   theme: {
     extend: {
+      zIndex: {
+        modal: "100",
+        toast: "110",
+      },
       height: {
         app: "var(--app-height)",
       },

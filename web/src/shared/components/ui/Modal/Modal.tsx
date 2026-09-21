@@ -72,7 +72,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
 
     return ReactDOM.createPortal(
       <div
-        className="fixed top-0 left-0 w-full h-full flex justify-center items-center z-50"
+        className="fixed top-0 left-0 z-modal flex h-full w-full items-center justify-center"
       >
         <div
           className="absolute top-0 left-0 w-full h-full"
