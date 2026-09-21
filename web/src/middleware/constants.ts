@@ -28,5 +28,6 @@ export const PUBLIC_PAGE_PREFIXES = [
   "/sign-up",
   "/cookie",
   "/kakao/login",
+  "/invite",
   "/reset-password",
 ] as const;

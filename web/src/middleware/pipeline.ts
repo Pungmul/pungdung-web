@@ -1,5 +1,6 @@
 import { authPagesHandler } from "./handlers/authPages";
 import { bypassHandler } from "./handlers/bypass";
+import { inviteCodeHandler } from "./handlers/invite-code";
 import { kakaoSignUpHandler } from "./handlers/kakaoSignUp";
 import { protectedRoutesHandler } from "./handlers/protectedRoutes";
 import { rootRedirectHandler } from "./handlers/rootRedirect";
@@ -10,6 +11,7 @@ import type { MiddlewareHandler } from "./types";
 export const middlewarePipeline: MiddlewareHandler[] = [
   bypassHandler,
   viewTypeCookieHandler,
+  inviteCodeHandler,
   kakaoSignUpHandler,
   rootRedirectHandler,
   authPagesHandler,

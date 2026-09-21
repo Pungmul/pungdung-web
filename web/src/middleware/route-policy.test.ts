@@ -22,6 +22,7 @@ describe("getGuestRoutePolicy", () => {
     expect(getGuestRoutePolicy("/reset-password")).toBe("public");
     expect(getGuestRoutePolicy("/reset-password/email-check")).toBe("public");
     expect(getGuestRoutePolicy("/login")).toBe("public");
+    expect(getGuestRoutePolicy("/invite")).toBe("public");
   });
 
   it("홈·번개·채팅·마이페이지·알림을 로그인 유도 화면으로 분류한다", () => {
