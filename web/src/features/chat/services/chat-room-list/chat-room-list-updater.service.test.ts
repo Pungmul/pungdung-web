@@ -21,6 +21,8 @@ const baseRoom = (id: string, unread: number | null = 1): ChatRoomListItem => ({
   roomName: "room",
   profileImageUrl: null,
   group: false,
+  type: "NORMAL",
+  relatedId: null,
 });
 
 describe("chat-room-list-updater.service", () => {

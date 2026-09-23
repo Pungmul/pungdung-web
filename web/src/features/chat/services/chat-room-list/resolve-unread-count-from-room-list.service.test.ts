@@ -19,6 +19,8 @@ const room = (id: string, unreadCount: number | null): ChatRoomListItem => ({
   roomName: id,
   profileImageUrl: null,
   group: false,
+  type: "NORMAL",
+  relatedId: null,
 });
 
 describe("resolveUnreadCountFromRoomList", () => {

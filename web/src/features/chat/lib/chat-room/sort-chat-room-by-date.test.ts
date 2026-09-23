@@ -19,6 +19,8 @@ const room = (over: Partial<ChatRoomListItem>): ChatRoomListItem => ({
   roomName: "n",
   profileImageUrl: null,
   group: false,
+  type: "NORMAL",
+  relatedId: null,
   ...over,
 });
 

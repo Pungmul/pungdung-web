@@ -18,6 +18,8 @@ const roomBase: Omit<ChatRoomListItem, "isMuted"> = {
   roomName: "room",
   profileImageUrl: null,
   group: false,
+  type: "NORMAL",
+  relatedId: null,
 };
 
 describe("mapChatRoomListItemIndexedDBToDomain", () => {
@@ -38,5 +40,16 @@ describe("mapChatRoomListItemIndexedDBToDomain", () => {
     });
 
     expect(result.isMuted).toBe(true);
+  });
+
+  it("type과 relatedId가 없으면 NORMAL과 null로 둔다", () => {
+    const { type: _type, relatedId: _relatedId, ...legacy } = roomBase;
+    const result = mapChatRoomListItemIndexedDBToDomain({
+      ...legacy,
+      isMuted: false,
+    });
+
+    expect(result.type).toBe("NORMAL");
+    expect(result.relatedId).toBeNull();
   });
 });

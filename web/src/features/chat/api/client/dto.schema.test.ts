@@ -186,6 +186,8 @@ describe("chat dto.schema — chatRoomListItemDtoSchema", () => {
       roomName: "방",
       profileImageUrl: null,
       group: false,
+      type: "NORMAL",
+      relatedId: null,
     });
     expect(parsed.success).toBe(true);
     if (parsed.success) {
@@ -210,6 +212,8 @@ describe("chat dto.schema — chatRoomListItemDtoSchema", () => {
       roomName: "방",
       profileImageUrl: null,
       group: false,
+      type: "NORMAL",
+      relatedId: null,
     });
     expect(parsed.success).toBe(true);
     if (parsed.success) expect(parsed.data.isMuted).toBe(true);
@@ -231,6 +235,8 @@ describe("chat dto.schema — chatRoomListItemDtoSchema", () => {
       roomName: "방",
       profileImageUrl: null,
       group: false,
+      type: "NORMAL",
+      relatedId: null,
     });
     expect(parsed.success).toBe(true);
     if (parsed.success) expect(parsed.data.isMuted).toBe(false);
@@ -253,9 +259,102 @@ describe("chat dto.schema — chatRoomListItemDtoSchema", () => {
       roomName: "방",
       profileImageUrl: null,
       group: false,
+      type: "NORMAL",
+      relatedId: null,
     });
     expect(parsed.success).toBe(true);
     if (parsed.success) expect(parsed.data.isMuted).toBe(false);
+  });
+
+  it("NORMAL은 relatedId가 null일 때만 통과한다", () => {
+    const parsed = chatRoomListItemDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      isMuted: false,
+      lastMessageTime: null,
+      lastMessageContent: null,
+      unreadCount: 0,
+      senderId: null,
+      senderName: null,
+      receiverId: null,
+      receiverName: null,
+      chatRoomMemberIds: [],
+      chatRoomMemberNames: [],
+      roomName: "방",
+      profileImageUrl: null,
+      group: false,
+      type: "NORMAL",
+      relatedId: 1,
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it("LIGHTNING은 relatedId 정수를 통과시킨다", () => {
+    const parsed = chatRoomListItemDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      muted: false,
+      lastMessageTime: null,
+      lastMessageContent: null,
+      unreadCount: 0,
+      senderId: null,
+      senderName: null,
+      receiverId: null,
+      receiverName: null,
+      chatRoomMemberIds: [1],
+      chatRoomMemberNames: ["a"],
+      roomName: "번개방",
+      profileImageUrl: null,
+      group: true,
+      type: "LIGHTNING",
+      relatedId: 12,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.type).toBe("LIGHTNING");
+      expect(parsed.data.relatedId).toBe(12);
+    }
+  });
+
+  it("PERFORMANCE는 relatedId 문자열을 통과시키고 null은 거절한다", () => {
+    const parsed = chatRoomListItemDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      isMuted: false,
+      lastMessageTime: null,
+      lastMessageContent: null,
+      unreadCount: 0,
+      senderId: null,
+      senderName: null,
+      receiverId: null,
+      receiverName: null,
+      chatRoomMemberIds: [],
+      chatRoomMemberNames: [],
+      roomName: "공연방",
+      profileImageUrl: null,
+      group: true,
+      type: "PERFORMANCE",
+      relatedId: "pk-1",
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) expect(parsed.data.relatedId).toBe("pk-1");
+
+    const rejected = chatRoomListItemDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      isMuted: false,
+      lastMessageTime: null,
+      lastMessageContent: null,
+      unreadCount: 0,
+      senderId: null,
+      senderName: null,
+      receiverId: null,
+      receiverName: null,
+      chatRoomMemberIds: [],
+      chatRoomMemberNames: [],
+      roomName: "공연방",
+      profileImageUrl: null,
+      group: true,
+      type: "PERFORMANCE",
+      relatedId: null,
+    });
+    expect(rejected.success).toBe(false);
   });
 });
 

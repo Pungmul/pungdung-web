@@ -150,19 +150,44 @@ export const chatRoomListItemDtoSchema = z
     roomName: z.string(),
     profileImageUrl: z.string().nullable(),
     group: z.boolean(),
+    type: z.enum(["NORMAL", "LIGHTNING", "PERFORMANCE"]),
+    relatedId: z.union([z.number().int(), z.string().min(1), z.null()]),
   })
   .superRefine((value, ctx) => {
     if (
-      typeof value.isMuted === "boolean" ||
-      typeof value.muted === "boolean"
+      typeof value.isMuted !== "boolean" &&
+      typeof value.muted !== "boolean"
     ) {
-      return;
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Either isMuted or muted must be provided",
+        path: ["isMuted"],
+      });
     }
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Either isMuted or muted must be provided",
-      path: ["isMuted"],
-    });
+
+    if (value.type === "NORMAL" && value.relatedId !== null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "NORMAL room relatedId must be null",
+        path: ["relatedId"],
+      });
+    }
+
+    if (value.type === "LIGHTNING" && typeof value.relatedId !== "number") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "LIGHTNING room relatedId must be a number",
+        path: ["relatedId"],
+      });
+    }
+
+    if (value.type === "PERFORMANCE" && typeof value.relatedId !== "string") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "PERFORMANCE room relatedId must be a string",
+        path: ["relatedId"],
+      });
+    }
   })
   .transform(({ muted: _muted, ...rest }) => ({
     ...rest,

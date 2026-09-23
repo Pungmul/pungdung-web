@@ -113,6 +113,8 @@ export function chatRoomListResponse(
       roomName: room.roomName,
       profileImageUrl: null,
       group: true,
+      type: "NORMAL",
+      relatedId: null,
     })),
   });
 }

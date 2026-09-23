@@ -26,6 +26,8 @@ function createRoom(overrides: Partial<ChatRoomListItem> = {}): ChatRoomListItem
     roomName: "room",
     profileImageUrl: null,
     group: false,
+    type: "NORMAL",
+    relatedId: null,
     ...overrides,
   };
 }

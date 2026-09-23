@@ -2,6 +2,8 @@ import type { User } from "@/features/user";
 
 import type { MessageList } from "./chat-message.types";
 
+export type ChatRoomType = "NORMAL" | "LIGHTNING" | "PERFORMANCE";
+
 export interface ChatRoomInfo {
   chatRoomUUID: string;
   roomName: string;
@@ -37,4 +39,6 @@ export interface ChatRoomListItem {
   roomName: string;
   profileImageUrl: string | null;
   group: boolean;
+  type: ChatRoomType;
+  relatedId: number | string | null;
 }

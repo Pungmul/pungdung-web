@@ -19,5 +19,7 @@ export function mapChatRoomListItemDtoToDomain(
     roomName: dto.roomName,
     profileImageUrl: dto.profileImageUrl,
     group: dto.group,
+    type: dto.type,
+    relatedId: dto.relatedId,
   };
 }

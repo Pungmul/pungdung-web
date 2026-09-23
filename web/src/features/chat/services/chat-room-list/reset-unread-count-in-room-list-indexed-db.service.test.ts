@@ -22,6 +22,8 @@ const createRoom = (
   roomName: "room",
   profileImageUrl: null,
   group: false,
+  type: "NORMAL",
+  relatedId: null,
   ...overrides,
 });
 

@@ -8,6 +8,7 @@ export type {
   ChatRoom,
   ChatRoomInfo,
   ChatRoomListItem,
+  ChatRoomType,
   UserLastReadMessageId,
 } from "./chat-room.types";
 export * from "./guards/message.guards";

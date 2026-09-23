@@ -27,6 +27,8 @@ function room(overrides: Partial<ChatRoomListItem> = {}): ChatRoomListItem {
     roomName: "로컬 방",
     profileImageUrl: "https://example.com/avatar.png",
     group: false,
+    type: "NORMAL",
+    relatedId: null,
     ...overrides,
   };
 }

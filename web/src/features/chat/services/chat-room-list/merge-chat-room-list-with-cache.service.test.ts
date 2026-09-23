@@ -19,6 +19,8 @@ const room = (override: Partial<ChatRoomListItem>): ChatRoomListItem => ({
   roomName: "room",
   profileImageUrl: null,
   group: false,
+  type: "NORMAL",
+  relatedId: null,
   ...override,
 });
 

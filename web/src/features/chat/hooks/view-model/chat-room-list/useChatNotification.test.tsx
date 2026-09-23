@@ -24,6 +24,8 @@ const room = (unread: number | null): ChatRoomListItem => ({
   roomName: "n",
   profileImageUrl: null,
   group: false,
+  type: "NORMAL",
+  relatedId: null,
 });
 
 describe("useChatNotification", () => {

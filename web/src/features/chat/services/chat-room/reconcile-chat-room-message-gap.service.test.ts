@@ -32,6 +32,8 @@ const roomListItem = (): ChatRoomListItem => ({
   roomName: "room",
   profileImageUrl: null,
   group: false,
+  type: "NORMAL",
+  relatedId: null,
 });
 
 describe("resolveNewestGapMessagePreview", () => {
