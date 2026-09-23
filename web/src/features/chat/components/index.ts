@@ -1,6 +1,7 @@
 export { ChatNotificationSocket } from "./module/chat-room-list/ChatNotificationSocket";
 export { default as ChatDrawer } from "./overlay/chat-room/ChatDrawer";
 export { default as InviteUserModal } from "./overlay/chat-room/InviteUserModal";
+export { ChatLightningInfoPanel } from "./section/chat-room/ChatLightningInfoPanel";
 export { ChatLoadFailFallback } from "./section/chat-room/ChatLoadFailFallback";
 export { ChatRoomHeader } from "./section/chat-room/ChatRoomHeader";
 export { ChatRoomTimelinePanel } from "./section/chat-room/ChatRoomTimelinePanel";

@@ -1,6 +1,7 @@
 export {
   AddChatRoomButton,
   ChatDrawer,
+  ChatLightningInfoPanel,
   ChatLoadFailFallback,
   ChatNotificationSocket,
   ChatRoomHeader,

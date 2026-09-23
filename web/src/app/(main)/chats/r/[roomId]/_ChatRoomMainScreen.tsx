@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import {
   ChatDrawer,
+  ChatLightningInfoPanel,
   ChatRoomHeader,
   ChatRoomTimelinePanel,
   type ChatRoomType,
@@ -18,6 +19,7 @@ type ChatRoomMainScreenProps = {
   roomId: string;
   title: string;
   roomType: ChatRoomType;
+  lightningMeetingId: number | null;
   memberCount: number;
   myUsername: string;
   readSign: ReadSignFn;
@@ -36,6 +38,7 @@ export function ChatRoomMainScreen({
   roomId,
   title,
   roomType,
+  lightningMeetingId,
   memberCount,
   myUsername,
   readSign,
@@ -54,15 +57,20 @@ export function ChatRoomMainScreen({
 
   return (
     <>
-      <div className="h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)_auto]">
-        <ChatRoomHeader
-          title={title}
-          roomType={roomType}
-          group={isGroupRoom}
-          memberCount={memberCount}
-          onBack={onBack}
-          onOpenDrawer={() => setDrawerOpen(true)}
-        />
+      <div className="h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)]">
+        <div className="shrink-0">
+          <ChatRoomHeader
+            title={title}
+            roomType={roomType}
+            group={isGroupRoom}
+            memberCount={memberCount}
+            onBack={onBack}
+            onOpenDrawer={() => setDrawerOpen(true)}
+          />
+          {lightningMeetingId != null ? (
+            <ChatLightningInfoPanel meetingId={lightningMeetingId} />
+          ) : null}
+        </div>
 
         <ChatRoomTimelinePanel
           roomId={roomId}

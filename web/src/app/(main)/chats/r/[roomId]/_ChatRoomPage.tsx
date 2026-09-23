@@ -84,6 +84,11 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
 
   const roomType = chatRoomData?.chatRoomInfo.type ?? "NORMAL";
   const memberCount = chatRoomData?.userInfoList.length ?? 0;
+  const relatedId = chatRoomData?.chatRoomInfo.relatedId;
+  const lightningMeetingId =
+    roomType === "LIGHTNING" && typeof relatedId === "number"
+      ? relatedId
+      : null;
 
   return (
     <AnimatePresence mode="wait">
@@ -99,6 +104,7 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
               roomId={roomId as string}
               title={title}
               roomType={roomType}
+              lightningMeetingId={lightningMeetingId}
               memberCount={memberCount}
               myUsername={myUsername}
               readSign={readSign}
