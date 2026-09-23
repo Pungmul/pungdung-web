@@ -6,6 +6,11 @@ describe("lightningQueryInternal", () => {
   it("루트와 하위 키가 안정적인 튜플 형태다", () => {
     expect(lightningQueryInternal.all()).toEqual(["lightning"]);
     expect(lightningQueryInternal.data()).toEqual(["lightning", "data"]);
+    expect(lightningQueryInternal.meeting(12)).toEqual([
+      "lightning",
+      "meeting",
+      12,
+    ]);
     expect(lightningQueryInternal.status()).toEqual(["lightning", "status"]);
   });
 

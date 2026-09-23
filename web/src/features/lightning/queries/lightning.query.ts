@@ -5,6 +5,7 @@ import { locationQueryKeys } from "@/features/location";
 import { lightningQueryInternal } from "./lightning-query-internal";
 import {
   fetchLightningData,
+  fetchLightningMeeting,
   fetchUserLocation,
   fetchUserParticipationStatus,
 } from "../api/client";
@@ -25,6 +26,13 @@ export const lightningQueries = {
       queryFn: fetchLightningData,
       staleTime: 30 * 1000,
       refetchOnMount: "always",
+    }),
+
+  meeting: (meetingId: number) =>
+    queryOptions({
+      queryKey: lightningQueryInternal.meeting(meetingId),
+      queryFn: () => fetchLightningMeeting(meetingId),
+      enabled: Number.isInteger(meetingId) && meetingId > 0,
     }),
 
   participationStatus: () =>

@@ -12,5 +12,7 @@ export const lightningQueryInternal = {
       ? ([...lightningQueryInternal.lists(), filters] as const)
       : lightningQueryInternal.lists(),
   data: () => [...LIGHTNING_QUERY_ROOT, "data"] as const,
+  meeting: (meetingId: number) =>
+    [...LIGHTNING_QUERY_ROOT, "meeting", meetingId] as const,
   status: () => [...LIGHTNING_QUERY_ROOT, "status"] as const,
 };

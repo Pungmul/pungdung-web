@@ -2,6 +2,7 @@ export { createLightning } from "./create-lightning.api";
 export { deleteLightningMeeting } from "./delete-lightning-meeting.api";
 export { exitLightningMeeting } from "./exit-lightning-meeting.api";
 export { fetchLightningData } from "./fetch-lightning-data.api";
+export { fetchLightningMeeting } from "./fetch-lightning-meeting.api";
 export { fetchNearLightning } from "./fetch-near-lightning.api";
 export { fetchUserLocation } from "./fetch-user-location.api";
 export { fetchUserParticipationStatus } from "./fetch-user-participation-status.api";
