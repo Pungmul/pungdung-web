@@ -86,8 +86,8 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
   const memberCount = chatRoomData?.userInfoList.length ?? 0;
   const relatedId = chatRoomData?.chatRoomInfo.relatedId;
   const lightningMeetingId =
-    roomType === "LIGHTNING" && typeof relatedId === "number"
-      ? relatedId
+    roomType === "LIGHTNING" && relatedId != null
+      ? Number(relatedId)
       : null;
   const promotionPublicKey =
     roomType === "PERFORMANCE" &&

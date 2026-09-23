@@ -99,10 +99,10 @@ function refineChatRoomTypeRelatedId(
     });
   }
 
-  if (value.type === "LIGHTNING" && typeof value.relatedId !== "number") {
+  if (value.type === "LIGHTNING" && typeof value.relatedId !== "string") {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "LIGHTNING room relatedId must be a number",
+      message: "LIGHTNING room relatedId must be a string",
       path: ["relatedId"],
     });
   }

@@ -289,7 +289,7 @@ describe("chat dto.schema — chatRoomListItemDtoSchema", () => {
     expect(parsed.success).toBe(false);
   });
 
-  it("LIGHTNING은 relatedId 정수를 통과시킨다", () => {
+  it("LIGHTNING은 relatedId 문자열을 통과시키고 정수는 거절한다", () => {
     const parsed = chatRoomListItemDtoSchema.safeParse({
       chatRoomUUID: "r1",
       muted: false,
@@ -308,11 +308,28 @@ describe("chat dto.schema — chatRoomListItemDtoSchema", () => {
       type: "LIGHTNING",
       relatedId: 12,
     });
-    expect(parsed.success).toBe(true);
-    if (parsed.success) {
-      expect(parsed.data.type).toBe("LIGHTNING");
-      expect(parsed.data.relatedId).toBe(12);
-    }
+    expect(parsed.success).toBe(false);
+
+    const asString = chatRoomListItemDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      muted: false,
+      lastMessageTime: null,
+      lastMessageContent: null,
+      unreadCount: 0,
+      senderId: null,
+      senderName: null,
+      receiverId: null,
+      receiverName: null,
+      chatRoomMemberIds: [1],
+      chatRoomMemberNames: ["a"],
+      roomName: "번개방",
+      profileImageUrl: null,
+      group: true,
+      type: "LIGHTNING",
+      relatedId: "78",
+    });
+    expect(asString.success).toBe(true);
+    if (asString.success) expect(asString.data.relatedId).toBe("78");
   });
 
   it("PERFORMANCE는 relatedId 문자열을 통과시키고 null은 거절한다", () => {
@@ -377,7 +394,7 @@ describe("chat dto.schema — chatRoomInfoDtoSchema", () => {
     }
   });
 
-  it("번개 방은 relatedId 정수가 있어야 한다", () => {
+  it("번개 방은 relatedId 문자열이 있어야 한다", () => {
     const parsed = chatRoomInfoDtoSchema.safeParse({
       chatRoomUUID: "r1",
       roomName: "번개",
@@ -386,7 +403,18 @@ describe("chat dto.schema — chatRoomInfoDtoSchema", () => {
       type: "LIGHTNING",
       relatedId: 12,
     });
-    expect(parsed.success).toBe(true);
+    expect(parsed.success).toBe(false);
+
+    const asString = chatRoomInfoDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      roomName: "번개",
+      profileImageUrl: null,
+      group: true,
+      type: "LIGHTNING",
+      relatedId: "78",
+    });
+    expect(asString.success).toBe(true);
+    if (asString.success) expect(asString.data.relatedId).toBe("78");
 
     const rejected = chatRoomInfoDtoSchema.safeParse({
       chatRoomUUID: "r1",
