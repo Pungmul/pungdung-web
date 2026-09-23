@@ -89,6 +89,12 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
     roomType === "LIGHTNING" && typeof relatedId === "number"
       ? relatedId
       : null;
+  const promotionPublicKey =
+    roomType === "PERFORMANCE" &&
+    typeof relatedId === "string" &&
+    relatedId.length > 0
+      ? relatedId
+      : null;
 
   return (
     <AnimatePresence mode="wait">
@@ -105,6 +111,7 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
               title={title}
               roomType={roomType}
               lightningMeetingId={lightningMeetingId}
+              promotionPublicKey={promotionPublicKey}
               memberCount={memberCount}
               myUsername={myUsername}
               readSign={readSign}

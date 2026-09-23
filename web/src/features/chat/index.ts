@@ -4,6 +4,7 @@ export {
   ChatLightningInfoPanel,
   ChatLoadFailFallback,
   ChatNotificationSocket,
+  ChatPromotionInfoPanel,
   ChatRoomHeader,
   ChatRoomPanelSkeleton,
   ChatRoomTimelinePanel,

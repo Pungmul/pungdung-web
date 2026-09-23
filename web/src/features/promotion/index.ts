@@ -109,6 +109,10 @@ export {
   usePublishPromotionForm,
   useSavePromotionFormDraft,
 } from "./hooks/actions";
+export {
+  formatPromotionDate,
+  formatPromotionTime,
+} from "./lib/format-promotion-date-time";
 export { resolvePromotionApplyLabel } from "./lib/promotion-apply-label";
 export { promotionMutationOptions, promotionQueries } from "./queries";
 export { usePromotionQuestionDraftStore } from "./store";

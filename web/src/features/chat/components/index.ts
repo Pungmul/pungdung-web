@@ -3,6 +3,7 @@ export { default as ChatDrawer } from "./overlay/chat-room/ChatDrawer";
 export { default as InviteUserModal } from "./overlay/chat-room/InviteUserModal";
 export { ChatLightningInfoPanel } from "./section/chat-room/ChatLightningInfoPanel";
 export { ChatLoadFailFallback } from "./section/chat-room/ChatLoadFailFallback";
+export { ChatPromotionInfoPanel } from "./section/chat-room/ChatPromotionInfoPanel";
 export { ChatRoomHeader } from "./section/chat-room/ChatRoomHeader";
 export { ChatRoomTimelinePanel } from "./section/chat-room/ChatRoomTimelinePanel";
 export { default as RoomContainer } from "./section/chat-room/RoomContainer";

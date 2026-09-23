@@ -5,6 +5,7 @@ import { useState } from "react";
 import {
   ChatDrawer,
   ChatLightningInfoPanel,
+  ChatPromotionInfoPanel,
   ChatRoomHeader,
   ChatRoomTimelinePanel,
   type ChatRoomType,
@@ -20,6 +21,7 @@ type ChatRoomMainScreenProps = {
   title: string;
   roomType: ChatRoomType;
   lightningMeetingId: number | null;
+  promotionPublicKey: string | null;
   memberCount: number;
   myUsername: string;
   readSign: ReadSignFn;
@@ -39,6 +41,7 @@ export function ChatRoomMainScreen({
   title,
   roomType,
   lightningMeetingId,
+  promotionPublicKey,
   memberCount,
   myUsername,
   readSign,
@@ -69,6 +72,9 @@ export function ChatRoomMainScreen({
           />
           {lightningMeetingId != null ? (
             <ChatLightningInfoPanel meetingId={lightningMeetingId} />
+          ) : null}
+          {promotionPublicKey != null ? (
+            <ChatPromotionInfoPanel publicKey={promotionPublicKey} />
           ) : null}
         </div>
 
