@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { fn } from "storybook/test";
 
 import { ViewStoreProvider } from "@/shared/lib/view/view-store-provider";
 
@@ -23,6 +24,9 @@ const meta = {
   parameters: {
     nextjs: {
       appDirectory: true,
+      router: {
+        back: fn(),
+      },
     },
   },
   decorators: [

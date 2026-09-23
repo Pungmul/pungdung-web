@@ -27,6 +27,8 @@ const room = (messages: Message[]): ChatRoom => ({
     roomName: "방",
     profileImageUrl: null,
     group: false,
+    type: "NORMAL",
+    relatedId: null,
   },
   userInfoList: [],
   messageList: {

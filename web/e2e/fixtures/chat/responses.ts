@@ -70,6 +70,8 @@ export function chatRoomInfoResponse(params: {
       roomName: params.roomName,
       profileImageUrl: null,
       group: true,
+      type: "NORMAL",
+      relatedId: null,
     },
     userInfoList: [e2eChatSelfUser, e2eChatOtherUser],
     messageList: {

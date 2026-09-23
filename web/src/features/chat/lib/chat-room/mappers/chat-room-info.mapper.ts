@@ -7,5 +7,7 @@ export function mapChatRoomInfoDtoToDomain(dto: ChatRoomInfoDto): ChatRoomInfo {
     roomName: dto.roomName,
     profileImageUrl: dto.profileImageUrl,
     group: dto.group,
+    type: dto.type,
+    relatedId: dto.relatedId,
   };
 }

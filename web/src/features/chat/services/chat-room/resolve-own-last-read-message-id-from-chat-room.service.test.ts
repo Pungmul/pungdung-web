@@ -10,6 +10,8 @@ const chatRoom = (overrides?: Partial<ChatRoom>): ChatRoom => ({
     roomName: "room",
     profileImageUrl: null,
     group: false,
+    type: "NORMAL",
+    relatedId: null,
   },
   userInfoList: [
     {

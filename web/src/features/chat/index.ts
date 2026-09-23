@@ -24,4 +24,4 @@ export { useChatRoomTitle, useChatRoomUserMaps } from "./hooks/view-model";
 export { chatQueries } from "./queries";
 export { useRoomReadSocket } from "./socket";
 export { SelectFriendModalProvider } from "./store";
-export type { ChatRoomListItem } from "./types";
+export type { ChatRoomListItem, ChatRoomType } from "./types";

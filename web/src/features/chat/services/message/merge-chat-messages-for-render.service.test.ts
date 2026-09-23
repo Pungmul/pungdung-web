@@ -68,6 +68,8 @@ describe("mergeChatMessagesForRender", () => {
         roomName: "room",
         profileImageUrl: null,
         group: false,
+        type: "NORMAL",
+        relatedId: null,
       },
       userInfoList: [],
       userInitReadList: [],

@@ -25,6 +25,8 @@ const chatRoomData = {
     roomName: "Room A",
     profileImageUrl: null,
     group: true,
+    type: "NORMAL",
+    relatedId: null,
   },
   userInfoList: [{ userId: 1, username: "me" }],
   messageList: {

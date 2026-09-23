@@ -9,6 +9,8 @@ export interface ChatRoomInfo {
   roomName: string;
   profileImageUrl: string | null;
   group: boolean;
+  type: ChatRoomType;
+  relatedId: number | string | null;
 }
 
 export interface UserLastReadMessageId {

@@ -6,6 +6,7 @@ import {
   chatRoomNotificationMutedDtoSchema,
   chatRoomNotificationStateDtoSchema,
   chatRoomListItemDtoSchema,
+  chatRoomInfoDtoSchema,
   chatRoomListResponseEnvelopeSchema,
   createChatRoomFailureDtoSchema,
   createChatRoomResponseDtoSchema,
@@ -352,6 +353,47 @@ describe("chat dto.schema — chatRoomListItemDtoSchema", () => {
       profileImageUrl: null,
       group: true,
       type: "PERFORMANCE",
+      relatedId: null,
+    });
+    expect(rejected.success).toBe(false);
+  });
+});
+
+describe("chat dto.schema — chatRoomInfoDtoSchema", () => {
+  it("일반 방 상세의 type과 relatedId null을 통과시킨다", () => {
+    const parsed = chatRoomInfoDtoSchema.safeParse({
+      chatRoomUUID: "5fd2e68b-4e88-4813-8978-63d9d87e1063",
+      roomName: "호두마루님의 모임",
+      profileImageUrl: null,
+      opponentLeft: false,
+      type: "NORMAL",
+      relatedId: null,
+      group: true,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.type).toBe("NORMAL");
+      expect(parsed.data.relatedId).toBeNull();
+    }
+  });
+
+  it("번개 방은 relatedId 정수가 있어야 한다", () => {
+    const parsed = chatRoomInfoDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      roomName: "번개",
+      profileImageUrl: null,
+      group: true,
+      type: "LIGHTNING",
+      relatedId: 12,
+    });
+    expect(parsed.success).toBe(true);
+
+    const rejected = chatRoomInfoDtoSchema.safeParse({
+      chatRoomUUID: "r1",
+      roomName: "번개",
+      profileImageUrl: null,
+      group: true,
+      type: "LIGHTNING",
       relatedId: null,
     });
     expect(rejected.success).toBe(false);

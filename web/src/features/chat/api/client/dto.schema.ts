@@ -76,12 +76,56 @@ export const messageListDtoSchema = chatMessageCursorPageDtoSchema;
 
 export type MessageListDto = ChatMessageCursorPageDto;
 
-export const chatRoomInfoDtoSchema = z.object({
-  chatRoomUUID: z.string(),
-  roomName: z.string(),
-  profileImageUrl: z.string().nullable(),
-  group: z.boolean(),
-});
+const chatRoomTypeSchema = z.enum(["NORMAL", "LIGHTNING", "PERFORMANCE"]);
+
+const chatRoomRelatedIdSchema = z.union([
+  z.number().int(),
+  z.string().min(1),
+  z.null(),
+]);
+
+function refineChatRoomTypeRelatedId(
+  value: {
+    type: z.infer<typeof chatRoomTypeSchema>;
+    relatedId: z.infer<typeof chatRoomRelatedIdSchema>;
+  },
+  ctx: z.RefinementCtx,
+) {
+  if (value.type === "NORMAL" && value.relatedId !== null) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "NORMAL room relatedId must be null",
+      path: ["relatedId"],
+    });
+  }
+
+  if (value.type === "LIGHTNING" && typeof value.relatedId !== "number") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "LIGHTNING room relatedId must be a number",
+      path: ["relatedId"],
+    });
+  }
+
+  if (value.type === "PERFORMANCE" && typeof value.relatedId !== "string") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "PERFORMANCE room relatedId must be a string",
+      path: ["relatedId"],
+    });
+  }
+}
+
+export const chatRoomInfoDtoSchema = z
+  .object({
+    chatRoomUUID: z.string(),
+    roomName: z.string(),
+    profileImageUrl: z.string().nullable(),
+    group: z.boolean(),
+    type: chatRoomTypeSchema,
+    relatedId: chatRoomRelatedIdSchema,
+  })
+  .superRefine(refineChatRoomTypeRelatedId);
 
 export type ChatRoomInfoDto = z.infer<typeof chatRoomInfoDtoSchema>;
 
@@ -150,8 +194,8 @@ export const chatRoomListItemDtoSchema = z
     roomName: z.string(),
     profileImageUrl: z.string().nullable(),
     group: z.boolean(),
-    type: z.enum(["NORMAL", "LIGHTNING", "PERFORMANCE"]),
-    relatedId: z.union([z.number().int(), z.string().min(1), z.null()]),
+    type: chatRoomTypeSchema,
+    relatedId: chatRoomRelatedIdSchema,
   })
   .superRefine((value, ctx) => {
     if (
@@ -165,29 +209,7 @@ export const chatRoomListItemDtoSchema = z
       });
     }
 
-    if (value.type === "NORMAL" && value.relatedId !== null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "NORMAL room relatedId must be null",
-        path: ["relatedId"],
-      });
-    }
-
-    if (value.type === "LIGHTNING" && typeof value.relatedId !== "number") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "LIGHTNING room relatedId must be a number",
-        path: ["relatedId"],
-      });
-    }
-
-    if (value.type === "PERFORMANCE" && typeof value.relatedId !== "string") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "PERFORMANCE room relatedId must be a string",
-        path: ["relatedId"],
-      });
-    }
+    refineChatRoomTypeRelatedId(value, ctx);
   })
   .transform(({ muted: _muted, ...rest }) => ({
     ...rest,

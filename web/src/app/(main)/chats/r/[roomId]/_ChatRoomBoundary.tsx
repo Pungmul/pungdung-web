@@ -47,7 +47,9 @@ function ChatRoomSuspenseFallback() {
     <div className="flex flex-col h-full bg-background">
       <ChatRoomHeader
         title={override?.roomName ?? roomFromList.roomName}
-        memberCount={roomFromList.chatRoomMemberIds?.length ?? 1}
+        roomType={roomFromList.type}
+        group={roomFromList.group}
+        memberCount={roomFromList.chatRoomMemberIds.length}
         onBack={() => router.push("/chats/r/inbox")}
         onOpenDrawer={() => { }}
       />

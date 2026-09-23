@@ -6,6 +6,7 @@ import {
   ChatDrawer,
   ChatRoomHeader,
   ChatRoomTimelinePanel,
+  type ChatRoomType,
   InviteUserModal,
 } from "@/features/chat";
 import { User, UserProfileCardModalHost } from "@/features/user";
@@ -16,6 +17,7 @@ import type { ReadSignTimelineMessagesRef } from "@/features/chat/socket/useRoom
 type ChatRoomMainScreenProps = {
   roomId: string;
   title: string;
+  roomType: ChatRoomType;
   memberCount: number;
   myUsername: string;
   readSign: ReadSignFn;
@@ -33,6 +35,7 @@ type ChatRoomMainScreenProps = {
 export function ChatRoomMainScreen({
   roomId,
   title,
+  roomType,
   memberCount,
   myUsername,
   readSign,
@@ -54,6 +57,8 @@ export function ChatRoomMainScreen({
       <div className="h-full min-h-0 grid grid-rows-[auto_minmax(0,1fr)_auto]">
         <ChatRoomHeader
           title={title}
+          roomType={roomType}
+          group={isGroupRoom}
           memberCount={memberCount}
           onBack={onBack}
           onOpenDrawer={() => setDrawerOpen(true)}

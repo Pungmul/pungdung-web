@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { use } from "react";
 import { useParams, useRouter } from "next/navigation";
 
@@ -82,9 +82,8 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
     chatRoomData,
   });
 
-  const memberCount = useMemo(() => chatRoomData?.userInfoList.length
-    ? chatRoomData?.userInfoList.length - 1
-    : 0, [chatRoomData?.userInfoList.length]);
+  const roomType = chatRoomData?.chatRoomInfo.type ?? "NORMAL";
+  const memberCount = chatRoomData?.userInfoList.length ?? 0;
 
   return (
     <AnimatePresence mode="wait">
@@ -99,6 +98,7 @@ export function ChatRoomPage({ decodedUsernamePromise }: ChatRoomPageProps) {
             main: <ChatRoomMainScreen
               roomId={roomId as string}
               title={title}
+              roomType={roomType}
               memberCount={memberCount}
               myUsername={myUsername}
               readSign={readSign}
