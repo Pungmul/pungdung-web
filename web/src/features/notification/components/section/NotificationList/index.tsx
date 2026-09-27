@@ -13,7 +13,7 @@ export function NotificationList() {
       <Suspense
         clientOnly
         fallback={
-          <div className="flex h-full items-center justify-center">
+          <div className="flex h-full items-center justify-center bg-grey-100">
             <Spinner size={32} />
           </div>
         }

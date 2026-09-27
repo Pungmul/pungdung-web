@@ -26,9 +26,11 @@ export default async function NotificationPage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col bg-grey-100">
       <Header title="알림" />
-      <NotificationList />
+      <div className="min-h-0 flex-1">
+        <NotificationList />
+      </div>
     </div>
   );
 }
