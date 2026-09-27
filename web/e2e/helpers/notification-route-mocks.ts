@@ -3,8 +3,8 @@ import type { Page } from "@playwright/test";
 import { mockAppShellHttp } from "./route-mocks";
 import { failEnvelope, okEnvelope } from "../fixtures/envelope";
 import {
-  emptyUnreadNotificationListResponse,
-  unreadNotificationListResponse,
+  emptyNotificationListResponse,
+  notificationListResponse,
 } from "../fixtures/notification/responses";
 
 export type NotificationRouteMockOptions = {
@@ -18,20 +18,18 @@ export async function mockNotificationHttp(
   page: Page,
   options: NotificationRouteMockOptions = {}
 ): Promise<void> {
-  let listEmpty = Boolean(options.emptyList);
+  const listEmpty = Boolean(options.emptyList);
 
   if (!options.skipAppShell) {
     await mockAppShellHttp(page);
   }
 
-  await page.route("**/api/notification/notReadMessage", async (route) => {
+  await page.route("**/api/notification/messages", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify(
-        listEmpty
-          ? emptyUnreadNotificationListResponse
-          : unreadNotificationListResponse
+        listEmpty ? emptyNotificationListResponse : notificationListResponse
       ),
     });
   });
@@ -42,16 +40,11 @@ export async function mockNotificationHttp(
       body: JSON.stringify(okEnvelope(listEmpty ? 0 : 1)),
     });
   });
-  await page.route("**/api/notification/*/read", async (route) => {
-    listEmpty = true;
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(okEnvelope(null)),
-    });
-  });
-  await page.route("**/api/notification/read-all", async (route) => {
-    listEmpty = true;
+  await page.route("**/api/notification/read", async (route) => {
+    if (route.request().method() !== "PATCH") {
+      await route.fallback();
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",

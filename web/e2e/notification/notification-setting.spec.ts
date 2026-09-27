@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { E2E_NOTIFICATION_TITLE } from "../fixtures/notification/responses";
 import { mockNotificationHttp } from "../helpers/notification-route-mocks";
 
 test("NOTI-005 | 알림 권한을 거부해도 목록 화면은 유지된다", async ({
@@ -17,7 +18,9 @@ test("NOTI-005 | 알림 권한을 거부해도 목록 화면은 유지된다", a
   );
 
   await page.goto("/notification");
-  await expect(page.getByText("읽지 않은 알림", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(E2E_NOTIFICATION_TITLE, { exact: true })
+  ).toBeVisible();
 });
 
 test("NOTI-006 | 토큰 등록 실패 화면은 FCM 토큰 발급에 의존한다", async () => {
