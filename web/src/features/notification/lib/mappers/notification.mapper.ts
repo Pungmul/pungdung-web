@@ -1,13 +1,13 @@
-import type { UnreadNotificationItemDto } from "../../api/client/dto.schema";
-import type { UnreadNotificationData } from "../../types";
+import type { NotificationItemDto } from "../../api/client/dto.schema";
+import type { NotificationListItem } from "../../types";
 import { resolveNotificationHref } from "../resolve-notification-href";
 
 function firstFilled(
-  ...values: Array<string | number | null | undefined>
-): string | number | null {
+  ...values: Array<string | null | undefined>
+): string | null {
   for (const value of values) {
     if (value == null) continue;
-    if (typeof value === "string" && value.trim() === "") continue;
+    if (value.trim() === "") continue;
     return value;
   }
 
@@ -32,19 +32,21 @@ function resolveReceivedAt(
   return INVALID_RECEIVED_AT_FALLBACK;
 }
 
-export function toNotificationData(
-  dto: UnreadNotificationItemDto
-): UnreadNotificationData {
+export function toNotificationData(dto: NotificationItemDto): NotificationListItem {
+  const linkType = firstFilled(dto.type, dto.data?.type, dto.domainType);
+
   return {
     logId: dto.id,
     title: dto.title,
     body: dto.body ?? "",
     receivedAt: resolveReceivedAt(dto.sentAt, dto.data?.sentAt),
+    isRead: dto.isRead,
+    linkType,
     // type, relatedId는 각자 항목 값 우선, 비어 있으면 data 값
     href: resolveNotificationHref({
       type: firstFilled(dto.type, dto.data?.type),
       relatedId: firstFilled(dto.relatedId, dto.data?.relatedId),
-      chatRoomUUID: dto.data?.chatRoomUUID,
+      chatRoomUUID: dto.data?.chatRoomUUID ?? null,
     }),
   };
 }

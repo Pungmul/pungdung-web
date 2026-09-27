@@ -1,21 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import type { UnreadNotificationItemDto } from "../../api/client/dto.schema";
+import type { NotificationItemDto } from "../../api/client/dto.schema";
 import { toNotificationData } from ".";
 
 function baseDto(
-  overrides: Partial<UnreadNotificationItemDto> = {}
-): UnreadNotificationItemDto {
+  overrides: Partial<NotificationItemDto> = {}
+): NotificationItemDto {
   return {
     id: 42,
-    receiverId: 1,
-    token: "t",
     title: "Hello",
     body: "World",
     data: null,
     isRead: false,
     sentAt: "2024-01-02T03:04:05.000Z",
-    status: "ok",
     domainType: "chat",
     ...overrides,
   };
@@ -31,6 +28,8 @@ describe("toNotificationData", () => {
     expect(result.title).toBe("Hello");
     expect(result.body).toBe("");
     expect(result.href).toBeNull();
+    expect(result.isRead).toBe(false);
+    expect(result.linkType).toBe("chat");
     expect(result.receivedAt.toISOString()).toBe("2024-01-02T03:04:05.000Z");
   });
 
@@ -51,7 +50,7 @@ describe("toNotificationData", () => {
       ...baseDto(),
       sentAt: undefined,
       data: { sentAt: "2024-05-10T12:00:00.000Z" },
-    } as unknown as UnreadNotificationItemDto;
+    } as unknown as NotificationItemDto;
 
     const result = toNotificationData(dto);
 

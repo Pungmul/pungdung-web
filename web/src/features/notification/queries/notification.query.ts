@@ -1,13 +1,10 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 
+import { acknowledgeNotificationList } from "../api/client/acknowledge-notification-list.api";
 import {
+  fetchNotifications,
   fetchUnreadNotificationCount,
-  fetchUnreadNotifications,
-} from "../api/client/fetch-unread-notifications.api";
-import {
-  markAllNotificationsAsRead,
-  markNotificationAsRead,
-} from "../api/client/read-notification.api";
+} from "../api/client/fetch-notifications.api";
 
 export const notificationQueries = {
   unreadCount: () =>
@@ -16,25 +13,22 @@ export const notificationQueries = {
       queryFn: fetchUnreadNotificationCount,
       refetchOnMount: "always",
     }),
-  unreadList: () =>
+  list: () =>
     queryOptions({
       queryKey: ["notificationList"],
-      queryFn: fetchUnreadNotifications,
+      queryFn: fetchNotifications,
       refetchOnMount: "always",
+      refetchOnWindowFocus: false,
+      gcTime: 0,
     }),
 };
 
 const notificationMutationRoot = ["notification", "mutation"] as const;
 
 export const notificationMutationOptions = {
-  markOneAsRead: () =>
+  acknowledgeList: () =>
     mutationOptions({
-      mutationKey: [...notificationMutationRoot, "markOneAsRead"] as const,
-      mutationFn: markNotificationAsRead,
-    }),
-  markAllAsRead: () =>
-    mutationOptions({
-      mutationKey: [...notificationMutationRoot, "markAllAsRead"] as const,
-      mutationFn: markAllNotificationsAsRead,
+      mutationKey: [...notificationMutationRoot, "acknowledgeList"] as const,
+      mutationFn: acknowledgeNotificationList,
     }),
 };

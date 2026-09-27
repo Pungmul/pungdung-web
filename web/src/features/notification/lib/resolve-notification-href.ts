@@ -6,13 +6,13 @@ export const NOTIFICATION_LINK_TYPE = {
 
 export type NotificationLinkInput = {
   type?: string | null;
-  relatedId?: string | number | null;
+  relatedId?: string | null;
   chatRoomUUID?: string | null;
 };
 
-function readText(value: string | number | null | undefined): string | null {
+function readText(value: string | null | undefined): string | null {
   if (value == null) return null;
-  const text = String(value).trim();
+  const text = value.trim();
   return text.length > 0 ? text : null;
 }
 
@@ -43,8 +43,7 @@ export function resolveNotificationHref(
       return `/chats/r/${encodeURIComponent(chatRoomUUID)}`;
     }
 
-    const meetingId = readPositiveIntId(relatedId);
-    return meetingId == null ? null : `/lightning/${meetingId}`;
+    return "/lightning";
   }
 
   return null;

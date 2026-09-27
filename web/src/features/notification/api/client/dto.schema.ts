@@ -2,11 +2,11 @@ import { z } from "zod";
 
 export const unreadNotificationCountDtoSchema = z.number();
 
-const notificationRelatedIdSchema = z.union([z.string(), z.number()]);
+const notificationRelatedIdSchema = z.string();
 
-// FCM unread 로그 data 필드 JSON 파싱 결과
-// GET /api/message/fcm/unread, 프록시 /api/notification/notReadMessage
-export const fcmUnreadNotificationDataSchema = z.looseObject({
+// FCM 알림 data 필드 JSON 파싱 결과
+// GET /api/message/fcm/messages, 프록시 /api/notification/messages
+export const fcmNotificationDataSchema = z.looseObject({
   sentAt: z.string().optional(),
   unreadCount: z.string().optional(),
   chatRoomUUID: z.string().optional(),
@@ -14,11 +14,11 @@ export const fcmUnreadNotificationDataSchema = z.looseObject({
   relatedId: notificationRelatedIdSchema.nullish(),
 });
 
-export type FcmUnreadNotificationDataDto = z.infer<
-  typeof fcmUnreadNotificationDataSchema
+export type FcmNotificationDataDto = z.infer<
+  typeof fcmNotificationDataSchema
 >;
 
-function parseUnreadNotificationDataField(raw: unknown): unknown {
+function parseNotificationDataField(raw: unknown): unknown {
   if (raw == null) return null;
 
   let candidate: unknown = raw;
@@ -37,37 +37,32 @@ function parseUnreadNotificationDataField(raw: unknown): unknown {
     return null;
   }
 
-  const parsed = fcmUnreadNotificationDataSchema.safeParse(candidate);
+  const parsed = fcmNotificationDataSchema.safeParse(candidate);
   return parsed.success ? parsed.data : null;
 }
 
-/** 단일 FCM 미읽음 알림 로그 (업스트림 row). */
-export const unreadNotificationItemDtoSchema = z.looseObject({
+// 최근 10일 알림 1건
+// isRead는 목록 확인(PATCH /read) 이전 도착 여부
+export const notificationItemDtoSchema = z.looseObject({
   id: z.coerce.number(),
-  receiverId: z.coerce.number(),
-  token: z.string(),
   title: z.string(),
   body: z.string().nullable().optional(),
-  data: z.preprocess(
-    parseUnreadNotificationDataField,
-    fcmUnreadNotificationDataSchema.nullable()
-  ),
-  isRead: z.boolean(),
-  sentAt: z.string(),
-  status: z.string(),
-  response: z.unknown().nullable().optional(),
-  domainType: z.string(),
   type: z.string().nullish(),
   relatedId: notificationRelatedIdSchema.nullish(),
+  isRead: z.boolean(),
+  sentAt: z.string(),
+  domainType: z.string(),
+  data: z
+    .preprocess(
+      parseNotificationDataField,
+      fcmNotificationDataSchema.nullable()
+    )
+    .nullish(),
 });
 
-export const unreadNotificationListDtoSchema = z.array(
-  unreadNotificationItemDtoSchema
-);
+export const notificationListDtoSchema = z.array(notificationItemDtoSchema);
 
-export type UnreadNotificationItemDto = z.infer<
-  typeof unreadNotificationItemDtoSchema
->;
+export type NotificationItemDto = z.infer<typeof notificationItemDtoSchema>;
 
 export const notificationMutationVoidResponseSchema = z
   .unknown()

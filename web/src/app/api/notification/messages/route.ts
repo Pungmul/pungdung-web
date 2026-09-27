@@ -6,14 +6,10 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function PATCH() {
+export async function GET() {
   try {
-    const proxyUrl = `${process.env.BASE_URL}/api/message/fcm/read-all`;
-
-    const proxyResponse = await fetchWithRefresh(proxyUrl, {
-      method: "PATCH",
-    });
-
+    const proxyUrl = `${process.env.BASE_URL}/api/message/fcm/messages`;
+    const proxyResponse = await fetchWithRefresh(proxyUrl);
     return createValidatedUpstreamResponse(proxyResponse);
   } catch (error) {
     console.error("프록시 처리 중 에러:", error);

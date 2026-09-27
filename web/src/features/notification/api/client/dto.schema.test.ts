@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { unreadNotificationItemDtoSchema } from "./dto.schema";
+import { notificationItemDtoSchema } from "./dto.schema";
 
-describe("unreadNotificationItemDtoSchema", () => {
+describe("notificationItemDtoSchema", () => {
   it("id가 문자열이면 숫자로 변환하고 data JSON 문자열을 객체로 파싱해야 한다", () => {
     const raw = {
       id: "7",
@@ -17,7 +17,7 @@ describe("unreadNotificationItemDtoSchema", () => {
       domainType: "d",
     };
 
-    const parsed = unreadNotificationItemDtoSchema.safeParse(raw);
+    const parsed = notificationItemDtoSchema.safeParse(raw);
 
     expect(parsed.success).toBe(true);
     if (!parsed.success) return;
@@ -41,7 +41,7 @@ describe("unreadNotificationItemDtoSchema", () => {
       data: "{not-json",
     };
 
-    const parsed = unreadNotificationItemDtoSchema.safeParse(raw);
+    const parsed = notificationItemDtoSchema.safeParse(raw);
 
     expect(parsed.success).toBe(true);
     if (!parsed.success) return;
@@ -61,7 +61,7 @@ describe("unreadNotificationItemDtoSchema", () => {
       data: "   ",
     };
 
-    const parsed = unreadNotificationItemDtoSchema.safeParse(raw);
+    const parsed = notificationItemDtoSchema.safeParse(raw);
 
     expect(parsed.success).toBe(true);
     if (!parsed.success) return;
@@ -83,7 +83,7 @@ describe("unreadNotificationItemDtoSchema", () => {
       data: '{"type":"LIGHTNING_MEETING","relatedId":"12","chatRoomUUID":"room-12"}',
     };
 
-    const parsed = unreadNotificationItemDtoSchema.safeParse(raw);
+    const parsed = notificationItemDtoSchema.safeParse(raw);
 
     expect(parsed.success).toBe(true);
     if (!parsed.success) return;
@@ -94,5 +94,25 @@ describe("unreadNotificationItemDtoSchema", () => {
       relatedId: "12",
       chatRoomUUID: "room-12",
     });
+  });
+
+  it("messages 응답처럼 data 없이 최상위 필드만 있어도 통과해야 한다", () => {
+    const parsed = notificationItemDtoSchema.safeParse({
+      id: 123,
+      title: "새 댓글",
+      body: "댓글 내용",
+      type: "POST",
+      relatedId: "45",
+      isRead: false,
+      sentAt: "2026-09-28T14:03:21",
+      domainType: "POST",
+    });
+
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.id).toBe(123);
+    expect(parsed.data.isRead).toBe(false);
+    expect(parsed.data.type).toBe("POST");
+    expect(parsed.data.relatedId).toBe("45");
   });
 });

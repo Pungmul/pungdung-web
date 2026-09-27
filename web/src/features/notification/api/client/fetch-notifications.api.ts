@@ -1,9 +1,11 @@
+import { clientApiRequest, withResponseMapper } from "@/core/api/client";
+
 import {
+  notificationListDtoSchema,
   unreadNotificationCountDtoSchema,
-  unreadNotificationListDtoSchema,
 } from "./dto.schema";
 import { toNotificationData } from "../../lib/mappers";
-import type { UnreadNotificationData } from "../../types";
+import type { NotificationListItem } from "../../types";
 
 export async function fetchUnreadNotificationCount(): Promise<number> {
   try {
@@ -25,23 +27,15 @@ export async function fetchUnreadNotificationCount(): Promise<number> {
   }
 }
 
-export async function fetchUnreadNotifications(): Promise<UnreadNotificationData[]> {
-  try {
-    const proxyResponse = await fetch("/api/notification/notReadMessage", {
-      credentials: "include",
-    });
-
-    if (!proxyResponse.ok) {
-      throw Error("서버 불안정" + proxyResponse.status);
-    }
-
-    const data = (await proxyResponse.json()) as { response?: unknown };
-    const messagesDto = data?.response;
-    return unreadNotificationListDtoSchema
-      .parse(messagesDto)
-      .map(toNotificationData);
-  } catch (error) {
-    console.error("프록시 처리 중 에러:", error);
-    throw error;
-  }
+export function fetchNotifications(): Promise<NotificationListItem[]> {
+  return withResponseMapper({
+    context: "GET /api/notification/messages",
+    fetchDto: () =>
+      clientApiRequest({
+        url: "/api/notification/messages",
+        method: "GET",
+        responseSchema: notificationListDtoSchema,
+      }),
+    map: (items) => items.map(toNotificationData),
+  });
 }

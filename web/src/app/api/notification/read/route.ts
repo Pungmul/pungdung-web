@@ -6,13 +6,9 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function PATCH(
-  _req: Request,
-  { params }: { params: Promise<{ logId: string }> }
-) {
+export async function PATCH() {
   try {
-    const { logId } = await params;
-    const proxyUrl = `${process.env.BASE_URL}/api/message/fcm/${logId}/read`;
+    const proxyUrl = `${process.env.BASE_URL}/api/message/fcm/read`;
 
     const proxyResponse = await fetchWithRefresh(proxyUrl, {
       method: "PATCH",

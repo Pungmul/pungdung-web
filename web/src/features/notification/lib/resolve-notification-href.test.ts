@@ -30,7 +30,7 @@ describe("resolveNotificationHref", () => {
       resolveNotificationHref({ type: "POST", relatedId: "10" })
     ).toBe("/board/d/10");
     expect(
-      resolveNotificationHref({ type: " POST ", relatedId: 10 })
+      resolveNotificationHref({ type: " POST ", relatedId: "10" })
     ).toBe("/board/d/10");
   });
 
@@ -62,23 +62,23 @@ describe("resolveNotificationHref", () => {
     ).toBe("/chats/r/room%2F1");
   });
 
-  it("모임 id만 있으면 번개 상세 경로를 반환해야 한다", () => {
+  it("채팅방 UUID가 공백이면 번개 페이지 경로를 반환해야 한다", () => {
     expect(
       resolveNotificationHref({
         type: "LIGHTNING_MEETING",
         relatedId: "12",
         chatRoomUUID: "   ",
       })
-    ).toBe("/lightning/12");
+    ).toBe("/lightning");
   });
 
-  it("모임 id가 숫자가 아니면 null을 반환해야 한다", () => {
+  it("채팅방 UUID가 없으면 번개 페이지 경로를 반환해야 한다", () => {
     expect(
       resolveNotificationHref({
         type: "LIGHTNING_MEETING",
-        relatedId: "meet-1",
+        relatedId: "12",
       })
-    ).toBeNull();
+    ).toBe("/lightning");
   });
 
   it("알 수 없는 type이면 null을 반환해야 한다", () => {
