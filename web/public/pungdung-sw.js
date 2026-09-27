@@ -3,6 +3,9 @@
  * API 키는 importScripts 순서 마지막의 `pungdung-fcm-background.js` 에서 주입된다.
  */
 
+importScripts("/service-worker/window-navigation.js");
+importScripts("/service-worker/notification-navigation.js");
+
 importScripts(
   "https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"
 );

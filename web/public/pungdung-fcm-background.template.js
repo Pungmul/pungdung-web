@@ -15,7 +15,7 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log("백그라운드 메시지 수신: ", payload);
 
-  if (payload.notification?.title && payload.notification?.body) {
+  if (payload.notification) {
     return;
   }
 
@@ -23,9 +23,10 @@ messaging.onBackgroundMessage((payload) => {
   const body = payload.data?.body;
   if (!title || !body) return;
 
-  self.registration.showNotification(title, {
+  return self.registration.showNotification(title, {
     body,
     icon: "/logos/pungdeong_logo_192.png",
     badge: "/logos/pungdeong_logo_192.png",
+    data: { pungdungFCM: payload.data },
   });
 });

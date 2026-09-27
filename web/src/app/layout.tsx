@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 
 import { createWebColorStyleText } from "@pungdung/design-tokens";
 
+import { ServiceWorkerNavigation } from "@/core/service-worker/ServiceWorkerNavigation";
+
 import {
   AlertModal,
   AppServiceWorkerRegistration,
@@ -69,7 +71,10 @@ export default async function Layout({
           <ViewDetector />
           {/* children은 페이지 컴포넌트 */}
           {/* 페이지 컴포넌트가 서버 컴포넌트라도 오류 없이 렌더링 됨 */}
-          <NavigationGuardRoot>{children}</NavigationGuardRoot>
+          <NavigationGuardRoot>
+            <ServiceWorkerNavigation />
+            {children}
+          </NavigationGuardRoot>
         </ViewStoreProvider>
       </body>
     </html>
