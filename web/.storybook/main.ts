@@ -5,6 +5,7 @@ const config: StorybookConfig = {
     "../src/shared/components/**/*.stories.@(ts|tsx)",
     "../src/features/promotion/**/*.stories.@(ts|tsx)",
     "../src/features/chat/**/*.stories.@(ts|tsx)",
+    "../src/features/notification/**/*.stories.@(ts|tsx)",
   ],
   addons: ["@storybook/addon-a11y", "@storybook/addon-docs"],
   framework: "@storybook/nextjs-vite",
