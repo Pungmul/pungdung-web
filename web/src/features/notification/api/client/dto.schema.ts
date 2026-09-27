@@ -2,14 +2,16 @@ import { z } from "zod";
 
 export const unreadNotificationCountDtoSchema = z.number();
 
-/**
- * FCM unread 로그의 `data` 필드(JSON 문자열)를 파싱한 페이로드.
- * @see GET `/api/message/fcm/unread` (프록시: `/api/notification/notReadMessage`)
- */
+const notificationRelatedIdSchema = z.union([z.string(), z.number()]);
+
+// FCM unread 로그 data 필드 JSON 파싱 결과
+// GET /api/message/fcm/unread, 프록시 /api/notification/notReadMessage
 export const fcmUnreadNotificationDataSchema = z.looseObject({
   sentAt: z.string().optional(),
   unreadCount: z.string().optional(),
   chatRoomUUID: z.string().optional(),
+  type: z.string().nullish(),
+  relatedId: notificationRelatedIdSchema.nullish(),
 });
 
 export type FcmUnreadNotificationDataDto = z.infer<
@@ -55,6 +57,8 @@ export const unreadNotificationItemDtoSchema = z.looseObject({
   status: z.string(),
   response: z.unknown().nullable().optional(),
   domainType: z.string(),
+  type: z.string().nullish(),
+  relatedId: notificationRelatedIdSchema.nullish(),
 });
 
 export const unreadNotificationListDtoSchema = z.array(

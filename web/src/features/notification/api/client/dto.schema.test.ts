@@ -67,4 +67,32 @@ describe("unreadNotificationItemDtoSchema", () => {
     if (!parsed.success) return;
     expect(parsed.data.data).toBeNull();
   });
+
+  it("항목과 data의 type, relatedId를 유지해야 한다", () => {
+    const raw = {
+      id: 3,
+      receiverId: 1,
+      token: "tok",
+      title: "모임 성사",
+      isRead: false,
+      sentAt: "2024-01-01T00:00:00.000Z",
+      status: "s",
+      domainType: "d",
+      type: "LIGHTNING_MEETING",
+      relatedId: "12",
+      data: '{"type":"LIGHTNING_MEETING","relatedId":"12","chatRoomUUID":"room-12"}',
+    };
+
+    const parsed = unreadNotificationItemDtoSchema.safeParse(raw);
+
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.type).toBe("LIGHTNING_MEETING");
+    expect(parsed.data.relatedId).toBe("12");
+    expect(parsed.data.data).toEqual({
+      type: "LIGHTNING_MEETING",
+      relatedId: "12",
+      chatRoomUUID: "room-12",
+    });
+  });
 });

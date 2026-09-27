@@ -30,6 +30,7 @@ describe("toNotificationData", () => {
     expect(result.logId).toBe(42);
     expect(result.title).toBe("Hello");
     expect(result.body).toBe("");
+    expect(result.href).toBeNull();
     expect(result.receivedAt.toISOString()).toBe("2024-01-02T03:04:05.000Z");
   });
 
@@ -66,5 +67,42 @@ describe("toNotificationData", () => {
     const result = toNotificationData(dto);
 
     expect(result.receivedAt.getTime()).toBe(0);
+  });
+
+  it("항목 값이 없으면 data의 type, relatedId, chatRoomUUID를 써야 한다", () => {
+    const result = toNotificationData(
+      baseDto({
+        data: {
+          type: "LIGHTNING_MEETING",
+          relatedId: "9",
+          chatRoomUUID: "room-9",
+        },
+      })
+    );
+
+    expect(result.href).toBe("/chats/r/room-9");
+  });
+
+  it("항목 type과 data.relatedId를 각각 조합해야 한다", () => {
+    const result = toNotificationData(
+      baseDto({
+        type: "POST",
+        data: { relatedId: "8" },
+      })
+    );
+
+    expect(result.href).toBe("/board/d/8");
+  });
+
+  it("항목 relatedId가 공백이면 data.relatedId를 써야 한다", () => {
+    const result = toNotificationData(
+      baseDto({
+        type: "PERFORMANCE",
+        relatedId: "  ",
+        data: { relatedId: "pk-1" },
+      })
+    );
+
+    expect(result.href).toBe("/board/promote/d/pk-1");
   });
 });
