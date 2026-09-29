@@ -10,6 +10,15 @@ const inactiveMinimumZ = "z-[5]";
 const inactiveMaximumZ = "z-[6]";
 const activeThumbZ = "z-10";
 
+function toRangePercent(value: number, min: number, rangeSize: number) {
+  if (rangeSize === 0) {
+    return 0;
+  }
+
+  const percent = ((value - min) / rangeSize) * 100;
+  return Math.min(100, Math.max(0, percent));
+}
+
 interface RangeSliderProps {
   label?: string;
   minimumName: string;
@@ -47,13 +56,16 @@ export function RangeSlider({
   );
 
   const rangeSize = max - min;
-  const minPercentage = rangeSize === 0 ? 0 : ((minValue - min) / rangeSize) * 100;
-  const maxPercentage = rangeSize === 0 ? 100 : ((maxValue - min) / rangeSize) * 100;
+  const minimumPercent = toRangePercent(minValue, min, rangeSize);
+  const maximumPercent =
+    rangeSize === 0 ? 100 : toRangePercent(maxValue, min, rangeSize);
+  const fillStart = Math.min(minimumPercent, maximumPercent);
+  const fillEnd = Math.max(minimumPercent, maximumPercent);
   const hasLabel = Boolean(label);
   const hasError = Boolean(errorMessage);
   const describedBy = hasError ? errorId : undefined;
-  const minThumbMax = Math.max(min, maxValue - step);
-  const maxThumbMin = Math.min(max, minValue + step);
+  const minimumUpperBound = Math.max(min, maxValue - step);
+  const maximumLowerBound = Math.min(max, minValue + step);
 
   return (
     <div
@@ -79,22 +91,22 @@ export function RangeSlider({
           aria-hidden
           className="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-primary"
           style={{
-            left: `${minPercentage}%`,
-            right: `${100 - maxPercentage}%`,
+            left: `${fillStart}%`,
+            width: `${fillEnd - fillStart}%`,
           }}
         />
         <RangeThumbInput
           accessibleName={minimumName}
           value={minValue}
           min={min}
-          max={minThumbMax}
+          max={max}
           step={step}
           disabled={disabled}
           isInvalid={hasError}
           className={activeThumb === "minimum" ? activeThumbZ : inactiveMinimumZ}
           {...(describedBy ? { describedBy } : {})}
           onChange={(nextMinimum) => {
-            onChange(nextMinimum, maxValue);
+            onChange(Math.min(nextMinimum, minimumUpperBound), maxValue);
           }}
           onFocus={() => {
             setActiveThumb("minimum");
@@ -103,7 +115,7 @@ export function RangeSlider({
         <RangeThumbInput
           accessibleName={maximumName}
           value={maxValue}
-          min={maxThumbMin}
+          min={min}
           max={max}
           step={step}
           disabled={disabled}
@@ -111,7 +123,7 @@ export function RangeSlider({
           className={activeThumb === "maximum" ? activeThumbZ : inactiveMaximumZ}
           {...(describedBy ? { describedBy } : {})}
           onChange={(nextMaximum) => {
-            onChange(minValue, nextMaximum);
+            onChange(minValue, Math.max(nextMaximum, maximumLowerBound));
           }}
           onFocus={() => {
             setActiveThumb("maximum");
