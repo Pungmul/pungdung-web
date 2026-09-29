@@ -49,7 +49,7 @@ export default async function Home() {
           <section className="flex flex-col gap-[12px] pb-[16px]">
             <NearLightningContent
               header={
-                <div className="relative z-30 flex flex-row items-center justify-between gap-2 overflow-visible px-[24px]">
+                <div className="relative flex flex-row items-center justify-between gap-2 overflow-visible px-[24px]">
                   <NearbyLightningHeading as="h2" className="min-w-0 text-h2" />
                   <HomeNearLightningAllowCta />
                 </div>
