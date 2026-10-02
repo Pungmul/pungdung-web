@@ -38,11 +38,12 @@ export async function loadNearLightning(): Promise<NearLightningType[]> {
     const userLocation = await fetchUserLocation();
     const store = locationStore.getState();
 
-    if (store.locationSource == null) {
+    if (store.locationSource !== "gps") {
       const member = await getMyPageInfo().catch(() => null);
       const clubList = await clubListApi().catch(() => []);
       await hydrateResolvedLocation(
-        resolveSchoolNameFromGroupName(member?.groupName, clubList)
+        resolveSchoolNameFromGroupName(member?.groupName, clubList),
+        isFiniteLatLng(userLocation) ? userLocation : null
       );
     }
 

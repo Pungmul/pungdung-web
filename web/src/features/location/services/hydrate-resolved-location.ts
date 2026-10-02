@@ -1,26 +1,21 @@
+import { hasGrantedGeolocationPermission, isFiniteLatLng } from "../lib";
+
 import { resolveFallbackLocation } from "./resolve-fallback-location";
 import { locationStore } from "../store/locationStore";
+import type { LocationType } from "../types";
 
-async function hasGrantedGeolocationPermission(): Promise<boolean> {
-  if (typeof navigator === "undefined" || !navigator.permissions?.query) {
-    return false;
-  }
-
-  try {
-    const status = await navigator.permissions.query({ name: "geolocation" });
-    return status.state === "granted";
-  } catch {
-    return false;
-  }
+function hasResolvedLocation() {
+  const { currentLocation, locationSource } = locationStore.getState();
+  return locationSource != null || currentLocation != null;
 }
 
 async function applyFallbackIfUnresolved(schoolKeyword: string | null) {
-  if (locationStore.getState().locationSource != null) {
+  if (hasResolvedLocation()) {
     return;
   }
 
   const resolved = await resolveFallbackLocation(schoolKeyword);
-  if (locationStore.getState().locationSource != null) {
+  if (hasResolvedLocation()) {
     return;
   }
 
@@ -31,8 +26,27 @@ async function applyFallbackIfUnresolved(schoolKeyword: string | null) {
 
 let hydrateInFlight: Promise<void> | null = null;
 
-async function hydrateResolvedLocationOnce(schoolKeyword: string | null) {
-  if (locationStore.getState().locationSource != null) {
+function keepResolvedOrServerLocation(serverLocation: LocationType | null) {
+  if (hasResolvedLocation()) {
+    return;
+  }
+
+  if (!isFiniteLatLng(serverLocation)) {
+    return;
+  }
+
+  locationStore.getState().setLocationView({
+    currentLocation: serverLocation,
+    locationSource: null,
+    locationLabel: null,
+  });
+}
+
+async function hydrateResolvedLocationOnce(
+  schoolKeyword: string | null,
+  serverLocation: LocationType | null
+) {
+  if (locationStore.getState().locationSource === "gps") {
     return;
   }
 
@@ -41,15 +55,19 @@ async function hydrateResolvedLocationOnce(schoolKeyword: string | null) {
       await locationStore.getState().requestGpsPosition();
       return;
     } catch {
-      // GPS 실패 시 학교/서울역
+      // GPS 실패 시 서버 좌표, 없으면 학교/서울역
     }
   }
 
+  keepResolvedOrServerLocation(serverLocation);
   await applyFallbackIfUnresolved(schoolKeyword);
 }
 
-export async function hydrateResolvedLocation(schoolKeyword: string | null) {
-  if (locationStore.getState().locationSource != null) {
+export async function hydrateResolvedLocation(
+  schoolKeyword: string | null,
+  serverLocation: LocationType | null = null
+) {
+  if (locationStore.getState().locationSource === "gps") {
     return;
   }
 
@@ -60,7 +78,10 @@ export async function hydrateResolvedLocation(schoolKeyword: string | null) {
     }
   }
 
-  hydrateInFlight = hydrateResolvedLocationOnce(schoolKeyword).finally(() => {
+  hydrateInFlight = hydrateResolvedLocationOnce(
+    schoolKeyword,
+    serverLocation
+  ).finally(() => {
     hydrateInFlight = null;
   });
   await hydrateInFlight;

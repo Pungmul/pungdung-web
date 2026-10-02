@@ -2,7 +2,11 @@ import { create } from "zustand";
 
 import { throttle } from "lodash";
 
+import { hasGrantedGeolocationPermission } from "../lib";
+
 import type { LocationSource, LocationType } from "../types";
+
+let gpsRequest: Promise<LocationType> | null = null;
 
 export type LocationView = {
   currentLocation: LocationType | null;
@@ -91,17 +95,25 @@ export const locationStore = create<LocationState>((set, get) => ({
     set({ error });
   },
 
-  requestGpsPosition: async () => {
-    try {
-      const newLocation = await requestBrowserGpsPosition();
-      get().setResolvedLocation(newLocation, "gps", null);
-      return newLocation;
-    } catch (error) {
-      if (error && typeof error === "object" && "code" in error) {
-        get().setError(error as GeolocationPositionError);
-      }
-      throw error;
+  requestGpsPosition: () => {
+    if (!gpsRequest) {
+      gpsRequest = requestBrowserGpsPosition()
+        .then((newLocation) => {
+          get().setResolvedLocation(newLocation, "gps", null);
+          return newLocation;
+        })
+        .catch((error: unknown) => {
+          if (error && typeof error === "object" && "code" in error) {
+            get().setError(error as GeolocationPositionError);
+          }
+          throw error;
+        })
+        .finally(() => {
+          gpsRequest = null;
+        });
     }
+
+    return gpsRequest;
   },
 
   getCurrentPosition: async () => {
@@ -110,40 +122,50 @@ export const locationStore = create<LocationState>((set, get) => ({
       return currentLocation;
     }
 
+    if (!(await hasGrantedGeolocationPermission())) {
+      return null;
+    }
+
     return get().requestGpsPosition();
   },
 
   startWatching: () => {
     const { geolocation } = navigator;
-    if (!geolocation) {
+    if (!geolocation || get().isWatching) {
       return;
     }
 
-    const { isWatching } = get();
-    if (isWatching) {
-      return;
-    }
+    void (async () => {
+      if (!(await hasGrantedGeolocationPermission()) || get().isWatching) {
+        return;
+      }
 
-    const throttledSetLocation = throttle((position: GeolocationPosition) => {
-      get().setResolvedLocation(
-        {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+      const { geolocation: geolocationApi } = navigator;
+      if (!geolocationApi || get().isWatching) {
+        return;
+      }
+
+      const throttledSetLocation = throttle((position: GeolocationPosition) => {
+        get().setResolvedLocation(
+          {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          },
+          "gps",
+          null
+        );
+      }, 1000 * 10);
+
+      const watchId = geolocationApi.watchPosition(
+        throttledSetLocation,
+        (error) => {
+          get().setError(error);
         },
-        "gps",
-        null
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       );
-    }, 1000 * 10);
 
-    const watchId = geolocation.watchPosition(
-      throttledSetLocation,
-      (error) => {
-        get().setError(error);
-      },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-    );
-
-    set({ isWatching: true, watchId, error: null });
+      set({ isWatching: true, watchId, error: null });
+    })();
   },
 
   stopWatching: () => {

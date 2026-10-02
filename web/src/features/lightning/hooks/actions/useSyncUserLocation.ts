@@ -20,9 +20,8 @@ export const useSyncUserLocation = () => {
   const currentLocation = locationStore((state) => state.currentLocation);
   const myInfoQuery = useQuery(myPageQueries.info());
   const clubListQuery = useQuery(clubQueries.list());
-  const { data: serverUserLocation } = useQuery(
-    lightningQueries.userLocation()
-  );
+  const { data: serverUserLocation, isFetched: serverLocationFetched } =
+    useQuery(lightningQueries.userLocation());
   const fallbackReady = myInfoQuery.isFetched && clubListQuery.isFetched;
   const schoolKeyword = resolveSchoolNameFromGroupName(
     myInfoQuery.data?.groupName,
@@ -30,12 +29,20 @@ export const useSyncUserLocation = () => {
   );
 
   useEffect(() => {
-    if (!fallbackReady) {
+    if (!fallbackReady || !serverLocationFetched) {
       return;
     }
 
-    void hydrateResolvedLocation(schoolKeyword);
-  }, [fallbackReady, schoolKeyword]);
+    void hydrateResolvedLocation(
+      schoolKeyword,
+      isFiniteLatLng(serverUserLocation) ? serverUserLocation : null
+    );
+  }, [
+    fallbackReady,
+    schoolKeyword,
+    serverLocationFetched,
+    serverUserLocation,
+  ]);
 
   useEffect(() => {
     if (!currentLocation) {
