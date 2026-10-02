@@ -51,7 +51,7 @@ export const BoardListItem = memo(function BoardListItem({
         )}
       </button>
       <div
-        className="flex-grow"
+        className="flex min-w-0 flex-1"
         onClickCapture={(event) => {
           if (!isGuest || isPublic) return;
 
@@ -75,7 +75,7 @@ export const BoardListItem = memo(function BoardListItem({
       >
         <WebViewLink
           href={getBoardRoute(board.id)}
-          className="text-[15px] leading-7 text-grey-600"
+          className="min-w-0 flex-1 text-[15px] leading-7 text-grey-600"
           prefetch
         >
           {board.name}
