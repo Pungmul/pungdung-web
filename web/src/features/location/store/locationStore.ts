@@ -7,6 +7,11 @@ import { hasGrantedGeolocationPermission } from "../lib";
 import type { LocationSource, LocationType } from "../types";
 
 let gpsRequest: Promise<LocationType> | null = null;
+let gpsResolvedAt = 0;
+
+export function hasRecentGpsPosition() {
+  return locationStore.getState().locationSource === "gps" && Date.now() - gpsResolvedAt < 5000;
+}
 
 export type LocationView = {
   currentLocation: LocationType | null;
@@ -99,6 +104,7 @@ export const locationStore = create<LocationState>((set, get) => ({
     if (!gpsRequest) {
       gpsRequest = requestBrowserGpsPosition()
         .then((newLocation) => {
+          gpsResolvedAt = Date.now();
           get().setResolvedLocation(newLocation, "gps", null);
           return newLocation;
         })

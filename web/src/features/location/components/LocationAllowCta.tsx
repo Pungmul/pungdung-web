@@ -1,13 +1,9 @@
 "use client";
 
-import { useState } from "react";
-
-import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
-import { updateUserLocation } from "../api/client";
-import { locationQueryKeys } from "../constant";
 import { locationStore } from "../store/locationStore";
 
 type LocationAllowCtaProps = {
@@ -15,14 +11,40 @@ type LocationAllowCtaProps = {
 };
 
 export function LocationAllowCta({ onAllowed }: LocationAllowCtaProps) {
-  const queryClient = useQueryClient();
   const locationSource = locationStore((state) => state.locationSource);
   const [tooltipPinned, setTooltipPinned] = useState(false);
   const [tooltipHovered, setTooltipHovered] = useState(false);
   const [isAllowing, setIsAllowing] = useState(false);
+  const [permission, setPermission] = useState<PermissionState | "unknown">("unknown");
   const tooltipOpen = tooltipPinned || tooltipHovered;
 
-  if (locationSource === "gps") {
+  useEffect(() => {
+    let active = true;
+    let status: PermissionStatus | undefined;
+    const updatePermission = () => {
+      if (active && status) setPermission(status.state);
+    };
+
+    if (!navigator.permissions?.query) {
+      setPermission("prompt");
+    } else {
+      void navigator.permissions.query({ name: "geolocation" }).then((result) => {
+        if (!active) return;
+        status = result;
+        updatePermission();
+        status.addEventListener("change", updatePermission);
+      }).catch(() => {
+        if (active) setPermission("prompt");
+      });
+    }
+
+    return () => {
+      active = false;
+      status?.removeEventListener("change", updatePermission);
+    };
+  }, []);
+
+  if (permission === "unknown" || permission === "granted" || locationSource === "gps") {
     return null;
   }
 
@@ -31,21 +53,13 @@ export function LocationAllowCta({ onAllowed }: LocationAllowCtaProps) {
       return;
     }
 
-    const previousView = locationStore.getState().getLocationView();
     setIsAllowing(true);
 
     try {
-      const position = await locationStore.getState().requestGpsPosition();
-      await updateUserLocation({
-        latitude: position.latitude,
-        longitude: position.longitude,
-      });
-      await queryClient.invalidateQueries({
-        queryKey: locationQueryKeys.user(),
-      });
+      await locationStore.getState().requestGpsPosition();
       await onAllowed?.();
-    } catch {
-      locationStore.getState().setLocationView(previousView);
+    } catch (error) {
+      console.error("위치 요청 실패:", error);
     } finally {
       setIsAllowing(false);
     }

@@ -1,37 +1,23 @@
+import { isFiniteLatLng } from "../lib";
 import { locationStore } from "../store";
-import { LocationType } from "../types";
 
-import { updateUserLocation } from "../api/client";
+import { persistCurrentLocationToServer } from "./persist-current-location";
+import { fetchUserLocation } from "../api/client";
+import type { LocationType } from "../types";
 
 export const updateLocation = async (): Promise<LocationType> => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const { currentLocation, getCurrentPosition } = locationStore.getState();
-
-      let patchPosition = currentLocation;
-
-      if (!patchPosition) {
-        const position = await getCurrentPosition();
-        if (!position) {
-          reject(new Error("위치 정보를 가져올 수 없습니다."));
-          return;
-        }
-        patchPosition = position;
-      }
-
-      if (!patchPosition) {
-        reject(new Error("위치 정보를 가져오는데 실패했습니다."));
-        return;
-      }
-
-      await updateUserLocation({
-        latitude: patchPosition.latitude,
-        longitude: patchPosition.longitude,
-      });
-
-      resolve(patchPosition);
-    } catch (error) {
-      reject(error);
-    }
-  });
+  const serverLocation = await fetchUserLocation();
+  let position: LocationType;
+  try {
+    position = await locationStore.getState().requestGpsPosition();
+  } catch (error) {
+    const { currentLocation, locationSource } = locationStore.getState();
+    if (currentLocation && locationSource !== "gps") return currentLocation;
+    throw error;
+  }
+  const result = await persistCurrentLocationToServer(
+    isFiniteLatLng(serverLocation) ? serverLocation : null
+  );
+  if (result === "failed") throw new Error("위치 정보를 저장할 수 없습니다.");
+  return position;
 };

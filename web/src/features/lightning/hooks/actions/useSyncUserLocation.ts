@@ -2,13 +2,12 @@
 
 import { useEffect } from "react";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { clubQueries } from "@/features/club";
 import {
   hydrateResolvedLocation,
   isFiniteLatLng,
-  locationStore,
   resolveSchoolNameFromGroupName,
   syncResolvedLocationToServer,
 } from "@/features/location";
@@ -17,11 +16,11 @@ import { myPageQueries } from "@/features/my-page";
 import { lightningQueries } from "../../queries";
 
 export const useSyncUserLocation = () => {
-  const currentLocation = locationStore((state) => state.currentLocation);
+  const queryClient = useQueryClient();
   const myInfoQuery = useQuery(myPageQueries.info());
   const clubListQuery = useQuery(clubQueries.list());
-  const { data: serverUserLocation, isFetched: serverLocationFetched } =
-    useQuery(lightningQueries.userLocation());
+  const { data: serverUserLocation, isSuccess, isFetching } =
+    useQuery({ ...lightningQueries.userLocation(), refetchOnMount: true });
   const fallbackReady = myInfoQuery.isFetched && clubListQuery.isFetched;
   const schoolKeyword = resolveSchoolNameFromGroupName(
     myInfoQuery.data?.groupName,
@@ -29,28 +28,27 @@ export const useSyncUserLocation = () => {
   );
 
   useEffect(() => {
-    if (!fallbackReady || !serverLocationFetched) {
+    if (!fallbackReady || !isSuccess || isFetching) {
       return;
     }
 
-    void hydrateResolvedLocation(
-      schoolKeyword,
-      isFiniteLatLng(serverUserLocation) ? serverUserLocation : null
-    );
+    const serverLocation = isFiniteLatLng(serverUserLocation) ? serverUserLocation : null;
+    void hydrateResolvedLocation(schoolKeyword, serverLocation)
+      .then(async (hasGps) => {
+        if (!hasGps) return;
+        const result = await syncResolvedLocationToServer(serverLocation);
+        if (result === "written") {
+          void queryClient.invalidateQueries({ ...lightningQueries.userLocation(), refetchType: "none" });
+        }
+      })
+      .catch((error: unknown) => console.error("위치 동기화 실패:", error));
   }, [
     fallbackReady,
+    queryClient,
     schoolKeyword,
-    serverLocationFetched,
+    isSuccess,
+    isFetching,
     serverUserLocation,
   ]);
 
-  useEffect(() => {
-    if (!currentLocation) {
-      return;
-    }
-
-    void syncResolvedLocationToServer(
-      isFiniteLatLng(serverUserLocation) ? serverUserLocation : null
-    );
-  }, [currentLocation, serverUserLocation]);
 };

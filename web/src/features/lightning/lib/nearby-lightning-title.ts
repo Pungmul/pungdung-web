@@ -11,8 +11,7 @@ export function getNearbyLightningTitlePrefix(
     case "school":
       return "우리학교 주변에 생긴";
     case "seoul_station":
-      return "지금 생긴";
     case null:
-      return null;
+      return "지금 생긴";
   }
 }

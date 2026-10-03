@@ -15,7 +15,6 @@ import {
   hydrateResolvedLocation,
   syncResolvedLocationToServer,
 } from "@/features/location/services";
-import { locationStore } from "@/features/location/store";
 
 function getThrownMessage(error: unknown): string {
   const geoMsg = getGeolocationUserMessage(error);
@@ -36,20 +35,14 @@ function getThrownMessage(error: unknown): string {
 export async function loadNearLightning(): Promise<NearLightningType[]> {
   try {
     const userLocation = await fetchUserLocation();
-    const store = locationStore.getState();
-
-    if (store.locationSource !== "gps") {
-      const member = await getMyPageInfo().catch(() => null);
-      const clubList = await clubListApi().catch(() => []);
-      await hydrateResolvedLocation(
-        resolveSchoolNameFromGroupName(member?.groupName, clubList),
-        isFiniteLatLng(userLocation) ? userLocation : null
-      );
-    }
-
-    await syncResolvedLocationToServer(
-      isFiniteLatLng(userLocation) ? userLocation : null
+    const member = await getMyPageInfo().catch(() => null);
+    const clubList = await clubListApi().catch(() => []);
+    const serverLocation = isFiniteLatLng(userLocation) ? userLocation : null;
+    const hasGps = await hydrateResolvedLocation(
+      resolveSchoolNameFromGroupName(member?.groupName, clubList),
+      serverLocation
     );
+    if (hasGps) await syncResolvedLocationToServer(serverLocation);
 
     const { lightningMeetingList } = await fetchNearLightning();
     return lightningMeetingList;

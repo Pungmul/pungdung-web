@@ -1,16 +1,21 @@
 import { isFiniteLatLng } from "../lib";
 
-import { updateUserLocation } from "../api/client";
+import { fetchUserLocation, updateUserLocation } from "../api/client";
 import { locationStore } from "../store/locationStore";
 import type { LocationType } from "../types";
 
 export type PersistCurrentLocationResult = "written" | "skipped" | "failed";
 
-function isSameLatLng(left: LocationType, right: LocationType) {
-  return (
-    left.latitude === right.latitude && left.longitude === right.longitude
-  );
+function isWithin200Meters(left: LocationType, right: LocationType) {
+  const rad = Math.PI / 180;
+  const lat = (right.latitude - left.latitude) * rad;
+  const lng = (right.longitude - left.longitude) * rad;
+  const a = Math.sin(lat / 2) ** 2 +
+    Math.cos(left.latitude * rad) * Math.cos(right.latitude * rad) * Math.sin(lng / 2) ** 2;
+  return 2 * 6371000 * Math.asin(Math.sqrt(Math.min(1, a))) < 200;
 }
+
+let pendingWrite: { location: LocationType; promise: Promise<PersistCurrentLocationResult> } | null = null;
 
 export function alignStoreToServerLocation(
   serverLocation: LocationType | null
@@ -25,32 +30,38 @@ export function alignStoreToServerLocation(
 export async function persistCurrentLocationToServer(
   serverLocation: LocationType | null
 ): Promise<PersistCurrentLocationResult> {
-  const resolved = locationStore.getState().currentLocation;
-  if (!resolved) {
+  const { currentLocation: resolved, locationSource } = locationStore.getState();
+  if (!resolved || locationSource !== "gps") {
     return "skipped";
   }
 
-  if (isFiniteLatLng(serverLocation) && isSameLatLng(serverLocation, resolved)) {
+  if (pendingWrite) {
+    const previous = pendingWrite;
+    const result = await previous.promise;
+    return persistCurrentLocationToServer(result === "written" ? previous.location : serverLocation);
+  }
+
+  if (isFiniteLatLng(serverLocation) && isWithin200Meters(serverLocation, resolved)) {
     return "skipped";
   }
 
+  const promise = updateUserLocation(resolved)
+    .then((): PersistCurrentLocationResult => "written")
+    .catch((): PersistCurrentLocationResult => "failed");
+  pendingWrite = { location: resolved, promise };
   try {
-    await updateUserLocation({
-      latitude: resolved.latitude,
-      longitude: resolved.longitude,
-    });
-    return "written";
-  } catch {
-    return "failed";
+    return await promise;
+  } finally {
+    if (pendingWrite?.promise === promise) pendingWrite = null;
   }
 }
 
 export async function syncResolvedLocationToServer(
-  serverLocation: LocationType | null
+  serverLocation?: LocationType | null
 ): Promise<PersistCurrentLocationResult> {
-  const result = await persistCurrentLocationToServer(serverLocation);
-  if (result === "failed") {
-    alignStoreToServerLocation(serverLocation);
+  if (serverLocation === undefined) {
+    const location = await fetchUserLocation();
+    serverLocation = isFiniteLatLng(location) ? location : null;
   }
-  return result;
+  return persistCurrentLocationToServer(serverLocation);
 }

@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 
-import { LocationAllowCta } from "@/features/location";
+import { LocationAllowCta, syncResolvedLocationToServer } from "@/features/location";
 
 import { lightningQueries } from "../../../queries";
 
@@ -14,6 +14,8 @@ export function LightningLocationAllowCta() {
   return (
     <LocationAllowCta
       onAllowed={async () => {
+        await syncResolvedLocationToServer();
+        await queryClient.invalidateQueries(lightningQueries.userLocation());
         await queryClient.invalidateQueries(lightningQueries.all());
         await queryClient.invalidateQueries({ queryKey: nearLightningQueryKey });
       }}
