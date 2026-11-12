@@ -19,6 +19,13 @@ export async function GET(req: Request) {
     const signUpToken = searchParams.get("sign_up_token");
     const redirectURL = searchParams.get("redirectURL");
 
+    if (searchParams.get("error") === "email_consent_required") {
+      const loginUrl = new URL("/login", reqUrl);
+      loginUrl.searchParams.set("reason", "email_consent_required");
+      loginUrl.searchParams.set("next", resolveLoginReturnPath(redirectURL));
+      return Response.redirect(loginUrl.href, 302);
+    }
+
     const cookieStore = await cookies();
 
     if (

@@ -24,7 +24,9 @@ export default function LoginPage() {
   useEffect(() => {
     const reason = searchParams.get("reason");
     const message =
-      reason === "session_expired"
+      reason === "email_consent_required"
+        ? "카카오 로그인 시 이메일 제공 동의가 필요해요. 다시 로그인해주세요."
+        : reason === "session_expired"
         ? "로그인 세션이 만료되었습니다. 다시 로그인해주세요."
         : reason === "auth_required"
           ? "로그인 후 이용할 수 있는 페이지입니다."
@@ -36,7 +38,7 @@ export default function LoginPage() {
     handledReasonRef.current = reason;
 
     Alert.alert({
-      title: "로그인 후 이용해주세요.",
+      title: reason === "email_consent_required" ? "이메일 제공 동의가 필요해요" : "로그인 후 이용해주세요.",
       message,
     });
     router.replace(`/login?next=${encodeURIComponent(returnPath)}`);

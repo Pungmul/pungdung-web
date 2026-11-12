@@ -9,7 +9,7 @@ export async function GET(req: Request) {
   try {
     // 카카오 OAuth 로그인 URL로 리디렉션
 
-    const searchParams = new URLSearchParams(req.url);
+    const searchParams = new URL(req.url).searchParams;
     const redirectURL = resolveLoginReturnPath(searchParams.get("redirectURL"));
 
     const kakaoLoginUrl = `${process.env.BASE_URL}/api/member/kakao/login`;
