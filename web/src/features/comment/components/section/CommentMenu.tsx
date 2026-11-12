@@ -16,9 +16,6 @@ import {
 import { useCommentMenuOpen } from "../../hooks/state";
 import type { Comment as CommentType, Reply as ReplyType } from "../../types";
 
-/** 위로 펼칠 때 메뉴 패널 높이에 맞춘 앵커 오프셋(px) */
-const COMMENT_MENU_PANEL_OFFSET_PX = 112;
-
 interface CommentMenuProps {
   comment: CommentType | ReplyType;
   menuLabel: string;
@@ -67,11 +64,8 @@ export function CommentMenu({ comment, menuLabel }: CommentMenuProps) {
       {isOpen && (
         <ul
           role="menu"
-          className={`absolute right-0 px-3 py-2 border border-grey-200 bg-background rounded-sm flex flex-col gap-2 z-10 ${openUpward ? "mb-1" : "top-full mt-1"
+          className={`absolute right-0 px-3 py-2 border border-grey-200 bg-background rounded-sm flex flex-col gap-2 z-10 ${openUpward ? "bottom-[calc(100%+6px)]" : "top-full mt-1"
             }`}
-          style={
-            openUpward ? { top: -COMMENT_MENU_PANEL_OFFSET_PX } : undefined
-          }
         >
           <li role="none">
             <button
