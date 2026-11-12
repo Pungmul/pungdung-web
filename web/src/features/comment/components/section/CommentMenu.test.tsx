@@ -26,6 +26,7 @@ const commentFixture: Comment = {
   anonymity: false,
   likedNum: 0,
   isLiked: false,
+  isMine: true,
   userName: "u",
   profile,
   createdAt: "",
@@ -72,4 +73,15 @@ describe("CommentMenu", () => {
     expect(deleteSpy).toHaveBeenCalledTimes(1);
     expect(reportSpy).toHaveBeenCalledTimes(1);
   });
+
+  it.each([null, 10])("다른 사람의 댓글과 대댓글은 삭제 메뉴를 렌더링하지 않는다 (parentId: %s)", async (parentId) => {
+    const user = userEvent.setup({ delay: null });
+    render(<CommentMenu comment={{ ...commentFixture, parentId, isMine: false }} menuLabel="댓글 메뉴" />);
+
+    await user.click(screen.getByRole("button", { name: "댓글 메뉴" }));
+
+    expect(screen.getByRole("menuitem", { name: "신고" })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "삭제" })).not.toBeInTheDocument();
+  });
+
 });

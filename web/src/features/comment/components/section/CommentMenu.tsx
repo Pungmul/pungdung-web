@@ -83,16 +83,18 @@ export function CommentMenu({ comment, menuLabel }: CommentMenuProps) {
               신고
             </button>
           </li>
-          <li role="none">
-            <button
-              type="button"
-              role="menuitem"
-              className="w-12 text-right text-red-400"
-              onClick={handleDeleteClick}
-            >
-              삭제
-            </button>
-          </li>
+          {comment.isMine && (
+            <li role="none">
+              <button
+                type="button"
+                role="menuitem"
+                className="w-12 text-right text-red-400"
+                onClick={handleDeleteClick}
+              >
+                삭제
+              </button>
+            </li>
+          )}
         </ul>
       )}
     </div>

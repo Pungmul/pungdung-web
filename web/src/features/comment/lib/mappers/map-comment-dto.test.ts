@@ -24,6 +24,7 @@ describe("mapCommentDtoToComment", () => {
       anonymity: false,
       likedNum: 2,
       isLiked: true,
+      isMine: true,
       userName: "작성자",
       profile: profileDto,
       createdAt: "2026-01-01",
@@ -38,6 +39,7 @@ describe("mapCommentDtoToComment", () => {
           anonymity: true,
           likedNum: 1,
           isLiked: false,
+          isMine: false,
           userName: "답글 작성자",
           profile: profileDto,
           createdAt: "2026-01-02",
@@ -50,6 +52,8 @@ describe("mapCommentDtoToComment", () => {
     expect(comment.anonymity).toBe(false);
     expect(comment.likedNum).toBe(2);
     expect(comment.isLiked).toBe(true);
+    expect(comment.isMine).toBe(true);
+    expect(comment.replies[0]?.isMine).toBe(false);
     expect(comment.replies[0]?.isLiked).toBe(false);
     expect(comment.profile.fullFilePath).toBe(profileDto.fullFilePath);
     expect(comment.replies[0]?.commentId).toBe(2);
@@ -65,6 +69,7 @@ describe("mapCommentDtoToComment", () => {
       hide: false,
       anonymity: false,
       likedNum: null,
+      isMine: false,
       userName: null,
       createdAt: "2026-01-01",
       replies: [],
