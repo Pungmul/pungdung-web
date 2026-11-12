@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import { Spinner } from "@/shared";
 
 import { AUTH_DOMAIN_MESSAGE } from "../../constants";
@@ -18,6 +20,8 @@ type CompleteStepProps = {
   onGoToLogin: () => void;
   onFinish: () => void;
   finishLabel: string;
+  failureMessage?: string;
+  failureActions?: ReactNode;
 };
 
 export const CompleteStep = ({
@@ -30,6 +34,8 @@ export const CompleteStep = ({
   onGoToLogin,
   onFinish,
   finishLabel,
+  failureMessage,
+  failureActions,
 }: CompleteStepProps) => {
   if (isPending) {
     return (
@@ -69,12 +75,12 @@ export const CompleteStep = ({
           <h2 className="text-2xl font-bold text-grey-800 mb-2">
             {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.FAILURE_TITLE}
           </h2>
-          <p className="text-grey-600 mb-4">
-            {getSignUpCompleteErrorMessage(failure)}
+          <p className="text-grey-600 mb-4 whitespace-pre-line">
+            {failureMessage ?? getSignUpCompleteErrorMessage(failure)}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        {failureActions ?? <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onEdit}
@@ -99,7 +105,7 @@ export const CompleteStep = ({
               {AUTH_DOMAIN_MESSAGE.SIGN_UP_COMPLETE.GO_TO_LOGIN}
             </button>
           )}
-        </div>
+        </div>}
       </div>
     );
   }
