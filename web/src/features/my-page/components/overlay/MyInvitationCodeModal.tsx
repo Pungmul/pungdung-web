@@ -2,10 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import dayjs from "dayjs";
+
 import { Modal, SkeletonView } from "@/shared";
 
 import { InvitationCodeCopyBox } from "../ui/InvitationCodeCopyBox";
 
+import "dayjs/locale/ko";
 import { myPageQueries } from "@/features/my-page/queries";
 
 type MyInvitationCodeModalProps = {
@@ -26,6 +29,7 @@ export function MyInvitationCodeModal({
     ...myPageQueries.invitationCode(),
     enabled: isOpen,
   });
+  const resetDate = invitationCode ? dayjs(invitationCode.nextResetAt) : null;
 
   return (
     <Modal
@@ -62,12 +66,16 @@ export function MyInvitationCodeModal({
         {invitationCode && (
           <>
             <InvitationCodeCopyBox code={invitationCode.code} />
-            <p className="text-[15px] font-medium text-grey-700">
-              남은 초대가능 횟수
+            <p className="px-0.5 text-[15px] font-medium text-grey-700">
               <span className="font-semibold text-primary">
-                {" " + invitationCode.remainingUses + " "}
+                {invitationCode.remainingUses}
               </span>
-              회
+              <span className="font-semibold text-grey-600">/{invitationCode.maxUses}</span>
+              {resetDate?.isValid() && (
+                <span className="text-grey-400">
+                  {" · "}{resetDate.locale("ko").format("M월 D일(dd) 초기화")}
+                </span>
+              )}
             </p>
           </>
         )}

@@ -7,6 +7,8 @@ describe("invitationCodeResponseSchema", () => {
     const result = invitationCodeResponseSchema.safeParse({
       code: "123456",
       remainingUses: 2,
+      maxUses: 10,
+      nextResetAt: "2026-11-16T00:00:00",
     });
 
     expect(result.success).toBe(true);
@@ -16,6 +18,8 @@ describe("invitationCodeResponseSchema", () => {
     const result = invitationCodeResponseSchema.safeParse({
       code: "123456",
       remainingUses: "2",
+      maxUses: 10,
+      nextResetAt: "2026-11-16T00:00:00",
     });
 
     expect(result.success).toBe(false);

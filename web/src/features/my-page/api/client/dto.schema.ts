@@ -47,6 +47,8 @@ export const memberMeResponseSchema = z.object({
 export const invitationCodeResponseSchema = z.object({
   code: z.string(),
   remainingUses: z.number(),
+  maxUses: z.number(),
+  nextResetAt: z.string(),
 });
 
 export const memberChangeInfoResponseSchema = z.object({
