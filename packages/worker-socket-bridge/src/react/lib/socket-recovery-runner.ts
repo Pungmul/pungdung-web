@@ -1,12 +1,11 @@
-import type { SocketConnectionStateCheck } from "../../client/socket-manager";
-import type { SocketConfig } from "../../protocol";
-
 import {
   isRecoveryCooldownElapsed,
   shouldBypassRecoveryCooldown,
   shouldRecreateRuntime,
   type StateCheckOptions,
 } from "./socket-recovery-policy";
+import type { SocketConnectionStateCheck } from "../../client/socket-manager";
+import type { SocketConfig } from "../../protocol";
 
 export function createSocketRecoveryRunner(
   forceRecreateRuntime: (config: SocketConfig) => Promise<void>,
@@ -15,9 +14,13 @@ export function createSocketRecoveryRunner(
   resolveConfig: () => Promise<SocketConfig | null>,
   recoveryActionCooldownMs: number,
   getLastRecoveryActionAt: () => number,
-  setLastRecoveryActionAt: (timestamp: number) => void
+  setLastRecoveryActionAt: (timestamp: number) => void,
+  onWorkerRecoveryFailure: () => void = () => {}
 ) {
-  return async (
+  let sequence = 0;
+  let failureTimer: ReturnType<typeof setTimeout> | undefined;
+
+  const run = async (
     checkOptions: StateCheckOptions,
     state: SocketConnectionStateCheck
   ) => {
@@ -33,23 +36,75 @@ export function createSocketRecoveryRunner(
       return;
     }
 
+    const currentSequence = ++sequence;
+    clearTimeout(failureTimer);
+
     const shouldRecreateRuntimeNow = shouldRecreateRuntime({
       reconnectOnly: checkOptions.reconnectOnly,
       forceRecreate: checkOptions.forceRecreate,
       workerAlive: state.workerAlive,
     });
-    const config = await resolveConfig();
-    if (!config) {
+    let config: SocketConfig | null;
+    const configTimer = !state.workerAlive
+      ? setTimeout(() => {
+          if (currentSequence === sequence) onWorkerRecoveryFailure();
+        }, 10_000)
+      : undefined;
+    failureTimer = configTimer;
+    try {
+      config = await resolveConfig();
+    } catch (error) {
+      if (!state.workerAlive && currentSequence === sequence) {
+        onWorkerRecoveryFailure();
+      }
+      throw error;
+    } finally {
+      clearTimeout(configTimer);
+      if (failureTimer === configTimer) failureTimer = undefined;
+    }
+    if (!config || currentSequence !== sequence) {
+      if (!config && !state.workerAlive && currentSequence === sequence) {
+        onWorkerRecoveryFailure();
+      }
       return;
     }
 
     if (shouldRecreateRuntimeNow) {
-      await forceRecreateRuntime(config);
+      if (state.workerAlive) {
+        await forceRecreateRuntime(config);
+      } else {
+        let reported = false;
+        const reportFailure = () => {
+          if (!reported && currentSequence === sequence) {
+            reported = true;
+            onWorkerRecoveryFailure();
+          }
+        };
+        const timer = setTimeout(reportFailure, 10_000);
+        failureTimer = timer;
+
+        try {
+          await forceRecreateRuntime(config);
+        } catch (error) {
+          reportFailure();
+          throw error;
+        } finally {
+          clearTimeout(timer);
+          if (failureTimer === timer) failureTimer = undefined;
+        }
+      }
     } else {
       await ensureWorkerAlive();
       await forceReconnect(config);
     }
 
-    setLastRecoveryActionAt(Date.now());
+    if (currentSequence === sequence) setLastRecoveryActionAt(Date.now());
   };
+
+  return Object.assign(run, {
+    dispose: () => {
+      sequence += 1;
+      clearTimeout(failureTimer);
+    },
+  });
 }

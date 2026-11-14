@@ -107,4 +107,62 @@ describe("SocketConnectionLifecycle", () => {
       )
     ).resolves.toBeUndefined();
   });
+  it("replaces a worker even while CONNECT is pending", async () => {
+    type Deps = ConstructorParameters<typeof SocketConnectionLifecycle>[0];
+    const firstRuntime = createRuntimeStub("dedicated");
+    const secondRuntime = createRuntimeStub("dedicated");
+    vi.mocked(createSocketRuntimeWithFallback)
+      .mockReturnValueOnce(createControllerStub(firstRuntime) as unknown as ReturnType<typeof createSocketRuntimeWithFallback>)
+      .mockReturnValueOnce(createControllerStub(secondRuntime) as unknown as ReturnType<typeof createSocketRuntimeWithFallback>);
+    let finishFirst!: () => void;
+    const invokeCommand = vi.fn<Deps["invokeCommand"]>()
+      .mockImplementationOnce(() => new Promise((resolve) => { finishFirst = () => resolve(undefined); }))
+      .mockResolvedValue(undefined);
+    const lifecycle = new SocketConnectionLifecycle({
+      managerOptions: {}, invokeCommand,
+      postDisconnect: vi.fn(), rejectAllPendingRpc: vi.fn(), getPendingRpcSize: () => 0,
+      getConnectionStatus: () => ({ phase: "connecting", isConnected: false }),
+      setConnectionStatusSilently: vi.fn(), updateConnectionStatus: vi.fn(),
+      subscriptions: { getActiveTopics: () => [], markTopicPending: vi.fn(), flushMessageBuffer: vi.fn() } as unknown as Deps["subscriptions"],
+      probe: { resetActivity: vi.fn(), invalidateTransportProbeCache: vi.fn(), markProbeHealthyNow: vi.fn() } as unknown as Deps["probe"],
+      topicBufferClear: vi.fn(), onStateChanged: vi.fn(), onRuntimeReady: vi.fn(),
+    });
+    const config = { url: "https://example.com" };
+    const first = lifecycle.connect(config);
+    const firstResult = expect(first).rejects.toThrow("Socket runtime replaced");
+    await lifecycle.forceRecreateRuntime(config);
+    expect(firstRuntime.dispose).toHaveBeenCalledOnce();
+    finishFirst();
+    await firstResult;
+    expect(lifecycle.getRuntime()).toBe(secondRuntime);
+  });
+
+  it.each(["connect", "ensureConnected", "forceReconnect"] as const)("keeps %s when a previous disconnect finishes late", async (method) => {
+    type Deps = ConstructorParameters<typeof SocketConnectionLifecycle>[0];
+    const firstRuntime = createRuntimeStub("dedicated");
+    const secondRuntime = createRuntimeStub("dedicated");
+    vi.mocked(createSocketRuntimeWithFallback)
+      .mockReturnValueOnce(createControllerStub(firstRuntime) as unknown as ReturnType<typeof createSocketRuntimeWithFallback>)
+      .mockReturnValueOnce(createControllerStub(secondRuntime) as unknown as ReturnType<typeof createSocketRuntimeWithFallback>);
+    let finishDisconnect!: () => void;
+    const lifecycle = new SocketConnectionLifecycle({
+      managerOptions: {}, invokeCommand: vi.fn().mockResolvedValue(undefined),
+      postDisconnect: () => new Promise((resolve) => { finishDisconnect = resolve; }),
+      rejectAllPendingRpc: vi.fn(), getPendingRpcSize: () => 0,
+      getConnectionStatus: () => ({ phase: "disconnected", isConnected: false }),
+      setConnectionStatusSilently: vi.fn(), updateConnectionStatus: vi.fn(),
+      subscriptions: { getActiveTopics: () => [], markTopicPending: vi.fn(), flushMessageBuffer: vi.fn() } as unknown as Deps["subscriptions"],
+      probe: { resetActivity: vi.fn(), invalidateTransportProbeCache: vi.fn(), markProbeHealthyNow: vi.fn() } as unknown as Deps["probe"],
+      topicBufferClear: vi.fn(), onStateChanged: vi.fn(), onRuntimeReady: vi.fn(),
+    });
+    const config = { url: "https://example.com" };
+    await lifecycle.connect(config);
+    const disconnect = lifecycle.disconnect();
+    await lifecycle[method](config);
+    finishDisconnect();
+    await disconnect;
+    expect(lifecycle.getRuntime()).toBe(secondRuntime);
+    expect(secondRuntime.dispose).not.toHaveBeenCalled();
+  });
+
 });

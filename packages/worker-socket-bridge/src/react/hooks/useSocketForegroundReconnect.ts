@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect } from "react";
 
+import type { CreateSocketConnectConfig } from "./useInitSocketConnect";
 import type { SocketConfig } from "../../protocol";
 import { createForegroundVisibilityTracker } from "../lib/foreground-visibility-tracker";
 import { createSocketConnectionWatch } from "../lib/socket-connection-watch";
@@ -16,8 +17,6 @@ import {
 import { createSocketReconnectSession } from "../lib/socket-reconnect-session";
 import { createTransportFailureRecoveryHandler } from "../lib/transport-failure-recovery-handler";
 import { useSocketManager } from "../SocketManagerProvider";
-
-import type { CreateSocketConnectConfig } from "./useInitSocketConnect";
 
 type UseSocketForegroundReconnectOptions = {
   stateCheckThrottleMs?: number;
@@ -62,10 +61,14 @@ export function useSocketForegroundReconnect(
       (config) => socket.forceRecreateRuntime(config),
       () => socket.ensureWorkerAlive(),
       (config) => socket.forceReconnect(config),
-      () => socket.checkConnectionState(),
+      (checkOptions) =>
+        checkOptions.trigger === "foreground"
+          ? socket.checkConnectionState(undefined, [100, 200, 300])
+          : socket.checkConnectionState(),
       resolveConfig,
       recoveryActionCooldownMs,
-      stateCheckThrottleMs
+      stateCheckThrottleMs,
+      () => socket.markRecoveryFailed()
     );
 
     const transportFailureHandler = createTransportFailureRecoveryHandler(
@@ -104,6 +107,7 @@ export function useSocketForegroundReconnect(
     );
 
     return () => {
+      session.dispose();
       transportFailureHandler.dispose();
       visibilityTracker.dispose();
       socket.setTransportFailureHandler(null);

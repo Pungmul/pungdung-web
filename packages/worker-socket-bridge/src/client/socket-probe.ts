@@ -137,7 +137,8 @@ export class SocketProbe {
   }
 
   async checkConnectionState(
-    timeoutMs: number = DEFAULT_WORKER_PING_TIMEOUT_MS
+    timeoutMs: number = DEFAULT_WORKER_PING_TIMEOUT_MS,
+    pingTimeouts?: readonly number[]
   ): Promise<SocketConnectionStateCheck> {
     if (!this.deps.hasRuntime()) {
       const result: SocketConnectionStateCheck = {
@@ -153,7 +154,17 @@ export class SocketProbe {
     }
 
     try {
-      const pong = await this.invokePing(timeoutMs);
+      const pong = pingTimeouts
+        ? await new Promise<PongPayload | undefined>((resolve, reject) => {
+            let remaining = pingTimeouts.length;
+            for (const timeout of pingTimeouts) {
+              void this.invokePing(timeout).then(resolve, (error: unknown) => {
+                remaining -= 1;
+                if (remaining === 0) reject(error);
+              });
+            }
+          })
+        : await this.invokePing(timeoutMs);
       this.syncConnectionStatusFromProbe(pong);
       const connectionStatus = this.deps.getConnectionStatus();
       const runtime = this.resolveRuntimeHealth(pong);

@@ -1,13 +1,12 @@
-import type { SocketConnectionStateCheck } from "../../client/socket-manager";
-
 import {
   isStateCheckThrottled,
   shouldBypassStateCheckInFlight,
   type StateCheckOptions,
 } from "./socket-recovery-policy";
+import type { SocketConnectionStateCheck } from "../../client/socket-manager";
 
 export function createSocketStateCheckRunner(
-  checkConnectionState: () => Promise<SocketConnectionStateCheck>,
+  checkConnectionState: (options: StateCheckOptions) => Promise<SocketConnectionStateCheck>,
   stateCheckThrottleMs: number,
   getLastStateCheckAt: () => number,
   setLastStateCheckAt: (timestamp: number) => void,
@@ -45,7 +44,7 @@ export function createSocketStateCheckRunner(
 
     void (async () => {
       try {
-        const state = await checkConnectionState();
+        const state = await checkConnectionState(checkOptions);
 
         if (state.healthy) {
           return;

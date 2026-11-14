@@ -1,15 +1,3 @@
-import type {
-  SocketConfig,
-  SocketConnectionStatus,
-  SocketListener,
-  SubscriptionStatus,
-} from "../protocol";
-import {
-  createSocketBridge,
-  type SocketBridge,
-} from "../rpc/create-socket-bridge";
-import type { CreateSocketRuntimeOptions, SocketRuntime } from "../runtime";
-
 import { ConnectionStatusStore } from "./connection-status-store";
 import { SocketConnectionLifecycle } from "./socket-connection";
 import {
@@ -23,6 +11,17 @@ import {
 } from "./socket-snapshot";
 import { SocketSubscriptions } from "./socket-subscriptions";
 import { TopicBuffer } from "./topic-buffer";
+import type {
+  SocketConfig,
+  SocketConnectionStatus,
+  SocketListener,
+  SubscriptionStatus,
+} from "../protocol";
+import {
+  createSocketBridge,
+  type SocketBridge,
+} from "../rpc/create-socket-bridge";
+import type { CreateSocketRuntimeOptions, SocketRuntime } from "../runtime";
 
 export type { SocketConnectionStateCheck } from "./socket-probe";
 
@@ -58,6 +57,7 @@ export class SocketManager {
   private readonly probe: SocketProbe;
   private readonly pushHandler: SocketPushHandler;
   private readonly connection: SocketConnectionLifecycle;
+  private recoveryVersion = 0;
   private idleDisconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(options: CreateSocketManagerOptions = {}) {
@@ -170,8 +170,8 @@ export class SocketManager {
       : this.probe.shouldProbeForMessageInactivity(thresholdMs);
   }
 
-  async checkConnectionState(timeoutMs?: number): Promise<SocketConnectionStateCheck> {
-    return this.probe.checkConnectionState(timeoutMs);
+  async checkConnectionState(timeoutMs?: number, pingTimeouts?: readonly number[]): Promise<SocketConnectionStateCheck> {
+    return this.probe.checkConnectionState(timeoutMs, pingTimeouts);
   }
 
   async probeWorkerAlive(timeoutMs?: number): Promise<boolean> {
@@ -197,11 +197,42 @@ export class SocketManager {
     return this.connection.ensureConnected(config);
   }
 
+  async retryConnection(): Promise<void> {
+    const config = this.connection.getLastConnectConfig();
+    if (!config) return;
+
+    const task = this.forceRecreateRuntime(config);
+    const version = this.recoveryVersion;
+    const reportFailure = () => {
+      if (version === this.recoveryVersion) this.markRecoveryFailed();
+    };
+    const timer = setTimeout(reportFailure, 10_000);
+    try {
+      await task;
+    } catch (error) {
+      reportFailure();
+      throw error;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  markRecoveryFailed(): void {
+    if (!this.connectionStatusStore.get().isConnected) {
+      this.connectionStatusStore.update({
+        phase: "failed",
+        isConnected: false,
+        error: "worker-recovery-timeout",
+      });
+    }
+  }
+
   async forceReconnect(config: SocketConfig): Promise<void> {
     return this.connection.forceReconnect(config);
   }
 
   async forceRecreateRuntime(config: SocketConfig): Promise<void> {
+    this.recoveryVersion += 1;
     return this.connection.forceRecreateRuntime(config);
   }
 
