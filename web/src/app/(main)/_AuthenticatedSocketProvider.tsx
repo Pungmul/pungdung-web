@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   useInitSocketConnect,
@@ -17,6 +17,9 @@ import {
   reportAppError,
 } from "@/core/config/report-app-error";
 import { createAuthenticatedSocketConfig } from "@/core/config/socket";
+
+import { chatQueries } from "@/features/chat";
+import { lightningQueries } from "@/features/lightning";
 
 import { useAuthenticatedSocketConnectConfig } from "@/features/auth/hooks/actions/useAuthenticatedSocketConnectConfig";
 import { useSocketReconnectTokenRefresh } from "@/features/auth/hooks/actions/useSocketReconnectTokenRefresh";
@@ -35,8 +38,24 @@ function AuthenticatedSocketLifecycle({
   });
   useSocketReconnectTokenRefresh();
   useReportSocketBrokerError();
+  useRefreshAfterWorkerFailure();
 
   return null;
+}
+
+function useRefreshAfterWorkerFailure() {
+  const queryClient = useQueryClient();
+  const { phase, error } = useSocketConnectionState();
+
+  useEffect(() => {
+    if (phase !== "failed" || error !== "worker-recovery-timeout") {
+      return;
+    }
+
+    void queryClient.invalidateQueries(chatQueries.roomList());
+    void queryClient.invalidateQueries(lightningQueries.lightningData());
+    void queryClient.invalidateQueries(lightningQueries.participationStatus());
+  }, [error, phase, queryClient]);
 }
 
 function useReportSocketBrokerError() {

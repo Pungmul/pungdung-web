@@ -3,6 +3,7 @@
 import { useCallback, useRef } from "react";
 
 import { ArrowUpIcon, PhotoIcon } from "@heroicons/react/24/outline";
+import { useSocketConnectionState, useSocketManager } from "@pungdung/worker-socket-bridge/react";
 
 import { useIOSKeyboardOpacityFix } from "@/shared/hooks";
 import { useView } from "@/shared/lib";
@@ -30,6 +31,8 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
     enabled: true,
   });
 
+  const socket = useSocketManager();
+  const { phase } = useSocketConnectionState();
   const formRef = useRef<HTMLFormElement>(null);
   const view = useView();
 
@@ -117,6 +120,15 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
       "
       onSubmit={onSubmit}
     >
+      {phase === "failed" && (
+        <button
+          type="button"
+          onClick={() => void socket.retryConnection().catch(console.error)}
+          className="px-4 text-sm"
+        >
+          연결 다시 시도
+        </button>
+      )}
       <div className="items-center bg-background px-2 py-2">
         <div className="flex flex-row items-end rounded-full bg-grey-100 px-0.5 py-0.5">
           <label
@@ -151,7 +163,7 @@ export const ChatSendForm: React.FC<ChatSendFormProps> = ({
               onBlur={handleTextareaBlur}
               onChange={adjustHeight}
               onKeyDown={handleKeyDown}
-              placeholder={canSend ? "메시지 입력" : "채팅 연결 중..."}
+              placeholder={canSend ? "메시지 입력" : phase === "failed" ? "채팅 연결에 실패했어요" : "채팅 연결 중..."}
               className="
  block box-border min-h-[20px] w-full resize-none overflow-y-hidden
                 border-none bg-transparent p-0 text-[12px] leading-[20px]

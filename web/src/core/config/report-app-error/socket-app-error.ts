@@ -12,6 +12,7 @@ const SOCKET_RECONNECT_REASONS = new Set([
   "connection-reconnecting",
   "connection-failed",
   "socket-not-connected",
+  "worker-recovery-timeout",
 ]);
 
 export function isSocketReconnectReason(reason: string): boolean {

@@ -2,7 +2,7 @@
 
 import { useIsFetching } from "@tanstack/react-query";
 
-import { useSocketConnectionState } from "@pungdung/worker-socket-bridge/react";
+import { useSocketConnectionState, useSocketManager } from "@pungdung/worker-socket-bridge/react";
 
 import { Spinner } from "@/shared";
 
@@ -12,7 +12,9 @@ import { lightningQueries } from "../../queries";
 const RECONNECT_OVERLAY_BG = "rgba(35, 36, 36, 0.35)";
 
 export function LightningSocketReconnectIndicator() {
+  const socket = useSocketManager();
   const { phase, isConnected } = useSocketConnectionState();
+  const hasConnectionFailed = phase === "failed";
   const isLightningDataFetching =
     useIsFetching({
       queryKey: lightningQueries.lightningData().queryKey,
@@ -22,6 +24,17 @@ export function LightningSocketReconnectIndicator() {
     phase === "connecting" ||
     phase === "reconnecting" ||
     (!isConnected && phase !== "idle");
+
+  if (hasConnectionFailed) {
+    return (
+      <div role="status" className="absolute top-4 left-1/2 z-[70] flex -translate-x-1/2 items-center gap-2 rounded-full bg-background px-4 py-2 text-sm shadow-up-sm">
+        연결에 실패했어요.
+        <button type="button" onClick={() => void socket.retryConnection().catch(console.error)}>
+          다시 시도
+        </button>
+      </div>
+    );
+  }
 
   if (!isSocketRecovering && !isLightningDataFetching) {
     return null;
