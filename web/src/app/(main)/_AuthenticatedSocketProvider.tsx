@@ -17,6 +17,7 @@ import {
   reportAppError,
 } from "@/core/config/report-app-error";
 import { createAuthenticatedSocketConfig } from "@/core/config/socket";
+import { useReportSocketRecoveryFailure } from "@/core/config/socket/useReportSocketRecoveryFailure";
 
 import { chatQueries } from "@/features/chat";
 import { lightningQueries } from "@/features/lightning";
@@ -38,6 +39,7 @@ function AuthenticatedSocketLifecycle({
   });
   useSocketReconnectTokenRefresh();
   useReportSocketBrokerError();
+  useReportSocketRecoveryFailure();
   useRefreshAfterWorkerFailure();
 
   return null;
