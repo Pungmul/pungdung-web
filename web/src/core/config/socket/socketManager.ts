@@ -17,13 +17,24 @@ export const defaultSocketManagerOptions = {
 } satisfies CreateSocketManagerOptions;
 
 export function makeSocketManager() {
+  const isStandalone =
+    typeof window !== "undefined" &&
+    window.matchMedia("(display-mode: standalone)").matches;
   const options: CreateSocketManagerOptions = isE2ERuntime()
     ? {
         ...defaultSocketManagerOptions,
         // SharedWorker WS는 Playwright가 인터셉트하지 못하므로 E2E만 main-thread 고정
         fallbackChain: ["main-thread"],
       }
-    : defaultSocketManagerOptions;
+    : isStandalone
+      ? {
+          ...defaultSocketManagerOptions,
+          fallbackChain:
+            typeof Worker !== "undefined"
+              ? ["dedicated", "main-thread"]
+              : ["main-thread"],
+        }
+      : defaultSocketManagerOptions;
 
   return new SocketManager(options);
 }
