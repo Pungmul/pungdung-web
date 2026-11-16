@@ -1,6 +1,6 @@
 import { clientApiRequest, withResponseMapper } from "@/core/api/client";
 
-import { boardDataDtoSchema } from "./dto.schema";
+import { boardPostListDtoSchema } from "./dto.schema";
 import { mapPostListPageDtoToPostListPage } from "../../lib/mappers";
 
 export const fetchPostList = (
@@ -13,7 +13,18 @@ export const fetchPostList = (
     fetchDto: () =>
       clientApiRequest({
         url: `${process.env.NEXT_PUBLIC_LOCAL_URL}/api/boards/${boardId}/list?page=${String(page)}&size=${String(size)}`,
-        responseSchema: boardDataDtoSchema,
+        responseSchema: boardPostListDtoSchema,
       }),
-    map: (dto) => mapPostListPageDtoToPostListPage(dto.recentPostList),
+    map: (dto) => {
+      const hotPost = dto.hotPost;
+      const post = hotPost !== null && typeof hotPost === "object"
+        ? hotPost as Record<string, unknown>
+        : null;
+      return {
+        ...mapPostListPageDtoToPostListPage(dto.recentPostList),
+        hotPost: post && typeof post.postId === "number" && typeof post.title === "string"
+          ? { postId: post.postId, title: post.title }
+          : null,
+      };
+    },
   });

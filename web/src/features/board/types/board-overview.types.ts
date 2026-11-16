@@ -3,7 +3,7 @@ import type { PostListPage } from "./post-list-page.types";
 
 export interface BoardChildCategory {
   id: number;
-  parentId: number | null;
+  parentId?: number | null | undefined;
   name: string;
   description: string | null;
 }
@@ -24,3 +24,5 @@ export interface BoardOverview {
   hotPost: HotPostBannerPost | null;
   recentPostList: PostListPage;
 }
+
+export type BoardMetadata = Pick<BoardOverview, "currentCategoryId" | "boardInfo">;

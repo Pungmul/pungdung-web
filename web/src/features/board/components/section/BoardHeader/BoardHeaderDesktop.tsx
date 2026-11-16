@@ -10,7 +10,6 @@ import { BoardHeaderSearchField } from "../../ui/BoardHeaderSearchField";
 interface BoardHeaderDesktopProps {
   boardID: string;
   boardInfo: BoardSummary | BoardHeaderDisplay | undefined;
-  categoryDescription?: string;
   keyword: BoardHeaderSearchKeyword;
   searchable?: boolean;
 }
@@ -19,7 +18,6 @@ interface BoardHeaderDesktopProps {
 export function BoardHeaderDesktop({
   boardID,
   boardInfo,
-  categoryDescription,
   keyword,
   searchable = true,
 }: BoardHeaderDesktopProps) {
@@ -35,9 +33,6 @@ export function BoardHeaderDesktop({
     <div className="flex flex-row justify-between gap-[12px] mx-auto w-full px-[24px] max-w-[960px] py-[48px] bg-background">
       <BoardHeaderDesktopInfo
         boardInfo={boardInfo}
-        {...(categoryDescription !== undefined
-          ? { categoryDescription }
-          : {})}
       />
       {searchable ? (
         <BoardHeaderSearchField

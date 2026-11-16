@@ -28,6 +28,9 @@ export function BoardChildCategoryTabs({
         >
           {categories.map((category) => {
             const isSelected = category.id === selectedCategory.id;
+            const hasDuplicateName = categories.some(
+              (other) => other.id !== category.id && other.name === category.name
+            );
 
             return (
               <motion.button
@@ -44,7 +47,9 @@ export function BoardChildCategoryTabs({
                 className="relative min-w-[72px] md:min-w-24 shrink-0 border-0 bg-transparent py-3 text-center text-[15px] font-semibold md:text-[18px]"
                 onClick={() => onCategoryChange(category)}
               >
-                {category.name}
+                {hasDuplicateName && category.description
+                  ? category.description
+                  : category.name}
                 <motion.span
                   className="absolute bottom-0 left-0 right-0 h-0.5 bg-grey-800"
                   initial={{ opacity: 0 }}

@@ -32,7 +32,7 @@ describe("GET /api/boards/[boardID]/list", () => {
     });
 
     expect(mocks.fetchPublic).toHaveBeenCalledWith(
-      new URL("https://api.example.com/api/boards/7?page=2&size=10")
+      new URL("https://api.example.com/api/boards/7/add?page=2&size=10")
     );
     expect(mocks.createValidatedUpstreamResponse).toHaveBeenCalledWith(
       upstreamResponse

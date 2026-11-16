@@ -2,6 +2,8 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
+import { ClientApiError } from "@/core/api/client";
+
 import { SkeletonView } from "@/shared";
 
 import {
@@ -21,7 +23,7 @@ export function BoardDetailPage({
   boardId: number;
   isGuest: boolean;
 }) {
-  const { data: boardData } = useSuspenseQuery(boardQueries.detail(boardId));
+  const { data: boardData, error } = useSuspenseQuery(boardQueries.boardInfo(boardId));
   const {
     hasChildCategories,
     effectiveChildCategories,
@@ -37,6 +39,8 @@ export function BoardDetailPage({
     boardData,
     selectedCategory,
   });
+
+  if (error instanceof ClientApiError && error.status === 403) throw error;
 
   return (
     <section
@@ -55,9 +59,7 @@ export function BoardDetailPage({
         : null}
         <BoardDetailContent
           key={`board-detail-content-${postListBoardId}`}
-          boardData={boardData}
           postListBoardId={postListBoardId}
-          hasChildCategories={hasChildCategories}
           isGuest={isGuest}
         />
     </section>

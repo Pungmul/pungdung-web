@@ -1,11 +1,10 @@
 "use client";
 
-import {
-  useSuspenseInfiniteQuery,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
+
+import { ClientApiError } from "@/core/api/client";
 
 import { useLoginRequiredConfirmAction } from "@/features/auth";
 import { PostBoxSkeleton, PostList } from "@/features/post";
@@ -14,21 +13,12 @@ import { LinkChipButton, ListEmptyView } from "@/shared/components";
 
 import { useDebouncedFetchNextPage } from "../../../hooks/view-model/useDebouncedFetchNextPage";
 import { boardQueries } from "../../../queries";
-import {
-  deriveBoardPostList,
-  deriveBoardPostListHasNextPage,
-} from "../../../services";
-import type { BoardOverview } from "../../../types";
 import { HotPostBanner } from "../../ui/HotPostBanner";
 import { HotPostBannerSkeleton } from "../../ui/HotPostBannerSkeleton";
 
 export interface BoardDetailContentProps {
-  /** 루트 게시판 상세(자식 탭 없을 때 목록 폴백 소스) */
-  boardData: BoardOverview;
   /** 탭 선택에 따라 게시글·핫글을 조회할 게시판 ID */
   postListBoardId: number;
-  /** 자식 카테고리 탭 존재 여부. `true`이면 부모 `recentPostList` 폴백을 쓰지 않는다 */
-  hasChildCategories: boolean;
   isGuest: boolean;
 }
 
@@ -37,40 +27,27 @@ export interface BoardDetailContentProps {
  * `Suspense` 경계 안에서 렌더한다.
  */
 export function BoardDetailContent({
-  boardData,
   postListBoardId,
-  hasChildCategories,
   isGuest,
 }: BoardDetailContentProps) {
-  const { data: postListBoardData } = useSuspenseQuery(
-    boardQueries.detail(postListBoardId)
-  );
   const postList = useSuspenseInfiniteQuery(
     boardQueries.postList(postListBoardId)
   );
 
-  const boardOverviewForListFallback = hasChildCategories
-    ? undefined
-    : boardData;
-
-  const posts = deriveBoardPostList(
-    boardOverviewForListFallback,
-    postList.data
-  );
-  const hasNextPageForList = deriveBoardPostListHasNextPage(
-    boardOverviewForListFallback,
-    postList.data,
-    postList.hasNextPage
-  );
+  const posts = postList.data.pages.flatMap((page) => page.list);
+  const hasNextPageForList = postList.hasNextPage;
   const { loadMore } = useDebouncedFetchNextPage({
     fetchNextPage: postList.fetchNextPage,
     hasNextPage: hasNextPageForList,
     isFetchingNextPage: postList.isFetchingNextPage,
   });
 
+  if (postList.error instanceof ClientApiError && postList.error.status === 403)
+    throw postList.error;
+
   return (
     <>
-      <HotPostBanner hotPost={postListBoardData.hotPost} />
+      <HotPostBanner hotPost={postList.data.pages[0]?.hotPost ?? null} />
       <PostList
         key={`board-post-list-${postListBoardId}`}
         posts={posts}

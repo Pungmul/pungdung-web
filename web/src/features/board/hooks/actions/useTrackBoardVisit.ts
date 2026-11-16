@@ -3,11 +3,11 @@
 import { useEffect } from "react";
 
 import { useFrequentBoard } from "../../store";
-import type { BoardChildCategory, BoardOverview } from "../../types";
+import type { BoardChildCategory, BoardMetadata } from "../../types";
 
 interface UseTrackBoardVisitParams {
   boardId: number;
-  boardData: BoardOverview | undefined;
+  boardData: BoardMetadata | undefined;
   selectedCategory: BoardChildCategory | undefined;
 }
 

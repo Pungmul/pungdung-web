@@ -10,7 +10,6 @@ import {
 } from "../constants";
 
 import {
-  fetchBoardDetails,
   fetchBoardInfo,
   fetchBoardInfoList,
   fetchHotPostList,
@@ -43,15 +42,6 @@ export const boardQueries = {
       refetchOnMount: false,
     }),
   details: () => [...boardQueries.all(), "detail"] as const,
-  detail: (boardId: number) =>
-    queryOptions({
-      queryKey: [...boardQueries.details(), boardId] as const,
-      queryFn: () => fetchBoardDetails(boardId),
-      staleTime: BOARD_STALE_TIME,
-      gcTime: BOARD_GC_TIME,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-    }),
   boardInfo: (boardId: number) =>
     queryOptions({
       queryKey: [...boardQueries.details(), boardId, "info"] as const,
@@ -75,7 +65,6 @@ export const boardQueries = {
       refetchOnWindowFocus: true,
       staleTime: BOARD_STALE_TIME,
       gcTime: BOARD_GC_TIME,
-      placeholderData: keepPreviousData,
     }),
   searchPostLists: () => [...boardQueries.all(), "search-post-list"] as const,
   searchPostList: (

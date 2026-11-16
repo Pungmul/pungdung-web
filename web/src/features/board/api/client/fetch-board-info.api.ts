@@ -1,7 +1,6 @@
 import { clientApiRequest, withResponseMapper } from "@/core/api/client";
 
-import { boardDataDtoSchema } from "./dto.schema";
-import { mapBoardDataDtoToBoardOverview } from "../../lib/mappers";
+import { boardMetadataDtoSchema } from "./dto.schema";
 
 export const fetchBoardInfo = (boardId: number) =>
   withResponseMapper({
@@ -9,7 +8,13 @@ export const fetchBoardInfo = (boardId: number) =>
     fetchDto: () =>
       clientApiRequest({
         url: `${process.env.NEXT_PUBLIC_LOCAL_URL}/api/boards/${boardId}/info`,
-        responseSchema: boardDataDtoSchema,
+        responseSchema: boardMetadataDtoSchema,
       }),
-    map: mapBoardDataDtoToBoardOverview,
+    map: (dto) => ({
+      currentCategoryId: dto.currentCategoryId,
+      boardInfo: {
+        ...dto.boardInfo,
+        rootCategoryName: dto.boardInfo.rootCategoryName ?? "",
+      },
+    }),
   });

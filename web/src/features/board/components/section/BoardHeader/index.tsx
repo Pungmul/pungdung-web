@@ -21,7 +21,7 @@ export function BoardHeader({
   initialBoardInfo,
   searchable = true,
 }: BoardHeaderProps) {
-  const { boardInfo, categoryDescription, goToBoardMain } = useBoardHeaderMeta(
+  const { boardInfo, goToBoardMain } = useBoardHeaderMeta(
     boardID,
     initialBoardInfo
   );
@@ -44,9 +44,6 @@ export function BoardHeader({
         <BoardHeaderDesktop
           boardID={boardID}
           boardInfo={boardInfo}
-          {...(categoryDescription !== undefined
-            ? { categoryDescription }
-            : {})}
           keyword={keyword}
           searchable={searchable}
         />

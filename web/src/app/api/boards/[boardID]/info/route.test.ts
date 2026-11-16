@@ -32,7 +32,7 @@ describe("GET /api/boards/[boardID]/info", () => {
     });
 
     expect(mocks.fetchPublic).toHaveBeenCalledWith(
-      "https://api.example.com/api/boards/7"
+      "https://api.example.com/api/boards/7/info"
     );
     expect(mocks.createValidatedUpstreamResponse).toHaveBeenCalledWith(
       upstreamResponse

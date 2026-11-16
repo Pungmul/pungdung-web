@@ -24,8 +24,12 @@ export async function GET(
         { status: 400 }
       );
     }
-    const proxyUrl = `${process.env.BASE_URL}/api/boards/${boardId}`;
+    const proxyUrl = `${process.env.BASE_URL}/api/boards/${boardId}/info`;
     const proxyResponse = await fetchPublic(proxyUrl);
+
+    if (proxyResponse.status === 403) {
+      return new Response(null, { status: 403 });
+    }
 
     return createValidatedUpstreamResponse(proxyResponse);
   } catch (error) {

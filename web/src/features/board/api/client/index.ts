@@ -1,5 +1,4 @@
 export { boardDataDtoSchema, briefBoardInfoListDtoSchema } from "./dto.schema";
-export { fetchBoardDetails } from "./fetch-board-details.api";
 export { fetchBoardInfo } from "./fetch-board-info.api";
 export { fetchBoardInfoList } from "./fetch-board-info-list.api";
 export {

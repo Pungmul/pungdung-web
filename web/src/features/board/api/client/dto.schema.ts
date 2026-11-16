@@ -40,6 +40,24 @@ export const boardDataDtoSchema = z.object({
 
 export type BoardDataDto = z.infer<typeof boardDataDtoSchema>;
 
+/** 분리된 게시판 정보 응답. */
+export const boardMetadataDtoSchema = z.object({
+  currentCategoryId: z.number(),
+  boardInfo: boardInfoDtoSchema.extend({
+    childCategories: z.array(childBoardCategoryDtoSchema.extend({
+      parentId: z.number().nullable().optional(),
+      isPublic: z.boolean().optional(),
+    })).default([]),
+  }),
+});
+
+/** 분리된 게시글 목록 응답. */
+export const boardPostListDtoSchema = z.object({
+  currentCategoryId: z.number(),
+  hotPost: z.unknown(),
+  recentPostList: postListPageDtoSchema,
+});
+
 export const briefBoardInfoDtoSchema = z.object({
   id: z.union([z.number(), z.string()]),
   parentId: z.number().nullable(),

@@ -2,6 +2,7 @@ export type { BoardHeaderDisplay } from "./board-header-display.types";
 export type {
   BoardCategoryPath,
   BoardChildCategory,
+  BoardMetadata,
   BoardOverview,
 } from "./board-overview.types";
 export type { BoardSummary } from "./board-summary.types";

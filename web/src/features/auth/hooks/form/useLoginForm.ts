@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -12,6 +12,7 @@ import { LoginFormType, loginSchema } from "../../types/schemas";
 
 export const useLoginForm = ({ returnPath = "/home" }: { returnPath?: string } = {}) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const setLogin = useLoginStore((state) => state.setLogin);
   const {
     mutate: loginRequest,
@@ -35,6 +36,7 @@ export const useLoginForm = ({ returnPath = "/home" }: { returnPath?: string } =
   const onSubmit = (data: LoginFormType) => {
     loginRequest(data, {
       onSuccess: () => {
+        queryClient.clear();
         setLogin("email");
         router.replace(returnPath);
       },
