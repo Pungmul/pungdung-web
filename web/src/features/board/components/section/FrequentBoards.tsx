@@ -20,11 +20,11 @@ export function FrequentBoards() {
 
   if (boardList.length === 0) return null;
   return (
-    <div className="flex flex-col lg:flex-row py-1 gap-1 lg:gap-4 lg:items-center">
+    <div className="flex min-w-0 flex-col lg:flex-row py-1 gap-1 lg:gap-4 lg:items-center">
       <h2 className="text-base font-normal flex-shrink-0 text-grey-500 px-6">
         자주 가는 게시판
       </h2>
-      <ul className="flex flex-row gap-2 overflow-x-auto w-fit list-none scrollbar-hide">
+      <ul className="flex min-w-0 max-w-full flex-row gap-2 overflow-x-auto w-fit list-none scrollbar-hide">
         <li>
           <Space w={16} />
         </li>
