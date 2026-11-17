@@ -1,8 +1,9 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useMemo } from "react";
 
 import { BoardListItem } from "./BoardListItem";
+import { useBoardBookmarks } from "../../../hooks/state/useBoardBookmarks";
 import { sortBoardsWithBookmarks } from "../../../services";
 import type { BoardSummary } from "../../../types";
 import { BoardGuestLoginPrompt } from "../BoardGuestLoginPrompt";
@@ -24,44 +25,11 @@ const BoardList = memo(function BoardList({
   boardList,
   isGuest,
 }: BoardListProps) {
-  // 즐겨찾기 게시판 id 목록 · 로컬 스토리지 동기화(로드 후에만 저장)
-  const [bookmarkedBoardList, setBookmarkedBoardList] = useState<
-    (number | string)[]
-  >([]);
-  const [hasHydratedBookmarks, setHasHydratedBookmarks] = useState(false);
+  const { ids: bookmarkedBoardList, toggle } = useBoardBookmarks();
 
   const toggleBookmark = useCallback((board: BoardSummary) => {
-    setBookmarkedBoardList((prev) => {
-      if (prev.includes(board.id)) {
-        return prev.filter((id) => id !== board.id);
-      } else {
-        return [...prev, board.id];
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("favoriteBoard");
-      if (raw) {
-        setBookmarkedBoardList(JSON.parse(raw));
-      }
-    } catch {
-      localStorage.removeItem("favoriteBoard");
-    } finally {
-      setHasHydratedBookmarks(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!hasHydratedBookmarks) {
-      return;
-    }
-    localStorage.setItem(
-      "favoriteBoard",
-      JSON.stringify(bookmarkedBoardList)
-    );
-  }, [bookmarkedBoardList, hasHydratedBookmarks]);
+    toggle(board.id);
+  }, [toggle]);
 
   // 즐겨찾기가 상단으로 오도록 정렬
   const sortedBoardList = useMemo(

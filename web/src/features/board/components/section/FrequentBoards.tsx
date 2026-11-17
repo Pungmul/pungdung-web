@@ -1,15 +1,22 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 import { Space, WebViewLink } from "@/shared/components";
 
+import { useBoardBookmarks } from "../../hooks/state/useBoardBookmarks";
 import { getBoardRoute } from "../../lib";
-import { frequentBoardItemKey, useFrequentBoard } from "../../store";
+import { boardQueries } from "../../queries";
 
 export function FrequentBoards() {
-  // 즐겨 방문 게시판 칩 목록 · 제거
-  const { boardList, removeBoard } = useFrequentBoard();
+  const { ids, toggle } = useBoardBookmarks();
+  const { data } = useQuery({ ...boardQueries.list(), enabled: ids.length > 0 });
+  const boardList = ids.flatMap((id) => {
+    const board = data?.find((item) => item.id === id);
+    return board ? [board] : [];
+  });
 
   if (boardList.length === 0) return null;
   return (
@@ -23,23 +30,23 @@ export function FrequentBoards() {
         </li>
         {boardList.map((board) => (
           <li
-            key={frequentBoardItemKey(board)}
+            key={board.id}
             className="flex flex-row items-center gap-2 p-2 flex-shrink-0 rounded-[4px] bg-primary text-background"
           >
             <button
               type="button"
-              aria-label={`${board.name} 제거`}
+              aria-label={`${board.name} 즐겨찾기 해제`}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                removeBoard(board);
+                toggle(board.id);
               }}
               className="size-4 flex items-center justify-center"
             >
               <XMarkIcon className="size-full" aria-hidden />
             </button>
             <WebViewLink
-              href={getBoardRoute(board.id, board.tabId)}
+              href={getBoardRoute(board.id)}
               className="text-m1 cursor-pointer leading-normal"
             >
               {board.name}
