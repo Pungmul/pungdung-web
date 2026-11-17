@@ -10,7 +10,6 @@ import { PostBoxSkeleton } from "@/features/post";
 
 import { BoardDetailPage } from "./_BoardDetailPage";
 
-export const dynamic = "force-dynamic";
 
 type BoardPageProps = {
   params: Promise<{ boardID: string }>;

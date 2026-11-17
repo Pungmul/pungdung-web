@@ -17,8 +17,6 @@ import {
 
 import { ScrollToTopButton } from "@/shared/components";
 
-export const dynamic = "force-dynamic";
-
 export async function generateMetadata({
   params,
 }: {
