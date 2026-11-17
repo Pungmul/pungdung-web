@@ -4,18 +4,12 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { ClientApiError } from "@/core/api/client";
 
-import { SkeletonView } from "@/shared";
-
-import {
-  BoardChildCategoryTabs,
-  BoardDetailContent,
-} from "@/features/board/components";
+import { BoardDetailContent } from "@/features/board/components";
 import { useTrackBoardVisit } from "@/features/board/hooks/actions";
 import { useBoardTabNavigation } from "@/features/board/hooks/view-model";
 import { boardQueries } from "@/features/board/queries";
 
-
-/** 게시판 상세: 자식 탭·게시글 목록·핫글 배너를 조합하는 클라이언트 페이지 */
+/** 게시판 상세의 탭 선택과 게시글 목록을 연결한다. */
 export function BoardDetailPage({
   boardId,
   isGuest,
@@ -23,16 +17,13 @@ export function BoardDetailPage({
   boardId: number;
   isGuest: boolean;
 }) {
-  const { data: boardData, error } = useSuspenseQuery(boardQueries.boardInfo(boardId));
-  const {
-    hasChildCategories,
-    effectiveChildCategories,
-    selectedCategory,
-    postListBoardId,
-    handleCategoryChange,
-  } = useBoardTabNavigation({
+  const { data: boardData, error } = useSuspenseQuery(
+    boardQueries.boardInfo(boardId)
+  );
+  const { selectedCategory, postListBoardId } = useBoardTabNavigation({
     boardId,
     childCategories: boardData.boardInfo.childCategories,
+    syncUrl: false,
   });
   useTrackBoardVisit({
     boardId,
@@ -47,22 +38,12 @@ export function BoardDetailPage({
       key="board-post-list-section"
       className="relative flex w-full flex-col bg-background"
     >
-      {hasChildCategories ?
-        selectedCategory ? (
-          <BoardChildCategoryTabs
-            categories={effectiveChildCategories}
-            selectedCategory={selectedCategory}
-            onCategoryChange={handleCategoryChange}
-          />
-        ) :
-          <SkeletonView className="w-80 h-10 rounded-sm" />
-        : null}
-        <BoardDetailContent
-          key={`board-detail-content-${postListBoardId}`}
-          boardId={boardId}
-          postListBoardId={postListBoardId}
-          isGuest={isGuest}
-        />
+      <BoardDetailContent
+        key={`board-detail-content-${postListBoardId}`}
+        boardId={boardId}
+        postListBoardId={postListBoardId}
+        isGuest={isGuest}
+      />
     </section>
   );
 }

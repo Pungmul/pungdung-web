@@ -18,7 +18,7 @@ export function BoardChildCategoryTabs({
   return (
     <AnimatePresence>
       <nav
-        className="w-full flex flex-row items-center border-b border-grey-200 sticky top-12 md:top-0 bg-background z-10 h-12"
+        className="w-full flex flex-row items-center border-b border-grey-200 md:sticky md:top-0 bg-background z-10 h-12"
         key="board-child-category-tabs-nav"
       >
         <div

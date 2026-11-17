@@ -3,6 +3,7 @@ export {
   type BoardDetailContentProps,
 } from "./section/BoardDetailContent";
 export { BoardHeader } from "./section/BoardHeader";
+export { BoardLayoutTabs } from "./section/BoardLayoutTabs";
 export { BoardList } from "./section/BoardList";
 export { BoardListNav } from "./section/BoardListNav";
 export { BoardMainPageContent } from "./section/BoardMainPageContent";

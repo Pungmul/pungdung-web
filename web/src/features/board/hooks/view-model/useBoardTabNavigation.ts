@@ -14,6 +14,7 @@ export interface UseBoardTabNavigationParams {
   boardId: number;
   /** 상세 API의 `boardInfo.childCategories` */
   childCategories: BoardChildCategory[];
+  syncUrl?: boolean;
 }
 
 /**
@@ -25,6 +26,7 @@ export interface UseBoardTabNavigationParams {
 export function useBoardTabNavigation({
   boardId,
   childCategories,
+  syncUrl = true,
 }: UseBoardTabNavigationParams) {
   const hasChildCategories = childCategories.length > 0;
   const effectiveChildCategories = getEffectiveBoardTabCategories(
@@ -57,11 +59,11 @@ export function useBoardTabNavigation({
   );
 
   useEffect(() => {
-    if (!shouldNormalizeTabQueryParam || selectedCategoryId === undefined) {
+    if (!syncUrl || !shouldNormalizeTabQueryParam || selectedCategoryId === undefined) {
       return;
     }
     window.history.replaceState(null, "", buildTabUrl(selectedCategoryId));
-  }, [buildTabUrl, selectedCategoryId, shouldNormalizeTabQueryParam]);
+  }, [buildTabUrl, selectedCategoryId, shouldNormalizeTabQueryParam, syncUrl]);
 
   const handleCategoryChange = useCallback(
     (category: BoardChildCategory) => {
