@@ -29,7 +29,7 @@ export function PostingButton({
   return (
     <div
       ref={componentRef}
-      className={`fixed pointer-events-none bottom-3 flex justify-center w-full p-2 z-30 transition-transform duration-500 will-change-transform ${isVisible ? "translate-y-0" : "translate-y-[120%]"
+      className={`fixed pointer-events-none bottom-3 flex justify-center w-full p-2 z-30 transition-transform duration-500 will-change-transform ${isVisible ? "max-md:-translate-y-2 md:translate-y-0" : "translate-y-[120%]"
         }`}
     >
       <Link

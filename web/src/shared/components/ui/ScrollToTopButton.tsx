@@ -15,7 +15,7 @@ export function ScrollToTopButton() {
   return (
     <div
       ref={componentRef}
-      className={`fixed bottom-3 flex justify-end left-0 right-2 md:right-6 p-2 z-30 pointer-events-none transition-transform duration-500 will-change-transform px-4 ${isVisible ? "translate-y-0" : "translate-y-[120%]"
+      className={`fixed bottom-3 flex justify-end left-0 right-2 md:right-6 p-2 z-30 pointer-events-none transition-transform duration-500 will-change-transform px-4 ${isVisible ? "max-md:-translate-y-2 md:translate-y-0" : "translate-y-[120%]"
         }`}
     >
       <FloatingButton
