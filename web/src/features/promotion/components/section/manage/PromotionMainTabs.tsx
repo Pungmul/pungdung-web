@@ -24,13 +24,13 @@ export function PromotionMainTabs({
   return (
     <AnimatePresence>
       <nav
-        className="w-full flex flex-row items-center justify-between border-b border-grey-200 sticky top-0 bg-background z-20 h-12"
+        className="w-full flex flex-row items-center justify-between border-b border-grey-200 md:sticky md:top-0 bg-background z-10 h-12"
         key="promotion-tabs-nav"
       >
         <div
           role="tablist"
           aria-label="공연"
-          className="flex flex-row w-full px-3 md:px-5 flex-grow"
+          className="flex min-w-0 flex-row w-full px-3 md:px-5 flex-grow overflow-x-auto scrollbar-hide"
         >
           {visibleTabs.map((item) => {
             const isSelected = item.value === selectedTab.value;
@@ -47,12 +47,12 @@ export function PromotionMainTabs({
                     ? "var(--color-grey-800)"
                     : "var(--color-grey-500)",
                 }}
-                className="relative w-[72px] border-0 bg-transparent py-[12px] text-center text-[15px] font-semibold md:w-[96px] md:text-[18px]"
+                className="relative min-w-[72px] md:min-w-24 shrink-0 border-0 bg-transparent py-3 text-center text-[15px] font-semibold md:text-[18px]"
                 onClick={() => onTabChange(item)}
               >
                 {item.label}
                 <motion.span
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-grey-800"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-grey-800"
                   initial={{ opacity: 0 }}
                   animate={{
                     opacity: isSelected ? 1 : 0,

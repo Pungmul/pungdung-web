@@ -13,6 +13,8 @@ import {
   loadBoardInfoListResult,
 } from "@/features/board";
 
+import { PromotionLayoutTabs } from "./_PromotionLayoutTabs";
+
 export const metadata: Metadata = {
   title: "풍덩 | 홍보 게시판",
 };
@@ -42,7 +44,11 @@ export default async function BoardPageLayout({
         <div className="flex flex-col w-full flex-grow relative">
           <div className="flex flex-row justify-center w-full h-full">
             <BoardListNav isGuest={isGuest} />
-            <div className="w-full md:max-w-[768px] z-10">{children}</div>
+            <div className="w-full md:max-w-[768px] z-10">
+              <PromotionLayoutTabs isGuest={isGuest} />
+              <div className="bg-background h-4 md:sticky md:top-12 z-20" />
+              {children}
+            </div>
           </div>
         </div>
       </div>
