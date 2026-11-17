@@ -59,6 +59,7 @@ export function BoardDetailPage({
         : null}
         <BoardDetailContent
           key={`board-detail-content-${postListBoardId}`}
+          boardId={boardId}
           postListBoardId={postListBoardId}
           isGuest={isGuest}
         />
