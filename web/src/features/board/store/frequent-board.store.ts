@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface FrequentBoardItem {
-  id: number;
+  id: number | "promote";
   tabId?: number;
   name: string;
 }
@@ -28,7 +28,8 @@ const useFrequentBoard = create<FrequentBoardStore>()(
         const nextBoardList = currentBoardList.filter(
           (item) => frequentBoardItemKey(item) !== visitKey
         );
-        nextBoardList.unshift(board);
+        const name = board.name.replace(/게시판/g, "").trim().replace(/^\S+(?:대학교|대학|학교|대)\s+/, "").trim();
+        nextBoardList.unshift({ ...board, name: name ? `${name} 게시판` : "게시판" });
 
         set({ boardList: nextBoardList });
       },

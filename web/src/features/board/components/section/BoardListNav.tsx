@@ -1,99 +1,67 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 
-import { useQuery } from "@tanstack/react-query";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 import { useLoginRequiredConfirmAction } from "@/features/auth";
 
-import { cn } from "@/shared";
+import { getBoardRoute } from "../../lib";
+import { frequentBoardItemKey, useFrequentBoard } from "../../store";
 
-import { boardHrefSegment, getBoardRoute } from "../../lib";
-import { boardQueries } from "../../queries";
-
-function boardNavLinkClass(isActive: boolean) {
-  return cn("cursor-pointer text-[15px]",
-    isActive ? "text-primary" : "text-grey-500",
-    "hover:text-primary transition-colors");
-}
-
-function isBoardPathActive(pathname: string, segment: string): boolean {
-  const basePath = `/board/${segment}`;
-  return pathname === basePath || pathname.startsWith(`${basePath}/`);
-}
+const FIXED_BOARDS = [
+  { name: "인기 게시판", href: "/board/hot-post", requiresLogin: true },
+  { name: "자유 게시판", href: "/board/1", requiresLogin: false },
+  { name: "홍보 게시판", href: getBoardRoute("promote"), requiresLogin: false },
+] as const;
 
 export function BoardListNav({ isGuest = false }: { isGuest?: boolean }) {
-  // 현재 경로와 핫게시판·각 게시판 활성 표시 매칭
-  const pathname = usePathname();
-  const router = useRouter();
-  // 게시판 사이드바 목록
-  const { data: boardList = [] } = useQuery(boardQueries.list());
   const { requestLogin } = useLoginRequiredConfirmAction();
+  const { boardList, removeBoard } = useFrequentBoard();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => setHydrated(true), []);
 
   return (
-    <aside>
-      <nav className="hidden lg:flex flex-col gap-[24px] sticky top-[72px] self-start w-36 h-fit">
-        <h2 className="text-[17px] font-bold px-4">다른 게시판</h2>
-        <ul className="flex flex-col items-start list-none gap-[24px] p-4">
-          <li>
-            <Link
-              href="/board/hot-post"
-              prefetch={false}
-              className={boardNavLinkClass(
-                isBoardPathActive(pathname, "hot-post")
-              )}
-              onMouseEnter={() => {
-                if (isGuest) return;
-                void router.prefetch("/board/hot-post");
-              }}
-              onTouchStart={() => {
-                if (isGuest) return;
-                void router.prefetch("/board/hot-post");
-              }}
-              onClick={(event) => {
-                if (!isGuest) return;
-
-                event.preventDefault();
-                requestLogin();
-              }}
-            >
-              인기 게시글
-            </Link>
-          </li>
-          {boardList.map((board) => {
-            const activeSegment = boardHrefSegment(board.id);
-            const landingHref = getBoardRoute(board.id);
-            const { isPublic } = board;
-            return (
-              <li key={board.id}>
-                <Link
-                  href={landingHref}
-                  prefetch={false}
-                  className={boardNavLinkClass(
-                    isBoardPathActive(pathname, activeSegment)
-                  )}
-                  onMouseEnter={() => {
-                    if (isGuest && !isPublic) return;
-                    void router.prefetch(landingHref);
-                  }}
-                  onTouchStart={() => {
-                    if (isGuest && !isPublic) return;
-                    void router.prefetch(landingHref);
-                  }}
-                  onClick={(event) => {
-                    if (!isGuest || isPublic) return;
-
+    <aside className="hidden lg:mr-3 lg:block">
+      <nav aria-label="게시판 목록" className="sticky top-[72px] w-40 rounded-xl border border-grey-200 bg-background p-3">
+        <ul className="flex list-none flex-col gap-1">
+          {FIXED_BOARDS.map((board) => (
+            <li key={board.href}>
+              <Link
+                href={board.href}
+                prefetch={false}
+                onClick={(event) => {
+                  if (isGuest && board.requiresLogin) {
                     event.preventDefault();
                     requestLogin();
-                  }}
-                >
-                  {board.name}
-                </Link>
-              </li>
-            );
-          })}
+                  }
+                }}
+                className="block rounded-md p-3 text-xs font-bold hover:bg-grey-100"
+              >
+                {board.name}
+              </Link>
+            </li>
+          ))}
         </ul>
+        {hydrated && boardList.length > 0 && (
+          <section className="mt-3.5">
+            <h2 className="px-1.5 py-1 text-xs text-grey-500">최근 방문한 게시판</h2>
+            <ul className="flex list-none flex-col gap-1">
+              {boardList.slice(0, 5).map((board) => (
+                <li key={frequentBoardItemKey(board)} className="flex items-center justify-between gap-2 rounded-md pl-3 pr-2 hover:bg-grey-100">
+                  <Link href={getBoardRoute(board.id, board.tabId)} prefetch={false} className="min-w-0 flex-1 truncate py-3 text-xs font-bold">
+                    {board.name}
+                  </Link>
+                  <button type="button" aria-label={`${board.name} 삭제`} onClick={() => removeBoard(board)} className="flex size-6 shrink-0 items-center justify-center text-grey-400">
+                    <XMarkIcon className="size-3" aria-hidden />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </nav>
     </aside>
   );

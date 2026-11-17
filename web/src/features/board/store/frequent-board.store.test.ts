@@ -17,8 +17,8 @@ describe("frequent-board store", () => {
     visitBoard({ id: 2, name: "B" });
 
     expect(useFrequentBoard.getState().boardList).toEqual([
-      { id: 2, name: "B" },
-      { id: 1, name: "A" },
+      { id: 2, name: "B 게시판" },
+      { id: 1, name: "A 게시판" },
     ]);
   });
 
@@ -29,8 +29,31 @@ describe("frequent-board store", () => {
     visitBoard({ id: 1, name: "A" });
 
     expect(useFrequentBoard.getState().boardList).toEqual([
-      { id: 1, name: "A" },
-      { id: 2, name: "B" },
+      { id: 1, name: "A 게시판" },
+      { id: 2, name: "B 게시판" },
+    ]);
+  });
+
+  it("홍보 게시판 방문도 중복 없이 최근 기록에 저장한다", () => {
+    const { visitBoard } = useFrequentBoard.getState();
+    visitBoard({ id: "promote", name: "홍보 게시판" });
+    visitBoard({ id: 1, name: "가상 게시판" });
+    visitBoard({ id: "promote", name: "홍보 게시판" });
+
+    expect(useFrequentBoard.getState().boardList).toEqual([
+      { id: "promote", name: "홍보 게시판" },
+      { id: 1, name: "가상 게시판" },
+    ]);
+  });
+
+  it("동아리 이름 앞의 학교명은 제거하고 학교 게시판 이름은 유지한다", () => {
+    const { visitBoard } = useFrequentBoard.getState();
+    visitBoard({ id: 10, name: "가상대학교 가상 동아리 게시판" });
+    visitBoard({ id: 11, name: "가상대학교 게시판" });
+
+    expect(useFrequentBoard.getState().boardList).toEqual([
+      { id: 11, name: "가상대학교 게시판" },
+      { id: 10, name: "가상 동아리 게시판" },
     ]);
   });
 
@@ -38,11 +61,11 @@ describe("frequent-board store", () => {
     const { visitBoard } = useFrequentBoard.getState();
     visitBoard({ id: 10, tabId: 201, name: "장구" });
     visitBoard({ id: 11, name: "자유" });
-    visitBoard({ id: 10, tabId: 201, name: "장구 게시판" });
+    visitBoard({ id: 10, tabId: 201, name: "장구 게시판 게시판" });
 
     expect(useFrequentBoard.getState().boardList).toEqual([
       { id: 10, tabId: 201, name: "장구 게시판" },
-      { id: 11, name: "자유" },
+      { id: 11, name: "자유 게시판" },
     ]);
   });
 
@@ -52,8 +75,8 @@ describe("frequent-board store", () => {
     visitBoard({ id: 10, tabId: 202, name: "북" });
 
     expect(useFrequentBoard.getState().boardList).toEqual([
-      { id: 10, tabId: 202, name: "북" },
-      { id: 10, tabId: 201, name: "장구" },
+      { id: 10, tabId: 202, name: "북 게시판" },
+      { id: 10, tabId: 201, name: "장구 게시판" },
     ]);
   });
 
@@ -71,7 +94,7 @@ describe("frequent-board store", () => {
     removeBoard({ id: 10, tabId: 201, name: "장구" });
 
     expect(useFrequentBoard.getState().boardList).toEqual([
-      { id: 10, tabId: 202, name: "북" },
+      { id: 10, tabId: 202, name: "북 게시판" },
     ]);
   });
 });
